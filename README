@@ -1,0 +1,15 @@
+== Dependencies
+
+* ruby 1.8.2
+
+Note that the files in the net-overrides/ directory are taken from Ruby 1.9.0.
+
+* narf 0.6.3 (www.narf-lib.org)
+
+  After unpacking, install it with:
+
+    ruby install.rb config
+    ruby install.rb setup
+    ruby install.rb install
+
+  Note that only the ruby-htmltools package bunded with narf works.

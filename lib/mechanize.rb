@@ -361,6 +361,7 @@ class Mechanize
   attr_accessor :open_timeout, :read_timeout
   attr_accessor :watch_for_set
   attr_accessor :max_history
+  attr_reader :history
    
   def initialize
     @history = []
@@ -570,7 +571,7 @@ class Mechanize
 
   def add_to_history(page)
     @history.push(page)
-    if @max_history and @history.size < @max_history
+    if @max_history and @history.size > @max_history
       # keep only the last @max_history entries
       @history = @history[@history.size - @max_history, @max_history] 
     end

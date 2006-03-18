@@ -421,6 +421,10 @@ class Mechanize
     get(uri)
   end
 
+  def back
+    @history.pop
+  end
+
   def submit(form, button=nil)
     query = form.build_query
     button.add_to_query(query) if button

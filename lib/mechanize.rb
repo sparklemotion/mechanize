@@ -1,10 +1,9 @@
-# 
+# Original Code: 
 # Copyright (c) 2005 by Michael Neumann (mneumann@ntecs.de) 
 #
-# This is a quick hack, to get something like Perl's WWW::Mechanize. Sure, we
-# have Web::Unit, but, that does not work for me as expected, as it does not
-# set cookies (I might be wrong), does not automatically redirect and has
-# problems with some html documents.
+# New Code:
+# Copyright (c) 2006 by Aaron Patterson (aaronp@rubyforge.org) 
+#
 
 Version = "0.3.1"
 

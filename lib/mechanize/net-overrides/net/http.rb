@@ -1059,7 +1059,7 @@ module Net # :nodoc:
     #   p request['X-My-Header']              #=> "a, b, c"
     #   p request.get_fields('X-My-Header')   #=> ["a", "b", "c"]
     #
-    def add_header(key, val)
+    def add_field(key, val)
       if @header.key?(key.downcase)
         @header[key.downcase].concat Array(val)
       else
@@ -1839,7 +1839,7 @@ module Net # :nodoc:
         httpv, code, msg = read_status_line(sock)
         res = response_class(code).new(httpv, code, msg)
         each_response_header(sock) do |k,v|
-          res.add_header k, v
+          res.add_field k, v
         end
         res
       end

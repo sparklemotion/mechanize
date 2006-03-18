@@ -406,8 +406,8 @@ class Mechanize
     # this is called before the request is sent
     pre_request_hook = proc {|request|
       log.debug("query: #{ query.inspect }")
-      request.add_header('Content-Type', 'application/x-www-form-urlencoded')
-      request.add_header('Content-Length', request_data[0].size.to_s)
+      request.add_field('Content-Type', 'application/x-www-form-urlencoded')
+      request.add_field('Content-Length', request_data[0].size.to_s)
     }
 
     # fetch the page
@@ -496,18 +496,18 @@ class Mechanize
         cookies = @cookie_jar.cookies(uri)
         cookie = cookies.length > 0 ? cookies.join("; ") : nil
         log.debug("use cookie: #{ cookie }")
-        request.add_header('Cookie', cookie)
+        request.add_field('Cookie', cookie)
       end
 
       # Add Referer header to request
 
       unless cur_page.uri.nil?
-        request.add_header('Referer', cur_page.uri.to_s)
+        request.add_field('Referer', cur_page.uri.to_s)
       end
 
       # Add User-Agent header to request
 
-      request.add_header('User-Agent', @user_agent) if @user_agent 
+      request.add_field('User-Agent', @user_agent) if @user_agent 
 
       request.basic_auth(@user, @password) if @user
 

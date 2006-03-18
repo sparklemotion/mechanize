@@ -15,9 +15,11 @@ require 'net/https'
 
 require 'web/htmltools/xmltree'   # narf
 require 'mechanize/parsing'
+require 'mechanize/cookie'
 require 'uri'
 require 'logger'
 require 'webrick'
+require 'date'
 
 module WWW
 
@@ -356,20 +358,30 @@ class Mechanize
 
   attr_accessor :log
   attr_accessor :user_agent
-  attr_accessor :cookies
+  attr_accessor :cookie_jar
   attr_accessor :open_timeout, :read_timeout
   attr_accessor :watch_for_set
   attr_accessor :max_history
    
   def initialize
     @history = []
-    @cookies = []
+    @cookie_jar = CookieJar.new
     @log = Logger.new(nil)
     yield self if block_given?
   end
 
   def user_agent_alias=(al)
     self.user_agent = AGENT_ALIASES[al] || raise("unknown agent alias")
+  end
+
+  def cookies
+    cookies = []
+    @cookie_jar.jar.each_key do |domain|
+      @cookie_jar.jar[domain].each_key do |name|
+        cookies << @cookie_jar.jar[domain][name]
+      end
+    end
+    cookies
   end
 
   def basic_authetication(user, password)
@@ -476,8 +488,9 @@ class Mechanize
         raise ArgumentError
       end
 
-      unless @cookies.empty?
-        cookie = @cookies.uniq.join("; ")
+      unless @cookie_jar.empty?(uri)
+        cookies = @cookie_jar.cookies(uri)
+        cookie = cookies.length > 0 ? cookies.join("; ") : nil
         log.debug("use cookie: #{ cookie }")
         request.add_header('Cookie', cookie)
       end
@@ -513,10 +526,9 @@ class Mechanize
 
       http.request(request, *request_data) {|response|
 
-        # TODO: expire/validate cookies
         (response.get_fields('Set-Cookie')||[]).each do |cookie|
           log.debug("cookie received: #{ cookie }") 
-          @cookies << cookie.split(";").first.strip
+          Cookie::parse(uri, cookie) { |c| @cookie_jar.add(c) }
         end
 
         response.each_header {|k,v|

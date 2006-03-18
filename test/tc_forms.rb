@@ -22,7 +22,12 @@ class FormsMechTest < Test::Unit::TestCase
       s.start
     }
 
-    sleep 2
+    begin
+      Net::HTTP.get(URI.parse("http://localhost:#{@port}/"))
+    rescue
+      sleep 2
+      retry
+    end
   end
 
   def test_post

@@ -79,7 +79,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_many_cookies
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new("mech.log") }
+    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
     page = agent.get("http://localhost:#{@port}/many_cookies")
     assert_equal(5, agent.cookies.length)
 

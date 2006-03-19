@@ -8,7 +8,9 @@
 Version = "0.3.1"
 
 # required due to the missing get_fields method in Ruby 1.8.2
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__), "mechanize", "net-overrides")
+unless RUBY_VERSION > "1.8.2"
+  $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "mechanize", "net-overrides")
+end
 require 'net/http'
 require 'net/https'
 

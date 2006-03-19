@@ -10,32 +10,7 @@ require 'uri'
 
 class FormsMechTest < Test::Unit::TestCase
   def setup
-    @server = Thread.new {
-      s = WEBrick::HTTPServer.new(
-        :Port           => 0,
-        :DocumentRoot   => Dir::pwd + "/htdocs",
-        :Logger         => Logger.new(nil),
-        :AccessLog      => Logger.new(nil)
-      )
-      @port = s.config[:Port]
-      s.mount("/one_cookie", OneCookieTest)
-      s.mount("/many_cookies", ManyCookiesTest)
-      s.mount("/many_cookies_as_string", ManyCookiesAsStringTest)
-      s.mount("/send_cookies", SendCookiesTest)
-
-      s.start
-    }
-
-    begin
-      Net::HTTP.get(URI.parse("http://localhost:#{@port}/"))
-    rescue
-      sleep 2
-      retry
-    end
-  end
-
-  def teardown
-    Thread.kill(@server)
+    @port = 2000
   end
 
   def test_send_cookies

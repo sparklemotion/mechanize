@@ -8,30 +8,7 @@ require 'servlets'
 
 class FormsMechTest < Test::Unit::TestCase
   def setup
-    @server = Thread.new {
-      s = WEBrick::HTTPServer.new(
-        :Port           => 0,
-        :DocumentRoot   => Dir::pwd + "/htdocs",
-        :Logger         => Logger.new(nil),
-        :AccessLog      => Logger.new(nil)
-      )
-      @port = s.config[:Port]
-      s.mount("/form_post", FormTest)
-      s.mount("/form post", FormTest)
-
-      s.start
-    }
-
-    begin
-      Net::HTTP.get(URI.parse("http://localhost:#{@port}/"))
-    rescue
-      sleep 2
-      retry
-    end
-  end
-
-  def teardown
-    Thread.kill(@server)
+    @port = 2000
   end
 
   def test_post

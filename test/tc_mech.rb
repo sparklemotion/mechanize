@@ -27,6 +27,10 @@ class MechMethodsTest < Test::Unit::TestCase
     end
   end
 
+  def teardown
+    Thread.kill(@server)
+  end
+
   def test_history
     agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
     0.upto(25) do |i|

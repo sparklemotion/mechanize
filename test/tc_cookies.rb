@@ -34,6 +34,10 @@ class FormsMechTest < Test::Unit::TestCase
     end
   end
 
+  def teardown
+    Thread.kill(@server)
+  end
+
   def test_send_cookies
     agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
     page = agent.get("http://localhost:#{@port}/many_cookies")

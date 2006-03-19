@@ -30,6 +30,10 @@ class FormsMechTest < Test::Unit::TestCase
     end
   end
 
+  def teardown
+    Thread.kill(@server)
+  end
+
   def test_post
     agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
     page = agent.get("http://localhost:#{@port}/form_test.html")

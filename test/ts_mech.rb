@@ -4,4 +4,5 @@ require 'test/unit'
 require 'tc_cookies'
 require 'tc_forms'
 require 'tc_mech'
+require 'tc_links'
 

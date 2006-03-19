@@ -263,6 +263,9 @@ class Link
   end
 end
 
+class Meta < Link
+end
+
 class Page 
   attr_accessor :uri, :cookies, :response, :body, :code, :watch_for_set
 
@@ -298,6 +301,11 @@ class Page
     @watches 
   end
 
+  def meta
+    parse_html() unless @meta 
+    @meta 
+  end
+
   private
 
   def parse_html
@@ -325,6 +333,7 @@ class Page
 
     @forms = []
     @links = []
+    @meta  = []
     @watches = {}
 
     @root.each_recursive {|node|
@@ -335,6 +344,15 @@ class Page
         @forms << Form.new(node)
       when 'a'
         @links << Link.new(node)
+      when 'meta'
+        equiv   = node.attributes['http-equiv']
+        content = node.attributes['content']
+        if equiv != nil && equiv.downcase == 'refresh'
+          if content != nil && content =~ /^\d+\s*;\s*url\s*=\s*(\S+)/i
+            node.attributes['href'] = $1
+            @meta << Meta.new(node)
+          end
+        end
       else
         if @watch_for_set and @watch_for_set.keys.include?( name )
           @watches[name] = [] unless @watches[name]

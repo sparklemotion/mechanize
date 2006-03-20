@@ -57,4 +57,14 @@ class MechMethodsTest < Test::Unit::TestCase
     assert_equal("http://localhost:#{@port}/",
       agent.history.last.uri.to_s)
   end
+
+  def test_google
+    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    page = agent.get("http://localhost:#{@port}/google.html")
+    search = page.forms.find { |f| f.name == "f" }
+    assert_not_nil(search)
+    assert_not_nil(search.fields.find { |f| f.name == 'q' })
+    assert_not_nil(search.fields.find { |f| f.name == 'hl' })
+    assert_not_nil(search.fields.find { |f| f.name == 'ie' })
+  end
 end

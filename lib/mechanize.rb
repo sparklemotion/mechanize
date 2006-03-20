@@ -218,7 +218,7 @@ class GlobalForm
     @elements_node.each_recursive {|node|
       case node.name.downcase
       when 'input'
-        case (node.attributes['type'] || '').downcase
+        case (node.attributes['type'] || 'text').downcase
         when 'text', 'password', 'hidden', 'int'
           @fields << Field.new(node.attributes['name'], node.attributes['value']) 
         when 'radio'

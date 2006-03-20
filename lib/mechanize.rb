@@ -153,7 +153,7 @@ class GlobalForm
   def initialize(form_node, elements_node)
     @form_node, @elements_node = form_node, elements_node
 
-    @method = (@form_node.attributes['method'] || 'POST').upcase
+    @method = (@form_node.attributes['method'] || 'GET').upcase
     @action = @form_node.attributes['action'] 
     @name = @form_node.attributes['name']
 

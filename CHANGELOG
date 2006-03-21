@@ -15,3 +15,5 @@
 
 * Added more unit tests
 
+* Added a response code exception
+

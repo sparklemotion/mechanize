@@ -1,0 +1,17 @@
+== 0.4.0
+
+* Added more unit tests
+
+* Added a cookie jar with better cookie support, included expiration of cookies
+  and general cookie security.
+
+* Updated mechanize to use built in net/http if ruby version is new enough.
+
+* Added support for meta refresh tags
+
+* Defaulted form actions to 'GET'
+
+* Fixed various bugs
+
+* Added more unit tests
+

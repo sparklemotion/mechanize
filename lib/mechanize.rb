@@ -266,6 +266,26 @@ end
 class Meta < Link
 end
 
+# = Synopsis
+# This class encapsulates a page.
+#
+# == Example
+#  require 'rubygems'
+#  require 'mechanize'
+#  require 'logger'
+#  
+#  class Body
+#    def initialize(node)
+#      puts node.attributes['bgcolor']
+#    end
+#  end
+#  
+#  agent = WWW::Mechanize.new { |a| a.log = Logger.new("mech.log") }
+#  agent.user_agent_alias = 'Mac Safari'
+#  page = agent.get("http://www.google.com/")
+#  page.watch_for_set = { 'body' => Body }
+#  
+#  body = page.watches
 class Page 
   attr_accessor :uri, :cookies, :response, :body, :code, :watch_for_set
 
@@ -296,6 +316,9 @@ class Page
     @root
   end
 
+  # This method watches out for a particular tag, and will call back to the
+  # class specified for the tag in the watch_for_set method.  See the example
+  # in this class.
   def watches
     parse_html() unless @watches 
     @watches 
@@ -364,6 +387,23 @@ class Page
   end
 end
 
+# = Synopsis
+# The Mechanize library is used for automating interaction with a website.  It
+# can follow links, and submit forms.  Form fields can be populated and
+# submitted.  A history of URL's is maintained and can be queried.
+#
+# == Example
+#  require 'rubygems'
+#  require 'mechanize'
+#  require 'logger'
+#  
+#  agent = WWW::Mechanize.new { |a| a.log = Logger.new("mech.log") }
+#  agent.user_agent_alias = 'Mac Safari'
+#  page = agent.get("http://www.google.com/")
+#  search_form = page.forms.find { |f| f.name == "f" }
+#  search_form.fields.find { |f| f.name == "q" }.value = "Hello"
+#  search_results = agent.submit(search_form)
+#  puts search_results.body
 class Mechanize
 
   AGENT_ALIASES = {

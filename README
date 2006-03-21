@@ -1,3 +1,9 @@
+= WWW::Mechanize
+
+The Mechanize library is used for automating interaction with a website.  It
+can follow links, and submit forms.  Form fields can be populated and
+submitted.  A history of URL's is maintained and can be queried.
+
 == Dependencies
 
 * ruby 1.8.2
@@ -13,3 +19,29 @@ Note that the files in the net-overrides/ directory are taken from Ruby 1.9.0.
     ruby install.rb install
 
   Note that only the ruby-htmltools package bunded with narf works.
+
+== Example
+  require 'rubygems'
+  require 'mechanize'
+  require 'logger'
+  
+  agent = WWW::Mechanize.new { |a| a.log = Logger.new("mech.log") }
+  agent.user_agent_alias = 'Mac Safari'
+  page = agent.get("http://www.google.com/")
+  search_form = page.forms.find { |f| f.name == "f" }
+  search_form.fields.find { |f| f.name == "q" }.value = "Hello"
+  search_results = agent.submit(search_form)
+  puts search_results.body
+
+== Authors
+
+Original Code: 
+Copyright (c) 2005 by Michael Neumann (mneumann@ntecs.de) 
+
+New Code:
+Copyright (c) 2006 by Aaron Patterson (aaronp@rubyforge.org) 
+
+== License
+
+This library is distributed under the GPL.  Please see the LICENSE file.
+

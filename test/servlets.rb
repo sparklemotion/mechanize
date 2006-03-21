@@ -2,6 +2,22 @@ require 'webrick'
 require 'logger'
 require 'date'
 
+class ResponseCodeTest < WEBrick::HTTPServlet::AbstractServlet
+  def do_GET(req, res)
+    res['Content-Type'] = "text/html"
+    if req.query['code']
+      code = req.query['code'].to_i
+      case code
+      when 301
+        res['Location'] = "/index.html"
+      when 302
+        res['Location'] = "/index.html"
+      end
+      res.status = code
+    else
+    end
+  end
+end
 class FormTest < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     res.body = "<HTML><body>"

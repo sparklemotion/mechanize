@@ -11,6 +11,7 @@ s.mount("/many_cookies_as_string", ManyCookiesAsStringTest)
 s.mount("/send_cookies", SendCookiesTest)
 s.mount("/form_post", FormTest)
 s.mount("/form post", FormTest)
+s.mount("/response_code", ResponseCodeTest)
 
 trap("INT") { s.stop }
 

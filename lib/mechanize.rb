@@ -387,6 +387,14 @@ class Page
   end
 end
 
+class ResponseCodeError < RuntimeError
+  attr_reader :response_code
+
+  def initialize(response_code)
+    @response_code = response_code
+  end
+end
+
 # = Synopsis
 # The Mechanize library is used for automating interaction with a website.  It
 # can follow links, and submit forms.  Form fields can be populated and
@@ -612,11 +620,14 @@ class Mechanize
         case page.code
         when "200"
           return page
+        when "301"
+          log.info("follow redirect to: #{ response.header['Location'] }")
+          return fetch_page(to_absolute_uri(response.header['Location'], page), :get, page)
         when "302"
           log.info("follow redirect to: #{ response.header['Location'] }")
           return fetch_page(to_absolute_uri(response.header['Location'], page), :get, page)
         else
-          raise
+          raise ResponseCodeError.new(page.code), "Unhandled response", caller
         end
       } 
     }

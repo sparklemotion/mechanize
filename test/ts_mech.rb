@@ -5,4 +5,5 @@ require 'tc_cookies'
 require 'tc_forms'
 require 'tc_mech'
 require 'tc_links'
+require 'tc_response_code'
 

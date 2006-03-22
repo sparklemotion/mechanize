@@ -632,10 +632,7 @@ class Mechanize
         case page.code
         when "200"
           return page
-        when "301"
-          log.info("follow redirect to: #{ response.header['Location'] }")
-          return fetch_page(to_absolute_uri(response.header['Location'], page), :get, page)
-        when "302"
+        when "301", "302"
           log.info("follow redirect to: #{ response.header['Location'] }")
           return fetch_page(to_absolute_uri(response.header['Location'], page), :get, page)
         else

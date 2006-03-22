@@ -1,0 +1,7 @@
+= Mechanize Testing
+
+These unit tests require a web server up and running.  To run the tests, first
+execute: 'server.rb'
+
+Once server.rb is up and running, execute 'ts_mech.rb' to run the tests.
+

@@ -4,8 +4,9 @@
 # New Code:
 # Copyright (c) 2006 by Aaron Patterson (aaronp@rubyforge.org) 
 #
+# Please see the LICENSE file for licensing.
+#
 
-Version = "0.3.1"
 
 # required due to the missing get_fields method in Ruby 1.8.2
 unless RUBY_VERSION > "1.8.2"

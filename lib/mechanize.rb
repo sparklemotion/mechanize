@@ -431,6 +431,7 @@ class Mechanize
   attr_accessor :open_timeout, :read_timeout
   attr_accessor :watch_for_set
   attr_accessor :max_history
+  attr_accessor :ca_file
   attr_reader :history
    
   def initialize
@@ -550,7 +551,16 @@ class Mechanize
     page = Page.new(uri)
 
     http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true if uri.scheme == "https"
+
+    if uri.scheme == 'https'
+      http.use_ssl = true
+      if @ca_file
+        http.ca_file = @ca_file
+        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      end
+    end
+
+
     http.start {
 
       case method

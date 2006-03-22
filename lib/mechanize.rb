@@ -7,6 +7,7 @@
 # Please see the LICENSE file for licensing.
 #
 
+Version = "0.4.0"
 
 # required due to the missing get_fields method in Ruby 1.8.2
 unless RUBY_VERSION > "1.8.2"

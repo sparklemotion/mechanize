@@ -40,7 +40,7 @@ Rake::RDocTask.new do |p|
 end
 
 Rake::Task.define_task("tag") do |p|
-  baseurl = "svn+ssh://#{ENV['USER']}@rubyforge.org//var/svn/mechanize/tags"
+  baseurl = "svn+ssh://#{ENV['USER']}@rubyforge.org//var/svn/mechanize"
   sh "svn cp -m 'tagged #{ MECH_VERSION }' #{ baseurl }/trunk #{ baseurl }/tags/REL-#{ MECH_VERSION }"
 end
 

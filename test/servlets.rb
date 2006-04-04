@@ -2,6 +2,12 @@ require 'webrick'
 require 'logger'
 require 'date'
 
+class FileUploadTest < WEBrick::HTTPServlet::AbstractServlet
+  def do_POST(req, res)
+    res.body = req.body
+  end
+end
+
 class ResponseCodeTest < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     res['Content-Type'] = "text/html"

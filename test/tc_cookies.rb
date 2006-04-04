@@ -7,11 +7,10 @@ require 'mechanize'
 require 'servlets'
 require 'net/http'
 require 'uri'
+require 'test_includes'
 
 class FormsMechTest < Test::Unit::TestCase
-  def setup
-    @port = 2000
-  end
+  include TestMethods
 
   def test_send_cookies
     agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }

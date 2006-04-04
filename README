@@ -20,18 +20,9 @@ Note that the files in the net-overrides/ directory are taken from Ruby 1.9.0.
 
   Note that only the ruby-htmltools package bunded with narf works.
 
-== Example
-  require 'rubygems'
-  require 'mechanize'
-  require 'logger'
-  
-  agent = WWW::Mechanize.new { |a| a.log = Logger.new("mech.log") }
-  agent.user_agent_alias = 'Mac Safari'
-  page = agent.get("http://www.google.com/")
-  search_form = page.forms.find { |f| f.name == "f" }
-  search_form.fields.find { |f| f.name == "q" }.value = "Hello"
-  search_results = agent.submit(search_form)
-  puts search_results.body
+== Examples
+
+See the EXAMPLES[link://files/EXAMPLES.html] file
 
 == Authors
 

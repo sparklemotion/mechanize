@@ -15,8 +15,7 @@ module WWW
 
       expires_key = cookie.keys.find { |k| k.downcase == "expires" }
       if expires_key
-        @expires = DateTime.parse(cookie.delete(expires_key),
-                                      "%A %d-%b-%y %H:%M:%S %Z")
+        @expires = DateTime.parse(cookie.delete(expires_key))
       end
 
       secure_key = cookie.keys.find { |k| k.downcase == "secure" }

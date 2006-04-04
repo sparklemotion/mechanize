@@ -3,11 +3,10 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "lib")
 require 'test/unit'
 require 'rubygems'
 require 'mechanize'
+require 'test_includes'
 
 class FormsMechTest < Test::Unit::TestCase
-  def setup
-    @port = 2000
-  end
+  include TestMethods
 
   def test_redirect
     agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }

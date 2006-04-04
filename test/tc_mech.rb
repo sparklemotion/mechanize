@@ -4,11 +4,10 @@ require 'webrick'
 require 'test/unit'
 require 'rubygems'
 require 'mechanize'
+require 'test_includes'
 
 class MechMethodsTest < Test::Unit::TestCase
-  def setup
-    @port = 2000
-  end
+  include TestMethods
 
   def test_history
     agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }

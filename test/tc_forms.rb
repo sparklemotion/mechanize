@@ -5,11 +5,10 @@ require 'test/unit'
 require 'rubygems'
 require 'mechanize'
 require 'servlets'
+require 'test_includes'
 
 class FormsMechTest < Test::Unit::TestCase
-  def setup
-    @port = 2000
-  end
+  include TestMethods
 
   def test_post
     agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }

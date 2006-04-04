@@ -8,7 +8,7 @@ PKG_NAME = 'daapclient'
 PKG_VERSION = '1.0.0' + PKG_BUILD
 PKG_FILES = FileList["{doc,lib,test}/**/*"].exclude("rdoc").to_a
 
-MECH_VERSION = "0.4.0"
+MECH_VERSION = "0.4.1"
 
 spec = Gem::Specification.new do |s|
   s.name      = "mechanize"
@@ -22,7 +22,8 @@ spec = Gem::Specification.new do |s|
   s.require_path  = "lib"
   s.autorequire   = "mechanize"
   s.has_rdoc      = true
-  s.extra_rdoc_files = ["README"]
+  s.extra_rdoc_files = ["README", "EXAMPLES"]
+  s.rdoc_options << "--main" << 'README'
   s.rubyforge_project = "mechanize"
   s.add_dependency('narf', '>= 0.6.3') 
 end
@@ -36,7 +37,7 @@ end
 Rake::RDocTask.new do |p|
   p.main = "README"
   p.rdoc_dir = "doc"
-  p.rdoc_files.include("README", "CHANGELOG", "LICENSE", "lib/**/*.rb")
+  p.rdoc_files.include("README", "CHANGELOG", "LICENSE", "EXAMPLES", "lib/**/*.rb")
 end
 
 Rake::Task.define_task("tag") do |p|

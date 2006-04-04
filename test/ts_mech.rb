@@ -8,4 +8,5 @@ require 'tc_links'
 require 'tc_response_code'
 require 'tc_upload'
 require 'tc_forms'
+require 'tc_watches'
 

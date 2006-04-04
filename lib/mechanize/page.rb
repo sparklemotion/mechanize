@@ -24,6 +24,11 @@ module WWW
   
     def initialize(uri=nil, cookies=[], response=nil, body=nil, code=nil)
       @uri, @cookies, @response, @body, @code = uri, cookies, response, body, code
+      @frames   = nil
+      @links    = nil
+      @forms    = nil
+      @meta     = nil
+      @watches  = nil
     end
   
     def header
@@ -31,7 +36,7 @@ module WWW
     end
   
     def content_type
-      header['Content-Type']
+      @response['Content-Type']
     end
   
     def forms

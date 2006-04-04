@@ -73,9 +73,15 @@ class Mechanize
   attr_accessor :max_history
   attr_accessor :ca_file
   attr_reader :history
-   
+
   def initialize
-    @history = []
+    @history        = []
+    @user_agent     = nil
+    @user           = nil
+    @open_timeout   = nil
+    @read_timeout   = nil
+    @watch_for_set  = nil
+    @max_history    = nil
     @cookie_jar = CookieJar.new
     @log = Logger.new(nil)
     yield self if block_given?
@@ -291,8 +297,8 @@ class Mechanize
         when "200"
           return page
         when "301", "302"
-          log.info("follow redirect to: #{ response.header['Location'] }")
-          return fetch_page(to_absolute_uri(response.header['Location'], page), :get, page)
+          log.info("follow redirect to: #{ response['Location'] }")
+          return fetch_page(to_absolute_uri(response['Location'], page), :get, page)
         else
           raise ResponseCodeError.new(page.code), "Unhandled response", caller
         end

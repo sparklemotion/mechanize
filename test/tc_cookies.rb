@@ -1,10 +1,8 @@
 $:.unshift File.join(File.dirname(__FILE__), "..", "lib")
 
-require 'webrick'
 require 'test/unit'
 require 'rubygems'
 require 'mechanize'
-require 'servlets'
 require 'net/http'
 require 'uri'
 require 'test_includes'

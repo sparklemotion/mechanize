@@ -22,10 +22,10 @@ spec = Gem::Specification.new do |s|
   s.require_path  = "lib"
   s.autorequire   = "mechanize"
   s.has_rdoc      = true
-  s.extra_rdoc_files = ["README", "EXAMPLES"]
+  s.extra_rdoc_files = ["README", "EXAMPLES", "CHANGELOG", "LICENSE"]
   s.rdoc_options << "--main" << 'README'
   s.rubyforge_project = "mechanize"
-  s.add_dependency('narf', '>= 0.6.3') 
+  s.add_dependency('ruby-web', '>= 1.1.0') 
 end
 
 Rake::GemPackageTask.new(spec) do |p|

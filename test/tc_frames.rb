@@ -19,4 +19,12 @@ class FramesMechTest < Test::Unit::TestCase
     assert_equal("/form_test.html", page.frames[1].src)
     assert_equal("/file_upload.html", page.frames[2].src)
   end
+
+  def test_iframes
+    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    page = agent.get("http://localhost:#{@port}/iframe_test.html")
+    assert_equal(1, page.iframes.size)
+    assert_equal("frame4", page.iframes.first.name)
+    assert_equal("/file_upload.html", page.iframes.first.src)
+  end
 end

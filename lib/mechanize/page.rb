@@ -25,6 +25,7 @@ module WWW
     def initialize(uri=nil, cookies=[], response=nil, body=nil, code=nil)
       @uri, @cookies, @response, @body, @code = uri, cookies, response, body, code
       @frames   = nil
+      @iframes  = nil
       @links    = nil
       @forms    = nil
       @meta     = nil
@@ -71,6 +72,11 @@ module WWW
       parse_html() unless @frames
       @frames
     end
+
+    def iframes
+      parse_html() unless @iframes
+      @iframes
+    end
   
     private
   
@@ -101,6 +107,7 @@ module WWW
       @links    = []
       @meta     = []
       @frames   = []
+      @iframes  = []
       @watches  = {}
   
       @root.each_recursive {|node|
@@ -122,6 +129,8 @@ module WWW
           end
         when 'frame'
           @frames << Frame.new(node)
+        when 'iframe'
+          @iframes << Frame.new(node)
         else
           if @watch_for_set and @watch_for_set.keys.include?( name )
             @watches[name] = [] unless @watches[name]

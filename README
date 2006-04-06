@@ -10,15 +10,7 @@ submitted.  A history of URL's is maintained and can be queried.
 
 Note that the files in the net-overrides/ directory are taken from Ruby 1.9.0.
 
-* narf 0.6.3 (www.narf-lib.org)
-
-  After unpacking, install it with:
-
-    ruby install.rb config
-    ruby install.rb setup
-    ruby install.rb install
-
-  Note that only the ruby-htmltools package bunded with narf works.
+* ruby-web 1.1.0 (http://rubyforge.org/projects/ruby-web/)
 
 == Examples
 

@@ -7,8 +7,6 @@
 # Please see the LICENSE file for licensing.
 #
 
-Version = "0.4.1"
-
 # required due to the missing get_fields method in Ruby 1.8.2
 unless RUBY_VERSION > "1.8.2"
   $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "mechanize", "net-overrides")
@@ -29,6 +27,8 @@ require 'mechanize/page'
 require 'mechanize/page_elements'
 
 module WWW
+  require 'mechanize/mech_version.rb'
+
 class ResponseCodeError < RuntimeError
   attr_reader :response_code
 

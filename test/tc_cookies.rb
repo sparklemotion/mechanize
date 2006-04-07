@@ -7,7 +7,7 @@ require 'net/http'
 require 'uri'
 require 'test_includes'
 
-class FormsMechTest < Test::Unit::TestCase
+class CookiesMechTest < Test::Unit::TestCase
   include TestMethods
 
   def test_send_cookies

@@ -5,7 +5,7 @@ require 'rubygems'
 require 'mechanize'
 require 'test_includes'
 
-class FormsMechTest < Test::Unit::TestCase
+class ResponseCodeMechTest < Test::Unit::TestCase
   include TestMethods
 
   def test_redirect

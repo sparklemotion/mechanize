@@ -5,7 +5,7 @@ require 'rubygems'
 require 'mechanize'
 require 'test_includes'
 
-class FormsMechTest < Test::Unit::TestCase
+class UploadMechTest < Test::Unit::TestCase
   include TestMethods
 
   def test_form_enctype

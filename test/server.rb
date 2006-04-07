@@ -1,9 +1,12 @@
 require 'webrick'
 require 'servlets'
+require 'logger'
 
 s = WEBrick::HTTPServer.new(
   :Port           => 2000,
-  :DocumentRoot   => Dir::pwd + "/htdocs"
+  :DocumentRoot   => Dir::pwd + "/htdocs",
+  :Logger         => Logger.new(nil),
+  :AccessLog      => Logger.new(nil)
 )
 s.mount("/one_cookie", OneCookieTest)
 s.mount("/many_cookies", ManyCookiesTest)

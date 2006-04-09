@@ -42,7 +42,7 @@ Rake::RDocTask.new do |p|
   p.main = "README"
   p.rdoc_dir = "doc"
   p.rdoc_files.include("README", "CHANGELOG", "LICENSE", "EXAMPLES", "lib/**/*.rb")
-  p.options << "--main" << 'README' << "--title" << "WWW::Mechanize RDoc"
+  p.options << "--main" << 'README' << "--title" << "'WWW::Mechanize RDoc'"
 end
 
 desc "Publish the API documentation"

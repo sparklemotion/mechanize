@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'rake'
+require 'rake/testtask'
 require 'rake/gempackagetask'
 require 'rake/rdoctask'
 require 'rake/contrib/sshpublisher'
@@ -9,16 +10,16 @@ def announce(msg='')
 end
 
 PKG_BUILD = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
-PKG_NAME = 'daapclient'
+PKG_NAME = 'mechanize'
 PKG_VERSION = '0.4.1' + PKG_BUILD
 PKG_FILES = FileList["{doc,lib,test}/**/*"].exclude("rdoc").to_a
 
 spec = Gem::Specification.new do |s|
-  s.name      = "mechanize"
+  s.name      = PKG_NAME
   s.version   = PKG_VERSION
   s.author    = "Aaron Patterson"
   s.email     = "aaronp@rubyforge.org"
-  s.homepage  = "mechanize.rubyforge.org"
+  s.homepage  = "#{PKG_NAME}.rubyforge.org"
   s.platform  = Gem::Platform::RUBY
   s.summary   = "Mechanize provides automated web-browsing"
   s.files     = Dir.glob("{bin,test,lib,doc}/**/*").delete_if {|item| item.include?(".svn") }
@@ -27,7 +28,7 @@ spec = Gem::Specification.new do |s|
   s.has_rdoc      = true
   s.extra_rdoc_files = ["README", "EXAMPLES", "CHANGELOG", "LICENSE"]
   s.rdoc_options << "--main" << 'README' << "--title" << "WWW::Mechanize RDoc"
-  s.rubyforge_project = "mechanize"
+  s.rubyforge_project = PKG_NAME
   s.add_dependency('ruby-web', '>= 1.1.0') 
 end
 
@@ -48,7 +49,7 @@ desc "Publish the API documentation"
 task :pubrdoc => [ :rdoc ] do
   Rake::SshDirPublisher.new(
     "#{ENV['USER']}@rubyforge.org",
-    "/var/www/gforge-projects/mechanize/",
+    "/var/www/gforge-projects/#{PKG_NAME}/",
     "doc" ).upload
 end
 
@@ -75,7 +76,7 @@ end
 
 desc "Tag code"
 Rake::Task.define_task("tag") do |p|
-  baseurl = "svn+ssh://#{ENV['USER']}@rubyforge.org//var/svn/mechanize"
+  baseurl = "svn+ssh://#{ENV['USER']}@rubyforge.org//var/svn/#{PKG_NAME}"
   sh "svn cp -m 'tagged #{ PKG_VERSION }' . #{ baseurl }/tags/REL-#{ PKG_VERSION }"
 end
 

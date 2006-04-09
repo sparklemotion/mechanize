@@ -27,7 +27,7 @@ spec = Gem::Specification.new do |s|
   s.autorequire   = "mechanize"
   s.has_rdoc      = true
   s.extra_rdoc_files = ["README", "EXAMPLES", "CHANGELOG", "LICENSE"]
-  s.rdoc_options << "--main" << 'README' << "--title" << "WWW::Mechanize RDoc"
+  s.rdoc_options << "--main" << 'README' << "--title" << "'WWW::Mechanize RDoc'"
   s.rubyforge_project = PKG_NAME
   s.add_dependency('ruby-web', '>= 1.1.0') 
 end

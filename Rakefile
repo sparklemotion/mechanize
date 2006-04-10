@@ -80,3 +80,9 @@ Rake::Task.define_task("tag") do |p|
   sh "svn cp -m 'tagged #{ PKG_VERSION }' . #{ baseurl }/tags/REL-#{ PKG_VERSION }"
 end
 
+desc "Branch code"
+Rake::Task.define_task("branch") do |p|
+  baseurl = "svn+ssh://#{ENV['USER']}@rubyforge.org/var/svn/#{PKG_NAME}"
+  sh "svn cp -m 'branched #{ PKG_VERSION }' #{baseurl}/trunk #{ baseurl }/branches/RB-#{ PKG_VERSION }"
+end
+

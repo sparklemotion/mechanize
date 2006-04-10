@@ -1,5 +1,8 @@
+== 0.4.2
+
 * Added support for iframes
 * Made mechanize dependant on ruby-web rather than narf
+* Added unit tests
 * Fixed a bunch of warnings
 
 == 0.4.1

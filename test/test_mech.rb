@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'yaml/stringio'
 require 'test/unit/testsuite'
 require 'test/unit/ui/reporter'
 require 'test/unit/ui/console/testrunner'

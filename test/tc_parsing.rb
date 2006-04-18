@@ -1,6 +1,8 @@
+$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
+
 require 'test/unit'
 require 'rexml/document'
-require '../lib/mechanize/parsing'
+require 'mechanize/parsing'
 
 class TestParsing < Test::Unit::TestCase
   def test_collect_text_recursively

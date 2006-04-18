@@ -4,7 +4,6 @@ require 'webrick'
 require 'test/unit'
 require 'rubygems'
 require 'mechanize'
-require 'servlets'
 require 'test_includes'
 
 class FormsMechTest < Test::Unit::TestCase
@@ -17,12 +16,17 @@ class FormsMechTest < Test::Unit::TestCase
     assert_not_nil(post_form, "Post form is null")
     assert_equal("post", post_form.method.downcase)
     assert_equal("/form_post", post_form.action)
-    assert_equal(1, post_form.fields.size)
+
+    assert_equal(2, post_form.fields.size)
+
     assert_equal(1, post_form.buttons.size)
     assert_equal(2, post_form.radiobuttons.size)
     assert_equal(2, post_form.checkboxes.size)
     assert_not_nil(post_form.fields.find { |f| f.name == "first_name" },
       "First name field was nil"
+    )
+    assert_not_nil(post_form.fields.find { |f| f.name == "country" },
+      "Country field was nil"
     )
     assert_not_nil(
     post_form.radiobuttons.find { |f| f.name == "gender" && f.value == "male"},
@@ -39,6 +43,11 @@ class FormsMechTest < Test::Unit::TestCase
     assert_not_nil(post_form.checkboxes.find { |f| f.name == "likes ham" },
       "couldn't find likes ham checkbox")
 
+    # Find the select list
+    s = post_form.fields.find { |f| f.name == "country" }
+    assert_equal(2, s.options.length)
+    assert_equal("USA", s.value)
+
     # Now set all the fields
     post_form.fields.find { |f| f.name == "first_name" }.value = "Aaron"
     post_form.radiobuttons.find { |f| 
@@ -48,7 +57,7 @@ class FormsMechTest < Test::Unit::TestCase
     page = agent.submit(post_form, post_form.buttons.first)
 
     # Check that the submitted fields exist
-    assert_equal(3, page.links.size, "Not enough links")
+    assert_equal(4, page.links.size, "Not enough links")
     assert_not_nil(
       page.links.find { |l| l.text == "likes ham:on" },
       "likes ham check box missing"
@@ -60,6 +69,10 @@ class FormsMechTest < Test::Unit::TestCase
     assert_not_nil(
       page.links.find { |l| l.text == "gender:male" },
       "gender field missing"
+    )
+    assert_not_nil(
+      page.links.find { |l| l.text == "country:USA" },
+      "select box not submitted"
     )
   end
 

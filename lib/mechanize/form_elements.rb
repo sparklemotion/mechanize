@@ -90,6 +90,7 @@ module WWW
   
     def initialize(name, node)
       @name = name
+      @value = nil
       @options = []
   
       # parse
@@ -100,6 +101,7 @@ module WWW
           @value = value if n.attributes['selected']
         end
       }
+      @value = @options.first if @value == nil
     end
   end
 end

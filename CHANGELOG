@@ -1,3 +1,6 @@
+* Defaulted dropdown lists to the first element
+* Added unit tests
+
 == 0.4.2
 
 * Added support for iframes

@@ -66,4 +66,15 @@ class MechMethodsTest < Test::Unit::TestCase
     assert_not_nil(search.fields.find { |f| f.name == 'hl' })
     assert_not_nil(search.fields.find { |f| f.name == 'ie' })
   end
+
+  def test_click
+    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    agent.user_agent_alias = 'Mac Safari'
+    page = agent.get("http://localhost:#{@port}/frame_test.html")
+    link = page.links.find { |l| l.text == "Form Test" }
+    assert_not_nil(link)
+    page = agent.click(link)
+    assert_equal("http://localhost:#{@port}/form_test.html",
+      agent.history.last.uri.to_s)
+  end
 end

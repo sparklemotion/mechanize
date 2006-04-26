@@ -21,6 +21,15 @@ module WWW
 #  body = page.watches
   class Page 
     attr_accessor :uri, :cookies, :response, :body, :code, :watch_for_set
+    attr_finder :frames, :iframes, :links, :forms, :meta, :watches
+
+    # Alias our finders so that we can lazily parse the html
+    alias :find_frames   :frames
+    alias :find_iframes  :iframes
+    alias :find_links    :links
+    alias :find_forms    :forms
+    alias :find_meta     :meta
+    alias :find_watches  :watches
   
     def initialize(uri=nil, cookies=[], response=nil, body=nil, code=nil)
       @uri, @cookies, @response, @body, @code = uri, cookies, response, body, code
@@ -30,6 +39,7 @@ module WWW
       @forms    = nil
       @meta     = nil
       @watches  = nil
+      @root     = nil
     end
   
     def header
@@ -40,14 +50,14 @@ module WWW
       @response['Content-Type']
     end
   
-    def forms
+    def forms(*args)
       parse_html() unless @forms
-      @forms
+      find_forms(*args)
     end
   
-    def links
+    def links(*args)
       parse_html() unless @links
-      @links
+      find_links(*args)
     end
   
     def root
@@ -58,24 +68,24 @@ module WWW
     # This method watches out for a particular tag, and will call back to the
     # class specified for the tag in the watch_for_set method.  See the example
     # in this class.
-    def watches
+    def watches(*args)
       parse_html() unless @watches 
-      @watches 
+      find_watches(*args)
     end
   
-    def meta
+    def meta(*args)
       parse_html() unless @meta 
-      @meta 
+      find_meta(*args)
     end
 
-    def frames
+    def frames(*args)
       parse_html() unless @frames
-      @frames
+      find_frames(*args)
     end
 
-    def iframes
+    def iframes(*args)
       parse_html() unless @iframes
-      @iframes
+      find_iframes(*args)
     end
   
     private

@@ -18,7 +18,7 @@ module WWW
     attr_reader :form_node, :elements_node
     attr_accessor :method, :action, :name
   
-    attr_reader :fields, :buttons, :file_uploads, :radiobuttons, :checkboxes
+    attr_finder :fields, :buttons, :file_uploads, :radiobuttons, :checkboxes
     attr_reader :enctype
   
     def initialize(form_node, elements_node)
@@ -28,6 +28,7 @@ module WWW
       @action = @form_node.attributes['action'] 
       @name = @form_node.attributes['name']
       @enctype = @form_node.attributes['enctype'] || 'application/x-www-form-urlencoded'
+      @clicked_buttons = []
   
       parse
     end
@@ -48,7 +49,7 @@ module WWW
       }
     end
   
-    def build_query
+    def build_query(buttons = [])
       query = {}
   
       fields().each do |f|
@@ -76,8 +77,16 @@ module WWW
           raise "multiple radiobuttons are checked in the same group!" 
         end
       end
+
+      @clicked_buttons.each { |b|
+        b.add_to_query(query)
+      }
   
       query
+    end
+
+    def add_button_to_query(button)
+      @clicked_buttons << button
     end
   
     def request_data

@@ -8,8 +8,8 @@
   agent = WWW::Mechanize.new { |a| a.log = Logger.new("mech.log") }
   agent.user_agent_alias = 'Mac Safari'
   page = agent.get("http://www.google.com/")
-  search_form = page.forms.find { |f| f.name == "f" }
-  search_form.fields.find { |f| f.name == "q" }.value = "Hello"
+  search_form = page.forms.with.name("f").first
+  search_form.fields.name("q").first.value = "Hello"
   search_results = agent.submit(search_form)
   puts search_results.body
 
@@ -18,7 +18,7 @@
   
   agent = WWW::Mechanize.new {|a| a.log = Logger.new(STDERR) }
   page = agent.get('http://rubyforge.org/')
-  link = page.links.find {|l| l.node.text =~ /Log In/ }
+  link = page.links.text(/Log In/).first
   page = agent.click(link)
   form = page.forms[1]
   form.fields.find {|f| f.name == 'form_loginname'}.value = ARGV[0]
@@ -36,13 +36,13 @@ This example uploads one image as two different images to flickr.
   agent = WWW::Mechanize.new
   page = agent.get('http://flickr.com/signin/flickr/')
   form = page.forms.first
-  form.fields.find { |f| f.name == 'email' }.value = ARGV[0]
-  form.fields.find { |f| f.name == 'password' }.value = ARGV[1]
+  form.fields.name('email').first.value = ARGV[0]
+  form.fields.name('password').first.value = ARGV[1]
   page = agent.submit(form)
-  page = agent.click(page.links.find { |l| l.text == 'Upload' })
+  page = agent.click page.links.text('Upload').first
   form = page.forms.first
-  img1 = form.file_uploads.find { |f| f.name == 'file1' }
-  img2 = form.file_uploads.find { |f| f.name == 'file2' }
+  img1 = form.file_uploads.name('file1').first
+  img2 = form.file_uploads.name('file2').first
   
   img1.file_name = img2.file_name = ARGV[2]
   File.open(ARGV[2], "r") { |f|

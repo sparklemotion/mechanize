@@ -1,3 +1,8 @@
+== 0.4.3
+
+* Added syntactic sugar for finding things
+* Fixed bug with HttpOnly option in cookies
+* Fixed a bug with cookie date parsing
 * Defaulted dropdown lists to the first element
 * Added unit tests
 
@@ -11,32 +16,21 @@
 == 0.4.1
 
 * Added support for file uploading
-
 * Added support for frames (Thanks Gabriel[mailto:leerbag@googlemail.com])
-
 * Added more unit tests
-
 * Fixed some bugs
 
 == 0.4.0
 
 * Added more unit tests
-
 * Added a cookie jar with better cookie support, included expiration of cookies
   and general cookie security.
-
 * Updated mechanize to use built in net/http if ruby version is new enough.
-
 * Added support for meta refresh tags
-
 * Defaulted form actions to 'GET'
-
 * Fixed various bugs
-
 * Added more unit tests
-
 * Added a response code exception
-
 * Thanks to Brian Ellin (brianellin@gmail.com) for:
   Added support for CA files, and support for 301 response codes
   

@@ -11,7 +11,7 @@ end
 
 PKG_BUILD = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME = 'mechanize'
-PKG_VERSION = '0.4.2' + PKG_BUILD
+PKG_VERSION = '0.4.3' + PKG_BUILD
 PKG_FILES = FileList["{doc,lib,test}/**/*"].exclude("rdoc").to_a
 
 spec = Gem::Specification.new do |s|
@@ -26,7 +26,7 @@ spec = Gem::Specification.new do |s|
   s.require_path  = "lib"
   s.autorequire   = "mechanize"
   s.has_rdoc      = true
-  s.extra_rdoc_files = ["README", "EXAMPLES", "CHANGELOG", "LICENSE"]
+  s.extra_rdoc_files = ["README", "EXAMPLES", "CHANGELOG", "LICENSE", "NOTES"]
   s.rdoc_options << "--main" << 'README' << "--title" << "'WWW::Mechanize RDoc'"
   s.rubyforge_project = PKG_NAME
   s.add_dependency('ruby-web', '>= 1.1.0') 
@@ -41,7 +41,7 @@ end
 Rake::RDocTask.new do |p|
   p.main = "README"
   p.rdoc_dir = "doc"
-  p.rdoc_files.include("README", "CHANGELOG", "LICENSE", "EXAMPLES", "lib/**/*.rb")
+  p.rdoc_files.include("README", "CHANGELOG", "LICENSE", "EXAMPLES", "NOTES", "lib/**/*.rb")
   p.options << "--main" << 'README' << "--title" << "'WWW::Mechanize RDoc'"
 end
 
@@ -62,6 +62,7 @@ task :update_version do
     f.puts "  MechVersion = '#{PKG_VERSION}'"
     f.puts "end"
   end
+  sh 'svn commit -m"updating version" lib/mechanize/mech_version.rb'
 end
 
 desc "Create a new release"

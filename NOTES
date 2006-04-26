@@ -1,0 +1,30 @@
+= Mechanize Release Notes
+
+== 0.4.3
+
+The new syntax for finding things like forms, fields, frames, etcetera looks
+like this:
+
+page.links.with.text 'Some Text'
+
+The preceding statement will find all links in a page with the text
+'Some Text'.  This can be applied to form fields as well:
+
+form.fields.with.name 'email'
+
+These can be chained as well like this:
+
+form.fields.with.name('email').and.with.value('blah@domain.com')
+
+'with' and 'and' can be omitted, and the old way is still supported.  The
+following statements all do the same thing:
+
+form.fields.find_all { |f| f.name == 'email' }
+form.fields.with.name('email')
+form.fields.name('email')
+form.fields(:name => 'email')
+
+Regular expressions are also supported:
+
+form.fields.with.name(/email/)
+

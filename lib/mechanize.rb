@@ -19,6 +19,7 @@ require 'logger'
 require 'webrick'
 require 'date'
 require 'web/htmltools/xmltree'   # narf
+require 'mechanize/module'
 require 'mechanize/parsing'
 require 'mechanize/cookie'
 require 'mechanize/form'
@@ -143,8 +144,8 @@ class Mechanize
   end
 
   def submit(form, button=nil)
+    form.add_button_to_query(button) if button
     query = form.build_query
-    button.add_to_query(query) if button
 
     uri = to_absolute_uri(URI::escape(form.action))
     case form.method.upcase

@@ -94,10 +94,11 @@ class ManyCookiesAsStringTest < WEBrick::HTTPServlet::AbstractServlet
     name_cookie = WEBrick::Cookie.new("name", "Aaron")
     name_cookie.path = "/"
     name_cookie.expires = Time.now + 86400
+    name_cookie.domain = 'localhost'
     cookies << name_cookie
     cookies << name_cookie
     cookies << name_cookie
-    cookies << name_cookie
+    cookies << "#{name_cookie}; HttpOnly"
 
     expired_cookie = WEBrick::Cookie.new("expired", "doh")
     expired_cookie.path = "/"

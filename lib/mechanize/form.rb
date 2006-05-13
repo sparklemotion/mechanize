@@ -148,16 +148,20 @@ module WWW
       string
     end
   
+    def mime_value_quote(str)
+      str.gsub(/(["\r\\])/){|s| '\\' + s}
+    end
+
     def param_to_multipart(name, value)
       return "Content-Disposition: form-data; name=\"" +
-              "#{WEBrick::HTTPUtils.escape_form(name)}\"\r\n" +
+              "#{mime_value_quote(name)}\"\r\n" +
               "\r\n#{value}\r\n"
     end
   
     def file_to_multipart(file)
       body =  "Content-Disposition: form-data; name=\"" +
-              "#{WEBrick::HTTPUtils.escape_form(file.name)}\"; " +
-              "filename=\"#{file.file_name}\"\r\n" +
+              "#{mime_value_quote(file.name)}\"; " +
+              "filename=\"#{mime_value_quote(file.file_name)}\"\r\n" +
               "Content-Transfer-Encoding: binary\r\n"
       if file.mime_type != nil
         body << "Content-Type: #{file.mime_type}\r\n"

@@ -96,12 +96,24 @@ module WWW
       # parse
       node.each_recursive {|n|
         if n.name.downcase == 'option'
-          value = n.attributes['value']
-          @options << value 
-          @value = value if n.attributes['selected']
+          option = Option.new(n)
+          @options << option
+          @value = option.value if option.selected
         end
       }
-      @value = @options.first if @value == nil
+      @value = @options.first.value if @value == nil
+    end
+  end
+
+  class Option
+    attr_reader :value, :selected, :text
+
+    alias :to_s :value
+
+    def initialize(node)
+      @text     = node.all_text
+      @value    = node.attributes['value']
+      @selected = node.attributes['selected'] ? true : false
     end
   end
 end

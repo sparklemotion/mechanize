@@ -11,7 +11,7 @@ end
 
 PKG_BUILD = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME = 'mechanize'
-PKG_VERSION = '0.4.3' + PKG_BUILD
+PKG_VERSION = '0.4.4' + PKG_BUILD
 PKG_FILES = FileList["{doc,lib,test}/**/*"].exclude("rdoc").to_a
 
 spec = Gem::Specification.new do |s|
@@ -24,7 +24,6 @@ spec = Gem::Specification.new do |s|
   s.summary   = "Mechanize provides automated web-browsing"
   s.files     = Dir.glob("{bin,test,lib,doc}/**/*").delete_if {|item| item.include?(".svn") }
   s.require_path  = "lib"
-  s.autorequire   = "mechanize"
   s.has_rdoc      = true
   s.extra_rdoc_files = ["README", "EXAMPLES", "CHANGELOG", "LICENSE", "NOTES"]
   s.rdoc_options << "--main" << 'README' << "--title" << "'WWW::Mechanize RDoc'"

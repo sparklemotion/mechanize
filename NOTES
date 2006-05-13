@@ -1,5 +1,14 @@
 = Mechanize Release Notes
 
+== 0.4.4
+
+This release of mechanize comes with a new "Option" object that can be
+accessed from select fields on forms.  That means that you can figure out
+what option to set based on the text in the select field.  For example:
+
+selectlist = form.fields.name('selectlist').first
+selectlist.value = selectlist.options.find { |o| o.text == 'foo'}.value
+
 == 0.4.3
 
 The new syntax for finding things like forms, fields, frames, etcetera looks

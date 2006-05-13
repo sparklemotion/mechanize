@@ -1,3 +1,9 @@
+== 0.4.4
+
+* Fixed error in method signature, basic_authetication is now basic_auth
+* Fixed bug with encoding names in file uploads (Big thanks to Alex Young)
+* Added options to the select list
+
 == 0.4.3
 
 * Added syntactic sugar for finding things

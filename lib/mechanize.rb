@@ -102,10 +102,12 @@ class Mechanize
     cookies
   end
 
-  def basic_authetication(user, password)
+  def basic_auth(user, password)
     @user = user
     @password = password
   end
+
+  alias :basic_authetication :basic_auth
 
   def get(url)
     cur_page = current_page() || Page.new

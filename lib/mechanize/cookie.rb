@@ -16,7 +16,7 @@ module WWW
       esc.split(/,/).each do |cookie_text|
         cookie_values = Hash.new
         cookie = Hash.new
-        cookie_text.split(/; /).each do |data|
+        cookie_text.split(/; ?/).each do |data|
           name, value = data.split('=', 2)
           next unless name
           cookie[name] = value ? URI::unescape(value) : nil

@@ -1,4 +1,5 @@
 $:.unshift File.join(File.dirname(__FILE__), "..", "lib")
+$:.unshift File.join(File.dirname(__FILE__), "..", "test")
 
 Thread.new {
 require 'server'
@@ -14,4 +15,5 @@ require 'tc_upload'
 require 'tc_forms'
 require 'tc_watches'
 require 'tc_parsing'
+require 'tc_authenticate'
 

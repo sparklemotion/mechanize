@@ -30,5 +30,24 @@ class UploadMechTest < Test::Unit::TestCase
     )
     assert_match('Content-Type: text/plain', page.body)
     assert_match('Hello World', page.body)
+    assert_match('foo[aaron]', page.body)
+  end
+
+  def test_form_multipart
+    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    page = agent.get("http://localhost:#{@port}/file_upload.html")
+    assert_equal('multipart/form-data', page.forms[1].enctype)
+
+    form = page.forms[1]
+    form.file_uploads.first.file_name = "README"
+    form.file_uploads.first.mime_type = "text/plain"
+    form.file_uploads.first.file_data = "Hello World\n\n"
+
+    page = agent.submit(form)
+
+    assert_match(
+      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"README\"",
+      page.body
+    )
   end
 end

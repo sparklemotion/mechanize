@@ -21,7 +21,7 @@ class FormsMechTest < Test::Unit::TestCase
 
     assert_equal(1, post_form.buttons.size)
     assert_equal(2, post_form.radiobuttons.size)
-    assert_equal(2, post_form.checkboxes.size)
+    assert_equal(3, post_form.checkboxes.size)
     assert_not_nil(post_form.fields.find { |f| f.name == "first_name" },
       "First name field was nil"
     )
@@ -42,11 +42,17 @@ class FormsMechTest < Test::Unit::TestCase
       "couldn't find cool person checkbox")
     assert_not_nil(post_form.checkboxes.find { |f| f.name == "likes ham" },
       "couldn't find likes ham checkbox")
+    assert_not_nil(post_form.checkboxes.find { |f| f.name == "green[eggs]" },
+      "couldn't find green[eggs] checkbox")
 
     # Find the select list
     s = post_form.fields.find { |f| f.name == "country" }
     assert_equal(2, s.options.length)
     assert_equal("USA", s.value)
+    assert_equal("USA", s.options.first.value)
+    assert_equal("USA", s.options.first.text)
+    assert_equal("CANADA", s.options[1].value)
+    assert_equal("CANADA", s.options[1].text)
 
     # Now set all the fields
     post_form.fields.find { |f| f.name == "first_name" }.value = "Aaron"
@@ -54,13 +60,18 @@ class FormsMechTest < Test::Unit::TestCase
       f.name == "gender" && f.value == "male" 
     }.checked = true
     post_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
+    post_form.checkboxes.find { |f| f.name == "green[eggs]" }.checked = true
     page = agent.submit(post_form, post_form.buttons.first)
 
     # Check that the submitted fields exist
-    assert_equal(4, page.links.size, "Not enough links")
+    assert_equal(5, page.links.size, "Not enough links")
     assert_not_nil(
       page.links.find { |l| l.text == "likes ham:on" },
       "likes ham check box missing"
+    )
+    assert_not_nil(
+      page.links.find { |l| l.text == "green[eggs]:on" },
+      "green[eggs] check box missing"
     )
     assert_not_nil(
       page.links.find { |l| l.text == "first_name:Aaron" },
@@ -86,7 +97,7 @@ class FormsMechTest < Test::Unit::TestCase
     assert_equal(1, get_form.fields.size)
     assert_equal(2, get_form.buttons.size)
     assert_equal(2, get_form.radiobuttons.size)
-    assert_equal(2, get_form.checkboxes.size)
+    assert_equal(3, get_form.checkboxes.size)
     assert_not_nil(get_form.fields.find { |f| f.name == "first_name" },
       "First name field was nil"
     )
@@ -104,6 +115,8 @@ class FormsMechTest < Test::Unit::TestCase
       "couldn't find cool person checkbox")
     assert_not_nil(get_form.checkboxes.find { |f| f.name == "likes ham" },
       "couldn't find likes ham checkbox")
+    assert_not_nil(get_form.checkboxes.find { |f| f.name == "green[eggs]" },
+      "couldn't find green[eggs] checkbox")
 
     # Set up the image button
     img = get_form.buttons.find { |f| f.name == "button" }
@@ -115,13 +128,18 @@ class FormsMechTest < Test::Unit::TestCase
       f.name == "gender" && f.value == "male" 
     }.checked = true
     get_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
+    get_form.checkboxes.find { |f| f.name == "green[eggs]" }.checked = true
     page = agent.submit(get_form, get_form.buttons.first)
 
     # Check that the submitted fields exist
-    assert_equal(6, page.links.size, "Not enough links")
+    assert_equal(7, page.links.size, "Not enough links")
     assert_not_nil(
       page.links.find { |l| l.text == "likes ham:on" },
       "likes ham check box missing"
+    )
+    assert_not_nil(
+      page.links.find { |l| l.text == "green[eggs]:on" },
+      "green[eggs] check box missing"
     )
     assert_not_nil(
       page.links.find { |l| l.text == "first_name:Aaron" },

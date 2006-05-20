@@ -16,4 +16,7 @@ require 'tc_forms'
 require 'tc_watches'
 require 'tc_parsing'
 require 'tc_authenticate'
+require 'tc_filter'
+require 'tc_cookie_class'
+require 'tc_cookie_jar'
 

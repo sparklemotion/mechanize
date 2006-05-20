@@ -1,3 +1,5 @@
+require 'date'
+
 module WWW
   class Cookie
     attr_reader :name, :value, :path, :domain, :expires, :secure
@@ -8,7 +10,7 @@ module WWW
       @domain   = cookie[:domain]
       @expires  = cookie[:expires]
       @secure   = cookie[:secure]
-      @string   = "#{cookie[:name]}=#{URI::escape(cookie[:value])}"
+      @string   = "#{cookie[:name]}=#{cookie[:value]}"
     end
   
     def Cookie::parse(uri, raw_cookie, &block)
@@ -19,7 +21,7 @@ module WWW
         cookie_text.split(/; ?/).each do |data|
           name, value = data.split('=', 2)
           next unless name
-          cookie[name] = value ? URI::unescape(value) : nil
+          cookie[name] = value
         end
   
         cookie_values[:path] = cookie.delete(
@@ -30,18 +32,48 @@ module WWW
         if expires_key
           time = nil
           expires_val = cookie.delete(expires_key)
+
+          # First lets try dates with timezones
           [ '%A %d-%b-%y %T %Z',
-            '%a, %d-%b-%Y %T %Z',
-            '%a %d %b %Y %T %Z'
+            '%a %d-%b-%Y %T %Z',
+            '%a %d %b %Y %T %Z',
+            '%d %b %y %H:%M %Z',      # 14 Apr 89 03:20 GMT
+            '%a %d %b %y %H:%M %Z',   # Fri, 17 Mar 89 4:01 GMT
+            '%a %b %d %H:%M %Z %Y',   # Mon Jan 16 16:12 PDT 1989
+            '%d %b %Y %H:%M-%Z (%A)', # 6 May 1992 16:41-JST (Wednesday)
+            '%y-%m-%d %T %Z',         # 95-06-08 19:32:48 EDT
           ].each { |fmt|
             begin
               time = DateTime.strptime(expires_val, fmt)
-            rescue ArgumentError
+            rescue ArgumentError => er
             else
               break
             end
           }
-          time = DateTime.parse(expires_val) if time == nil
+
+          # If it didn't have a timezone, we'll assume GMT, like Mozilla does
+          if time.nil?
+            [
+              '%d %b %y %T %Z',            # 14 Apr 89 03:20:12
+              '%a %d %b %y %T %Z',         # Fri, 17 Mar 89 4:01:33
+              #'%d-%b-%Y %H:%M:%S.%N %Z',   # 22-AUG-1993 10:59:12.82
+              '%d-%b-%Y %H:%M%P %Z',       # 22-AUG-1993 10:59pm
+              '%d-%b-%Y %H:%M %p %Z',      # 22-AUG-1993 12:59 PM
+              #'%A %B %d %Y %H:%M %p',   # Friday, August 04, 1995 3:54 PM
+              '%x %I:%M:%S %p %Z',         # 06/21/95 04:24:34 PM
+              '%d/%m/%y %H:%M %Z',         # 20/06/95 21:07
+            ].each { |fmt|
+              begin
+                time = DateTime.strptime("#{expires_val} GMT", fmt)
+              rescue ArgumentError => er
+              else
+                break
+              end
+            }
+          end
+
+          # If we couldn't parse it, set it to the current time
+          time = DateTime.now if time == nil
           cookie_values[:expires] = time
         end
 

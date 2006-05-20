@@ -50,14 +50,15 @@ module WWW
     end
   
     def build_query(buttons = [])
-      query = {}
+      query = []
   
       fields().each do |f|
-        query[f.name] = f.value || ""
+        next unless f.value
+        query << [f.name, f.value]
       end
   
       checkboxes().each do |f|
-        query[f.name] = f.value || "on" if f.checked
+        query << [f.name, f.value || "on"] if f.checked
       end
   
       radio_groups = {}
@@ -72,7 +73,7 @@ module WWW
   
         if checked.size == 1
           f = checked.first
-          query[f.name] = f.value || ""
+          query << [f.name, f.value || ""]
         elsif checked.size > 1 
           raise "multiple radiobuttons are checked in the same group!" 
         end
@@ -102,7 +103,7 @@ module WWW
         query = params.collect { |p| "--#{boundary}\r\n#{p}" }.join('') +
           "--#{boundary}--\r\n"
       else
-        query = build_query_string(query_params)
+        query = WWW::Mechanize.build_query_string(query_params)
       end
   
       query
@@ -120,7 +121,7 @@ module WWW
         when 'input'
           case (node.attributes['type'] || 'text').downcase
           when 'text', 'password', 'hidden', 'int'
-            @fields << Field.new(node.attributes['name'], node.attributes['value']) 
+            @fields << Field.new(node.attributes['name'], node.attributes['value'] || '') 
           when 'radio'
             @radiobuttons << RadioButton.new(node.attributes['name'], node.attributes['value'], node.attributes.has_key?('checked'))
           when 'checkbox'
@@ -170,17 +171,6 @@ module WWW
       body << "\r\n#{file.file_data}\r\n"
   
       body
-    end
-
-    def build_query_string(hash)
-      vals = []
-      hash.each_pair do |k,v|
-        vals << [
-          WEBrick::HTTPUtils.escape_form(k),
-          WEBrick::HTTPUtils.escape_form(v)
-        ].join("=")
-      end
-      vals.join("&")
     end
   end
   

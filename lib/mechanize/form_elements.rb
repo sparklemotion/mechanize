@@ -41,7 +41,7 @@ module WWW
     end
   
     def add_to_query(query)
-      query[@name] = @value || "" if @name
+      query << [@name, @value || ''] if @name
     end
   
     # Returns an array of Button objects
@@ -62,9 +62,9 @@ module WWW
     
     def add_to_query(query)
       if @name
-        query[@name] = @value || ""
-        query[@name+".x"] = (@x || "0").to_s
-        query[@name+".y"] = (@y || "0").to_s
+        query << [@name, @value || '']
+        query << [@name + ".x", (@x || 0).to_s]
+        query << [@name + ".y", (@y || 0).to_s]
       end
     end
   end
@@ -101,7 +101,7 @@ module WWW
           @value = option.value if option.selected
         end
       }
-      @value = @options.first.value if @value == nil
+      @value = @options.first.value if (@value == nil && @options.first)
     end
   end
 

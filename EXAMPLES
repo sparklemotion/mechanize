@@ -53,3 +53,46 @@ This example uploads one image as two different images to flickr.
   
   agent.submit(form)
   
+== Page Body Filter
+This example shows how to preprocess a body before mechanize parses it.  The
+body filter sends the page body to the code block, and parses what the code
+block returns.  The filter on WWW::Page#body_filter is a "per-page" filter,
+meaning that it is only applied to one page object.
+
+  require 'rubygems'
+  require 'mechanize'
+  
+  agent = WWW::Mechanize.new
+  
+  page = agent.get('http://google.com/')
+  page.body_filter = lambda { |body|
+      body.gsub(/google/i, "Net::DAAP::Client")
+  }
+  puts page.body
+  
+  page = agent.get('http://google.com/')
+  puts page.body
+
+== Global Body Filter
+The body filter can be set on the WWW::Mechanize object for use as a global
+filter.  The filter set will be applied to every page that is requested.  The
+following example shows the global filter being used, then being set back to
+the original filter.
+
+  require 'rubygems'
+  require 'mechanize'
+  
+  agent = WWW::Mechanize.new
+  
+  old_filter = agent.body_filter
+  agent.body_filter = lambda { |body|
+    body.gsub(/(<a[^>]*>)[^<]*(<\/a[^>]*>)/i, "#{$1}Net::DAAP::Client#{$2}")
+  }
+  
+  page = agent.get('http://google.com/')
+  page.links.each { |l| puts l.text }
+  
+  agent.body_filter = old_filter
+  page = agent.get('http://google.com/')
+  page.links.each { |l| puts l.text }
+

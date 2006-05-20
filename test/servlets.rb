@@ -28,7 +28,9 @@ class FormTest < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     res.body = "<HTML><body>"
     req.query.each_key { |k|
-      res.body << "<a href=\"#\">#{k}:#{req.query[k]}</a><br />"
+      req.query[k].each_data { |data|
+        res.body << "<a href=\"#\">#{k}:#{data}</a><br />"
+      }
     }
     res.body << "</body></HTML>"
     res['Content-Type'] = "text/html"
@@ -37,7 +39,9 @@ class FormTest < WEBrick::HTTPServlet::AbstractServlet
   def do_POST(req, res)
     res.body = "<HTML><body>"
     req.query.each_key { |k|
-      res.body << "<a href=\"#\">#{k}:#{req.query[k]}</a><br />"
+      req.query[k].each_data { |data|
+        res.body << "<a href=\"#\">#{k}:#{data}</a><br />"
+      }
     }
     res.body << "</body></HTML>"
     res['Content-Type'] = "text/html"
@@ -50,6 +54,17 @@ class OneCookieTest < WEBrick::HTTPServlet::AbstractServlet
     cookie.path = "/"
     cookie.expires = Time.now + 86400
     res.cookies << cookie
+    res['Content-Type'] = "text/html"
+    res.body = "<html><body>hello</body></html>"
+  end
+end
+
+class OneCookieNoSpacesTest < WEBrick::HTTPServlet::AbstractServlet
+  def do_GET(req, res)
+    cookie = WEBrick::Cookie.new("foo", "bar")
+    cookie.path = "/"
+    cookie.expires = Time.now + 86400
+    res.cookies << cookie.to_s.gsub(/; /, ';')
     res['Content-Type'] = "text/html"
     res.body = "<html><body>hello</body></html>"
   end

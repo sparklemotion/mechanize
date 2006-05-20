@@ -11,7 +11,7 @@ end
 
 PKG_BUILD = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME = 'mechanize'
-PKG_VERSION = '0.4.4' + PKG_BUILD
+PKG_VERSION = '0.4.5' + PKG_BUILD
 PKG_FILES = FileList["{doc,lib,test}/**/*"].exclude("rdoc").to_a
 
 spec = Gem::Specification.new do |s|

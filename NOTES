@@ -1,5 +1,20 @@
 = Mechanize Release Notes
 
+== 0.4.5
+
+This release comes with a new filtering system.  You can now manipulate the
+response body before mechanize parses it.  This can be useful if you know that
+the HTML you need to parse is broken, or if you want to speed up the parsing.
+This filter can be done on a global basis, or on a per page basis.  Check out
+the new examples in the EXAMPLES file for usage.
+
+This release is also starting to phase out the misspelled method
+WWW::Mechanize#basic_authetication.  If you are using that method, please
+switch to WWW::Mechanize#basic_auth.
+
+The 0.4.5 release has many bug fixes, most noteably better cookie parsing and
+better form support.
+
 == 0.4.4
 
 This release of mechanize comes with a new "Option" object that can be

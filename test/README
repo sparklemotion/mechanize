@@ -1,7 +1,7 @@
 = Mechanize Testing
 
-These unit tests require a web server up and running.  To run the tests, first
-execute: 'server.rb'
+To run the tests, execute ts_mech.rb
 
-Once server.rb is up and running, execute 'ts_mech.rb' to run the tests.
+ts_mech.rb spawns a thread that has a WEBrick server in it to test against.
+The WEBrick server can be found in server.rb.
 

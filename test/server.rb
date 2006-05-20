@@ -11,6 +11,7 @@ s = WEBrick::HTTPServer.new(
   :AccessLog      => Logger.new(nil)
 )
 s.mount("/one_cookie", OneCookieTest)
+s.mount("/one_cookie_no_space", OneCookieNoSpacesTest)
 s.mount("/many_cookies", ManyCookiesTest)
 s.mount("/many_cookies_as_string", ManyCookiesAsStringTest)
 s.mount("/send_cookies", SendCookiesTest)

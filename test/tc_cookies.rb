@@ -19,6 +19,17 @@ class CookiesMechTest < Test::Unit::TestCase
     assert_not_nil(page.links.find { |l| l.text == "no_expires:nope" })
   end
 
+  def test_no_space_cookies
+    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    page = agent.get("http://localhost:#{@port}/one_cookie_no_space")
+    assert_equal(1, agent.cookies.length)
+    foo_cookie = agent.cookies.find { |k| k.name == 'foo' }
+    assert_not_nil(foo_cookie, 'Foo cookie was nil')
+    assert_equal('bar', foo_cookie.value)
+    assert_equal('/', foo_cookie.path)
+    assert_equal(true, DateTime.now < foo_cookie.expires)
+  end
+
   def test_many_cookies_as_string
     agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
     page = agent.get("http://localhost:#{@port}/many_cookies_as_string")

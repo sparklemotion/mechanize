@@ -1,3 +1,13 @@
+== 0.4.5
+
+* Added support for multiple values of the same name
+* Updated build_query_string to take an array of arrays (Thanks Michal Janeczek)
+* Added WWW::Mechanize#body_filter= so that response bodies can be preprocessed
+* Added WWW::Page#body_filter= so that response bodies can be preprocessed
+* Added support for more date formats in the cookie parser
+* Fixed a bug with empty select lists
+* Fixing a problem with cookies not handling no spaces after semicolons
+
 == 0.4.4
 
 * Fixed error in method signature, basic_authetication is now basic_auth

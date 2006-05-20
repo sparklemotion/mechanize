@@ -22,6 +22,7 @@ module WWW
   class Page 
     attr_accessor :uri, :cookies, :response, :body, :code, :watch_for_set
     attr_finder :frames, :iframes, :links, :forms, :meta, :watches
+    attr_reader :body_filter
 
     # Alias our finders so that we can lazily parse the html
     alias :find_frames   :frames
@@ -33,15 +34,21 @@ module WWW
   
     def initialize(uri=nil, cookies=[], response=nil, body=nil, code=nil)
       @uri, @cookies, @response, @body, @code = uri, cookies, response, body, code
-      @frames   = nil
-      @iframes  = nil
-      @links    = nil
-      @forms    = nil
-      @meta     = nil
-      @watches  = nil
-      @root     = nil
+      @frames       = nil
+      @iframes      = nil
+      @links        = nil
+      @forms        = nil
+      @meta         = nil
+      @watches      = nil
+      @root         = nil
+      @body_filter  = lambda { |body| body }
     end
   
+    def body_filter=(filter)
+      @body_filter = filter
+      parse_html()
+    end
+
     def header
       @response.header
     end
@@ -96,7 +103,7 @@ module WWW
       # construct parser and feed with HTML
       parser = HTMLTree::XMLParser.new
       begin
-        parser.feed(@body)
+        parser.feed(body_filter.call(@body))
       rescue => ex
         if ex.message =~ /attempted adding second root element to document/ and
           # Put the whole document inside a single root element, which I simply name

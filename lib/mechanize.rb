@@ -73,6 +73,7 @@ class Mechanize
   attr_accessor :watch_for_set
   attr_accessor :max_history
   attr_accessor :ca_file
+  attr_accessor :body_filter
   attr_reader :history
 
   def initialize
@@ -83,6 +84,7 @@ class Mechanize
     @read_timeout   = nil
     @watch_for_set  = nil
     @max_history    = nil
+    @body_filter    = lambda { |body| body }
     @cookie_jar = CookieJar.new
     @log = Logger.new(nil)
     yield self if block_given?
@@ -107,7 +109,10 @@ class Mechanize
     @password = password
   end
 
-  alias :basic_authetication :basic_auth
+  def basic_authetication(user, password)
+    $stderr.puts "This method will be deprecated, please change to 'basic_auth'"
+    basic_auth(user, password)
+  end
 
   def get(url)
     cur_page = current_page() || Page.new
@@ -121,7 +126,7 @@ class Mechanize
   def post(url, query={})
     cur_page = current_page() || Page.new
 
-    request_data = [build_query_string(query)]
+    request_data = [WWW::Mechanize.build_query_string(query)]
 
     # this is called before the request is sent
     pre_request_hook = proc {|request|
@@ -155,9 +160,9 @@ class Mechanize
       post_form(uri, form) 
     when 'GET'
       if uri.query.nil?
-        get(uri.to_s + "?" + build_query_string(query))
+        get(uri.to_s + "?" + WWW::Mechanize.build_query_string(query))
       else
-        get(uri.to_s + "&" + build_query_string(query))
+        get(uri.to_s + "&" + WWW::Mechanize.build_query_string(query))
       end
     else
       raise 'unsupported method'
@@ -290,7 +295,7 @@ class Mechanize
         page.code = response.code
 
         response.read_body
-        page.body = response.body
+        page.body = body_filter.call(response.body)
 
         log.info("status: #{ page.code }")
 
@@ -309,9 +314,9 @@ class Mechanize
     }
   end
 
-  def build_query_string(hash)
+  def self.build_query_string(parameters)
     vals = [] 
-    hash.each_pair {|k,v|
+    parameters.each { |k,v|
       vals <<
       [WEBrick::HTTPUtils.escape_form(k), 
        WEBrick::HTTPUtils.escape_form(v)].join("=")

@@ -9,6 +9,48 @@ require 'test_includes'
 class FormsMechTest < Test::Unit::TestCase
   include TestMethods
 
+  # Test submitting form with two fields of the same name
+  def test_post_multival
+    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    page = agent.get("http://localhost:#{@port}/form_multival.html")
+    form = page.forms.name('post_form').first
+
+    assert_not_nil(form)
+    assert_equal(2, form.fields.name('first').length)
+
+    form.fields.name('first')[0].value = 'Aaron'
+    form.fields.name('first')[1].value = 'Patterson'
+
+    page = agent.submit(form)
+
+    assert_not_nil(page)
+
+    assert_equal(2, page.links.length)
+    assert_not_nil(page.links.text('first:Aaron').first)
+    assert_not_nil(page.links.text('first:Patterson').first)
+  end
+
+  # Test submitting form with two fields of the same name
+  def test_get_multival
+    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    page = agent.get("http://localhost:#{@port}/form_multival.html")
+    form = page.forms.name('get_form').first
+
+    assert_not_nil(form)
+    assert_equal(2, form.fields.name('first').length)
+
+    form.fields.name('first')[0].value = 'Aaron'
+    form.fields.name('first')[1].value = 'Patterson'
+
+    page = agent.submit(form)
+
+    assert_not_nil(page)
+
+    assert_equal(2, page.links.length)
+    assert_not_nil(page.links.text('first:Aaron').first)
+    assert_not_nil(page.links.text('first:Patterson').first)
+  end
+
   def test_post
     agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
     page = agent.get("http://localhost:#{@port}/form_test.html")
@@ -17,7 +59,7 @@ class FormsMechTest < Test::Unit::TestCase
     assert_equal("post", post_form.method.downcase)
     assert_equal("/form_post", post_form.action)
 
-    assert_equal(2, post_form.fields.size)
+    assert_equal(3, post_form.fields.size)
 
     assert_equal(1, post_form.buttons.size)
     assert_equal(2, post_form.radiobuttons.size)

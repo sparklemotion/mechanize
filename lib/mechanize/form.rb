@@ -110,11 +110,11 @@ module WWW
     end
   
     def parse
-      @fields = []
-      @buttons = []
-      @file_uploads = []
-      @radiobuttons = []
-      @checkboxes = []
+      @fields       = WWW::Mechanize::List.new
+      @buttons      = WWW::Mechanize::List.new
+      @file_uploads = WWW::Mechanize::List.new
+      @radiobuttons = WWW::Mechanize::List.new
+      @checkboxes   = WWW::Mechanize::List.new
   
       @elements_node.each_recursive {|node|
         case node.name.downcase
@@ -139,6 +139,19 @@ module WWW
           @fields << SelectList.new(node.attributes['name'], node)
         end
       }
+    end
+
+    def inspect
+      string = "Form: ['#{@name}' -> #{@action}]\n"
+      string << "[radiobuttons]\n"
+      @radiobuttons.each { |f| string << f.inspect }
+      string << "[checkboxes]\n"
+      @checkboxes.each { |f| string << f.inspect }
+      string << "[fields]\n"
+      @fields.each { |f| string << f.inspect }
+      string << "[buttons]\n"
+      @buttons.each { |f| string << f.inspect }
+      string
     end
   
     private

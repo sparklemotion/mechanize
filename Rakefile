@@ -11,7 +11,7 @@ end
 
 PKG_BUILD = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME = 'mechanize'
-PKG_VERSION = '0.4.5' + PKG_BUILD
+PKG_VERSION = '0.4.6' + PKG_BUILD
 PKG_FILES = FileList["{doc,lib,test}/**/*"].exclude("rdoc").to_a
 
 spec = Gem::Specification.new do |s|
@@ -41,7 +41,7 @@ Rake::RDocTask.new do |p|
   p.main = "README"
   p.rdoc_dir = "doc"
   p.rdoc_files.include("README", "CHANGELOG", "LICENSE", "EXAMPLES", "NOTES", "lib/**/*.rb")
-  p.options << "--main" << 'README' << "--title" << "'WWW::Mechanize RDoc'"
+  p.options << "--main" << 'README' << "--title" << "WWW::Mechanize RDoc"
 end
 
 desc "Publish the API documentation"

@@ -2,6 +2,13 @@ require 'webrick'
 require 'logger'
 require 'date'
 
+class BadContentTypeTest < WEBrick::HTTPServlet::AbstractServlet
+  def do_GET(req, res)
+    res['Content-Type'] = "text/xml"
+    res.body = "Hello World"
+  end
+end
+
 class FileUploadTest < WEBrick::HTTPServlet::AbstractServlet
   def do_POST(req, res)
     res.body = req.body
@@ -29,7 +36,7 @@ class FormTest < WEBrick::HTTPServlet::AbstractServlet
     res.body = "<HTML><body>"
     req.query.each_key { |k|
       req.query[k].each_data { |data|
-        res.body << "<a href=\"#\">#{k}:#{data}</a><br />"
+        res.body << "<a href=\"#\">#{URI.unescape(k)}:#{URI.unescape(data)}</a><br />"
       }
     }
     res.body << "</body></HTML>"

@@ -96,3 +96,12 @@ the original filter.
   page = agent.get('http://google.com/')
   page.links.each { |l| puts l.text }
 
+== Using a proxy
+
+  require 'rubygems'
+  require 'mechanize'
+  
+  agent = WWW::Mechanize.new
+  agent.set_proxy('localhost', '8000')
+  page = agent.get(ARGV[0])
+  puts page.body

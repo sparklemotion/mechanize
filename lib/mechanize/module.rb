@@ -19,19 +19,3 @@ class Module
   end
 end
 
-class Array
-  def with
-    self
-  end
-
-  alias :and :with
-
-  def method_missing(meth_sym, arg)
-    if arg.class == Regexp
-      find_all { |e| e.send(meth_sym) =~ arg }
-    else
-      find_all { |e| e.send(meth_sym) == arg }
-    end
-  end
-end
-

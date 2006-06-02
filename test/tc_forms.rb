@@ -129,6 +129,38 @@ class FormsMechTest < Test::Unit::TestCase
     )
   end
 
+  def test_select_box
+    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    page = agent.get("http://localhost:#{@port}/form_test.html")
+    post_form = page.forms.find { |f| f.name == "post_form1" }
+    assert_not_nil(post_form, "Post form is null")
+    assert_not_nil(page.header)
+    assert_not_nil(page.root)
+    assert_equal(0, page.iframes.length)
+    assert_equal("post", post_form.method.downcase)
+    assert_equal("/form_post", post_form.action)
+
+    # Find the select list
+    s = post_form.fields.name(/country/).first
+    assert_not_nil(s, "Couldn't find country select list")
+    assert_equal(2, s.options.length)
+    assert_equal("USA", s.value)
+    assert_equal("USA", s.options.first.value)
+    assert_equal("USA", s.options.first.text)
+    assert_equal("CANADA", s.options[1].value)
+    assert_equal("CANADA", s.options[1].text)
+
+    # Now set all the fields
+    post_form.fields.name(/country/).value = s.options[1]
+    page = agent.submit(post_form, post_form.buttons.first)
+
+    # Check that the submitted fields exist
+    assert_not_nil(
+      page.links.find { |l| l.text == "country:CANADA" },
+      "select box not submitted"
+    )
+  end
+
   def test_get
     agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
     page = agent.get("http://localhost:#{@port}/form_test.html")

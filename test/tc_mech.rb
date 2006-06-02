@@ -21,6 +21,12 @@ class MechMethodsTest < Test::Unit::TestCase
       agent.history.last.uri.to_s)
     assert_equal("http://localhost:#{@port}/",
       agent.history[-2].uri.to_s)
+
+    assert_equal(true, agent.visited?("http://localhost:#{@port}/"))
+    assert_equal(true, agent.visited?("/form_test.html"))
+    assert_equal(false, agent.visited?("http://google.com/"))
+    assert_equal(true, agent.visited?(page.links.first))
+
   end
 
   def test_max_history

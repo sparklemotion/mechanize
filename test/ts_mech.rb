@@ -19,4 +19,5 @@ require 'tc_authenticate'
 require 'tc_filter'
 require 'tc_cookie_class'
 require 'tc_cookie_jar'
+require 'tc_errors'
 

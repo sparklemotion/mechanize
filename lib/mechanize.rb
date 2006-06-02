@@ -20,6 +20,7 @@ require 'webrick'
 require 'date'
 require 'web/htmltools/xmltree'   # narf
 require 'mechanize/module'
+require 'mechanize/list'
 require 'mechanize/parsing'
 require 'mechanize/cookie'
 require 'mechanize/form'
@@ -51,8 +52,8 @@ end
 #  agent = WWW::Mechanize.new { |a| a.log = Logger.new("mech.log") }
 #  agent.user_agent_alias = 'Mac Safari'
 #  page = agent.get("http://www.google.com/")
-#  search_form = page.forms.find { |f| f.name == "f" }
-#  search_form.fields.find { |f| f.name == "q" }.value = "Hello"
+#  search_form = page.forms.name("f").first
+#  search_form.fields.name("q").value = "Hello"
 #  search_results = agent.submit(search_form)
 #  puts search_results.body
 class Mechanize
@@ -60,7 +61,8 @@ class Mechanize
   AGENT_ALIASES = {
     'Windows IE 6' => 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)',
     'Windows Mozilla' => 'Mozilla/5.0 (Windows; U; Windows NT 5.0; en-US; rv:1.4b) Gecko/20030516 Mozilla Firebird/0.6',
-    'Mac Safari' => 'Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en-us) AppleWebKit/85 (KHTML, like Gecko) Safari/85',
+    'Mac Safari' => 'Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en) AppleWebKit/418 (KHTML, like Gecko) Safari/417.9.3',
+    'Mac FireFox' => 'Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.8.0.3) Gecko/20060426 Firefox/1.5.0.3',
     'Mac Mozilla' => 'Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.4a) Gecko/20030401',
     'Linux Mozilla' => 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.4) Gecko/20030624',
     'Linux Konqueror' => 'Mozilla/5.0 (compatible; Konqueror/3; Linux)',
@@ -87,13 +89,25 @@ class Mechanize
     @body_filter    = lambda { |body| body }
     @cookie_jar = CookieJar.new
     @log = Logger.new(nil)
+    @proxy_addr     = nil
+    @proxy_port     = nil
+    @proxy_user     = nil
+    @proxy_pass     = nil
     yield self if block_given?
   end
 
+  # Sets the proxy address, port, user, and password
+  def set_proxy(addr, port, user = nil, pass = nil)
+    @proxy_addr, @proxy_port, @proxy_user, @proxy_pass = addr, port, user, pass
+  end
+
+  # Set the user agent for the Mechanize object.
+  # See AGENT_ALIASES
   def user_agent_alias=(al)
     self.user_agent = AGENT_ALIASES[al] || raise("unknown agent alias")
   end
 
+  # Returns a list of cookies stored in the cookie jar.
   def cookies
     cookies = []
     @cookie_jar.jar.each_key do |domain|
@@ -104,6 +118,7 @@ class Mechanize
     cookies
   end
 
+  # Sets the user and password to be used for basic authentication.
   def basic_auth(user, password)
     @user = user
     @password = password
@@ -114,6 +129,7 @@ class Mechanize
     basic_auth(user, password)
   end
 
+  # Fetches the URL passed in.
   def get(url)
     cur_page = current_page() || Page.new
 
@@ -123,6 +139,7 @@ class Mechanize
     page
   end
 
+  # Posts to the given URL wht the query parameters passed in.
   def post(url, query={})
     cur_page = current_page() || Page.new
 
@@ -141,11 +158,14 @@ class Mechanize
     page
   end
 
+  # Clicks the WWW::Link object passed in.
   def click(link)
     uri = to_absolute_uri(link.href)
     get(uri)
   end
 
+  # Equivalent to the browser back button.  Returns the most recent page
+  # visited.
   def back
     @history.pop
   end
@@ -154,23 +174,34 @@ class Mechanize
     form.add_button_to_query(button) if button
     query = form.build_query
 
-    uri = to_absolute_uri(URI::escape(form.action))
+    uri = to_absolute_uri(form.action)
     case form.method.upcase
     when 'POST'
       post_form(uri, form) 
     when 'GET'
       if uri.query.nil?
-        get(uri.to_s + "?" + WWW::Mechanize.build_query_string(query))
+        uri.query = WWW::Mechanize.build_query_string(query)
       else
-        get(uri.to_s + "&" + WWW::Mechanize.build_query_string(query))
+        uri.query = uri.query + "&" + WWW::Mechanize.build_query_string(query)
       end
+      get(uri)
     else
       raise 'unsupported method'
     end
   end
 
+  # Returns the current page loaded by Mechanize
   def current_page
     @history.last
+  end
+
+  # Returns whether or not a url has been visited
+  def visited?(url)
+    if url.is_a?(WWW::Link)
+      url = url.uri
+    end
+    uri = to_absolute_uri(url)
+    ! @history.find { |h| h.uri.to_s == uri.to_s }.nil?
   end
 
   alias page current_page
@@ -181,13 +212,13 @@ class Mechanize
     if url.is_a?(URI)
       uri = url
     else
-      uri = URI.parse(url)
+      uri = URI.parse(url.gsub(/\s/, '%20'))
     end
 
     # construct an absolute uri
     if uri.relative?
-      if cur_page
-        uri = cur_page.uri + url
+      if cur_page.uri
+        uri = cur_page.uri + (url.is_a?(URI) ? url : URI::escape(url))
       else
         raise 'no history. please specify an absolute URL'
       end
@@ -222,7 +253,13 @@ class Mechanize
 
     page = Page.new(uri)
 
-    http = Net::HTTP.new(uri.host, uri.port)
+    http = Net::HTTP.new( uri.host,
+                          uri.port,
+                          @proxy_addr,
+                          @proxy_port,
+                          @proxy_user,
+                          @proxy_pass
+                        )
 
     if uri.scheme == 'https'
       http.use_ssl = true
@@ -306,7 +343,7 @@ class Mechanize
           return page
         when "301", "302"
           log.info("follow redirect to: #{ response['Location'] }")
-          return fetch_page(to_absolute_uri(response['Location'], page), :get, page)
+          return fetch_page(to_absolute_uri(URI.parse(response['Location'].gsub(/ /, '%20')), page), :get, page)
         else
           raise ResponseCodeError.new(page.code), "Unhandled response", caller
         end
@@ -330,6 +367,14 @@ class Mechanize
     if @max_history and @history.size > @max_history
       # keep only the last @max_history entries
       @history = @history[@history.size - @max_history, @max_history] 
+    end
+  end
+
+  class ContentTypeError < RuntimeError
+    attr_reader :content_type
+  
+    def initialize(content_type)
+      @content_type = content_type
     end
   end
 

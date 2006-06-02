@@ -19,6 +19,7 @@ s.mount("/form_post", FormTest)
 s.mount("/form post", FormTest)
 s.mount("/response_code", ResponseCodeTest)
 s.mount("/file_upload", FileUploadTest)
+s.mount("/bad_content_type", BadContentTypeTest)
 
 htpasswd = WEBrick::HTTPAuth::Htpasswd.new(base_dir + '/data/htpasswd')
 auth = WEBrick::HTTPAuth::BasicAuth.new(

@@ -1,5 +1,34 @@
 = Mechanize Release Notes
 
+== 0.4.6
+
+The 0.4.6 release comes with proxy support which can be enabled by calling
+the set_proxy method on your WWW::Mechanize object.  Once you have set your
+proxy settings, all mechanize requests will go through the proxy.
+
+A new "visited?" method has been added to WWW::Mechanize so that you can see
+if any particular URL is in your history.
+
+Image alt text support has been added to links.  If a link contains an image
+with no text, the alt text of the image will be used.  For example:
+
+  <a href="foo.html><img src="foo.gif" alt="Foo Image"></a>
+
+This link will contain the text "Foo Image", and can be found like this:
+
+  link = page.links.text('Foo Image')
+
+Lists of things have been updated so that you can set a value without
+specifying the position in the array.  It will just assume that you want to
+set the value on the first element.  For example, the following two statements
+are equivalent:
+
+  form.fields.name('q').first.value = 'xyz'  # Old syntax
+  form.fields.name('q').value = 'xyz'        # New syntax
+
+This new syntax comes with a note of caution; make sure you know you want to
+set only the first value.  There could be multiple fields with the name 'q'.
+
 == 0.4.5
 
 This release comes with a new filtering system.  You can now manipulate the

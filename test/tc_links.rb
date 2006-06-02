@@ -21,4 +21,17 @@ class LinksMechTest < Test::Unit::TestCase
     page = agent.get("http://localhost:#{@port}/find_link.html")
     assert_equal(15, page.links.length)
   end
+
+  def test_alt_text
+    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    page = agent.get("http://localhost:#{@port}/alt_text.html")
+    assert_equal(4, page.links.length)
+    assert_equal(1, page.meta.length)
+
+    assert_equal('', page.meta.first.text)
+    assert_equal('alt text', page.links.href('alt_text.html').first.text)
+    assert_equal('', page.links.href('no_alt_text.html').first.text)
+    assert_equal('no image', page.links.href('no_image.html').first.text)
+    assert_equal('', page.links.href('no_text.html').first.text)
+  end
 end

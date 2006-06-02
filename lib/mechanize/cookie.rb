@@ -1,6 +1,7 @@
 require 'date'
 
 module WWW
+  # This class is used to represent an HTTP Cookie.
   class Cookie
     attr_reader :name, :value, :path, :domain, :expires, :secure
     def initialize(cookie)
@@ -21,7 +22,7 @@ module WWW
         cookie_text.split(/; ?/).each do |data|
           name, value = data.split('=', 2)
           next unless name
-          cookie[name] = value
+          cookie[name.strip] = value
         end
   
         cookie_values[:path] = cookie.delete(
@@ -116,12 +117,15 @@ module WWW
     end
   end
 
+  # This class is used to manage the Cookies that have been returned from
+  # any particular website.
   class CookieJar
     attr_accessor :jar
     def initialize
       @jar = {}
     end
   
+    # Add a cookie to the Jar.
     def add(cookie)
       unless @jar.has_key?(cookie.domain)
         @jar[cookie.domain] = Hash.new
@@ -130,6 +134,7 @@ module WWW
       @jar[cookie.domain][cookie.name] = cookie
     end
   
+    # Fetch the cookies that should be used for the URI object passed in.
     def cookies(url)
       cookies = []
       @jar.each_key do |domain|

@@ -1,3 +1,14 @@
+== 0.4.6
+
+* Added support for proxies
+* Added a uri field to WWW::Link
+* Added a error class WWW::Mechanize::ContentTypeError
+* Added image alt text to link text
+* Added an visited? method to WWW::Mechanize
+* Added Array#value= which will set the first value to the argument.  That
+  allows syntax as such:    form.fields.name('q').value = 'xyz'
+  Before it was like this:  form.fields.name('q').first.value = 'xyz'
+
 == 0.4.5
 
 * Added support for multiple values of the same name

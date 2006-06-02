@@ -44,29 +44,38 @@ module WWW
       @body_filter  = lambda { |body| body }
     end
   
+    # Set the body filter for the page.  The body should be a Proc object that
+    # returns what the body should be set to.  For example, replace all
+    # occurrences of 'foo' with 'bar':
+    #  page.body_filter = lambda { |body| body.gsub(/foo/, bar) }
     def body_filter=(filter)
       @body_filter = filter
       parse_html()
     end
 
+    # Get the response header
     def header
       @response.header
     end
   
+    # Get the content type
     def content_type
       @response['Content-Type']
     end
   
+    # Get a list of Form associated with this page.
     def forms(*args)
       parse_html() unless @forms
       find_forms(*args)
     end
   
+    # Get a list of Link associated with this page.
     def links(*args)
       parse_html() unless @links
       find_links(*args)
     end
   
+    # Get the root XML parse tree for this page.
     def root
       parse_html() unless @root
       @root
@@ -80,25 +89,43 @@ module WWW
       find_watches(*args)
     end
   
+    # Get a list of Meta links, usually used for refreshing the page.
     def meta(*args)
       parse_html() unless @meta 
       find_meta(*args)
     end
 
+    # Get a list of Frame from the page
     def frames(*args)
       parse_html() unless @frames
       find_frames(*args)
     end
 
+    # Get a list of IFrame from the page
     def iframes(*args)
       parse_html() unless @iframes
       find_iframes(*args)
     end
   
+    def inspect
+      string = "[meta]\n"
+      meta.each { |l| string << l.inspect }
+      string << "[frames]\n"
+      frames.each { |l| string << l.inspect }
+      string << "[iframes]\n"
+      iframes.each { |l| string << l.inspect }
+      string << "[links]\n"
+      links.each { |l| string << l.inspect }
+      string << "[forms]\n"
+      forms.each { |l| string << l.inspect }
+      string
+    end
+
     private
   
     def parse_html
-      raise "no html" unless content_type() =~ /^text\/html/ 
+      raise Mechanize::ContentTypeError.new(content_type()) unless
+        content_type() =~ /^text\/html/ 
   
       # construct parser and feed with HTML
       parser = HTMLTree::XMLParser.new
@@ -120,11 +147,11 @@ module WWW
   
       @root = parser.document
   
-      @forms    = []
-      @links    = []
-      @meta     = []
-      @frames   = []
-      @iframes  = []
+      @forms    = WWW::Mechanize::List.new
+      @links    = WWW::Mechanize::List.new
+      @meta     = WWW::Mechanize::List.new
+      @frames   = WWW::Mechanize::List.new
+      @iframes  = WWW::Mechanize::List.new
       @watches  = {}
   
       @root.each_recursive {|node|

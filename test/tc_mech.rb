@@ -100,4 +100,12 @@ class MechMethodsTest < Test::Unit::TestCase
       assert_equal(a, d)
     }
   end
+
+  def test_get_file
+    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    page = agent.get("http://localhost:#{@port}/frame_test.html")
+    content_length = page.header['Content-Length']
+    page_as_string = agent.get_file("http://localhost:#{@port}/frame_test.html")
+    assert_equal(content_length.to_i, page_as_string.length.to_i)
+  end
 end

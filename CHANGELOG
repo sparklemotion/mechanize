@@ -1,3 +1,12 @@
+== 0.4.7
+
+* Fixed bug with no action in forms.  Thanks to Adam Wiggins
+* Setting a default user-agent string
+* Added house cleaning to the cookie jar so expired cookies don't stick around.
+* Added new method WWW::Form#field to find the first field with a given name.
+  (thanks to Gregory Brown)
+* Added WWW::Mechanize#get_file for fetching non text/html files
+
 == 0.4.6
 
 * Added support for proxies

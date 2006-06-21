@@ -1,5 +1,14 @@
 = Mechanize Release Notes
 
+== 0.4.7
+
+This release of mechanize comes with a few bug fixes including fixing a
+bug when there is no action specified in a form.
+
+In this version, a default user agent string is now set for mechanize.  Also
+a convenience method WWW::Mechanize#get_file has been added for fetching
+non text/html files.
+
 == 0.4.6
 
 The 0.4.6 release comes with proxy support which can be enabled by calling

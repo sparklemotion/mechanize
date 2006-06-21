@@ -66,6 +66,7 @@ class Mechanize
     'Mac Mozilla' => 'Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.4a) Gecko/20030401',
     'Linux Mozilla' => 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.4) Gecko/20030624',
     'Linux Konqueror' => 'Mozilla/5.0 (compatible; Konqueror/3; Linux)',
+    'Mechanize' => "WWW-Mechanize/#{WWW::MechVersion} (http://rubyforge.org/projects/mechanize/)"
   }
 
   attr_accessor :log
@@ -80,7 +81,7 @@ class Mechanize
 
   def initialize
     @history        = []
-    @user_agent     = nil
+    @user_agent     = AGENT_ALIASES['Mechanize']
     @user           = nil
     @open_timeout   = nil
     @read_timeout   = nil
@@ -137,6 +138,11 @@ class Mechanize
     page = fetch_page(to_absolute_uri(url, cur_page), :get, cur_page)
     add_to_history(page)
     page
+  end
+
+  # Fetch a file and return the contents
+  def get_file(url)
+    get(url).body
   end
 
   # Posts to the given URL wht the query parameters passed in.

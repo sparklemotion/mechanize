@@ -129,6 +129,46 @@ class CookieClassTest < Test::Unit::TestCase
     end
   end
 
+  # Test using secure cookies
+  def test_cookie_with_secure
+    url = URI.parse('http://rubyforge.org/')
+    cookie_params = {}
+    cookie_params['expires']   = 'expires=Sun, 27-Sep-2037 00:00:00 GMT'
+    cookie_params['path']      = 'path=/'
+    cookie_params['domain']    = 'domain=.rubyforge.org'
+    cookie_params['secure']    = 'secure'
+    cookie_value = '12345%7D=ASDFWEE345%3DASda'
+
+    expires = DateTime.strptime('Sun, 27-Sep-2037 00:00:00 GMT',
+              '%a, %d-%b-%Y %T %Z')
+    
+    cookie_params.keys.combine.each do |c|
+      next unless c.find { |k| k == 'secure' }
+      cookie_text = "#{cookie_value}; "
+      c.each_with_index do |key, idx|
+        if idx == (c.length - 1)
+          cookie_text << "#{cookie_params[key]}"
+        else
+          cookie_text << "#{cookie_params[key]}; "
+        end
+      end
+      cookie = nil
+      WWW::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
+      assert_not_nil(cookie)
+      assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
+      assert_equal('rubyforge.org', cookie.domain)
+      assert_equal('/', cookie.path)
+      assert_equal(true, cookie.secure)
+
+      # if expires was set, make sure we parsed it
+      if c.find { |k| k == 'expires' }
+        assert_equal(expires, cookie.expires)
+      else
+        assert_nil(cookie.expires)
+      end
+    end
+  end
+
   # If no domain was given, we must use the one from the URL
   def test_cookie_with_url_domain
     url = URI.parse('http://login.rubyforge.org/')

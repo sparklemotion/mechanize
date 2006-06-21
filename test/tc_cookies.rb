@@ -33,7 +33,7 @@ class CookiesMechTest < Test::Unit::TestCase
   def test_many_cookies_as_string
     agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
     page = agent.get("http://localhost:#{@port}/many_cookies_as_string")
-    assert_equal(5, agent.cookies.length)
+    assert_equal(4, agent.cookies.length)
 
     name_cookie = agent.cookies.find { |k| k.name == "name" }
     assert_not_nil(name_cookie, "Name cookie was nil")
@@ -42,10 +42,7 @@ class CookiesMechTest < Test::Unit::TestCase
     assert_equal(true, DateTime.now < name_cookie.expires)
 
     expired_cookie = agent.cookies.find { |k| k.name == "expired" }
-    assert_not_nil(expired_cookie, "Expired cookie was nil")
-    assert_equal("doh", expired_cookie.value)
-    assert_equal("/", expired_cookie.path)
-    assert_equal(true, DateTime.now > expired_cookie.expires)
+    assert_nil(expired_cookie, "Expired cookie was not nil")
 
     no_exp_cookie = agent.cookies.find { |k| k.name == "no_expires" }
     assert_not_nil(no_exp_cookie, "No expires cookie is nil")
@@ -68,7 +65,7 @@ class CookiesMechTest < Test::Unit::TestCase
   def test_many_cookies
     agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
     page = agent.get("http://localhost:#{@port}/many_cookies")
-    assert_equal(5, agent.cookies.length)
+    assert_equal(4, agent.cookies.length)
 
     name_cookie = agent.cookies.find { |k| k.name == "name" }
     assert_not_nil(name_cookie, "Name cookie was nil")
@@ -77,10 +74,7 @@ class CookiesMechTest < Test::Unit::TestCase
     assert_equal(true, DateTime.now < name_cookie.expires)
 
     expired_cookie = agent.cookies.find { |k| k.name == "expired" }
-    assert_not_nil(expired_cookie, "Expired cookie was nil")
-    assert_equal("doh", expired_cookie.value)
-    assert_equal("/", expired_cookie.path)
-    assert_equal(true, DateTime.now > expired_cookie.expires)
+    assert_nil(expired_cookie, "Expired cookie was not nil")
 
     no_exp_cookie = agent.cookies.find { |k| k.name == "no_expires" }
     assert_not_nil(no_exp_cookie, "No expires cookie is nil")

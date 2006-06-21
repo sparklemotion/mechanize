@@ -9,6 +9,13 @@ require 'test_includes'
 class FormsMechTest < Test::Unit::TestCase
   include TestMethods
 
+  def test_no_form_action
+    mech = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    page = mech.get('http://localhost:2000/form_no_action.html')
+    page.forms.first.fields.first.value = 'Aaron'
+    page = mech.submit(page.forms.first)
+    assert_match('/form_no_action.html?first=Aaron', page.uri.to_s)
+  end
   # Test submitting form with two fields of the same name
   def test_post_multival
     agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
@@ -367,13 +374,13 @@ class FormsMechTest < Test::Unit::TestCase
       "Gender female button was nil"
     )
 
-    assert_not_nil(post_form.checkboxes.find { |f| f.name == "cool person" },
+    assert_not_nil(post_form.checkboxes.name("cool person").first,
       "couldn't find cool person checkbox")
     assert_not_nil(post_form.checkboxes.find { |f| f.name == "likes ham" },
       "couldn't find likes ham checkbox")
 
     # Now set all the fields
-    post_form.fields.find { |f| f.name == "first_name" }.value = "Aaron"
+    post_form.fields.name('first_name').value = "Aaron"
     post_form.radiobuttons.find { |f| 
       f.name == "gender" && f.value == "male" 
     }.checked = true
@@ -455,5 +462,13 @@ class FormsMechTest < Test::Unit::TestCase
       page.links.find { |l| l.text == "one:two" },
       "one field missing"
     )
+  end
+
+  def test_field_addition
+    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    page = agent.get("http://localhost:#{@port}/form_test.html")
+    get_form = page.forms.find { |f| f.name == "get_form1" }
+    get_form.field("first_name").value = "Gregory"
+    assert_equal( "Gregory", get_form.field("first_name").value ) 
   end
 end

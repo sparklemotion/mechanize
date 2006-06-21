@@ -24,6 +24,8 @@ module WWW
     attr_finder :frames, :iframes, :links, :forms, :meta, :watches
     attr_reader :body_filter
 
+    alias :content :body
+
     # Alias our finders so that we can lazily parse the html
     alias :find_frames   :frames
     alias :find_iframes  :iframes
@@ -159,7 +161,9 @@ module WWW
   
         case name
         when 'form'
-          @forms << Form.new(node)
+          form = Form.new(node)
+          form.action ||= @uri
+          @forms << form
         when 'a'
           @links << Link.new(node)
         when 'meta'

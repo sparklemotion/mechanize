@@ -132,10 +132,13 @@ module WWW
       end
   
       @jar[cookie.domain][cookie.name] = cookie
+      cleanup()
+      cookie
     end
   
     # Fetch the cookies that should be used for the URI object passed in.
     def cookies(url)
+      cleanup
       cookies = []
       @jar.each_key do |domain|
         if url.host =~ /#{domain}$/
@@ -156,6 +159,20 @@ module WWW
   
     def empty?(url)
       cookies(url).length > 0 ? false : true
+    end
+
+    private
+
+    # Remove expired cookies
+    def cleanup
+      @jar.each_key do |domain|
+        @jar[domain].each_key do |name|
+          if ! @jar[domain][name].expires.nil? &&
+            DateTime.now > @jar[domain][name].expires
+              @jar[domain].delete(name)
+          end
+        end
+      end
     end
   end
 end

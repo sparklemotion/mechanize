@@ -194,5 +194,10 @@ module WWW
       @node = node
       super(@node, @node)
     end
+
+    # Fetch the first field whose name is equal to field_name
+    def field(field_name)
+      fields.find { |f| f.name.eql? field_name }
+    end
   end
 end

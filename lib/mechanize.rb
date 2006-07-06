@@ -17,27 +17,20 @@ require 'net/https'
 require 'uri'
 require 'logger'
 require 'webrick'
-require 'date'
 require 'web/htmltools/xmltree'   # narf
 require 'mechanize/module'
-require 'mechanize/list'
-require 'mechanize/parsing'
+require 'mechanize/mech_version'
 require 'mechanize/cookie'
+require 'mechanize/errors'
+require 'mechanize/pluggable_parsers'
 require 'mechanize/form'
 require 'mechanize/form_elements'
+require 'mechanize/list'
 require 'mechanize/page'
 require 'mechanize/page_elements'
+require 'mechanize/parsing'
 
 module WWW
-  require 'mechanize/mech_version.rb'
-
-class ResponseCodeError < RuntimeError
-  attr_reader :response_code
-
-  def initialize(response_code)
-    @response_code = response_code
-  end
-end
 
 # = Synopsis
 # The Mechanize library is used for automating interaction with a website.  It
@@ -57,7 +50,6 @@ end
 #  search_results = agent.submit(search_form)
 #  puts search_results.body
 class Mechanize
-
   AGENT_ALIASES = {
     'Windows IE 6' => 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)',
     'Windows Mozilla' => 'Mozilla/5.0 (Windows; U; Windows NT 5.0; en-US; rv:1.4b) Gecko/20030516 Mozilla Firebird/0.6',
@@ -66,34 +58,51 @@ class Mechanize
     'Mac Mozilla' => 'Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.4a) Gecko/20030401',
     'Linux Mozilla' => 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.4) Gecko/20030624',
     'Linux Konqueror' => 'Mozilla/5.0 (compatible; Konqueror/3; Linux)',
-    'Mechanize' => "WWW-Mechanize/#{WWW::MechVersion} (http://rubyforge.org/projects/mechanize/)"
+    'Mechanize' => "WWW-Mechanize/#{Version} (http://rubyforge.org/projects/mechanize/)"
   }
 
-  attr_accessor :log
-  attr_accessor :user_agent
   attr_accessor :cookie_jar
-  attr_accessor :open_timeout, :read_timeout
-  attr_accessor :watch_for_set
+  attr_accessor :log
   attr_accessor :max_history
+  attr_accessor :open_timeout, :read_timeout
+  attr_accessor :user_agent
+  attr_accessor :watch_for_set
   attr_accessor :ca_file
-  attr_accessor :body_filter
+  attr_accessor :key
+  attr_accessor :cert
+  attr_accessor :pass
+
   attr_reader :history
+  attr_reader :pluggable_parser
 
   def initialize
-    @history        = []
-    @user_agent     = AGENT_ALIASES['Mechanize']
-    @user           = nil
-    @open_timeout   = nil
-    @read_timeout   = nil
-    @watch_for_set  = nil
-    @max_history    = nil
-    @body_filter    = lambda { |body| body }
+    # attr_accessors
     @cookie_jar = CookieJar.new
     @log = Logger.new(nil)
+    @max_history    = nil
+    @open_timeout   = nil
+    @read_timeout   = nil
+    @user_agent     = AGENT_ALIASES['Mechanize']
+    @watch_for_set  = nil
+    @ca_file        = nil
+    @cert           = nil # OpenSSL Certificate
+    @key            = nil # OpenSSL Private Key
+    @pass           = nil # OpenSSL Password
+    
+    # attr_readers
+    @history        = []
+    @pluggable_parser = PluggableParser.new
+
+    # Basic Auth variables
+    @user           = nil # Basic Auth User
+    @password       = nil # Basic Auth Password
+
+    # Proxy settings
     @proxy_addr     = nil
+    @proxy_pass     = nil
     @proxy_port     = nil
     @proxy_user     = nil
-    @proxy_pass     = nil
+
     yield self if block_given?
   end
 
@@ -110,13 +119,7 @@ class Mechanize
 
   # Returns a list of cookies stored in the cookie jar.
   def cookies
-    cookies = []
-    @cookie_jar.jar.each_key do |domain|
-      @cookie_jar.jar[domain].each_key do |name|
-        cookies << @cookie_jar.jar[domain][name]
-      end
-    end
-    cookies
+    @cookie_jar.to_a
   end
 
   # Sets the user and password to be used for basic authentication.
@@ -125,12 +128,7 @@ class Mechanize
     @password = password
   end
 
-  def basic_authetication(user, password)
-    $stderr.puts "This method will be deprecated, please change to 'basic_auth'"
-    basic_auth(user, password)
-  end
-
-  # Fetches the URL passed in.
+  # Fetches the URL passed in and returns a page.
   def get(url)
     cur_page = current_page() || Page.new
 
@@ -140,31 +138,14 @@ class Mechanize
     page
   end
 
-  # Fetch a file and return the contents
+  # Fetch a file and return the contents of the file.
   def get_file(url)
     get(url).body
   end
 
-  # Posts to the given URL wht the query parameters passed in.
-  def post(url, query={})
-    cur_page = current_page() || Page.new
 
-    request_data = [WWW::Mechanize.build_query_string(query)]
-
-    # this is called before the request is sent
-    pre_request_hook = proc {|request|
-      log.debug("query: #{ query.inspect }")
-      request.add_field('Content-Type', 'application/x-www-form-urlencoded')
-      request.add_field('Content-Length', request_data[0].size.to_s)
-    }
-
-    # fetch the page
-    page = fetch_page(to_absolute_uri(url, cur_page), :post, cur_page, pre_request_hook, request_data)
-    add_to_history(page) 
-    page
-  end
-
-  # Clicks the WWW::Link object passed in.
+  # Clicks the WWW::Mechanize::Link object passed in and returns the
+  # page fetched.
   def click(link)
     uri = to_absolute_uri(link.href)
     get(uri)
@@ -176,23 +157,48 @@ class Mechanize
     @history.pop
   end
 
+  # Posts to the given URL wht the query parameters passed in.  Query
+  # parameters can be passed as a hash, or as an array of arrays.
+  # Example:
+  #  agent.post('http://example.com/', "foo" => "bar")
+  # or
+  #  agent.post('http://example.com/', [ ["foo", "bar"] ])
+  def post(url, query={})
+    cur_page = current_page() || Page.new
+
+    node = REXML::Element.new
+    node.add_attribute('method', 'POST')
+    node.add_attribute('enctype', 'application/x-www-form-urlencoded')
+
+    form = Form.new(node)
+    query.each { |k,v|
+      form.fields << Field.new(k,v)
+    }
+    post_form(url, form)
+  end
+
+  # Submit a form with an optional button.
+  # Without a button:
+  #  page = agent.get('http://example.com')
+  #  agent.submit(page.forms.first)
+  # With a button
+  #  agent.submit(page.forms.first, page.forms.first.buttons.first)
   def submit(form, button=nil)
     form.add_button_to_query(button) if button
-    query = form.build_query
-
     uri = to_absolute_uri(form.action)
     case form.method.upcase
     when 'POST'
       post_form(uri, form) 
     when 'GET'
       if uri.query.nil?
-        uri.query = WWW::Mechanize.build_query_string(query)
+        uri.query = WWW::Mechanize.build_query_string(form.build_query)
       else
-        uri.query = uri.query + "&" + WWW::Mechanize.build_query_string(query)
+        uri.query = uri.query + "&" +
+          WWW::Mechanize.build_query_string(form.build_query)
       end
       get(uri)
     else
-      raise 'unsupported method'
+      raise "unsupported method: #{form.method.upcase}"
     end
   end
 
@@ -203,14 +209,14 @@ class Mechanize
 
   # Returns whether or not a url has been visited
   def visited?(url)
-    if url.is_a?(WWW::Link)
+    if url.is_a?(Link)
       url = url.uri
     end
     uri = to_absolute_uri(url)
     ! @history.find { |h| h.uri.to_s == uri.to_s }.nil?
   end
 
-  alias page current_page
+  alias :page :current_page
 
   private
 
@@ -269,9 +275,14 @@ class Mechanize
 
     if uri.scheme == 'https'
       http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       if @ca_file
         http.ca_file = @ca_file
         http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      end
+      if @cert && @key
+        http.cert = OpenSSL::X509::Certificate.new(::File.read(@cert))
+        http.key  = OpenSSL::PKey::RSA.new(::File.read(@key), @pass)
       end
     end
 
@@ -334,15 +345,28 @@ class Mechanize
           log.debug("header: #{ k } : #{ v }")
         }
 
-        page.response = response
-        page.code = response.code
-
         response.read_body
-        page.body = body_filter.call(response.body)
+
+        content_type = nil
+        unless response['Content-Type'].nil?
+          data = response['Content-Type'].match(/^([^;]*)/)
+          content_type = data[1].downcase unless data.nil?
+        end
+
+
+        # Find our pluggable parser
+        page = @pluggable_parser.parser(content_type).new(
+          uri,
+          response,
+          response.body,
+          response.code
+        )
 
         log.info("status: #{ page.code }")
 
-        page.watch_for_set = @watch_for_set
+        if page.respond_to? :watch_for_set
+          page.watch_for_set = @watch_for_set
+        end
 
         case page.code
         when "200"
@@ -375,15 +399,6 @@ class Mechanize
       @history = @history[@history.size - @max_history, @max_history] 
     end
   end
-
-  class ContentTypeError < RuntimeError
-    attr_reader :content_type
-  
-    def initialize(content_type)
-      @content_type = content_type
-    end
-  end
-
 end
 
 end # module WWW

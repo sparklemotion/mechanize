@@ -19,6 +19,14 @@ end
 
 module REXML::Node
 
+# Aliasing functions to get rid of warnings.  Remove when support for 1.8.2
+# is dropped.
+if RUBY_VERSION > "1.8.2"
+  alias :old_each_recursive       :each_recursive
+  alias :old_find_first_recursive :find_first_recursive
+  alias :old_index_in_parent      :index_in_parent
+end
+
   # Visit all subnodes of +self+ recursively
 
   def each_recursive(&block) # :yields: node
@@ -54,7 +62,7 @@ module REXML::Node
   #   node == node.parent.elements[node.index_in_parent]
 
   def index_in_parent
-    parent.elements.index(self)
+    parent.index(self)+1
   end
 
   # Recursivly collects all text strings starting into an array.
@@ -161,9 +169,9 @@ def extract_from_table(root_node, headers, header_tags = %w(td th))
   # for each row we collect the elements at the same positions as the header_nodes.
   # this is what we finally return from the method. 
 
-  (header_row.index_in_parent+1 .. table.elements.size).collect do |inx|
+  (header_row.index_in_parent .. table.elements.size).collect do |inx|
     row = table.elements[inx]
-    header_nodes.collect { |n| row.elements[ n.index_in_parent ].text }
+    header_nodes.collect { |n| row.elements[ n.parent.elements.index(n) ].text }
   end 
 end
 

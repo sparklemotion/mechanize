@@ -1,5 +1,54 @@
 = Mechanize Release Notes
 
+== 0.5.0
+
+Good News first:
+
+This release has many new great features!  Mechanize has been updated to
+handle any content type a web server returns using a system called "Pluggable
+Parsers".  Mechanize has always been able to handle any content type
+(sort of), but the pluggable parser system lets us cleanly handle any
+content type by instantiating a class for the content type returned from the
+server.  For example, a web server returns type 'text/html', mechanize asks
+the pluggable parser for a class to instantiate for 'text/html'.  Mechanize
+then instantiates that class and returns it.  Users can define their own
+parsers, and register them with the Pluggable Parser so that mechanize will
+instantiate your class when the content type you specify is returned.  This
+allows you to easily preprocess your HTML, or even use other HTML parsers.
+Content types that the pluggable parser doesn't know how to handle will
+return WWW::Mechanize::File which has basic functionality like a 'save_as'
+method.  For more information, see the RDoc for
+WWW::Mechanize::PluggableParser also see the EXAMPLES file.
+
+A 'save_as' method has been added so that any page downloaded can be easily
+saved to a file.
+
+The cookie jar for mechanize can now be saved to disk and loaded back up at
+another time.  If your script needs to save cookie state between executions,
+you can now use the 'save_as' and 'load' methods on WWW::Mechanize::CookieJar.
+
+Form fields can now be treated as accessors.  This means that if you have a
+form with the fields 'username' and 'password', you could manipulate them like
+this:
+
+  form.username = 'test'
+  form.password = 'testing'
+  puts "username: #{form.username}"
+  puts "password: #{form.password}"
+
+Form fields can still be accessed in the usual way in case there are multiple
+input fields with the same name.
+
+Bad news second:
+
+In this release, the name space has been altered to be more consistent.  Many
+classes used to be under WWW directly, they are now all under WWW::Mechanize.
+For example, in 0.4.7 Page was WWW::Page, in this release it is now
+WWW::Mechanize::Page.  This may break your code, but if you aren't using
+class names directly, everything should be fine.
+
+Body filters have been removed in favor of Pluggable Parsers.
+
 == 0.4.7
 
 This release of mechanize comes with a few bug fixes including fixing a

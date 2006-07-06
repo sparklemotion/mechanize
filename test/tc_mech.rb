@@ -9,63 +9,63 @@ require 'test_includes'
 class MechMethodsTest < Test::Unit::TestCase
   include TestMethods
 
+  def setup
+    @agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+  end
+
   def test_history
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
     0.upto(25) do |i|
-      assert_equal(i, agent.history.size)
-      page = agent.get("http://localhost:#{@port}/")
+      assert_equal(i, @agent.history.size)
+      page = @agent.get("http://localhost:#{PORT}/")
     end
-    page = agent.get("http://localhost:#{@port}/form_test.html")
+    page = @agent.get("http://localhost:#{PORT}/form_test.html")
 
-    assert_equal("http://localhost:#{@port}/form_test.html",
-      agent.history.last.uri.to_s)
-    assert_equal("http://localhost:#{@port}/",
-      agent.history[-2].uri.to_s)
+    assert_equal("http://localhost:#{PORT}/form_test.html",
+      @agent.history.last.uri.to_s)
+    assert_equal("http://localhost:#{PORT}/",
+      @agent.history[-2].uri.to_s)
 
-    assert_equal(true, agent.visited?("http://localhost:#{@port}/"))
-    assert_equal(true, agent.visited?("/form_test.html"))
-    assert_equal(false, agent.visited?("http://google.com/"))
-    assert_equal(true, agent.visited?(page.links.first))
+    assert_equal(true, @agent.visited?("http://localhost:#{PORT}/"))
+    assert_equal(true, @agent.visited?("/form_test.html"))
+    assert_equal(false, @agent.visited?("http://google.com/"))
+    assert_equal(true, @agent.visited?(page.links.first))
 
   end
 
   def test_max_history
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    agent.max_history = 10
+    @agent.max_history = 10
     0.upto(10) do |i|
-      assert_equal(i, agent.history.size)
-      page = agent.get("http://localhost:#{@port}/")
+      assert_equal(i, @agent.history.size)
+      page = @agent.get("http://localhost:#{PORT}/")
     end
     
     0.upto(10) do |i|
-      assert_equal(10, agent.history.size)
-      page = agent.get("http://localhost:#{@port}/")
+      assert_equal(10, @agent.history.size)
+      page = @agent.get("http://localhost:#{PORT}/")
     end
   end
 
   def test_back_button
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
     0.upto(5) do |i|
-      assert_equal(i, agent.history.size)
-      page = agent.get("http://localhost:#{@port}/")
+      assert_equal(i, @agent.history.size)
+      page = @agent.get("http://localhost:#{PORT}/")
     end
-    page = agent.get("http://localhost:#{@port}/form_test.html")
+    page = @agent.get("http://localhost:#{PORT}/form_test.html")
 
-    assert_equal("http://localhost:#{@port}/form_test.html",
-      agent.history.last.uri.to_s)
-    assert_equal("http://localhost:#{@port}/",
-      agent.history[-2].uri.to_s)
+    assert_equal("http://localhost:#{PORT}/form_test.html",
+      @agent.history.last.uri.to_s)
+    assert_equal("http://localhost:#{PORT}/",
+      @agent.history[-2].uri.to_s)
 
-    assert_equal(7, agent.history.size)
-    agent.back
-    assert_equal(6, agent.history.size)
-    assert_equal("http://localhost:#{@port}/",
-      agent.history.last.uri.to_s)
+    assert_equal(7, @agent.history.size)
+    @agent.back
+    assert_equal(6, @agent.history.size)
+    assert_equal("http://localhost:#{PORT}/",
+      @agent.history.last.uri.to_s)
   end
 
   def test_google
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/google.html")
+    page = @agent.get("http://localhost:#{PORT}/google.html")
     search = page.forms.find { |f| f.name == "f" }
     assert_not_nil(search)
     assert_not_nil(search.fields.name('q').first)
@@ -74,19 +74,17 @@ class MechMethodsTest < Test::Unit::TestCase
   end
 
   def test_click
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    agent.user_agent_alias = 'Mac Safari'
-    page = agent.get("http://localhost:#{@port}/frame_test.html")
+    @agent.user_agent_alias = 'Mac Safari'
+    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
     link = page.links.text("Form Test").first
     assert_not_nil(link)
-    page = agent.click(link)
-    assert_equal("http://localhost:#{@port}/form_test.html",
-      agent.history.last.uri.to_s)
+    page = @agent.click(link)
+    assert_equal("http://localhost:#{PORT}/form_test.html",
+      @agent.history.last.uri.to_s)
   end
 
   def test_new_find
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/frame_test.html")
+    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
     assert_equal(3, page.frames.size)
 
     find_orig = page.frames.find_all { |f| f.name == 'frame1' }
@@ -102,10 +100,9 @@ class MechMethodsTest < Test::Unit::TestCase
   end
 
   def test_get_file
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/frame_test.html")
+    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
     content_length = page.header['Content-Length']
-    page_as_string = agent.get_file("http://localhost:#{@port}/frame_test.html")
+    page_as_string = @agent.get_file("http://localhost:#{PORT}/frame_test.html")
     assert_equal(content_length.to_i, page_as_string.length.to_i)
   end
 end

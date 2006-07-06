@@ -1,4 +1,4 @@
-class Module
+class Module # :nodoc:
   def attr_finder(*syms)
     syms.each do |sym|
       class_eval %{ def #{sym.to_s}(hash = nil)

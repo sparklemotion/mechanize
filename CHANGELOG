@@ -1,3 +1,20 @@
+= Mechanize CHANGELOG
+
+== 0.5.0
+
+* Added pluggable parsers. (Thanks to Eric Kolve for the idea)
+* Changed namespace so all classes are under WWW::Mechanize.
+* Updating Forms so that fields can be used as accessors (Thanks Gregory Brown)
+* Added WWW::Mechanize::File as default object used for unknown content types.
+* Added 'save_as' method to Mechanize::File, so any page can be saved.
+* Adding 'save_as' and 'load' to CookieJar so that cookies can be saved
+  between sessions.
+* Added WWW::Mechanize::FileSaver pluggable parser to automatically save files.
+* Added WWW::Mechanize::Page#title for page titles
+* Added OpenSSL certificate support (Thanks Mike Dalessio)
+* Removed support for body filters in favor of pluggable parsers.
+* Fixed cookie bug adding a '/' when the url is missing one (Thanks Nick Dainty)
+
 == 0.4.7
 
 * Fixed bug with no action in forms.  Thanks to Adam Wiggins

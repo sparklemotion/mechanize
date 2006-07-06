@@ -1,51 +1,64 @@
 module WWW
-  class Link
-    attr_reader :node
-    attr_reader :href
-    attr_reader :text
-    alias :to_s :text
-  
-    def initialize(node)
-      @node = node
-      @href = node.attributes['href'] 
-      @text = node.all_text
+  class Mechanize
+    # This class encapsulates links.  It contains the text and the URI for
+    # 'a' tags parsed out of an HTML page.  If the link contains an image,
+    # the alt text will be used for that image.
+    #
+    # For example, the text for the following links with both be 'Hello World':
+    #
+    # <a href="http://rubyforge.org">Hello World</a>
+    # <a href="http://rubyforge.org"><img src="test.jpg" alt="Hello World"></a>
+    class Link
+      attr_reader :node
+      attr_reader :href
+      attr_reader :text
+      alias :to_s :text
+    
+      def initialize(node)
+        @node = node
+        @href = node.attributes['href'] 
+        @text = node.all_text
 
-      # If there is no text, try to find an image and use it's alt text
-      if (@text.nil? || @text.length == 0) && @node.has_elements?
-        @text = ''
-        @node.each_element { |e|
-          if e.name == 'img'
-            @text << (e.has_attributes? ? e.attributes['alt'] || '' : '')
-          end
-        }
+        # If there is no text, try to find an image and use it's alt text
+        if (@text.nil? || @text.length == 0) && @node.has_elements?
+          @text = ''
+          @node.each_element { |e|
+            if e.name == 'img'
+              @text << (e.has_attributes? ? e.attributes['alt'] || '' : '')
+            end
+          }
+        end
+      end
+
+      def uri
+        URI.parse(@href)
+      end
+
+      def inspect
+        "'#{@text}' -> #{@href}"
       end
     end
-
-    def uri
-      URI.parse(@href)
+    
+    # This class encapsulates a Meta tag.  Mechanize treats meta tags just
+    # like 'a' tags.  Meta objects will contain links, but most likely will
+    # have no text.
+    class Meta < Link
     end
 
-    def inspect
-      "'#{@text}' -> #{@href}\n"
-    end
-  end
-  
-  class Meta < Link
-  end
+    # This class encapsulates a 'frame' tag.  Frame objects can be treated
+    # just like Link objects.  They contain src, the link they refer to,
+    # name, the name of the frame.  'src' and 'name' are aliased to 'href'
+    # and 'text' respectively so that a Frame object can be treated just
+    # like a Link.
+    class Frame < Link
+      alias :src :href
+      alias :name :text
 
-  class Frame
-    attr_reader :node
-    attr_reader :name
-    attr_reader :src
-
-    def initialize(node)
-      @node = node
-      @name = node.attributes['name']
-      @src  = node.attributes['src']
-    end
-
-    def inspect
-      "'#{@name}' -> #{@src}\n"
+      def initialize(node)
+        @node = node
+        @text = node.attributes['name']
+        @href = node.attributes['src']
+      end
     end
   end
 end

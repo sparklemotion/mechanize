@@ -1,13 +1,21 @@
 require 'webrick'
-require 'base64'
+require 'webrick/https'
 require 'servlets'
 require 'logger'
 
 base_dir = FileTest.exists?(Dir::pwd + '/test') ? Dir::pwd + '/test' : Dir::pwd
 
 s = WEBrick::HTTPServer.new(
-  :Port           => 2000,
+  :Port           => 2002,
   :DocumentRoot   => base_dir + "/htdocs",
+  :SSLEnable      => true,
+  :SSLVerifyClient  => OpenSSL::SSL::VERIFY_NONE,
+  :SSLCertificate => OpenSSL::X509::Certificate.new(
+                                  File.read("data/server.crt")
+                       ),
+  :SSLPrivateKey    => OpenSSL::PKey::RSA.new(
+                                  File.read("data/server.pem")
+                       ),
   :Logger         => Logger.new(nil),
   :AccessLog      => Logger.new(nil)
 )

@@ -8,22 +8,25 @@ require 'test_includes'
 class ResponseCodeMechTest < Test::Unit::TestCase
   include TestMethods
 
-  def test_redirect
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    agent.get("http://localhost:#{@port}/response_code?code=301")
-    assert_equal("http://localhost:#{@port}/index.html",
-      agent.current_page.uri.to_s)
+  def setup
+    @agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+  end
 
-    agent.get("http://localhost:#{@port}/response_code?code=302")
-    assert_equal("http://localhost:#{@port}/index.html",
-      agent.current_page.uri.to_s)
+  def test_redirect
+    @agent.get("http://localhost:#{PORT}/response_code?code=301")
+    assert_equal("http://localhost:#{PORT}/index.html",
+      @agent.current_page.uri.to_s)
+
+    @agent.get("http://localhost:#{PORT}/response_code?code=302")
+    assert_equal("http://localhost:#{PORT}/index.html",
+      @agent.current_page.uri.to_s)
   end
 
   def test_error
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    @agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
     begin
-      agent.get("http://localhost:#{@port}/response_code?code=500")
-    rescue WWW::ResponseCodeError => err
+      @agent.get("http://localhost:#{PORT}/response_code?code=500")
+    rescue WWW::Mechanize::ResponseCodeError => err
       assert_equal("500", err.response_code)
     end
   end

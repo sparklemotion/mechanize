@@ -16,9 +16,12 @@ end
 class WatchesMechTest < Test::Unit::TestCase
   include TestMethods
 
+  def setup
+    @agent = WWW::Mechanize.new
+  end
+
   def test_watches
-    agent = WWW::Mechanize.new
-    page = agent.get("http://localhost:#{@port}/find_link.html")
+    page = @agent.get("http://localhost:#{PORT}/find_link.html")
     page.watch_for_set = { 'area' => Area }
     watches = page.watches
     assert_equal(3, watches['area'].size)

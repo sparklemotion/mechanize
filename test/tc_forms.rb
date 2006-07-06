@@ -9,17 +9,19 @@ require 'test_includes'
 class FormsMechTest < Test::Unit::TestCase
   include TestMethods
 
+  def setup
+    @agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+  end
+
   def test_no_form_action
-    mech = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = mech.get('http://localhost:2000/form_no_action.html')
+    page = @agent.get('http://localhost:2000/form_no_action.html')
     page.forms.first.fields.first.value = 'Aaron'
-    page = mech.submit(page.forms.first)
+    page = @agent.submit(page.forms.first)
     assert_match('/form_no_action.html?first=Aaron', page.uri.to_s)
   end
   # Test submitting form with two fields of the same name
   def test_post_multival
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/form_multival.html")
+    page = @agent.get("http://localhost:#{PORT}/form_multival.html")
     form = page.forms.name('post_form').first
 
     assert_not_nil(form)
@@ -28,7 +30,7 @@ class FormsMechTest < Test::Unit::TestCase
     form.fields.name('first')[0].value = 'Aaron'
     form.fields.name('first')[1].value = 'Patterson'
 
-    page = agent.submit(form)
+    page = @agent.submit(form)
 
     assert_not_nil(page)
 
@@ -39,8 +41,7 @@ class FormsMechTest < Test::Unit::TestCase
 
   # Test submitting form with two fields of the same name
   def test_get_multival
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/form_multival.html")
+    page = @agent.get("http://localhost:#{PORT}/form_multival.html")
     form = page.forms.name('get_form').first
 
     assert_not_nil(form)
@@ -49,7 +50,7 @@ class FormsMechTest < Test::Unit::TestCase
     form.fields.name('first')[0].value = 'Aaron'
     form.fields.name('first')[1].value = 'Patterson'
 
-    page = agent.submit(form)
+    page = @agent.submit(form)
 
     assert_not_nil(page)
 
@@ -59,8 +60,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_post
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/form_test.html")
+    page = @agent.get("http://localhost:#{PORT}/form_test.html")
     post_form = page.forms.find { |f| f.name == "post_form1" }
     assert_not_nil(post_form, "Post form is null")
     assert_equal("post", post_form.method.downcase)
@@ -110,7 +110,7 @@ class FormsMechTest < Test::Unit::TestCase
     }.checked = true
     post_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
     post_form.checkboxes.find { |f| f.name == "green[eggs]" }.checked = true
-    page = agent.submit(post_form, post_form.buttons.first)
+    page = @agent.submit(post_form, post_form.buttons.first)
 
     # Check that the submitted fields exist
     assert_equal(5, page.links.size, "Not enough links")
@@ -137,8 +137,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_select_box
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/form_test.html")
+    page = @agent.get("http://localhost:#{PORT}/form_test.html")
     post_form = page.forms.find { |f| f.name == "post_form1" }
     assert_not_nil(post_form, "Post form is null")
     assert_not_nil(page.header)
@@ -159,7 +158,7 @@ class FormsMechTest < Test::Unit::TestCase
 
     # Now set all the fields
     post_form.fields.name(/country/).value = s.options[1]
-    page = agent.submit(post_form, post_form.buttons.first)
+    page = @agent.submit(post_form, post_form.buttons.first)
 
     # Check that the submitted fields exist
     assert_not_nil(
@@ -169,8 +168,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_get
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/form_test.html")
+    page = @agent.get("http://localhost:#{PORT}/form_test.html")
     get_form = page.forms.find { |f| f.name == "get_form1" }
     assert_not_nil(get_form, "Get form is null")
     assert_equal("get", get_form.method.downcase)
@@ -210,7 +208,7 @@ class FormsMechTest < Test::Unit::TestCase
     }.checked = true
     get_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
     get_form.checkboxes.find { |f| f.name == "green[eggs]" }.checked = true
-    page = agent.submit(get_form, get_form.buttons.first)
+    page = @agent.submit(get_form, get_form.buttons.first)
 
     # Check that the submitted fields exist
     assert_equal(7, page.links.size, "Not enough links")
@@ -245,8 +243,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_post_with_space_in_action
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/form_test.html")
+    page = @agent.get("http://localhost:#{PORT}/form_test.html")
     post_form = page.forms.find { |f| f.name == "post_form2" }
     assert_not_nil(post_form, "Post form is null")
     assert_equal("post", post_form.method.downcase)
@@ -279,7 +276,7 @@ class FormsMechTest < Test::Unit::TestCase
       f.name == "gender" && f.value == "male" 
     }.checked = true
     post_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
-    page = agent.submit(post_form, post_form.buttons.first)
+    page = @agent.submit(post_form, post_form.buttons.first)
 
     # Check that the submitted fields exist
     assert_equal(3, page.links.size, "Not enough links")
@@ -298,8 +295,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_get_with_space_in_action
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/form_test.html")
+    page = @agent.get("http://localhost:#{PORT}/form_test.html")
     get_form = page.forms.find { |f| f.name == "get_form2" }
     assert_not_nil(get_form, "Get form is null")
     assert_equal("get", get_form.method.downcase)
@@ -332,7 +328,7 @@ class FormsMechTest < Test::Unit::TestCase
       f.name == "gender" && f.value == "male" 
     }.checked = true
     get_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
-    page = agent.submit(get_form, get_form.buttons.first)
+    page = @agent.submit(get_form, get_form.buttons.first)
 
     # Check that the submitted fields exist
     assert_equal(3, page.links.size, "Not enough links")
@@ -351,8 +347,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_post_with_param_in_action
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/form_test.html")
+    page = @agent.get("http://localhost:#{PORT}/form_test.html")
     post_form = page.forms.find { |f| f.name == "post_form3" }
     assert_not_nil(post_form, "Post form is null")
     assert_equal("post", post_form.method.downcase)
@@ -385,7 +380,7 @@ class FormsMechTest < Test::Unit::TestCase
       f.name == "gender" && f.value == "male" 
     }.checked = true
     post_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
-    page = agent.submit(post_form, post_form.buttons.first)
+    page = @agent.submit(post_form, post_form.buttons.first)
 
     # Check that the submitted fields exist
     assert_equal(3, page.links.size, "Not enough links")
@@ -404,8 +399,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_get_with_param_in_action
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/form_test.html")
+    page = @agent.get("http://localhost:#{PORT}/form_test.html")
     get_form = page.forms.find { |f| f.name == "get_form3" }
     assert_not_nil(get_form, "Get form is null")
     assert_equal("get", get_form.method.downcase)
@@ -438,7 +432,7 @@ class FormsMechTest < Test::Unit::TestCase
       f.name == "gender" && f.value == "male" 
     }.checked = true
     get_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
-    page = agent.submit(get_form, get_form.buttons.first)
+    page = @agent.submit(get_form, get_form.buttons.first)
 
     # Check that the submitted fields exist
     assert_equal(5, page.links.size, "Not enough links")
@@ -465,10 +459,20 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_field_addition
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/form_test.html")
+    page = @agent.get("http://localhost:#{PORT}/form_test.html")
     get_form = page.forms.find { |f| f.name == "get_form1" }
     get_form.field("first_name").value = "Gregory"
     assert_equal( "Gregory", get_form.field("first_name").value ) 
+  end
+
+  def test_fields_as_accessors
+    page = @agent.get("http://localhost:#{PORT}/form_multival.html")
+    form = page.forms.name('post_form').first
+
+    assert_not_nil(form)
+    assert_equal(2, form.fields.name('first').length)
+
+    form.first = 'Aaron'
+    assert_equal('Aaron', form.first)
   end
 end

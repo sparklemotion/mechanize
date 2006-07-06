@@ -8,9 +8,12 @@ require 'test_includes'
 class UploadMechTest < Test::Unit::TestCase
   include TestMethods
 
+  def setup
+    @agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+  end
+
   def test_form_enctype
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/file_upload.html")
+    page = @agent.get("http://localhost:#{PORT}/file_upload.html")
     assert_equal('multipart/form-data', page.forms[0].enctype)
 
     form = page.forms.first
@@ -18,7 +21,7 @@ class UploadMechTest < Test::Unit::TestCase
     form.file_uploads.first.mime_type = "text/plain"
     form.file_uploads.first.file_data = "Hello World\n\n"
 
-    page = agent.submit(form)
+    page = @agent.submit(form)
 
     assert_match(
       "Content-Disposition: form-data; name=\"userfile1\"; filename=\"README\"",
@@ -34,8 +37,7 @@ class UploadMechTest < Test::Unit::TestCase
   end
 
   def test_form_multipart
-    agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
-    page = agent.get("http://localhost:#{@port}/file_upload.html")
+    page = @agent.get("http://localhost:#{PORT}/file_upload.html")
     assert_equal('multipart/form-data', page.forms[1].enctype)
 
     form = page.forms[1]
@@ -43,7 +45,7 @@ class UploadMechTest < Test::Unit::TestCase
     form.file_uploads.first.mime_type = "text/plain"
     form.file_uploads.first.file_data = "Hello World\n\n"
 
-    page = agent.submit(form)
+    page = @agent.submit(form)
 
     assert_match(
       "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"README\"",

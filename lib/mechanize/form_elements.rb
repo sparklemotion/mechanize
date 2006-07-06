@@ -1,4 +1,5 @@
 module WWW
+  class Mechanize
   # This class represents a field in a form.  It handles the following input
   # tags found in a form:
   # text, password, hidden, int, textarea
@@ -12,22 +13,8 @@ module WWW
       @name, @value = name, value
     end
   
-    # Returns an array of Field objects
-    # TODO: is this correct?
-    def self.extract_all_from(root_node)
-      fields = []
-      root_node.each_recursive {|node|
-        if (node.name.downcase == 'input' and 
-           %w(text password hidden checkbox radio int).include?(node.attributes['type'].downcase)) or
-           %w(textarea option).include?(node.name.downcase)
-          fields << Field.new(node.attributes['name'], node.attributes['value']) 
-        end
-      }
-      return fields
-    end
-
     def inspect
-      "#{name} = #{@value}\n"
+      "#{name} = #{@value}"
     end
   end
   
@@ -36,44 +23,25 @@ module WWW
   # to upload and WWW::FileUpload#mime_type= to the appropriate mime type
   # of the file.
   # See the example in EXAMPLES[link://files/EXAMPLES.html]
-  class FileUpload
-    # value is the file-name, not the file-content
-    attr_accessor :name
+  class FileUpload < Field
+    attr_accessor :name # Field name
+    attr_accessor :file_name # File name
+    attr_accessor :mime_type # Mime Type (Optional)
     
-    attr_accessor :file_name, :file_data, :mime_type
+    alias :file_data :value
+    alias :file_data= :value=
   
     def initialize(name, file_name)
-      @name, @file_name = name, file_name
+      @file_name = file_name
       @file_data = nil
+      super(name, @file_data)
     end
   end
   
   # This class represents a Submit button in a form.
-  class Button
-    attr_accessor :name, :value
-  
-    def initialize(name, value)
-      @name, @value = name, value
-    end
-  
+  class Button < Field
     def add_to_query(query)
       query << [@name, @value || ''] if @name
-    end
-  
-    # Returns an array of Button objects
-    def self.extract_all_from(root_node)
-      buttons = []
-      root_node.each_recursive {|node|
-        if node.name.downcase == 'input' and 
-           ['submit'].include?(node.attributes['type'].downcase)
-          buttons << Button.new(node.attributes['name'], node.attributes['value'])
-        end
-      }
-      return buttons
-    end
-
-    def inspect
-      "#{name} = #{@value}\n"
     end
   end 
   
@@ -82,6 +50,12 @@ module WWW
   class ImageButton < Button
     attr_accessor :x, :y
     
+    def initialize(name, value)
+      @x = nil
+      @y = nil
+      super(name, value)
+    end
+
     def add_to_query(query)
       if @name
         query << [@name, @value || '']
@@ -93,30 +67,18 @@ module WWW
   
   # This class represents a radio button found in a Form.  To activate the
   # RadioButton in the Form, set the checked method to true.
-  class RadioButton
-    attr_accessor :name, :value, :checked
+  class RadioButton < Field
+    attr_accessor :checked
   
     def initialize(name, value, checked)
-      @name, @value, @checked = name, value, checked
-    end
-
-    def inspect
-      "#{name} = #{@value}\n"
+      @checked = checked
+      super(name, value)
     end
   end
   
   # This class represents a check box found in a Form.  To activate the
   # CheckBox in the Form, set the checked method to true.
-  class CheckBox
-    attr_accessor :name, :value, :checked
-  
-    def initialize(name, value, checked)
-      @name, @value, @checked = name, value, checked
-    end
-
-    def inspect
-      "#{name} = #{@value}\n"
-    end
+  class CheckBox < RadioButton
   end
   
   # This class represents a select list or drop down box in a Form.  Set the
@@ -124,13 +86,11 @@ module WWW
   # list of Option that were found.  After finding the correct option, set
   # the select lists value to the option value:
   #  selectlist.value = selectlist.options.first.value
-  class SelectList
-    attr_accessor :name, :options
-    attr_reader :value
+  class SelectList < Field
+    attr_accessor :options
   
     def initialize(name, node)
-      @name = name
-      @value = nil
+      value = nil
       @options = WWW::Mechanize::List.new
   
       # parse
@@ -138,18 +98,17 @@ module WWW
         if n.name.downcase == 'option'
           option = Option.new(n)
           @options << option
-          @value = option.value if option.selected
+          value = option.value if option.selected
         end
       }
-      @value = @options.first.value if (@value == nil && @options.first)
+      value = @options.first.value if (value == nil && @options.first)
+      super(name, value)
     end
+
+    alias :old_value= :value=
 
     def value=(value)
       @value = value.to_s
-    end
-
-    def inspect
-      "#{name} = #{@value}\n"
     end
   end
 
@@ -165,5 +124,6 @@ module WWW
       @value    = node.attributes['value']
       @selected = node.attributes['selected'] ? true : false
     end
+  end
   end
 end

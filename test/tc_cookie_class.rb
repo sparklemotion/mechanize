@@ -26,7 +26,7 @@ class CookieClassTest < Test::Unit::TestCase
   def test_parse_dates
     url = URI.parse('http://localhost/')
 
-    yesterday = DateTime.now - 1
+    yesterday = Time.now - 86400
 
     dates = [ "14 Apr 89 03:20:12",
               "14 Apr 89 03:20 GMT",
@@ -41,14 +41,29 @@ class CookieClassTest < Test::Unit::TestCase
               "22-AUG-1993 12:59 PM",
               #"Friday, August 04, 1995 3:54 PM",
               "06/21/95 04:24:34 PM",
-              "20/06/95 21:07",
+              #"20/06/95 21:07",
               "95-06-08 19:32:48 EDT",
     ]
 
     dates.each do |date|
       cookie = "PREF=1; expires=#{date}"
-      WWW::Cookie.parse(url, cookie) { |cookie|
+      WWW::Mechanize::Cookie.parse(url, cookie) { |cookie|
         assert_equal(true, cookie.expires < yesterday)
+      }
+    end
+  end
+
+  def test_parse_date_fail
+    url = URI.parse('http://localhost/')
+
+    dates = [ 
+              "20/06/95 21:07",
+    ]
+
+    dates.each do |date|
+      cookie = "PREF=1; expires=#{date}"
+      WWW::Mechanize::Cookie.parse(url, cookie) { |cookie|
+        assert_equal(true, cookie.expires > (Time.now - 86400))
       }
     end
   end
@@ -62,8 +77,7 @@ class CookieClassTest < Test::Unit::TestCase
     cookie_params['httponly']  = 'HttpOnly'
     cookie_value = '12345%7D=ASDFWEE345%3DASda'
 
-    expires = DateTime.strptime('Sun, 27-Sep-2037 00:00:00 GMT',
-              '%a, %d-%b-%Y %T %Z')
+    expires = Time.parse('Sun, 27-Sep-2037 00:00:00 GMT')
     
     cookie_params.keys.combine.each do |c|
       cookie_text = "#{cookie_value}; "
@@ -75,7 +89,7 @@ class CookieClassTest < Test::Unit::TestCase
         end
       end
       cookie = nil
-      WWW::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
+      WWW::Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
       assert_not_nil(cookie)
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('/', cookie.path)
@@ -100,8 +114,7 @@ class CookieClassTest < Test::Unit::TestCase
     cookie_params['httponly']  = 'HttpOnly'
     cookie_value = '12345%7D=ASDFWEE345%3DASda'
 
-    expires = DateTime.strptime('Sun, 27-Sep-2037 00:00:00 GMT',
-              '%a, %d-%b-%Y %T %Z')
+    expires = Time.parse('Sun, 27-Sep-2037 00:00:00 GMT')
     
     cookie_params.keys.combine.each do |c|
       next if c.find { |k| k == 'path' }
@@ -114,7 +127,7 @@ class CookieClassTest < Test::Unit::TestCase
         end
       end
       cookie = nil
-      WWW::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
+      WWW::Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
       assert_not_nil(cookie)
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('rubyforge.org', cookie.domain)
@@ -139,8 +152,7 @@ class CookieClassTest < Test::Unit::TestCase
     cookie_params['secure']    = 'secure'
     cookie_value = '12345%7D=ASDFWEE345%3DASda'
 
-    expires = DateTime.strptime('Sun, 27-Sep-2037 00:00:00 GMT',
-              '%a, %d-%b-%Y %T %Z')
+    expires = Time.parse('Sun, 27-Sep-2037 00:00:00 GMT')
     
     cookie_params.keys.combine.each do |c|
       next unless c.find { |k| k == 'secure' }
@@ -153,7 +165,7 @@ class CookieClassTest < Test::Unit::TestCase
         end
       end
       cookie = nil
-      WWW::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
+      WWW::Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
       assert_not_nil(cookie)
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('rubyforge.org', cookie.domain)
@@ -179,8 +191,7 @@ class CookieClassTest < Test::Unit::TestCase
     cookie_params['httponly']  = 'HttpOnly'
     cookie_value = '12345%7D=ASDFWEE345%3DASda'
 
-    expires = DateTime.strptime('Sun, 27-Sep-2037 00:00:00 GMT',
-              '%a, %d-%b-%Y %T %Z')
+    expires = Time.parse('Sun, 27-Sep-2037 00:00:00 GMT')
     
     cookie_params.keys.combine.each do |c|
       next if c.find { |k| k == 'domain' }
@@ -193,7 +204,7 @@ class CookieClassTest < Test::Unit::TestCase
         end
       end
       cookie = nil
-      WWW::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
+      WWW::Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
       assert_not_nil(cookie)
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('/', cookie.path)
@@ -218,8 +229,7 @@ class CookieClassTest < Test::Unit::TestCase
     cookie_params['httponly']  = 'HttpOnly'
     cookie_value = '12345%7D=ASDFWEE345%3DASda'
 
-    expires = DateTime.strptime('Sun, 27-Sep-2037 00:00:00 GMT',
-              '%a, %d-%b-%Y %T %Z')
+    expires = Time.parse('Sun, 27-Sep-2037 00:00:00 GMT')
     
     cookie_params.keys.combine.each do |c|
       cookie_text = "#{cookie_value};"
@@ -231,7 +241,7 @@ class CookieClassTest < Test::Unit::TestCase
         end
       end
       cookie = nil
-      WWW::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
+      WWW::Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
       assert_not_nil(cookie)
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('/', cookie.path)

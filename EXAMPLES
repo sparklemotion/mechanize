@@ -3,26 +3,25 @@
 == Google
   require 'rubygems'
   require 'mechanize'
-  require 'logger'
   
-  agent = WWW::Mechanize.new { |a| a.log = Logger.new("mech.log") }
+  agent = WWW::Mechanize.new
   agent.user_agent_alias = 'Mac Safari'
   page = agent.get("http://www.google.com/")
   search_form = page.forms.with.name("f").first
-  search_form.fields.name("q").first.value = "Hello"
+  search_form.q = "Hello"
   search_results = agent.submit(search_form)
   puts search_results.body
 
 == Rubyforge
   require 'mechanize'
   
-  agent = WWW::Mechanize.new {|a| a.log = Logger.new(STDERR) }
+  agent = WWW::Mechanize.new
   page = agent.get('http://rubyforge.org/')
   link = page.links.text(/Log In/).first
   page = agent.click(link)
   form = page.forms[1]
-  form.fields.find {|f| f.name == 'form_loginname'}.value = ARGV[0]
-  form.fields.find {|f| f.name == 'form_pw'}.value = ARGV[1]
+  form.form_loginname = ARGV[0]
+  form.form_pw = ARGV[1]
   page = agent.submit(form, form.buttons.first)
   
   puts page.body
@@ -36,8 +35,8 @@ This example uploads one image as two different images to flickr.
   agent = WWW::Mechanize.new
   page = agent.get('http://flickr.com/signin/flickr/')
   form = page.forms.first
-  form.fields.name('email').first.value = ARGV[0]
-  form.fields.name('password').first.value = ARGV[1]
+  form.email = ARGV[0]
+  form.password = ARGV[1]
   page = agent.submit(form)
   page = agent.click page.links.text('Upload').first
   form = page.forms.first
@@ -53,48 +52,28 @@ This example uploads one image as two different images to flickr.
   
   agent.submit(form)
   
-== Page Body Filter
-This example shows how to preprocess a body before mechanize parses it.  The
-body filter sends the page body to the code block, and parses what the code
-block returns.  The filter on WWW::Page#body_filter is a "per-page" filter,
-meaning that it is only applied to one page object.
+== Pluggable Parsers
+Lets say you want html pages to automatically be parsed with Rubyful Soup.
+This example shows you how:
 
   require 'rubygems'
   require 'mechanize'
-  
-  agent = WWW::Mechanize.new
-  
-  page = agent.get('http://google.com/')
-  page.body_filter = lambda { |body|
-      body.gsub(/google/i, "Net::DAAP::Client")
-  }
-  puts page.body
-  
-  page = agent.get('http://google.com/')
-  puts page.body
+  require 'rubyful_soup'
 
-== Global Body Filter
-The body filter can be set on the WWW::Mechanize object for use as a global
-filter.  The filter set will be applied to every page that is requested.  The
-following example shows the global filter being used, then being set back to
-the original filter.
+  class SoupParser < WWW::Mechanize::Page
+    attr_reader :soup
+    def initialize(uri = nil, response = nil, body = nil, code = nil)
+      @soup = BeautifulSoup.new(body)
+      super(uri, response, body, code)
+    end
+  end
 
-  require 'rubygems'
-  require 'mechanize'
-  
   agent = WWW::Mechanize.new
-  
-  old_filter = agent.body_filter
-  agent.body_filter = lambda { |body|
-    body.gsub(/(<a[^>]*>)[^<]*(<\/a[^>]*>)/i, "#{$1}Net::DAAP::Client#{$2}")
-  }
-  
-  page = agent.get('http://google.com/')
-  page.links.each { |l| puts l.text }
-  
-  agent.body_filter = old_filter
-  page = agent.get('http://google.com/')
-  page.links.each { |l| puts l.text }
+  agent.pluggable_parser.html = SoupParser
+
+Now all HTML pages will be parsed with the SoupParser class, and automatically
+give you access to a method called 'soup' where you can get access to the
+Beautiful Soup for that page.
 
 == Using a proxy
 

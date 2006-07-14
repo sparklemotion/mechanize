@@ -14,17 +14,21 @@ class PluggableParserTest < Test::Unit::TestCase
 
   def test_content_type_error
     page = @agent.get("http://localhost:#{PORT}/bad_content_type")
-    page = WWW::Mechanize::Page.new(
-                                    page.uri, 
-                                    page.response, 
-                                    page.body,
-                                    page.code
-                                   )
     assert_raise(WWW::Mechanize::ContentTypeError) {
-      page.root
+      page = WWW::Mechanize::Page.new(
+                                      page.uri, 
+                                      page.response, 
+                                      page.body,
+                                      page.code
+                                     )
     }
     begin
-      page.root
+      page = WWW::Mechanize::Page.new(
+                                      page.uri, 
+                                      page.response, 
+                                      page.body,
+                                      page.code
+                                     )
     rescue WWW::Mechanize::ContentTypeError => ex
       assert_equal('text/xml', ex.content_type)
     end
@@ -36,6 +40,16 @@ class PluggableParserTest < Test::Unit::TestCase
   end
 
   class Filter < WWW::Mechanize::Page
+    def initialize(uri=nil, response=nil, body=nil, code=nil)
+      super(  uri,
+            response,
+            body.gsub(/<body>/, '<body><a href="http://daapclient.rubyforge.org">Net::DAAP::Client</a>'),
+            code
+           )
+    end
+  end
+
+  class FileFilter < WWW::Mechanize::File
     def initialize(uri=nil, response=nil, body=nil, code=nil)
       super(  uri,
             response,
@@ -78,26 +92,26 @@ class PluggableParserTest < Test::Unit::TestCase
   end
 
   def test_content_type_pdf
-    @agent.pluggable_parser.pdf = Filter
+    @agent.pluggable_parser.pdf = FileFilter
     page = @agent.get("http://localhost:#{PORT}/content_type_test?ct=application/pdf")
     assert_kind_of(Class, @agent.pluggable_parser['application/pdf'])
-    assert_equal(Filter, @agent.pluggable_parser['application/pdf'])
-    assert_kind_of(Filter, page)
+    assert_equal(FileFilter, @agent.pluggable_parser['application/pdf'])
+    assert_kind_of(FileFilter, page)
   end
 
   def test_content_type_csv
-    @agent.pluggable_parser.csv = Filter
+    @agent.pluggable_parser.csv = FileFilter
     page = @agent.get("http://localhost:#{PORT}/content_type_test?ct=text/csv")
     assert_kind_of(Class, @agent.pluggable_parser['text/csv'])
-    assert_equal(Filter, @agent.pluggable_parser['text/csv'])
-    assert_kind_of(Filter, page)
+    assert_equal(FileFilter, @agent.pluggable_parser['text/csv'])
+    assert_kind_of(FileFilter, page)
   end
 
   def test_content_type_xml
-    @agent.pluggable_parser.xml = Filter
+    @agent.pluggable_parser.xml = FileFilter
     page = @agent.get("http://localhost:#{PORT}/content_type_test?ct=text/xml")
     assert_kind_of(Class, @agent.pluggable_parser['text/xml'])
-    assert_equal(Filter, @agent.pluggable_parser['text/xml'])
-    assert_kind_of(Filter, page)
+    assert_equal(FileFilter, @agent.pluggable_parser['text/xml'])
+    assert_kind_of(FileFilter, page)
   end
 end

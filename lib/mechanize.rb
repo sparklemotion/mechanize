@@ -130,7 +130,7 @@ class Mechanize
 
   # Fetches the URL passed in and returns a page.
   def get(url)
-    cur_page = current_page() || Page.new
+    cur_page = current_page || Page.new( nil, {'content-type'=>'text/html'})
 
     # fetch the page
     page = fetch_page(to_absolute_uri(url, cur_page), :get, cur_page)
@@ -164,8 +164,6 @@ class Mechanize
   # or
   #  agent.post('http://example.com/', [ ["foo", "bar"] ])
   def post(url, query={})
-    cur_page = current_page() || Page.new
-
     node = Hpricot::Elem.new(Hpricot::STag.new('form'))
     node.attributes['method'] = 'POST'
     node.attributes['enctype'] = 'application/x-www-form-urlencoded'
@@ -240,7 +238,7 @@ class Mechanize
   end
 
   def post_form(url, form)
-    cur_page = current_page() || Page.new
+    cur_page = current_page || Page.new(nil, {'content-type'=>'text/html'})
 
     request_data = [form.request_data]
 
@@ -263,7 +261,7 @@ class Mechanize
 
     log.info("#{ method.to_s.upcase }: #{ uri.to_s }")
 
-    page = Page.new(uri)
+    page = nil
 
     http = Net::HTTP.new( uri.host,
                           uri.port,

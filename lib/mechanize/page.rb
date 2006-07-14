@@ -15,28 +15,18 @@ module WWW
     #  agent.get('http://google.com/').class  #=> WWW::Mechanize::Page
     #
     class Page < File
-      attr_accessor :watch_for_set
+      attr_reader :root, :title, :watch_for_set
       attr_finder :frames, :iframes, :links, :forms, :meta, :watches
 
-      # Alias our finders so that we can lazily parse the html
-      alias :find_frames   :frames
-      alias :find_iframes  :iframes
-      alias :find_links    :links
-      alias :find_forms    :forms
-      alias :find_meta     :meta
-      alias :find_watches  :watches
-    
       def initialize(uri=nil, response=nil, body=nil, code=nil)
         super(uri, response, body, code)
-        @frames       = nil
-        @iframes      = nil
-        @links        = nil
-        @forms        = nil
-        @meta         = nil
-        @watches      = nil
-        @root         = nil
-        @title        = nil
         @watch_for_set = {}
+
+        yield self if block_given?
+
+        raise Mechanize::ContentTypeError.new(response['content-type']) unless
+            content_type() =~ /^text\/html/ 
+        parse_html if body && response
       end
     
       # Get the response header
@@ -46,59 +36,14 @@ module WWW
     
       # Get the content type
       def content_type
-        @response['Content-Type']
+        @response['content-type']
       end
     
-      # Get a list of Form associated with this page.
-      def forms(*args)
-        parse_html() unless @forms
-        find_forms(*args)
-      end
-    
-      # Get a list of Link associated with this page.
-      def links(*args)
-        parse_html() unless @links
-        find_links(*args)
-      end
-    
-      # Get the root XML parse tree for this page.
-      def root
-        parse_html() unless @root
-        @root
-      end
-    
-      # This method watches out for a particular tag, and will call back to the
-      # class specified for the tag in the watch_for_set method.  See the example
-      # in this class.
-      def watches(*args)
-        parse_html() unless @watches 
-        find_watches(*args)
-      end
-    
-      # Get a list of Meta links, usually used for refreshing the page.
-      def meta(*args)
-        parse_html() unless @meta 
-        find_meta(*args)
+      def watch_for_set=(obj)
+        @watch_for_set = obj
+        parse_html if @body
       end
 
-      # Get a list of Frame from the page
-      def frames(*args)
-        parse_html() unless @frames
-        find_frames(*args)
-      end
-
-      # Get a list of IFrame from the page
-      def iframes(*args)
-        parse_html() unless @iframes
-        find_iframes(*args)
-      end
-
-      # Fetch the title of the page
-      def title
-        parse_html() unless @title
-        @title
-      end
-    
       def inspect
         "Page: [#{title} '#{uri.to_s}']"
       end
@@ -106,13 +51,8 @@ module WWW
       private
     
       def parse_html
-        raise Mechanize::ContentTypeError.new(content_type()) unless
-          content_type() =~ /^text\/html/ 
-    
         # construct parser and feed with HTML
-        parser = Hpricot.parse(@body)
-    
-        @root = parser
+        @root = Hpricot.parse(@body)
     
         @forms    = WWW::Mechanize::List.new
         @links    = WWW::Mechanize::List.new

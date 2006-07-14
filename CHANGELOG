@@ -1,5 +1,9 @@
 = Mechanize CHANGELOG
 
+== 0.5.1
+
+* Fixed bug with file uploads
+
 == 0.5.0
 
 * Added pluggable parsers. (Thanks to Eric Kolve for the idea)

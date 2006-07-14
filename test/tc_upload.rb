@@ -52,4 +52,16 @@ class UploadMechTest < Test::Unit::TestCase
       page.body
     )
   end
+
+  def test_submit_no_file
+    page = @agent.get("http://localhost:#{PORT}/file_upload.html")
+    form = page.forms.first
+    form.fields.name('name').value = 'Aaron'
+    page = @agent.submit(form)
+    assert_match('Aaron', page.body)
+    assert_match(
+      "Content-Disposition: form-data; name=\"userfile1\"; filename=\"\"",
+      page.body
+    )
+  end
 end

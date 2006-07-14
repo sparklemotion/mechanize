@@ -110,7 +110,7 @@ module WWW
         case @enctype.downcase
         when 'multipart/form-data'
           boundary = rand_string(20)
-          @enctype << ", boundary=#{boundary}"
+          @enctype << "; boundary=#{boundary}"
           params = []
           query_params.each { |k,v| params << param_to_multipart(k, v) }
           @file_uploads.each { |f| params << file_to_multipart(f) }
@@ -119,7 +119,7 @@ module WWW
         else
           query = WWW::Mechanize.build_query_string(query_params)
         end
-    
+
         query
       end
     
@@ -180,7 +180,7 @@ module WWW
       def file_to_multipart(file)
         body =  "Content-Disposition: form-data; name=\"" +
                 "#{mime_value_quote(file.name)}\"; " +
-                "filename=\"#{mime_value_quote(file.file_name)}\"\r\n" +
+                "filename=\"#{mime_value_quote(file.file_name || '')}\"\r\n" +
                 "Content-Transfer-Encoding: binary\r\n"
         if file.mime_type != nil
           body << "Content-Type: #{file.mime_type}\r\n"

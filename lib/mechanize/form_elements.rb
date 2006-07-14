@@ -98,7 +98,7 @@ module WWW
         if n.name.downcase == 'option'
           option = Option.new(n)
           @options << option
-          value = option.value if option.selected
+          value = option.value if option.selected && value.nil?
         end
       }
       value = @options.first.value if (value == nil && @options.first)

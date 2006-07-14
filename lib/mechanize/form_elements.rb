@@ -94,13 +94,11 @@ module WWW
       @options = WWW::Mechanize::List.new
   
       # parse
-      node.each_recursive {|n|
-        if n.name.downcase == 'option'
-          option = Option.new(n)
-          @options << option
-          value = option.value if option.selected && value.nil?
-        end
-      }
+      (node/'option').each do |n|
+        option = Option.new(n)
+        @options << option
+        value = option.value if option.selected && value.nil?
+      end
       value = @options.first.value if (value == nil && @options.first)
       super(name, value)
     end

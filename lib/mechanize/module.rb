@@ -1,3 +1,5 @@
+require 'hpricot'
+
 class Module # :nodoc:
   def attr_finder(*syms)
     syms.each do |sym|
@@ -19,3 +21,14 @@ class Module # :nodoc:
   end
 end
 
+class Hpricot::Elem
+  def all_text
+    text = ''
+    children.each do |child|
+      if child.respond_to? :content
+        text << child.content
+      end
+    end
+    text
+  end
+end

@@ -135,29 +135,33 @@ module WWW
         @radiobuttons = WWW::Mechanize::List.new
         @checkboxes   = WWW::Mechanize::List.new
     
-        @elements_node.each_recursive {|node|
-          case node.name.downcase
-          when 'input'
-            case (node.attributes['type'] || 'text').downcase
-            when 'text', 'password', 'hidden', 'int'
-              @fields << Field.new(node.attributes['name'], node.attributes['value'] || '') 
-            when 'radio'
-              @radiobuttons << RadioButton.new(node.attributes['name'], node.attributes['value'], node.attributes.has_key?('checked'))
-            when 'checkbox'
-              @checkboxes << CheckBox.new(node.attributes['name'], node.attributes['value'], node.attributes.has_key?('checked'))
-            when 'file'
-              @file_uploads << FileUpload.new(node.attributes['name'], node.attributes['value']) 
-            when 'submit'
-              @buttons << Button.new(node.attributes['name'], node.attributes['value'])
-            when 'image'
-              @buttons << ImageButton.new(node.attributes['name'], node.attributes['value'])
-            end
-          when 'textarea'
-            @fields << Field.new(node.attributes['name'], node.all_text)
-          when 'select'
-            @fields << SelectList.new(node.attributes['name'], node)
+        # Find all input tags
+        (@elements_node/'input').each do |node|
+          case (node.attributes['type'] || 'text').downcase
+          when 'text', 'password', 'hidden', 'int'
+            @fields << Field.new(node.attributes['name'], node.attributes['value'] || '') 
+          when 'radio'
+            @radiobuttons << RadioButton.new(node.attributes['name'], node.attributes['value'], node.attributes.has_key?('checked'))
+          when 'checkbox'
+            @checkboxes << CheckBox.new(node.attributes['name'], node.attributes['value'], node.attributes.has_key?('checked'))
+          when 'file'
+            @file_uploads << FileUpload.new(node.attributes['name'], node.attributes['value']) 
+          when 'submit'
+            @buttons << Button.new(node.attributes['name'], node.attributes['value'])
+          when 'image'
+            @buttons << ImageButton.new(node.attributes['name'], node.attributes['value'])
           end
-        }
+        end
+
+        # Find all textarea tags
+        (@elements_node/'textarea').each do |node|
+          @fields << Field.new(node.attributes['name'], node.all_text)
+        end
+
+        # Find all select tags
+        (@elements_node/'select').each do |node|
+          @fields << SelectList.new(node.attributes['name'], node)
+        end
       end
 
       def rand_string(len = 10)

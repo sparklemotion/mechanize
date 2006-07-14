@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'hpricot'
 
 module WWW
   class Mechanize
@@ -35,6 +36,7 @@ module WWW
         @watches      = nil
         @root         = nil
         @title        = nil
+        @watch_for_set = {}
       end
     
       # Get the response header
@@ -108,25 +110,9 @@ module WWW
           content_type() =~ /^text\/html/ 
     
         # construct parser and feed with HTML
-        parser = HTMLTree::XMLParser.new
-        begin
-          parser.feed(@body)
-        rescue => ex
-          if ex.message =~ /attempted adding second root element to document/ and
-            # Put the whole document inside a single root element, which I
-            # simply name <root>, just to make the parser happy. It's no
-            #longer valid HTML, but without a single root element, it's not
-            # valid HTML as well.
-  
-            # TODO: leave a possible doctype definition outside this element.
-            parser = HTMLTree::XMLParser.new
-            parser.feed("<root>" + @body + "</root>")
-          else
-            raise
-          end
-        end
+        parser = Hpricot.parse(@body)
     
-        @root = parser.document
+        @root = parser
     
         @forms    = WWW::Mechanize::List.new
         @links    = WWW::Mechanize::List.new
@@ -135,39 +121,54 @@ module WWW
         @iframes  = WWW::Mechanize::List.new
         @watches  = {}
     
-        @root.each_recursive {|node|
-          name = node.name.downcase
-    
-          case name
-          when 'form'
-            form = Form.new(node)
-            form.action ||= @uri
-            @forms << form
-          when 'title'
-            @title = node.text
-          when 'a'
-            @links << Link.new(node)
-          when 'meta'
-            equiv   = node.attributes['http-equiv']
-            content = node.attributes['content']
-            if equiv != nil && equiv.downcase == 'refresh'
-              if content != nil && content =~ /^\d+\s*;\s*url\s*=\s*(\S+)/i
-                node.attributes['href'] = $1
-                @meta << Meta.new(node)
-              end
-            end
-          when 'frame'
-            @frames << Frame.new(node)
-          when 'iframe'
-            @iframes << Frame.new(node)
-          else
-            if @watch_for_set and @watch_for_set.keys.include?( name )
-              @watches[name] = [] unless @watches[name]
-              klass = @watch_for_set[name]
-              @watches[name] << (klass ? klass.new(node) : node)
+        # Set the title
+        @title = if (@root/'title').text.length > 0
+          (@root/'title').text
+        end
+
+        # Find all the form tags
+        (@root/'form').each do |html_form|
+          form = Form.new(html_form)
+          form.action ||= @uri
+          @forms << form
+        end
+
+        # Find all the 'a' tags
+        (@root/'a').each do |node|
+          @links << Link.new(node)
+        end
+
+        # Find all 'meta' tags
+        (@root/'meta').each do |node|
+          equiv   = node.attributes['http-equiv']
+          content = node.attributes['content']
+          if equiv != nil && equiv.downcase == 'refresh'
+            if content != nil && content =~ /^\d+\s*;\s*url\s*=\s*(\S+)/i
+              node.attributes['href'] = $1
+              @meta << Meta.new(node)
             end
           end
-        }
+        end
+
+        # Find all 'frame' tags
+        (@root/'frame').each do |node|
+          @frames << Frame.new(node)
+        end
+
+        # Find all 'iframe' tags
+        (@root/'iframe').each do |node|
+          @iframes << Frame.new(node)
+        end
+
+        # Find all watch tags
+        unless @watch_for_set.nil?
+          @watch_for_set.each do |key, klass|
+            (@root/key).each do |node|
+              @watches[key] ||= []
+              @watches[key] << (klass ? klass.new(node) : node)
+            end
+          end
+        end
       end
     end
   end

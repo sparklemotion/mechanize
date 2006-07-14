@@ -20,14 +20,13 @@ module WWW
         @text = node.all_text
 
         # If there is no text, try to find an image and use it's alt text
-        if (@text.nil? || @text.length == 0) && @node.has_elements?
+        if (@text.nil? || @text.length == 0) && (node/'img').length > 0
           @text = ''
-          @node.each_element { |e|
-            if e.name == 'img'
-              @text << (e.has_attributes? ? e.attributes['alt'] || '' : '')
-            end
-          }
+          (node/'img').each do |e|
+            @text << (e.attributes.has_key?('alt') ? e.attributes['alt'] : '')
+          end
         end
+
       end
 
       def uri

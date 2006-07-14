@@ -166,9 +166,9 @@ class Mechanize
   def post(url, query={})
     cur_page = current_page() || Page.new
 
-    node = REXML::Element.new
-    node.add_attribute('method', 'POST')
-    node.add_attribute('enctype', 'application/x-www-form-urlencoded')
+    node = Hpricot::Elem.new(Hpricot::STag.new('form'))
+    node.attributes['method'] = 'POST'
+    node.attributes['enctype'] = 'application/x-www-form-urlencoded'
 
     form = Form.new(node)
     query.each { |k,v|

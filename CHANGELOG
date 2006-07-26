@@ -1,8 +1,13 @@
 = Mechanize CHANGELOG
 
+== 0.5.2
+
+* Fixed a bug with input names that are nil
+
 == 0.5.1
 
 * Fixed bug with file uploads
+* Added performance tweaks to the cookie class
 
 == 0.5.0
 

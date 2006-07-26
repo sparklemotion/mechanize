@@ -137,7 +137,10 @@ module WWW
     
         # Find all input tags
         (@elements_node/'input').each do |node|
-          case (node.attributes['type'] || 'text').downcase
+          type = (node.attributes['type'] || 'text').downcase
+          name = node.attributes['name']
+          next if type != 'submit' && name.nil?
+          case type
           when 'text', 'password', 'hidden', 'int'
             @fields << Field.new(node.attributes['name'], node.attributes['value'] || '') 
           when 'radio'
@@ -155,11 +158,13 @@ module WWW
 
         # Find all textarea tags
         (@elements_node/'textarea').each do |node|
+          next if node.attributes['name'].nil?
           @fields << Field.new(node.attributes['name'], node.all_text)
         end
 
         # Find all select tags
         (@elements_node/'select').each do |node|
+          next if node.attributes['name'].nil?
           @fields << SelectList.new(node.attributes['name'], node)
         end
       end

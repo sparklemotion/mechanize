@@ -13,76 +13,61 @@ module WWW
         @domain   = cookie[:domain]
         @expires  = cookie[:expires]
         @secure   = cookie[:secure]
-        @string   = "#{cookie[:name]}=#{cookie[:value]}"
       end
     
       def Cookie::parse(uri, raw_cookie, &block)
         esc = raw_cookie.gsub(/(expires=[^,]*),([^;]*(;|$))/i) { "#{$1}#{$2}" }
         esc.split(/,/).each do |cookie_text|
-          cookie_values = Hash.new
           cookie = Hash.new
+          valid_cookie = true
           cookie_text.split(/; ?/).each do |data|
             name, value = data.split('=', 2)
             next unless name
-            cookie[name.strip] = value
-          end
+
+            name.strip!
     
-          cookie_values[:path] = cookie.delete(
-            cookie.keys.find { |k| k.downcase  == "path" } ) || uri.path
+            # Set the cookie to invalid if the domain is incorrect
+            case name.downcase
+            when 'path'
+              cookie[:path] = value
+            when 'expires'
+              cookie[:expires] = begin
+                Time::parse(value)
+              rescue
+                Time.now
+              end
+            when 'secure'
+              cookie[:secure] = true
+            when 'domain' # Reject the cookie if it isn't for this domain
+              cookie[:domain] = value.sub(/^\./, '')
 
-          expires_key = cookie.keys.find { |k| k.downcase == "expires" }
-          if expires_key
-            time = nil
-            expires_val = cookie.delete(expires_key)
-
-            # If we can't parse the time, set it to the current time
-            begin
-              time = Time::parse(expires_val)
-            rescue
-              time = Time.now
-            end
-
-            # If we couldn't parse it, set it to the current time
-            time = Time.now if time == nil
-            cookie_values[:expires] = time
-          end
-
-          secure_key = cookie.keys.find { |k| k.downcase == "secure" }
-          if secure_key
-            cookie_values[:secure] = true
-            cookie.delete(secure_key)
-          else
-            cookie_values[:secure] = false
-          end
-    
-          # Set the domain name of the cookie
-          domain_key = cookie.keys.find { |k| k.downcase == "domain" }
-          if domain_key
-            domain = cookie.delete(domain_key)
-            domain.sub!(/^\./, '')
-
-            # Reject cookies not for this domain
-            next unless uri.host =~ /#{domain}$/
-            cookie_values[:domain] = domain
-          else
-            cookie_values[:domain] = uri.host
-          end
-
-          # Delete the http only option
+              # Reject cookies not for this domain
+              # TODO Move the logic to reject based on host to the jar
+              unless uri.host =~ /#{cookie[:domain]}$/
+                valid_cookie = false
+              end
+            when 'httponly'
+              # do nothing
           # http://msdn.microsoft.com/workshop/author/dhtml/httponly_cookies.asp
-          http_only = cookie.keys.find { |k| k.downcase == 'httponly' }
-          cookie.delete(http_only) if http_only
+            else
+              cookie[:name]  = name
+              cookie[:value] = value
+            end
+          end
 
-          cookie.each { |k,v|
-            cookie_values[:name] = k.strip
-            cookie_values[:value] = v.strip
-          }
-          yield Cookie.new(cookie_values)
+          # Don't yield this cookie if it is invalid
+          next unless valid_cookie
+
+          cookie[:path]    ||= uri.path
+          cookie[:secure]  ||= false
+          cookie[:domain]  ||= uri.host
+
+          yield Cookie.new(cookie)
         end
       end
     
       def to_s
-        @string
+        "#{@name}=#{@value}"
       end
     end
 

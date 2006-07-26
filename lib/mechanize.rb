@@ -382,6 +382,7 @@ class Mechanize
   def self.build_query_string(parameters)
     vals = [] 
     parameters.each { |k,v|
+      next if k.nil?
       vals <<
       [WEBrick::HTTPUtils.escape_form(k), 
        WEBrick::HTTPUtils.escape_form(v)].join("=")

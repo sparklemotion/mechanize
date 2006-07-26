@@ -27,6 +27,7 @@ require 'tc_save_file'
 require 'tc_post_form'
 require 'tc_pluggable_parser'
 require 'tc_page'
+require 'tc_form_no_inputname'
 #require 'tc_proxy'
 #require 'tc_ssl_server'
 

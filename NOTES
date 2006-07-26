@@ -1,5 +1,11 @@
 = Mechanize Release Notes
 
+== 0.5.1
+
+This release is a small bugfix release.  The main bug fixed in this release is
+a problem with file uploading.  I have also made some performance improvements
+to cookie parsing.
+
 == 0.5.0
 
 Good News first:

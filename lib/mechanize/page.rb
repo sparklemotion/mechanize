@@ -38,6 +38,13 @@ module WWW
       def content_type
         @response['content-type']
       end
+
+      # Search through the page like HPricot
+      def search(*args)
+        @root.search(*args)
+      end
+
+      alias :/ :search
     
       def watch_for_set=(obj)
         @watch_for_set = obj

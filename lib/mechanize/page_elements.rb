@@ -12,12 +12,14 @@ module WWW
       attr_reader :node
       attr_reader :href
       attr_reader :text
+      attr_reader :attributes
       alias :to_s :text
     
       def initialize(node)
         @node = node
         @href = node.attributes['href'] 
         @text = node.all_text
+        @attributes = node.attributes
 
         # If there is no text, try to find an image and use it's alt text
         if (@text.nil? || @text.length == 0) && (node/'img').length > 0

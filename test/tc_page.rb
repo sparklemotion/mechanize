@@ -5,7 +5,7 @@ require 'rubygems'
 require 'mechanize'
 require 'test_includes'
 
-class PageTest < Test::Unit::TestCase
+class TestPage < Test::Unit::TestCase
   include TestMethods
 
   def setup

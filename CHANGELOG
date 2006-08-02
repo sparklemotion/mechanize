@@ -1,5 +1,12 @@
 = Mechanize CHANGELOG
 
+== 0.6.0
+
+* Changed main parser to use hpricot
+* Made WWW::Mechanize::Page class searchable like hpricot
+* Updated WWW::Mechanize#click to support hpricot links like this:
+  @agent.click (page/"a").first
+
 == 0.5.2
 
 * Fixed a bug with input names that are nil

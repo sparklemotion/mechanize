@@ -6,7 +6,7 @@ require 'rubygems'
 require 'mechanize'
 require 'test_includes'
 
-class MechMethodsTest < Test::Unit::TestCase
+class TestMechMethods < Test::Unit::TestCase
   include TestMethods
 
   def setup
@@ -77,6 +77,16 @@ class MechMethodsTest < Test::Unit::TestCase
     @agent.user_agent_alias = 'Mac Safari'
     page = @agent.get("http://localhost:#{PORT}/frame_test.html")
     link = page.links.text("Form Test").first
+    assert_not_nil(link)
+    page = @agent.click(link)
+    assert_equal("http://localhost:#{PORT}/form_test.html",
+      @agent.history.last.uri.to_s)
+  end
+
+  def test_click_hpricot
+    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
+
+    link = (page/"a[@class=bar]").first
     assert_not_nil(link)
     page = @agent.click(link)
     assert_equal("http://localhost:#{PORT}/form_test.html",

@@ -93,6 +93,16 @@ class TestMechMethods < Test::Unit::TestCase
       @agent.history.last.uri.to_s)
   end
 
+  def test_click_hpricot_frame
+    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
+
+    link = (page/"frame[@name=frame2]").first
+    assert_not_nil(link)
+    page = @agent.click(link)
+    assert_equal("http://localhost:#{PORT}/form_test.html",
+      @agent.history.last.uri.to_s)
+  end
+
   def test_new_find
     page = @agent.get("http://localhost:#{PORT}/frame_test.html")
     assert_equal(3, page.frames.size)

@@ -6,6 +6,8 @@
 * Made WWW::Mechanize::Page class searchable like hpricot
 * Updated WWW::Mechanize#click to support hpricot links like this:
   @agent.click (page/"a").first
+* Clicking a Frame is now possible:
+  @agent.click (page/"frame").first
 
 == 0.5.2
 

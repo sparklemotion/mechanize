@@ -147,7 +147,9 @@ class Mechanize
   # Clicks the WWW::Mechanize::Link object passed in and returns the
   # page fetched.
   def click(link)
-    uri = to_absolute_uri(link.attributes['href'])
+    uri = to_absolute_uri(
+      link.attributes['href'] || link.attributes['src'] || link.href
+    )
     get(uri)
   end
 

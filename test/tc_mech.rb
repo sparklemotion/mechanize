@@ -69,7 +69,7 @@ class TestMechMethods < Test::Unit::TestCase
     search = page.forms.find { |f| f.name == "f" }
     assert_not_nil(search)
     assert_not_nil(search.fields.name('q').first)
-    assert_not_nil(search.fields(:name => 'hl').first)
+    assert_not_nil(search.fields.name('hl').first)
     assert_not_nil(search.fields.find { |f| f.name == 'ie' })
   end
 
@@ -110,12 +110,10 @@ class TestMechMethods < Test::Unit::TestCase
     find_orig = page.frames.find_all { |f| f.name == 'frame1' }
     find1 = page.frames.with.name('frame1')
     find2 = page.frames.name('frame1')
-    find3 = page.frames(:name => 'frame1')
 
-    find_orig.zip(find1, find2, find3).each { |a,b,c,d|
+    find_orig.zip(find1, find2).each { |a,b,c|
       assert_equal(a, b)
       assert_equal(a, c)
-      assert_equal(a, d)
     }
   end
 

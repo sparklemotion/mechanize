@@ -12,6 +12,16 @@
 == 0.5.2
 
 * Fixed a bug with input names that are nil
+* Added a warning when using attr_finder because attr_finder will be deprecated
+  in 0.6.0 in favor of method calls.  So this syntax:
+    @agent.links(:text => 'foo')
+  should be changed to this:
+    @agent.links.text('foo')
+* Added support for selecting multiple options in select tags that support
+  multiple options.  See WWW::Mechanize::MultiSelectList.
+* New select list methods have been added, select_all, select_none.
+* Options for select lists can now be "clicked" which toggles their selection,
+  they can be "seleted" and "unselected".  See WWW::Mechanize::Option
 
 == 0.5.1
 

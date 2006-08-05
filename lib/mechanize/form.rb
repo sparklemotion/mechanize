@@ -63,11 +63,11 @@ module WWW
     
         fields().each do |f|
           next unless f.value
-          query << [f.name, f.value]
+          query.push(*f.query_value)
         end
     
         checkboxes().each do |f|
-          query << [f.name, f.value || "on"] if f.checked
+          query.push(*f.query_value) if f.checked
         end
     
         radio_groups = {}
@@ -82,14 +82,14 @@ module WWW
     
           if checked.size == 1
             f = checked.first
-            query << [f.name, f.value || ""]
+            query.push(*f.query_value)
           elsif checked.size > 1 
             raise "multiple radiobuttons are checked in the same group!" 
           end
         end
 
         @clicked_buttons.each { |b|
-          b.add_to_query(query)
+          query.push(*b.query_value)
         }
     
         query
@@ -165,7 +165,11 @@ module WWW
         # Find all select tags
         (@elements_node/'select').each do |node|
           next if node.attributes['name'].nil?
-          @fields << SelectList.new(node.attributes['name'], node)
+          if node.attributes.has_key? 'multiple'
+            @fields << MultiSelectList.new(node.attributes['name'], node)
+          else
+            @fields << SelectList.new(node.attributes['name'], node)
+          end
         end
       end
 

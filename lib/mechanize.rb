@@ -387,7 +387,7 @@ class Mechanize
       next if k.nil?
       vals <<
       [WEBrick::HTTPUtils.escape_form(k), 
-       WEBrick::HTTPUtils.escape_form(v)].join("=")
+       WEBrick::HTTPUtils.escape_form(v.to_s)].join("=")
     }
 
     vals.join("&")

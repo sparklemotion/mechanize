@@ -158,6 +158,7 @@ class FormsMechTest < Test::Unit::TestCase
 
     # Now set all the fields
     post_form.fields.name(/country/).value = s.options[1]
+    assert_equal('CANADA', post_form.country)
     page = @agent.submit(post_form, post_form.buttons.first)
 
     # Check that the submitted fields exist

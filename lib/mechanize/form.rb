@@ -24,7 +24,7 @@ module WWW
       attr_reader :form_node, :elements_node
       attr_accessor :method, :action, :name
     
-      attr_finder :fields, :buttons, :file_uploads, :radiobuttons, :checkboxes
+      attr_reader :fields, :buttons, :file_uploads, :radiobuttons, :checkboxes
       attr_reader :enctype
     
       def initialize(form_node, elements_node)

@@ -8,6 +8,7 @@
   @agent.click (page/"a").first
 * Clicking a Frame is now possible:
   @agent.click (page/"frame").first
+* Removed deprecated attr_finder
 
 == 0.5.2
 

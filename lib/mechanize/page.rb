@@ -16,7 +16,7 @@ module WWW
     #
     class Page < File
       attr_reader :root, :title, :watch_for_set
-      attr_finder :frames, :iframes, :links, :forms, :meta, :watches
+      attr_reader :frames, :iframes, :links, :forms, :meta, :watches
 
       def initialize(uri=nil, response=nil, body=nil, code=nil)
         super(uri, response, body, code)

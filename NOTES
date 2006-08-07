@@ -1,5 +1,38 @@
 = Mechanize Release Notes
 
+== 0.5.2
+
+This release comes with a few cool new features.  First, support for select
+lists which are "multi" has been added.  This means that you can select
+multiple values for a select list that has the "multiple" attribute.  See
+WWW::Mechanize::MultiSelectList for more information.
+
+New methods for select lists have been added.  You can use the select_all
+method to select all options and select_none to select none to select no
+options.  Options can now be "selected" which selects an option, "unselected",
+which unselects an option, and "clicked" which toggles the current status of
+the option.  What this means is that instead of having to select the first 
+option like this:
+  select_list.value = select_list.options.first.value
+You can select the first option by just saying this:
+  select_list.options.first.select
+Of course you can still set the select list to an arbitrary value by just
+setting the value of the select list.
+
+A new method has been added to Form so that multiple fields can be set at the
+same time.  To set 'foo', and 'name' at the same time on the form, you can do
+the following:
+  form.set_fields( :foo => 'bar', :name => 'Aaron' )
+Or to set the second fields named 'name' you can do the following:
+  form.set_fields( :name => ['Aaron', 1] )
+
+Finally, attr_finder has been deprecated, and all syntax like this:
+  @agent.links(:text => 'foo')
+needs to be changed to:
+  @agent.links.text('foo')
+With this release you will just get a warning, and the code will be removed in
+0.6.0.
+
 == 0.5.1
 
 This release is a small bugfix release.  The main bug fixed in this release is

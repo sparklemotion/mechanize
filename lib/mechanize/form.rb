@@ -227,6 +227,26 @@ module WWW
         fields.find { |f| f.name.eql? field_name }
       end
 
+      # This method sets multiple fields on the form.  It takes a list of field
+      # name, value pairs.  If there is more than one field found with the
+      # same name, this method will set the first one found.  If you want to
+      # set the value of a duplicate field, use a value which is an Array with
+      # the second value of the array as the index in to the form.  The index
+      # is zero based.  For example, to set the second field named 'foo', you
+      # could do the following:
+      #  form.set_fields( :foo => ['bar', 1] )
+      def set_fields(fields = {})
+        fields.each do |k,v|
+          value = nil
+          index = 0
+          v.each do |val|
+            index = val.to_i unless value.nil?
+            value = val if value.nil?
+          end
+          self.fields.name(k.to_s).[](index).value = value
+        end
+      end
+
       # Treat form fields like accessors.
       def method_missing(id,*args)
         method = id.to_s.gsub(/=$/, '')

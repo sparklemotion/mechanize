@@ -22,7 +22,10 @@
   multiple options.  See WWW::Mechanize::MultiSelectList.
 * New select list methods have been added, select_all, select_none.
 * Options for select lists can now be "clicked" which toggles their selection,
-  they can be "seleted" and "unselected".  See WWW::Mechanize::Option
+  they can be "selected" and "unselected".  See WWW::Mechanize::Option
+* Added a method to set multiple fields at the same time,
+  WWW::Mechanize::Form#set_fields.  Which can be used like so:
+   form.set_fields( :foo => 'bar', :name => 'Aaron' )
 
 == 0.5.1
 

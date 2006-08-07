@@ -33,6 +33,7 @@ require 'tc_select_all'
 require 'tc_select_none'
 require 'tc_select'
 require 'tc_select_noopts'
+require 'tc_set_fields'
 #require 'tc_proxy'
 #require 'tc_ssl_server'
 

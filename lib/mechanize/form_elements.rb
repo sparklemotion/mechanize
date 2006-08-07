@@ -185,7 +185,9 @@ module WWW
 
   # This class contains option an option found within SelectList.  A
   # SelectList can have many Option classes associated with it.  An option
-  # can be selected by calling Option#select, or Option#click.
+  # can be selected by calling Option#select, or Option#click.  For example,
+  # select the first option in a list:
+  #  select_list.first.select
   class Option
     attr_reader :value, :selected, :text, :select_list
 

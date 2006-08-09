@@ -35,4 +35,15 @@ class LinksMechTest < Test::Unit::TestCase
     assert_equal('no image', page.links.href('no_image.html').first.text)
     assert_equal('', page.links.href('no_text.html').first.text)
   end
+
+  def test_click_link
+    @agent.user_agent_alias = 'Mac Safari'
+    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
+    link = page.links.text("Form Test")
+    assert_not_nil(link)
+    assert_equal('Form Test', link.text)
+    page = @agent.click(link)
+    assert_equal("http://localhost:#{PORT}/form_test.html",
+      @agent.history.last.uri.to_s)
+  end
 end

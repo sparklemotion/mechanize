@@ -29,6 +29,7 @@ require 'mechanize/list'
 require 'mechanize/page'
 require 'mechanize/page_elements'
 require 'mechanize/parsing'
+require 'mechanize/inspect'
 
 module WWW
 
@@ -224,13 +225,13 @@ class Mechanize
     if url.is_a?(URI)
       uri = url
     else
-      uri = URI.parse(url.gsub(/\s/, '%20'))
+      uri = URI.parse(url.strip.gsub(/\s/, '%20'))
     end
 
     # construct an absolute uri
     if uri.relative?
       if cur_page.uri
-        uri = cur_page.uri + (url.is_a?(URI) ? url : URI::escape(url))
+        uri = cur_page.uri + (url.is_a?(URI) ? url : URI::escape(url.strip))
       else
         raise 'no history. please specify an absolute URL'
       end

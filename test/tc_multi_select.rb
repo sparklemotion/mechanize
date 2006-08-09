@@ -102,7 +102,7 @@ class MultiSelectTest < Test::Unit::TestCase
     page = @agent.get("http://localhost:#{PORT}/form_multi_select.html")
     form = page.forms.first
     form.list = ['1', 'Aaron']
-    form.fields.name('list').first.options[3].select
+    form.fields.name('list').first.options[3].tick
     assert_equal(['1', 'Aaron', '4'].sort, form.list.sort)
     page = @agent.submit(form)
     assert_equal(3, page.links.length)

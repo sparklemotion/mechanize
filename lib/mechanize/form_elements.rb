@@ -13,8 +13,8 @@ module WWW
       @name, @value = name, value
     end
   
-    def inspect
-      "#{name} = #{@value}"
+    def query_value
+      [[@name, @value || '']]
     end
 
     def query_value
@@ -69,9 +69,31 @@ module WWW
   class RadioButton < Field
     attr_accessor :checked
   
-    def initialize(name, value, checked)
+    def initialize(name, value, checked, form)
       @checked = checked
+      @form    = form
       super(name, value)
+    end
+
+    def tick
+      uncheck_peers
+      @checked = true
+    end
+
+    def untick
+      @checked = false
+    end
+
+    def click
+      @checked = !@checked
+    end
+
+    private
+    def uncheck_peers
+      @form.radiobuttons.name(name).each do |b|
+        next if b.value == value
+        b.untick
+      end
     end
   end
   
@@ -113,13 +135,13 @@ module WWW
     # Select no options
     def select_none
       @value = []
-      options.each { |o| o.unselect }
+      options.each { |o| o.untick }
     end
 
     # Select all options
     def select_all
       @value = []
-      options.each { |o| o.select }
+      options.each { |o| o.tick }
     end
 
     # Get a list of all selected options
@@ -211,6 +233,9 @@ module WWW
     def unselect
       @selected = false
     end
+
+    alias :tick   :select
+    alias :untick :unselect
 
     # Toggle the selection value of this option
     def click

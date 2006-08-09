@@ -51,10 +51,6 @@ module WWW
         parse_html if @body
       end
 
-      def inspect
-        "Page: [#{title} '#{uri.to_s}']"
-      end
-
       private
     
       def parse_html

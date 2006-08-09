@@ -34,10 +34,6 @@ module WWW
       def uri
         URI.parse(@href)
       end
-
-      def inspect
-        "'#{@text}' -> #{@href}"
-      end
     end
     
     # This class encapsulates a Meta tag.  Mechanize treats meta tags just

@@ -82,7 +82,7 @@ class SelectTest < Test::Unit::TestCase
 
   def test_select_with_click
     @form.list = ['1', 'Aaron']
-    @form.fields.name('list').first.options[3].select
+    @form.fields.name('list').first.options[3].tick
     assert_equal('4', @form.list)
     page = @agent.submit(@form)
     assert_equal(1, page.links.length)

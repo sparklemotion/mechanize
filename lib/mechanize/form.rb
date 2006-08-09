@@ -123,10 +123,6 @@ module WWW
         query
       end
     
-      def inspect
-        "Form: ['#{@name}' #{@method} #{@action}]"
-      end
-
       private
       def parse
         @fields       = WWW::Mechanize::List.new
@@ -144,9 +140,9 @@ module WWW
           when 'text', 'password', 'hidden', 'int'
             @fields << Field.new(node.attributes['name'], node.attributes['value'] || '') 
           when 'radio'
-            @radiobuttons << RadioButton.new(node.attributes['name'], node.attributes['value'], node.attributes.has_key?('checked'))
+            @radiobuttons << RadioButton.new(node.attributes['name'], node.attributes['value'], node.attributes.has_key?('checked'), self)
           when 'checkbox'
-            @checkboxes << CheckBox.new(node.attributes['name'], node.attributes['value'], node.attributes.has_key?('checked'))
+            @checkboxes << CheckBox.new(node.attributes['name'], node.attributes['value'], node.attributes.has_key?('checked'), self)
           when 'file'
             @file_uploads << FileUpload.new(node.attributes['name'], node.attributes['value']) 
           when 'submit'
@@ -168,7 +164,11 @@ module WWW
           if node.attributes.has_key? 'multiple'
             @fields << MultiSelectList.new(node.attributes['name'], node)
           else
-            @fields << SelectList.new(node.attributes['name'], node)
+            if node.attributes.has_key? 'multiple'
+              @fields << MultiSelectList.new(node.attributes['name'], node)
+            else
+              @fields << SelectList.new(node.attributes['name'], node)
+            end
           end
         end
       end

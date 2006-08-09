@@ -17,7 +17,7 @@
   
   agent = WWW::Mechanize.new
   page = agent.get('http://rubyforge.org/')
-  link = page.links.text(/Log In/).first
+  link = page.links.text(/Log In/)
   page = agent.click(link)
   form = page.forms[1]
   form.form_loginname = ARGV[0]
@@ -40,8 +40,8 @@ This example uploads one image as two different images to flickr.
   page = agent.submit(form)
   page = agent.click page.links.text('Upload').first
   form = page.forms.first
-  img1 = form.file_uploads.name('file1').first
-  img2 = form.file_uploads.name('file2').first
+  img1 = form.file_uploads.name('file1')
+  img2 = form.file_uploads.name('file2')
   
   img1.file_name = img2.file_name = ARGV[2]
   File.open(ARGV[2], "r") { |f|

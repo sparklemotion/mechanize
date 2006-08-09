@@ -10,6 +10,21 @@
   @agent.click (page/"frame").first
 * Removed deprecated attr_finder
 
+== 0.5.3
+
+* Mechanize#click will now act on the first element of an array.  So if an
+  array of links is passed to WWW::Mechanize#click, the first link is clicked.
+  That means the syntax for clicking links is shortened and still supports
+  selecting a link.  The following are equivalent:
+   agent.click page.links.first
+   agent.click page.links
+* Fixed a bug with spaces in href's and get's
+* Added a tick, untick, and click method to radio buttons so that
+  radiobuttons can be "clicked"
+* Added a tick, untick, and click method to check boxes so that
+  checkboxes can be "clicked"
+* Options on Select lists can now be "tick"ed, and "untick"ed.
+
 == 0.5.2
 
 * Fixed a bug with input names that are nil

@@ -40,22 +40,6 @@ module WWW
         parse
       end
     
-      # In the case of malformed HTML, fields of multiple forms might occure in this forms'
-      # field array. If the fields have the same name, posterior fields overwrite former fields.
-      # To avoid this, this method rejects all posterior duplicate fields.
-    
-      def uniq_fields!
-        names_in = {}
-        fields.reject! {|f|
-          if names_in.include?(f.name)
-            true
-          else
-            names_in[f.name] = true
-            false
-          end
-        }
-      end
-    
       # This method builds an array of arrays that represent the query
       # parameters to be used with this form.  The return value can then
       # be used to create a query string for this form.
@@ -168,11 +152,7 @@ module WWW
           if node.attributes.has_key? 'multiple'
             @fields << MultiSelectList.new(node.attributes['name'], node)
           else
-            if node.attributes.has_key? 'multiple'
-              @fields << MultiSelectList.new(node.attributes['name'], node)
-            else
-              @fields << SelectList.new(node.attributes['name'], node)
-            end
+            @fields << SelectList.new(node.attributes['name'], node)
           end
         end
       end

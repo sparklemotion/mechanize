@@ -16,6 +16,7 @@ module WWW
       alias :to_s :text
     
       def initialize(node)
+        node.attributes ||= {}
         @node = node
         @href = node.attributes['href'] 
         @text = node.all_text
@@ -25,6 +26,7 @@ module WWW
         if (@text.nil? || @text.length == 0) && (node/'img').length > 0
           @text = ''
           (node/'img').each do |e|
+            e.attributes ||= {}
             @text << (e.attributes.has_key?('alt') ? e.attributes['alt'] : '')
           end
         end
@@ -52,6 +54,7 @@ module WWW
       alias :name :text
 
       def initialize(node)
+        node.attributes ||= {}
         @node = node
         @text = node.attributes['name']
         @href = node.attributes['src']

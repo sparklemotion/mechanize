@@ -30,6 +30,7 @@ module WWW
       def initialize(form_node, elements_node)
         @form_node, @elements_node = form_node, elements_node
     
+        @form_node.attributes ||= {}
         @method = (@form_node.attributes['method'] || 'GET').upcase
         @action = @form_node.attributes['action'] 
         @name = @form_node.attributes['name']
@@ -133,6 +134,7 @@ module WWW
     
         # Find all input tags
         (@elements_node/'input').each do |node|
+          node.attributes ||= {}
           type = (node.attributes['type'] || 'text').downcase
           name = node.attributes['name']
           next if type != 'submit' && name.nil?
@@ -154,12 +156,14 @@ module WWW
 
         # Find all textarea tags
         (@elements_node/'textarea').each do |node|
+          next if node.attributes.nil?
           next if node.attributes['name'].nil?
           @fields << Field.new(node.attributes['name'], node.all_text)
         end
 
         # Find all select tags
         (@elements_node/'select').each do |node|
+          next if node.attributes.nil?
           next if node.attributes['name'].nil?
           if node.attributes.has_key? 'multiple'
             @fields << MultiSelectList.new(node.attributes['name'], node)

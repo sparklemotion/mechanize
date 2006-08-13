@@ -168,6 +168,7 @@ class Mechanize
   #  agent.post('http://example.com/', [ ["foo", "bar"] ])
   def post(url, query={})
     node = Hpricot::Elem.new(Hpricot::STag.new('form'))
+    node.attributes = {}
     node.attributes['method'] = 'POST'
     node.attributes['enctype'] = 'application/x-www-form-urlencoded'
 

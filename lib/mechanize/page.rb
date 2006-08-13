@@ -83,6 +83,9 @@ module WWW
 
         # Find all 'meta' tags
         (@root/'meta').each do |node|
+          next if node.attributes.nil?
+          next unless node.attributes.has_key? 'http-equiv'
+          next unless node.attributes.has_key? 'content'
           equiv   = node.attributes['http-equiv']
           content = node.attributes['content']
           if equiv != nil && equiv.downcase == 'refresh'

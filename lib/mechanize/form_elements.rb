@@ -16,10 +16,6 @@ module WWW
     def query_value
       [[@name, @value || '']]
     end
-
-    def query_value
-      [[@name, @value || '']]
-    end
   end
   
   # This class represents a file upload field found in a form.  To use this

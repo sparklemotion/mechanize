@@ -5,7 +5,7 @@ require 'rubygems'
 require 'mechanize'
 require 'test_includes'
 
-class BasicAuthTest < Test::Unit::TestCase
+class TestNoAttributes < Test::Unit::TestCase
   include TestMethods
 
   def setup

@@ -1,13 +1,21 @@
-$LOAD_PATH.unshift '../lib'
+$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
+
+# This example logs a user in to rubyforge and prints out the body of the
+# page after logging the user in.
+require 'rubygems'
 require 'mechanize'
 
-agent = WWW::Mechanize.new {|a| a.log = Logger.new(STDERR) }
+# Create a new mechanize object
+agent = WWW::Mechanize.new { |a| a.log = Logger.new(STDERR) }
+
+# Load the rubyforge website
 page = agent.get('http://rubyforge.org/')
-link = page.links.find {|l| l.node.text =~ /Log In/ }
-page = agent.click(link)
-form = page.forms[1]
-form.fields.find {|f| f.name == 'form_loginname'}.value = ARGV[0]
-form.fields.find {|f| f.name == 'form_pw'}.value = ARGV[1]
+page = agent.click page.links.text(/Log In/) # Click the login link
+form = page.forms[1] # Select the first form
+form.form_loginname = ARGV[0]
+form.form_pw        = ARGV[1]
+
+# Submit the form
 page = agent.submit(form, form.buttons.first)
 
-puts page.body
+puts page.body # Print out the body

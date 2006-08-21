@@ -38,7 +38,7 @@ This example uploads one image as two different images to flickr.
   form.email = ARGV[0]
   form.password = ARGV[1]
   page = agent.submit(form)
-  page = agent.click page.links.text('Upload').first
+  page = agent.click page.links.text('Upload')
   form = page.forms.first
   img1 = form.file_uploads.name('file1')
   img2 = form.file_uploads.name('file2')

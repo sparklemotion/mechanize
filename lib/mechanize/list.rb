@@ -24,6 +24,14 @@ module WWW
     #  list.name('foo').href('bar.html')
     #
     # This code will find all elements with name 'foo' and href 'bar.html'.
+    # If you call a method with no arguments that List does not know how to
+    # respond to, it will try that method on the first element of the array.
+    # This lets you treat the array like the type of object it contains.
+    # For example, you can click the first element in the array just by
+    # saying:
+    #  agent.click page.links
+    # Or click the first link with the text "foo"
+    #  agent.click page.links.text('foo')
     class List < Array
       # This method provides syntax sugar so that you can write expressions
       # like this:

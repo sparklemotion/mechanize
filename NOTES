@@ -1,5 +1,37 @@
 = Mechanize Release Notes
 
+== 0.5.3 (Twan)
+
+Here it is.  Mechanize 0.5.3 also named the "Twan" release.  There are a few
+new features, a few fixed bugs, and some other stuff too!
+
+First, new features.  WWW::Mechanize#click has been updated to operate on the
+first link if an array is passed in.  How is this helpful?  It allows
+syntax like this:
+  agent.click page.links.first
+to be like this:
+  agent.click page.links
+This trick was actually implemented in WWW::Mechanize::List.  If you send a
+method to WWW::Mechanize::List, and it doesn't know how to respond, it will
+try calling that method on the first element of the list.  But it only does
+that for methods with no arguments.
+
+Radio buttons, check boxes, and select lists can now be ticked, unticked, and
+clicked.  Now to select the second radio button from a list, you can do this:
+  form.radiobuttons.name('color')[1].click
+Mechanize will handle unchecking all of the other radio buttons with the same
+name.
+
+Pretty printing has been added so that inspecting mechanize objects is very
+pretty.  Go ahead and try it out!
+  pp page
+Or even
+  pp page.forms.first
+
+Now, bugfixes.  A bug was fixed when spaces are passed in as part of the URL
+to WWW::Mechanize#get.  Thanks to Eric Kolve, a bug was fixed with methods
+that conflict with rails.  Thanks to Yinon Bentor for sending in a patch to
+improve Log4r support and a slight speed increase.
 == 0.5.2
 
 This release comes with a few cool new features.  First, support for select

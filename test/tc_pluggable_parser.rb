@@ -114,4 +114,39 @@ class PluggableParserTest < Test::Unit::TestCase
     assert_equal(FileFilter, @agent.pluggable_parser['text/xml'])
     assert_kind_of(FileFilter, page)
   end
+
+  def test_file_saver_no_path
+    url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '', nil, nil, nil)
+    fs = WWW::Mechanize::FileSaver.new(url, nil, 'hello world', 200)
+    assert_equal('example.com/index.html', fs.filename)
+    FileUtils.rm_rf('example.com')
+  end
+
+  def test_file_saver_slash
+    url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '/', nil, nil, nil)
+    fs = WWW::Mechanize::FileSaver.new(url, nil, 'hello world', 200)
+    assert_equal('example.com/index.html', fs.filename)
+    FileUtils.rm_rf('example.com')
+  end
+
+  def test_file_saver_slash_file
+    url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '/foo.html', nil, nil, nil)
+    fs = WWW::Mechanize::FileSaver.new(url, nil, 'hello world', 200)
+    assert_equal('example.com/foo.html', fs.filename)
+    FileUtils.rm_rf('example.com')
+  end
+
+  def test_file_saver_long_path_no_file
+    url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '/one/two/', nil, nil, nil)
+    fs = WWW::Mechanize::FileSaver.new(url, nil, 'hello world', 200)
+    assert_equal('example.com/one/two/index.html', fs.filename)
+    FileUtils.rm_rf('example.com')
+  end
+
+  def test_file_saver_long_path
+    url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '/one/two/foo.html', nil, nil, nil)
+    fs = WWW::Mechanize::FileSaver.new(url, nil, 'hello world', 200)
+    assert_equal('example.com/one/two/foo.html', fs.filename)
+    FileUtils.rm_rf('example.com')
+  end
 end

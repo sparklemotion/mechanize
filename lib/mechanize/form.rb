@@ -1,3 +1,5 @@
+require 'mime/types'
+
 module WWW
   class Mechanize
     # =Synopsis
@@ -91,7 +93,6 @@ module WWW
       # multi-part post,
       def request_data
         query_params = build_query()
-        query = nil
         case @enctype.downcase
         when 'multipart/form-data'
           boundary = rand_string(20)
@@ -99,13 +100,11 @@ module WWW
           params = []
           query_params.each { |k,v| params << param_to_multipart(k, v) }
           @file_uploads.each { |f| params << file_to_multipart(f) }
-          query = params.collect { |p| "--#{boundary}\r\n#{p}" }.join('') +
+          params.collect { |p| "--#{boundary}\r\n#{p}" }.join('') +
             "--#{boundary}--\r\n"
         else
-          query = WWW::Mechanize.build_query_string(query_params)
+          WWW::Mechanize.build_query_string(query_params)
         end
-
-        query
       end
     
       private
@@ -130,7 +129,7 @@ module WWW
           when 'checkbox'
             @checkboxes << CheckBox.new(node.attributes['name'], node.attributes['value'], node.attributes.has_key?('checked'), self)
           when 'file'
-            @file_uploads << FileUpload.new(node.attributes['name'], node.attributes['value']) 
+            @file_uploads << FileUpload.new(node.attributes['name'], nil) 
           when 'submit'
             @buttons << Button.new(node.attributes['name'], node.attributes['value'])
           when 'image'
@@ -179,12 +178,23 @@ module WWW
                 "#{mime_value_quote(file.name)}\"; " +
                 "filename=\"#{mime_value_quote(file.file_name || '')}\"\r\n" +
                 "Content-Transfer-Encoding: binary\r\n"
+
+        if file.file_data.nil? and ! file.file_name.nil?
+          file.file_data = ::File.open(file.file_name, "rb") { |f| f.read }
+          file.mime_type = MIME::Types.type_for(file.file_name).first
+        end
+
         if file.mime_type != nil
           body << "Content-Type: #{file.mime_type}\r\n"
         end
     
-        body << "\r\n#{file.file_data}\r\n"
-    
+        body <<
+          if file.file_data.respond_to? :read
+            "\r\n#{file.file_data.read}\r\n"
+          else
+            "\r\n#{file.file_data}\r\n"
+          end
+
         body
       end
     end
@@ -198,6 +208,9 @@ module WWW
     # Find a form and print out its fields
     #  form = page.forms.first # => WWW::Mechanize::Form
     #  form.fields.each { |f| puts f.name }
+    # Set the input field 'name' to "Aaron"
+    #  form['name'] = 'Aaron'
+    #  puts form['name']
     class Form < GlobalForm
       attr_reader :node
     
@@ -229,6 +242,22 @@ module WWW
           end
           self.fields.name(k.to_s).[](index).value = value
         end
+      end
+
+      # Fetch the value of the first input field with the name passed in
+      # ==Example
+      # Fetch the value set in the input field 'name'
+      #  puts form['name']
+      def [](field_name)
+        field(field_name).value
+      end
+
+      # Set the value of the first input field with the name passed in
+      # ==Example
+      # Set the value in the input field 'name' to "Aaron"
+      #  form['name'] = 'Aaron'
+      def []=(field_name, value)
+        field(field_name).value = value
       end
 
       # Treat form fields like accessors.

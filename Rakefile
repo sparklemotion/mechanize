@@ -11,7 +11,7 @@ end
 
 PKG_BUILD = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME = 'mechanize'
-PKG_VERSION = '0.5.3' + PKG_BUILD
+PKG_VERSION = '0.5.4' + PKG_BUILD
 PKG_FILES = FileList["{doc,lib,test}/**/*"].exclude("rdoc").to_a
 
 spec = Gem::Specification.new do |s|
@@ -29,6 +29,7 @@ spec = Gem::Specification.new do |s|
   s.rdoc_options << "--main" << 'README' << "--title" << "'WWW::Mechanize RDoc'"
   s.rubyforge_project = PKG_NAME
   s.add_dependency('ruby-web', '>= 1.1.0') 
+  s.add_dependency('mime-types') 
 end
 
 Rake::GemPackageTask.new(spec) do |p|
@@ -88,3 +89,14 @@ Rake::Task.define_task("branch") do |p|
   sh "svn cp -m 'branched #{ PKG_VERSION }' #{baseurl}/trunk #{ baseurl }/branches/RB-#{ PKG_VERSION }"
 end
 
+desc "Update SSL Certificate"
+Rake::Task.define_task('ssl_cert') do |p|
+  sh "openssl genrsa -des3 -out server.key 1024"
+  sh "openssl req -new -key server.key -out server.csr"
+  sh "cp server.key server.key.org"
+  sh "openssl rsa -in server.key.org -out server.key"
+  sh "openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt"
+  sh "cp server.key server.pem"
+  sh "mv server.key server.csr server.crt server.pem test/data/"
+  sh "rm server.key.org"
+end

@@ -1,6 +1,27 @@
 require 'webrick'
 require 'logger'
 require 'date'
+require 'zlib'
+require 'stringio'
+
+class GzipServlet < WEBrick::HTTPServlet::AbstractServlet
+  def do_GET(req, res)
+    if req['Accept-Encoding'] =~ /gzip/
+      File.open("htdocs/#{req.query['file']}", 'r') do |file|
+        string = ""
+        zipped = StringIO.new string, 'w'
+        gz = Zlib::GzipWriter.new(zipped)
+        gz.write file.read
+        gz.close
+        res['Content-Encoding'] = 'gzip'
+        res['Content-Type'] = "text/html"
+        res.body = string
+      end
+    else
+      raise 'no gzip'
+    end
+  end
+end
 
 class BadContentTypeTest < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)

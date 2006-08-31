@@ -17,5 +17,10 @@
       File to process: <input name="green[eggs]" type="file" /><br />
       <input type="submit" value="Send File" />
     </form>
+    <form enctype="multipart/form-data" action="/file_upload" name="value_test" method="post">
+      Your name: <input type="text" name="name" /><br />
+      File to process: <input name="green[eggs]" value="/etc/hosts" type="file" /><br />
+      <input type="submit" value="Send File" />
+    </form>
   </body>
 </html>

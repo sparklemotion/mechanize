@@ -51,6 +51,16 @@ module WWW
         parse_html if @body
       end
 
+      # Fetch the title of the page
+      def title
+        parse_html() unless @title
+        @title
+      end
+
+      def form(name)
+        forms.name(name).first
+      end
+    
       private
     
       def parse_html

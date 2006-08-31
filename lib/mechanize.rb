@@ -15,8 +15,9 @@ require 'net/http'
 require 'net/https'
 
 require 'uri'
-require 'logger'
 require 'webrick'
+require 'zlib'
+require 'stringio'
 require 'web/htmltools/xmltree'   # narf
 require 'mechanize/module'
 require 'mechanize/mech_version'
@@ -134,7 +135,9 @@ class Mechanize
     cur_page = current_page || Page.new( nil, {'content-type'=>'text/html'})
 
     # fetch the page
-    page = fetch_page(to_absolute_uri(url, cur_page), :get, cur_page)
+    abs_uri = to_absolute_uri(url, cur_page)
+    request = fetch_request(abs_uri)
+    page = fetch_page(abs_uri, request, cur_page)
     add_to_history(page)
     page
   end
@@ -218,6 +221,17 @@ class Mechanize
     ! @history.find { |h| h.uri.to_s == uri.to_s }.nil?
   end
 
+  # Runs given block, then resets the page history as it was before. self is
+  # given as a parameter to the block. Returns the value of the block.
+  def transact
+    history_backup = @history.dup
+    begin
+      yield self
+    ensure
+      @history = history_backup
+    end
+  end
+
   alias :page :current_page
 
   private
@@ -244,30 +258,40 @@ class Mechanize
   def post_form(url, form)
     cur_page = current_page || Page.new(nil, {'content-type'=>'text/html'})
 
-    request_data = [form.request_data]
+    request_data = form.request_data
 
-    # this is called before the request is sent
-    pre_request_hook = proc {|request|
-      log.debug("query: #{ request_data.inspect }")
-      request.add_field('Content-Type', form.enctype)
-      request.add_field('Content-Length', request_data[0].size.to_s)
-    }
+    abs_url = to_absolute_uri(url, cur_page)
+    request = fetch_request(abs_url, :post)
+    request.add_field('Content-Type', form.enctype)
+    request.add_field('Content-Length', request_data.size.to_s)
+
+    log.debug("query: #{ request_data.inspect }") if log
 
     # fetch the page
-    page = fetch_page(to_absolute_uri(url, cur_page), :post, cur_page, pre_request_hook, request_data)
+    page = fetch_page(abs_url, request, cur_page, [request_data])
     add_to_history(page) 
     page
   end
 
+  # Creates a new request object based on the scheme and type
+  def fetch_request(uri, type = :get)
+    raise "unsupported scheme" unless ['http', 'https'].include?(uri.scheme)
+    if type == :get
+      Net::HTTP::Get.new(uri.request_uri)
+    else
+      Net::HTTP::Post.new(uri.request_uri)
+    end
+  end
+
   # uri is an absolute URI
-  def fetch_page(uri, method=:get, cur_page=current_page(), pre_request_hook=nil, request_data=[])
+  def fetch_page(uri, request, cur_page=current_page(), request_data=[])
     raise "unsupported scheme" unless ['http', 'https'].include?(uri.scheme)
 
-    log.info("#{ method.to_s.upcase }: #{ uri.to_s }")
+    log.info("#{ request.class }: #{ uri.to_s }") if log
 
     page = nil
 
-    http = Net::HTTP.new( uri.host,
+    http_obj = Net::HTTP.new( uri.host,
                           uri.port,
                           @proxy_addr,
                           @proxy_port,
@@ -276,68 +300,55 @@ class Mechanize
                         )
 
     if uri.scheme == 'https'
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http_obj.use_ssl = true
+      http_obj.verify_mode = OpenSSL::SSL::VERIFY_NONE
       if @ca_file
-        http.ca_file = @ca_file
-        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        http_obj.ca_file = @ca_file
+        http_obj.verify_mode = OpenSSL::SSL::VERIFY_PEER
       end
       if @cert && @key
-        http.cert = OpenSSL::X509::Certificate.new(::File.read(@cert))
-        http.key  = OpenSSL::PKey::RSA.new(::File.read(@key), @pass)
+        http_obj.cert = OpenSSL::X509::Certificate.new(::File.read(@cert))
+        http_obj.key  = OpenSSL::PKey::RSA.new(::File.read(@key), @pass)
       end
     end
 
+    request.add_field('Accept-Encoding', 'gzip,identity')
 
-    http.start {
-
-      case method
-      when :get
-        request = Net::HTTP::Get.new(uri.request_uri)
-      when :post
-        request = Net::HTTP::Post.new(uri.request_uri)
-      else
-        raise ArgumentError
+    unless @cookie_jar.empty?(uri)
+      cookies = @cookie_jar.cookies(uri)
+      cookie = cookies.length > 0 ? cookies.join("; ") : nil
+      if log
+        cookies.each do |c|
+          log.debug("using cookie: #{c}")
+        end
       end
+      request.add_field('Cookie', cookie)
+    end
 
-      unless @cookie_jar.empty?(uri)
-        cookies = @cookie_jar.cookies(uri)
-        cookie = cookies.length > 0 ? cookies.join("; ") : nil
-        log.debug("use cookie: #{ cookie }")
-        request.add_field('Cookie', cookie)
-      end
+    # Add Referer header to request
+    unless cur_page.uri.nil?
+      request.add_field('Referer', cur_page.uri.to_s)
+    end
 
-      # Add Referer header to request
+    # Add User-Agent header to request
+    request.add_field('User-Agent', @user_agent) if @user_agent 
 
-      unless cur_page.uri.nil?
-        request.add_field('Referer', cur_page.uri.to_s)
-      end
+    request.basic_auth(@user, @password) if @user
 
-      # Add User-Agent header to request
-
-      request.add_field('User-Agent', @user_agent) if @user_agent 
-
-      request.basic_auth(@user, @password) if @user
-
-      # Invoke pre-request-hook (use it to add custom headers or content)
-
-      pre_request_hook.call(request) if pre_request_hook
-
-      # Log specified headers for the request
-
+    # Log specified headers for the request
+    if log
       request.each_header do |k, v|
         log.debug("request-header: #{ k } => #{ v }")
       end
+    end
 
+    http_obj.start { |http|
       # Specify timeouts if given
-
       http.open_timeout = @open_timeout if @open_timeout
       http.read_timeout = @read_timeout if @read_timeout
 
       # Send the request
-
       http.request(request, *request_data) {|response|
-
         (response.get_fields('Set-Cookie')||[]).each do |cookie|
           log.debug("cookie received: #{ cookie }") 
           Cookie::parse(uri, cookie) { |c| @cookie_jar.add(c) }
@@ -355,12 +366,24 @@ class Mechanize
           content_type = data[1].downcase unless data.nil?
         end
 
+        response_body = 
+        if encoding = response['Content-Encoding']
+          case encoding.downcase
+          when 'gzip'
+            log.debug('gunzip body') if log
+            Zlib::GzipReader.new(StringIO.new(response.body)).read
+          else
+            raise 'Unsupported content encoding'
+          end
+        else
+          response.body
+        end
 
         # Find our pluggable parser
         page = @pluggable_parser.parser(content_type).new(
           uri,
           response,
-          response.body,
+          response_body,
           response.code
         )
 
@@ -375,11 +398,15 @@ class Mechanize
           return page
         when "301", "302"
           log.info("follow redirect to: #{ response['Location'] }")
-          return fetch_page(to_absolute_uri(URI.parse(response['Location'].gsub(/ /, '%20')), page), :get, page)
+          abs_uri = to_absolute_uri(
+            URI.parse(
+              URI.escape(URI.unescape(response['Location'].to_s))), page)
+          request = fetch_request(abs_uri)
+          return fetch_page(abs_uri, request, page)
         else
           raise ResponseCodeError.new(page.code), "Unhandled response", caller
         end
-      } 
+      }
     }
   end
 

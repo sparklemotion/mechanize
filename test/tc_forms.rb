@@ -476,4 +476,16 @@ class FormsMechTest < Test::Unit::TestCase
     form.first = 'Aaron'
     assert_equal('Aaron', form.first)
   end
+
+  def test_fields_as_hash
+    page = @agent.get("http://localhost:#{PORT}/form_multival.html")
+    form = page.forms.name('post_form').first
+
+    assert_not_nil(form)
+    assert_equal(2, form.fields.name('first').length)
+
+    form['first'] = 'Aaron'
+    assert_equal('Aaron', form['first'])
+    assert_equal('Aaron', form.fields.name('first').first.value)
+  end
 end

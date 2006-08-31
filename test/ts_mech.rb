@@ -39,6 +39,7 @@ require 'tc_radiobutton'
 require 'tc_checkboxes'
 require 'tc_pretty_print'
 require 'tc_no_attributes'
+require 'tc_gzipping'
 #require 'tc_proxy'
 #require 'tc_ssl_server'
 

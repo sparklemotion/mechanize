@@ -1,5 +1,25 @@
 = Mechanize Release Notes
 
+== 0.5.4 (Sylvester)
+
+WWW::Mechanize 0.5.4 aka Sylvester is fresh out the the frying pan and in to
+the fire!  It is also ready for you to download and use.
+
+New features include WWW::Mechanize#transact (thanks to Johan Kiviniemi) which
+lets you maintain your history state between transactions.  Forms can now be
+accessed as a hash.  For example, to set the value of an input field, you can
+do the following:
+ form['name'] = "Aaron"
+Doing this assumes that you are setting the first field.  If there are multiple
+fields with the same name, you must use a different method to set the value.
+
+Form file uploads will now read the file specified by FileUpload#file_name.
+The mime type will also be automatically determined for you!  Take a look
+at the EXAMPLES file for a new flickr upload script.
+
+Lastly, gzip encoding is now supported!  WWW::Mechanize now supports pages
+being sent gzip encoded.  This means less network bandwidth.  Yay!
+
 == 0.5.3 (Twan)
 
 Here it is.  Mechanize 0.5.3 also named the "Twan" release.  There are a few

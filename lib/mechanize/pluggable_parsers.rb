@@ -27,7 +27,7 @@ module WWW
 
       # Use this method to save the content of this object to filename
       def save_as(filename)
-        ::File::open(filename, "w") { |f|
+        ::File::open(filename, "wb") { |f|
           f.write body
         }
       end
@@ -47,14 +47,25 @@ module WWW
     #  agent.get('http://example.com/foo.pdf')
     #
     class FileSaver < File
+      attr_reader :filename
+
       def initialize(uri=nil, response=nil, body=nil, code=nil)
         @uri, @response, @body, @code = uri, response, body, code
-        path = uri.path == '/' ? '/index.html' : uri.path
-        path =~ /^(.*)\/([^\/]*)$/
-        filename = $2
-        path = "#{uri.host}#{$1}"
+        path = uri.path.empty? ? 'index.html' : uri.path.gsub(/^[\/]*/, '')
+        path += 'index.html' if path =~ /\/$/
+
+        split_path = path.split(/\//)
+        filename = split_path.length > 0 ? split_path.pop : 'index.html'
+        joined_path = split_path.join(::File::SEPARATOR)
+        path = if joined_path.empty?
+          uri.host
+        else
+          "#{uri.host}#{::File::SEPARATOR}#{joined_path}"
+        end
+
+        @filename = "#{path}#{::File::SEPARATOR}#{filename}"
         FileUtils.mkdir_p(path)
-        save_as("#{path}/#{filename}")
+        save_as(@filename)
       end
     end
 

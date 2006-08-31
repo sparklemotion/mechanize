@@ -10,6 +10,21 @@
   @agent.click (page/"frame").first
 * Removed deprecated attr_finder
 
+== 0.5.4
+
+* Added WWW::Mechanize#trasact for saving history state between in a
+  transaction.  See the EXAMPLES file.  Thanks Johan Kiviniemi.
+* Added support for gzip compressed pages
+* Forms can now be accessed like a hash.  For example, to set the value
+  of an input field named 'name' to "Aaron", you can do this:
+   form['name'] = "Aaron"
+  Or to get the value of a field named 'name', do this:
+   puts form['name']
+* File uploads will now read the file specified in FileUpload#file_name
+* FileUpload can use an IO object in FileUpload#file_data
+* Fixed a bug with saving files on windows
+* Fixed a bug with the filename being set in forms
+
 == 0.5.3
 
 * Mechanize#click will now act on the first element of an array.  So if an

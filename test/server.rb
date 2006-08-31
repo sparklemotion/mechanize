@@ -22,6 +22,7 @@ s.mount("/response_code", ResponseCodeTest)
 s.mount("/file_upload", FileUploadTest)
 s.mount("/bad_content_type", BadContentTypeTest)
 s.mount("/content_type_test", ContentTypeTest)
+s.mount("/gzip", GzipServlet)
 
 htpasswd = WEBrick::HTTPAuth::Htpasswd.new(base_dir + '/data/htpasswd')
 auth = WEBrick::HTTPAuth::BasicAuth.new(

@@ -46,4 +46,3 @@ s.mount_proc('/htpasswd_auth') { |req, res|
 trap("INT") { s.stop }
 
 s.start
-

@@ -123,4 +123,16 @@ class TestMechMethods < Test::Unit::TestCase
     page_as_string = @agent.get_file("http://localhost:#{PORT}/frame_test.html")
     assert_equal(content_length.to_i, page_as_string.length.to_i)
   end
+
+  def test_transact
+    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
+    assert_equal(1, @agent.history.length)
+    @agent.transact { |a|
+      5.times {
+        @agent.get("http://localhost:#{PORT}/frame_test.html")
+      }
+      assert_equal(6, @agent.history.length)
+    }
+    assert_equal(1, @agent.history.length)
+  end
 end

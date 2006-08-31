@@ -29,28 +29,27 @@
 == File Upload
 This example uploads one image as two different images to flickr.
 
-  require 'rubygems'
-  require 'mechanize'
-  
-  agent = WWW::Mechanize.new
-  page = agent.get('http://flickr.com/signin/flickr/')
-  form = page.forms.first
-  form.email = ARGV[0]
-  form.password = ARGV[1]
-  page = agent.submit(form)
-  page = agent.click page.links.text('Upload')
-  form = page.forms.first
-  img1 = form.file_uploads.name('file1')
-  img2 = form.file_uploads.name('file2')
-  
-  img1.file_name = img2.file_name = ARGV[2]
-  File.open(ARGV[2], "r") { |f|
-    img1.file_data = img2.file_data = f.read 
-  }
-  
-  img1.mime_type = img2.mime_type = 'image/jpeg'
-  
-  agent.submit(form)
+ require 'rubygems'
+ require 'mechanize'
+ 
+ agent = WWW::Mechanize.new
+ 
+ # Get the flickr sign in page
+ page  = agent.get('http://flickr.com/signin/flickr/')
+ 
+ # Fill out the login form
+ form  = page.forms.name('flickrloginform').first
+ form.email = ARGV[0]
+ form.password = ARGV[1]
+ page  = agent.submit(form)
+ 
+ # Go to the upload page
+ page  = agent.click page.links.text('Upload')
+ 
+ # Fill out the form
+ form  = page.forms.action('/photos_upload_process.gne').first
+ form.file_uploads.name('file1').first.file_name = ARGV[2]
+ agent.submit(form)
   
 == Pluggable Parsers
 Lets say you want html pages to automatically be parsed with Rubyful Soup.
@@ -84,3 +83,42 @@ Beautiful Soup for that page.
   agent.set_proxy('localhost', '8000')
   page = agent.get(ARGV[0])
   puts page.body
+
+== The transact method
+
+transact runs the given block and then resets the page history. I.e. after the
+block has been executed, you're back at the original page; no need count how
+many times to call the back method at the end of a loop (while accounting for
+possible exceptions).
+
+This example also demonstrates subclassing Mechanize.
+
+  require 'mechanize'
+
+  class TestMech < WWW::Mechanize
+    def process
+      get 'http://rubyforge.org/'
+      search_form = page.forms.first
+      search_form.words = 'WWW'
+      submit search_form
+
+      page.links.with.href( %r{/projects/} ).each do |link|
+        next if link.href =~ %r{/projects/support/}
+
+        puts 'Loading %-30s %s' % [link.href, link.text]
+        begin
+          transact do
+            click link
+            # Do stuff, maybe click more links.
+          end
+          # Now we're back at the original page.
+
+        rescue => e
+          $stderr.puts "#{e.class}: #{e.message}"
+        end
+      end
+    end
+  end
+
+  TestMech.new.process
+

@@ -28,7 +28,7 @@ spec = Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README", "EXAMPLES", "CHANGELOG", "LICENSE", "NOTES"]
   s.rdoc_options << "--main" << 'README' << "--title" << "'WWW::Mechanize RDoc'"
   s.rubyforge_project = PKG_NAME
-  s.add_dependency('ruby-web', '>= 1.1.0') 
+  s.add_dependency('hpricot') 
   s.add_dependency('mime-types') 
 end
 

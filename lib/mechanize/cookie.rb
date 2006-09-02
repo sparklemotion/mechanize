@@ -1,69 +1,51 @@
 require 'yaml'
 require 'time'
+require 'webrick/httputils'
+require 'webrick/cookie'
 
 module WWW
   class Mechanize
   # This class is used to represent an HTTP Cookie.
-    class Cookie
-      attr_reader :name, :value, :path, :domain, :expires, :secure
-      def initialize(cookie)
-        @name     = cookie[:name]
-        @value    = cookie[:value]
-        @path     = cookie[:path]
-        @domain   = cookie[:domain]
-        @expires  = cookie[:expires]
-        @secure   = cookie[:secure]
-      end
-    
-      def Cookie::parse(uri, raw_cookie, &block)
-        esc = raw_cookie.gsub(/(expires=[^,]*),([^;]*(;|$))/i) { "#{$1}#{$2}" }
-        esc.split(/,/).each do |cookie_text|
-          cookie = Hash.new
-          valid_cookie = true
-          cookie_text.split(/; ?/).each do |data|
-            name, value = data.split('=', 2)
-            next unless name
-
-            name.strip!
-    
-            # Set the cookie to invalid if the domain is incorrect
-            case name.downcase
-            when 'path'
-              cookie[:path] = value
+    class Cookie < WEBrick::Cookie
+      def self.parse(uri, str)
+        cookies = []
+        str.gsub(/(,([^;,]*=)|,$)/) { "\r\n#{$2}" }.split(/\r\n/).each { |c|
+          cookie_elem = c.split(/;/)
+          first_elem = cookie_elem.shift
+          first_elem.strip!
+          key, value = first_elem.split(/=/, 2)
+          cookie = new(key, WEBrick::HTTPUtils.dequote(value))
+          cookie_elem.each{|pair|
+            pair.strip!
+            key, value = pair.split(/=/, 2)
+            if value
+              value = WEBrick::HTTPUtils.dequote(value.strip)
+            end
+            case key.downcase
+            when "domain"  then cookie.domain  = value.sub(/^\./, '')
+            when "path"    then cookie.path    = value
             when 'expires'
-              cookie[:expires] = begin
+              cookie.expires = begin
                 Time::parse(value)
               rescue
                 Time.now
               end
-            when 'secure'
-              cookie[:secure] = true
-            when 'domain' # Reject the cookie if it isn't for this domain
-              cookie[:domain] = value.sub(/^\./, '')
-
-              # Reject cookies not for this domain
-              # TODO Move the logic to reject based on host to the jar
-              unless uri.host =~ /#{cookie[:domain]}$/
-                valid_cookie = false
-              end
-            when 'httponly'
-              # do nothing
-          # http://msdn.microsoft.com/workshop/author/dhtml/httponly_cookies.asp
-            else
-              cookie[:name]  = name
-              cookie[:value] = value
+            when "max-age" then cookie.max_age = Integer(value)
+            when "comment" then cookie.comment = value
+            when "version" then cookie.version = Integer(value)
+            when "secure"  then cookie.secure = true
             end
+          }
+          cookie.path    ||= uri.path
+          cookie.secure  ||= false
+          cookie.domain  ||= uri.host
+          # Move this in to the cookie jar
+          if uri.host =~ /#{cookie.domain}$/
+            yield cookie if block_given?
+            cookies << cookie
           end
-
-          # Don't yield this cookie if it is invalid
-          next unless valid_cookie
-
-          cookie[:path]    ||= uri.path
-          cookie[:secure]  ||= false
-          cookie[:domain]  ||= uri.host
-
-          yield Cookie.new(cookie)
-        end
+        }
+        return cookies
       end
     
       def to_s

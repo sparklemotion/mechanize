@@ -9,6 +9,7 @@
 * Clicking a Frame is now possible:
   @agent.click (page/"frame").first
 * Removed deprecated attr_finder
+* Removed REXML helper methods since the main parser is now hpricot
 
 == 0.5.4
 

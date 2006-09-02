@@ -80,7 +80,7 @@ class Mechanize
   def initialize
     # attr_accessors
     @cookie_jar = CookieJar.new
-    @log = Logger.new(nil)
+    @log            = nil
     @max_history    = nil
     @open_timeout   = nil
     @read_timeout   = nil
@@ -214,11 +214,9 @@ class Mechanize
 
   # Returns whether or not a url has been visited
   def visited?(url)
-    if url.is_a?(Link)
-      url = url.uri
-    end
-    uri = to_absolute_uri(url)
-    ! @history.find { |h| h.uri.to_s == uri.to_s }.nil?
+    url = url.uri if url.respond_to? :uri
+    uri = to_absolute_uri(url).to_s
+    ! @history.find { |h| h.uri.to_s == uri }.nil?
   end
 
   # Runs given block, then resets the page history as it was before. self is
@@ -237,22 +235,15 @@ class Mechanize
   private
 
   def to_absolute_uri(url, cur_page=current_page())
-    if url.is_a?(URI)
-      uri = url
-    else
-      uri = URI.parse(url.strip.gsub(/\s/, '%20'))
-    end
+    url =  URI.parse(URI.escape(url.to_s.strip)) unless url.is_a? URI
 
     # construct an absolute uri
-    if uri.relative?
-      if cur_page.uri
-        uri = cur_page.uri + (url.is_a?(URI) ? url : URI::escape(url.strip))
-      else
-        raise 'no history. please specify an absolute URL'
-      end
+    if url.relative?
+      raise 'no history. please specify an absolute URL' unless cur_page.uri
+      url = cur_page.uri + url
     end
 
-    return uri
+    return url
   end
 
   def post_form(url, form)
@@ -349,14 +340,18 @@ class Mechanize
 
       # Send the request
       http.request(request, *request_data) {|response|
-        (response.get_fields('Set-Cookie')||[]).each do |cookie|
-          log.debug("cookie received: #{ cookie }") 
-          Cookie::parse(uri, cookie) { |c| @cookie_jar.add(c) }
+        if log
+          response.each_header {|k,v|
+            log.debug("response-header: #{ k } => #{ v }")
+          }
         end
 
-        response.each_header {|k,v|
-          log.debug("header: #{ k } : #{ v }")
-        }
+        (response.get_fields('Set-Cookie')||[]).each do |cookie|
+          Cookie::parse(uri, cookie) { |c|
+            log.debug("saved cookie: #{c}") if log
+            @cookie_jar.add(c)
+          }
+        end
 
         response.read_body
 
@@ -387,7 +382,7 @@ class Mechanize
           response.code
         )
 
-        log.info("status: #{ page.code }")
+        log.info("status: #{ page.code }") if log
 
         if page.respond_to? :watch_for_set
           page.watch_for_set = @watch_for_set
@@ -397,7 +392,7 @@ class Mechanize
         when "200"
           return page
         when "301", "302"
-          log.info("follow redirect to: #{ response['Location'] }")
+          log.info("follow redirect to: #{ response['Location'] }") if log
           abs_uri = to_absolute_uri(
             URI.parse(
               URI.escape(URI.unescape(response['Location'].to_s))), page)

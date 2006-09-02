@@ -39,6 +39,8 @@
 * Added a tick, untick, and click method to check boxes so that
   checkboxes can be "clicked"
 * Options on Select lists can now be "tick"ed, and "untick"ed.
+* Fixed a potential bug conflicting with rails.  Thanks Eric Kolve
+* Updated log4r support for a speed increase.  Thanks Yinon Bentor
 * Added inspect methods and pretty printing
 
 == 0.5.2

@@ -30,6 +30,7 @@ spec = Gem::Specification.new do |s|
   s.rubyforge_project = PKG_NAME
   s.add_dependency('hpricot') 
   s.add_dependency('mime-types') 
+  s.add_dependency('mime-types') 
 end
 
 Rake::GemPackageTask.new(spec) do |p|

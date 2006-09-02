@@ -9,7 +9,7 @@ class FramesMechTest < Test::Unit::TestCase
   include TestMethods
 
   def setup
-    @agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    @agent = WWW::Mechanize.new
   end
 
   def test_frames

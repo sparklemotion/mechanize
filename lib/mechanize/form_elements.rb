@@ -193,7 +193,7 @@ module WWW
     end
 
     def value=(new)
-      if new.respond_to? :first
+      if new != new.to_s and new.respond_to? :first
         super([new.first])
       else
         super([new.to_s])
@@ -203,9 +203,9 @@ module WWW
 
   # This class contains option an option found within SelectList.  A
   # SelectList can have many Option classes associated with it.  An option
-  # can be selected by calling Option#select, or Option#click.  For example,
+  # can be selected by calling Option#tick, or Option#click.  For example,
   # select the first option in a list:
-  #  select_list.first.select
+  #  select_list.first.tick
   class Option
     attr_reader :value, :selected, :text, :select_list
 

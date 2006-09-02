@@ -9,7 +9,7 @@ class ResponseCodeMechTest < Test::Unit::TestCase
   include TestMethods
 
   def setup
-    @agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    @agent = WWW::Mechanize.new
   end
 
   def test_redirect
@@ -23,7 +23,7 @@ class ResponseCodeMechTest < Test::Unit::TestCase
   end
 
   def test_error
-    @agent = WWW::Mechanize.new { |a| a.log = Logger.new(nil) }
+    @agent = WWW::Mechanize.new
     begin
       @agent.get("http://localhost:#{PORT}/response_code?code=500")
     rescue WWW::Mechanize::ResponseCodeError => err

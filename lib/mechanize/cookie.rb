@@ -1,6 +1,5 @@
 require 'yaml'
 require 'time'
-require 'webrick/httputils'
 require 'webrick/cookie'
 
 module WWW

@@ -15,11 +15,10 @@ require 'net/http'
 require 'net/https'
 
 require 'uri'
-require 'webrick'
+require 'webrick/httputils'
 require 'zlib'
 require 'stringio'
-require 'web/htmltools/xmltree'   # narf
-require 'mechanize/module'
+require 'mechanize/hpricot'
 require 'mechanize/mech_version'
 require 'mechanize/cookie'
 require 'mechanize/errors'
@@ -29,7 +28,6 @@ require 'mechanize/form_elements'
 require 'mechanize/list'
 require 'mechanize/page'
 require 'mechanize/page_elements'
-require 'mechanize/parsing'
 require 'mechanize/inspect'
 
 module WWW
@@ -324,7 +322,7 @@ class Mechanize
     # Add User-Agent header to request
     request.add_field('User-Agent', @user_agent) if @user_agent 
 
-    request.basic_auth(@user, @password) if @user
+    request.basic_auth(@user, @password) if @user || @password
 
     # Log specified headers for the request
     if log

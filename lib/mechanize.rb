@@ -349,7 +349,7 @@ class Mechanize
         (response.get_fields('Set-Cookie')||[]).each do |cookie|
           Cookie::parse(uri, cookie) { |c|
             log.debug("saved cookie: #{c}") if log
-            @cookie_jar.add(c)
+            @cookie_jar.add(uri, c)
           }
         end
 

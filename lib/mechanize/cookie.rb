@@ -40,10 +40,8 @@ module WWW
           cookie.secure  ||= false
           cookie.domain  ||= uri.host
           # Move this in to the cookie jar
-          if uri.host =~ /#{cookie.domain}$/
-            yield cookie if block_given?
-            cookies << cookie
-          end
+          yield cookie if block_given?
+          cookies << cookie
         }
         return cookies
       end
@@ -63,7 +61,8 @@ module WWW
       end
     
       # Add a cookie to the Jar.
-      def add(cookie)
+      def add(uri, cookie)
+        return unless uri.host =~ /#{cookie.domain}$/
         unless @jar.has_key?(cookie.domain)
           @jar[cookie.domain] = Hash.new
         end

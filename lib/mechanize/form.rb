@@ -1,5 +1,3 @@
-require 'mime/types'
-
 module WWW
   class Mechanize
     # =Synopsis
@@ -181,7 +179,8 @@ module WWW
 
         if file.file_data.nil? and ! file.file_name.nil?
           file.file_data = ::File.open(file.file_name, "rb") { |f| f.read }
-          file.mime_type = MIME::Types.type_for(file.file_name).first
+          file.mime_type = WEBrick::HTTPUtils.mime_type(file.file_name,
+                                          WEBrick::HTTPUtils::DefaultMimeTypes)
         end
 
         if file.mime_type != nil

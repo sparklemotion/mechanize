@@ -14,7 +14,7 @@ class TestPrettyPrint < Test::Unit::TestCase
   
   def test_pretty_print
     @agent.get("http://localhost:#{PORT}/tc_pretty_print.html")
-    pretty_string = @agent.inspect
+    pretty_string = @agent.pretty_print_inspect
     assert_match("{title \"tc_pretty_print.html\"}", pretty_string)
     assert_match(/\{frames[^"]*"http:\/\/meme/, pretty_string)
     assert_match(/\{iframes[^"]*"http:\/\/meme/, pretty_string)

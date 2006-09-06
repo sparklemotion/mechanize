@@ -11,7 +11,6 @@ module WWW
         q.pp current_page
       }
     end
-    alias :inspect :pretty_print_inspect
 
     class Page
       def pretty_print(q)
@@ -43,7 +42,6 @@ module WWW
           }
         }
       end
-      alias :inspect :pretty_print_inspect
     end
 
     class Link
@@ -53,7 +51,6 @@ module WWW
           q.breakable; q.pp href
         }
       end
-      alias :inspect :pretty_print_inspect
     end
 
     class Form

@@ -7,14 +7,15 @@ submitted.  A history of URL's is maintained and can be queried.
 == Dependencies
 
 * ruby 1.8.2
+* hpricot[http://code.whytheluckystiff.net/hpricot/]
 
 Note that the files in the net-overrides/ directory are taken from Ruby 1.9.0.
 
-* ruby-web 1.1.0 (http://rubyforge.org/projects/ruby-web/)
 
 == Examples
 
-See the EXAMPLES[link://files/EXAMPLES.html] file
+If you are just starting, check out the GUIDE[link://files/GUIDE.html].  
+Also, check out the EXAMPLES[link://files/EXAMPLES.html] file.
 
 == Authors
 

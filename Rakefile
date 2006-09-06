@@ -25,7 +25,8 @@ spec = Gem::Specification.new do |s|
   s.files     = Dir.glob("{bin,test,lib,doc}/**/*").delete_if {|item| item.include?(".svn") }
   s.require_path  = "lib"
   s.has_rdoc      = true
-  s.extra_rdoc_files = ["README", "EXAMPLES", "CHANGELOG", "LICENSE", "NOTES"]
+  s.extra_rdoc_files = ["README", "EXAMPLES", "CHANGELOG", "LICENSE", "NOTES",
+                        "GUIDE"]
   s.rdoc_options << "--main" << 'README' << "--title" << "'WWW::Mechanize RDoc'"
   s.rubyforge_project = PKG_NAME
   s.add_dependency('hpricot') 
@@ -40,7 +41,8 @@ end
 Rake::RDocTask.new do |p|
   p.main = "README"
   p.rdoc_dir = "doc"
-  p.rdoc_files.include("README", "CHANGELOG", "LICENSE", "EXAMPLES", "NOTES", "lib/**/*.rb")
+  p.rdoc_files.include("README", "CHANGELOG", "LICENSE", "EXAMPLES", "NOTES",
+                       "GUIDE", "lib/**/*.rb")
   p.options << "--main" << 'README' << "--title" << "WWW::Mechanize RDoc"
 end
 

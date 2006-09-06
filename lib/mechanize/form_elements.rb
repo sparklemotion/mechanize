@@ -71,12 +71,12 @@ module WWW
       super(name, value)
     end
 
-    def tick
+    def check
       uncheck_peers
       @checked = true
     end
 
-    def untick
+    def uncheck
       @checked = false
     end
 
@@ -88,7 +88,7 @@ module WWW
     def uncheck_peers
       @form.radiobuttons.name(name).each do |b|
         next if b.value == value
-        b.untick
+        b.uncheck
       end
     end
   end

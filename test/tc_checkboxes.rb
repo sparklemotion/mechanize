@@ -15,7 +15,7 @@ class TestCheckBoxes < Test::Unit::TestCase
 
   def test_select_one
     form = @page.forms.first
-    form.checkboxes.name('green').tick
+    form.checkboxes.name('green').check
     assert_equal(true,  form.checkboxes.name('green').checked)
     assert_equal(false, form.checkboxes.name('red').checked)
     assert_equal(false, form.checkboxes.name('blue').checked)
@@ -26,7 +26,7 @@ class TestCheckBoxes < Test::Unit::TestCase
   def test_select_all
     form = @page.forms.first
     form.checkboxes.each do |b|
-      b.tick
+      b.check
     end
     form.checkboxes.each do |b|
       assert_equal(true, b.checked)
@@ -36,17 +36,17 @@ class TestCheckBoxes < Test::Unit::TestCase
   def test_select_none
     form = @page.forms.first
     form.checkboxes.each do |b|
-      b.untick
+      b.uncheck
     end
     form.checkboxes.each do |b|
       assert_equal(false, b.checked)
     end
   end
 
-  def test_tick_one
+  def test_check_one
     form = @page.forms.first
     assert_equal(2, form.checkboxes.name('green').length)
-    form.checkboxes.name('green')[1].tick
+    form.checkboxes.name('green')[1].check
     assert_equal(false,  form.checkboxes.name('green')[0].checked)
     assert_equal(true,  form.checkboxes.name('green')[1].checked)
     page = @agent.submit(form)
@@ -54,11 +54,11 @@ class TestCheckBoxes < Test::Unit::TestCase
     assert_equal('green:on', page.links.first.text)
   end
 
-  def test_tick_two
+  def test_check_two
     form = @page.forms.first
     assert_equal(2, form.checkboxes.name('green').length)
-    form.checkboxes.name('green')[0].tick
-    form.checkboxes.name('green')[1].tick
+    form.checkboxes.name('green')[0].check
+    form.checkboxes.name('green')[1].check
     assert_equal(true,  form.checkboxes.name('green')[0].checked)
     assert_equal(true,  form.checkboxes.name('green')[1].checked)
     page = @agent.submit(form)

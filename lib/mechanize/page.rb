@@ -44,6 +44,10 @@ module WWW
         @root.search(*args)
       end
 
+      def at(*args)
+        @root.at(*args)
+      end
+
       alias :/ :search
     
       def watch_for_set=(obj)

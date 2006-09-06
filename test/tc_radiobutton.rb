@@ -16,7 +16,7 @@ class TestRadioButtons < Test::Unit::TestCase
   def test_select_one
     form = @page.forms.first
     button = form.radiobuttons.name('color')
-    form.radiobuttons.name('color').value('green').tick
+    form.radiobuttons.name('color').value('green').check
     assert_equal(true, button.value('green').checked)
     assert_equal(false, button.value('red').checked)
     assert_equal(false, button.value('blue').checked)
@@ -28,9 +28,9 @@ class TestRadioButtons < Test::Unit::TestCase
     form = @page.forms.first
     button = form.radiobuttons.name('color')
     form.radiobuttons.name('color').each do |b|
-      b.tick
+      b.check
     end
-    form.radiobuttons.name('color').value('green').tick
+    form.radiobuttons.name('color').value('green').check
     assert_equal(true, button.value('green').checked)
     assert_equal(false, button.value('red').checked)
     assert_equal(false, button.value('blue').checked)
@@ -42,7 +42,7 @@ class TestRadioButtons < Test::Unit::TestCase
     form = @page.forms.first
     button = form.radiobuttons.name('color')
     form.radiobuttons.name('color').each do |b|
-      b.untick
+      b.uncheck
     end
     assert_equal(false, button.value('green').checked)
     assert_equal(false, button.value('red').checked)

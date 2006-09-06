@@ -79,7 +79,6 @@ module WWW
           }
         }
       end
-      alias :inspect :pretty_print_inspect
     end
 
     class RadioButton

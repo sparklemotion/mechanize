@@ -10,6 +10,7 @@
   @agent.click (page/"frame").first
 * Removed deprecated attr_finder
 * Removed REXML helper methods since the main parser is now hpricot
+* Overhauled cookie parser to use WEBrick::Cookie
 
 == 0.5.4
 

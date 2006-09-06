@@ -1,5 +1,33 @@
 = Mechanize Release Notes
 
+== 0.6.0 (Rufus)
+
+WWW::Mechanize 0.6.0 aka Rufus is ready!  This hpricot flavored pie has
+finished cooling on the window sill and is ready for you to eat.  But if you
+don't want to eat it, you can just download it and use it.  I would
+understand that.
+
+The best new feature in this release in my opinion is the hpricot flavoring
+packed inside.  Mechanize now uses hpricot as its html parser.  This means
+mechanize gets a huge speed boost, and you can use the power of hpricot for
+scraping data.  Page objects returned from mechanize will allow you to use
+hpricot search methods:
+ agent.get('http://rubyforge.org').search("//strong")
+or
+ agent.get('http://rubyforge.org')/"strong"
+
+The click method on mechanize has been updated so that you can click on links
+you find using hpricot methods:
+ agent.click (page/"a").first
+Or click on frames:
+ agent.click (page/"frame").first
+
+The cookie parser has been overhauled to be more RFC 2109 compliant and to
+use WEBrick cookies.  Dependencies on ruby-web and mime-types have been
+removed in favor of using hpricot and WEBrick respectively.
+
+attr_finder and REXML helper methods have been removed.
+
 == 0.5.4 (Sylvester)
 
 WWW::Mechanize 0.5.4 aka Sylvester is fresh out the the frying pan and in to

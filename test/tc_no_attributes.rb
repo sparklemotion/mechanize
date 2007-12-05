@@ -14,7 +14,7 @@ class TestNoAttributes < Test::Unit::TestCase
 
   def test_parse_no_attributes
     assert_nothing_raised do
-      page = @agent.get("http://localhost:#{PORT}/tc_no_attributes.html")
+      page = @agent.get('http://localhost/tc_no_attributes.html')
     end
   end
 end

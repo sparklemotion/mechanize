@@ -3,11 +3,76 @@ require 'logger'
 require 'date'
 require 'zlib'
 require 'stringio'
+require 'base64'
+
+class BasicAuthServlet < WEBrick::HTTPServlet::AbstractServlet
+  def do_GET(req,res)
+    htpd = WEBrick::HTTPAuth::Htpasswd.new('dot.htpasswd')
+    htpd.set_passwd('Blah', 'user', 'pass')
+    authenticator = WEBrick::HTTPAuth::BasicAuth.new({
+                                                     :UserDB => htpd,
+                                                     :Realm  => 'Blah',
+                                                     :Logger => Logger.new(nil)
+    }
+    )
+    begin
+      authenticator.authenticate(req,res)
+      res.body = 'You are authenticated'
+    rescue WEBrick::HTTPStatus::Unauthorized => ex
+      res.status = 401
+    end
+    FileUtils.rm('dot.htpasswd')
+  end
+end
+
+class HeaderServlet < WEBrick::HTTPServlet::AbstractServlet
+  def do_GET(req, res)
+    res['Content-Type'] = "text/html"
+    body = ''
+    req.each_header do |k,v|
+      body << "#{k}|#{v}\n"
+    end
+    res.body = body
+  end
+end
+
+class RefererServlet < WEBrick::HTTPServlet::AbstractServlet
+  def do_GET(req, res)
+    res['Content-Type'] = "text/html"
+    res.body = req['Referer'] || ''
+  end
+
+  def do_POST(req, res)
+    res['Content-Type'] = "text/html"
+    res.body = req['Referer'] || ''
+  end
+end
+
+class ModifiedSinceServlet < WEBrick::HTTPServlet::AbstractServlet
+  def do_GET(req, res)
+    s_time = 'Fri, 04 May 2001 00:00:38 GMT'
+
+    my_time = Time.parse(s_time)
+
+    if req['If-Modified-Since']
+      your_time = Time.parse(req['If-Modified-Since'])
+      if my_time > your_time
+        res.body = 'This page was updated since you requested'
+      else
+        res.status = 304
+      end
+    else
+      res.body = 'You did not send an If-Modified-Since header'
+    end
+
+    res['Last-Modified'] = s_time
+  end
+end
 
 class GzipServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     if req['Accept-Encoding'] =~ /gzip/
-      File.open("htdocs/#{req.query['file']}", 'r') do |file|
+      File.open("#{BASE_DIR}/htdocs/#{req.query['file']}", 'r') do |file|
         string = ""
         zipped = StringIO.new string, 'w'
         gz = Zlib::GzipWriter.new(zipped)
@@ -46,13 +111,11 @@ end
 
 class ResponseCodeTest < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
-    res['Content-Type'] = "text/html"
+    res['Content-Type'] = req.query['ct'] || "text/html"
     if req.query['code']
       code = req.query['code'].to_i
       case code
-      when 301
-        res['Location'] = "/index.html"
-      when 302
+      when 300, 301, 302, 303, 304, 305, 307
         res['Location'] = "/index.html"
       end
       res.status = code

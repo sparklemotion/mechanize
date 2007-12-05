@@ -1,7 +1,0 @@
-= Mechanize Testing
-
-To run the tests, execute ts_mech.rb
-
-ts_mech.rb spawns a thread that has a WEBrick server in it to test against.
-The WEBrick server can be found in server.rb.
-

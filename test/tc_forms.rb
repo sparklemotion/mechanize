@@ -39,6 +39,26 @@ class FormsMechTest < Test::Unit::TestCase
     assert_not_nil(page.links.text('first:Patterson').first)
   end
 
+  # Test calling submit on the form object
+  def test_submit_on_form
+    page = @agent.get("http://localhost:#{PORT}/form_multival.html")
+    form = page.forms.name('post_form').first
+
+    assert_not_nil(form)
+    assert_equal(2, form.fields.name('first').length)
+
+    form.fields.name('first')[0].value = 'Aaron'
+    form.fields.name('first')[1].value = 'Patterson'
+
+    page = form.submit
+
+    assert_not_nil(page)
+
+    assert_equal(2, page.links.length)
+    assert_not_nil(page.links.text('first:Aaron').first)
+    assert_not_nil(page.links.text('first:Patterson').first)
+  end
+
   # Test submitting form with two fields of the same name
   def test_get_multival
     page = @agent.get("http://localhost:#{PORT}/form_multival.html")
@@ -436,7 +456,7 @@ class FormsMechTest < Test::Unit::TestCase
     page = @agent.submit(get_form, get_form.buttons.first)
 
     # Check that the submitted fields exist
-    assert_equal(5, page.links.size, "Not enough links")
+    assert_equal(3, page.links.size, "Not enough links")
     assert_not_nil(
       page.links.find { |l| l.text == "likes ham:on" },
       "likes ham check box missing"
@@ -448,14 +468,6 @@ class FormsMechTest < Test::Unit::TestCase
     assert_not_nil(
       page.links.find { |l| l.text == "gender:male" },
       "gender field missing"
-    )
-    assert_not_nil(
-      page.links.find { |l| l.text == "great day:yes" },
-      "great day field missing"
-    )
-    assert_not_nil(
-      page.links.find { |l| l.text == "one:two" },
-      "one field missing"
     )
   end
 
@@ -477,15 +489,50 @@ class FormsMechTest < Test::Unit::TestCase
     assert_equal('Aaron', form.first)
   end
 
-  def test_fields_as_hash
+  def test_add_field
     page = @agent.get("http://localhost:#{PORT}/form_multival.html")
     form = page.forms.name('post_form').first
 
     assert_not_nil(form)
-    assert_equal(2, form.fields.name('first').length)
+    number_of_fields = form.fields.length
 
-    form['first'] = 'Aaron'
-    assert_equal('Aaron', form['first'])
-    assert_equal('Aaron', form.fields.name('first').first.value)
+    f = form.add_field!('intarweb')
+    assert_not_nil(f)
+    assert_equal(number_of_fields + 1, form.fields.length)
+  end
+  
+  def test_delete_field
+    page = @agent.get("http://localhost:#{PORT}/form_multival.html")
+    form = page.forms.name('post_form').first
+
+    assert_not_nil(form)
+    number_of_fields = form.fields.length
+
+    form.delete_field!('first')
+    assert_nil(form['first'])
+    assert_equal(number_of_fields - 2, form.fields.length)    
+  end
+
+  def test_has_field
+    page = @agent.get("http://localhost:#{PORT}/form_multival.html")
+    form = page.forms.name('post_form').first
+
+    assert_not_nil(form)
+    assert_equal(false, form.has_field?('intarweb'))
+    f = form.add_field!('intarweb')
+    assert_not_nil(f)
+    assert_equal(true, form.has_field?('intarweb'))
+  end
+
+  def test_field_error
+    @page = @agent.get('http://localhost/empty_form.html')
+    form = @page.forms.first
+    assert_raise(NoMethodError) {
+      form.foo = 'asdfasdf'
+    }
+
+    assert_raise(NoMethodError) {
+      form.foo
+    }
   end
 end

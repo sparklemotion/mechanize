@@ -1,0 +1,11 @@
+Q: I keep getting an EOFError:
+  protocol.rb:133:in `sysread': end of file reached (EOFError)
+
+A:  Some people have experienced an EOFError during normal mechanize usage.
+    Most of the time this occurs because the remote website claims to support
+    keep alives, but does not implement them correctly.  Try turning off
+    keep alives on your mechanize object:
+
+      mech.keep_alive = false
+
+

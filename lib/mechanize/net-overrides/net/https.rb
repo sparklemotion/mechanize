@@ -1,3 +1,4 @@
+# :enddoc:
 =begin
 
 = $RCSfile: https.rb,v $ -- SSL/TLS enhancement for Net::HTTP.

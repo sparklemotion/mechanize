@@ -13,21 +13,23 @@ module WWW
       attr_reader :href
       attr_reader :text
       attr_reader :attributes
+      attr_reader :page
       alias :to_s :text
+      alias :referer :page
     
-      def initialize(node)
-        node.attributes ||= {}
+      def initialize(node, mech, page)
         @node = node
-        @href = node.attributes['href'] 
-        @text = node.all_text
-        @attributes = node.attributes
+        @href = node['href'] 
+        @text = node.inner_text
+        @page = page
+        @mech = mech
+        @attributes = node
 
         # If there is no text, try to find an image and use it's alt text
         if (@text.nil? || @text.length == 0) && (node/'img').length > 0
           @text = ''
           (node/'img').each do |e|
-            e.attributes ||= {}
-            @text << (e.attributes.has_key?('alt') ? e.attributes['alt'] : '')
+            @text << ( e['alt'] || '')
           end
         end
 
@@ -35,6 +37,11 @@ module WWW
 
       def uri
         URI.parse(@href)
+      end
+
+      # Click on this link
+      def click
+        @mech.click self
       end
     end
     
@@ -53,12 +60,18 @@ module WWW
       alias :src :href
       alias :name :text
 
-      def initialize(node)
-        node.attributes ||= {}
+      def initialize(node, mech, referer)
+        super(node, mech, referer)
         @node = node
-        @text = node.attributes['name']
-        @href = node.attributes['src']
+        @text = node['name']
+        @href = node['src']
       end
+    end
+
+    # This class encapsulates a Base tag.  Mechanize treats base tags just like
+    # 'a' tags.  Base objects will contain links, but most likely will have
+    # no text.
+    class Base < Link
     end
   end
 end

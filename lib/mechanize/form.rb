@@ -26,15 +26,16 @@ module WWW
     
       attr_reader :fields, :buttons, :file_uploads, :radiobuttons, :checkboxes
       attr_reader :enctype
+
+      alias :elements :fields
     
       def initialize(form_node, elements_node)
         @form_node, @elements_node = form_node, elements_node
     
-        @form_node.attributes ||= {}
-        @method = (@form_node.attributes['method'] || 'GET').upcase
-        @action = @form_node.attributes['action'] 
-        @name = @form_node.attributes['name']
-        @enctype = @form_node.attributes['enctype'] || 'application/x-www-form-urlencoded'
+        @method = (@form_node['method'] || 'GET').upcase
+        @action = Util::html_unescape(@form_node['action'])
+        @name = @form_node['name']
+        @enctype = @form_node['enctype'] || 'application/x-www-form-urlencoded'
         @clicked_buttons = []
     
         parse
@@ -47,7 +48,6 @@ module WWW
         query = []
     
         fields().each do |f|
-          next unless f.value
           query.push(*f.query_value)
         end
     
@@ -105,6 +105,11 @@ module WWW
         end
       end
     
+      # Removes all fields with name +field_name+. 
+      def delete_field!(field_name)
+        @fields.delete_if{ |f| f.name == field_name}
+      end
+          
       private
       def parse
         @fields       = WWW::Mechanize::List.new
@@ -115,41 +120,40 @@ module WWW
     
         # Find all input tags
         (@elements_node/'input').each do |node|
-          node.attributes ||= {}
-          type = (node.attributes['type'] || 'text').downcase
-          name = node.attributes['name']
-          next if type != 'submit' && name.nil?
+          type = (node['type'] || 'text').downcase
+          name = node['name']
+          next if name.nil? && !(type == 'submit' || type =='button')
           case type
           when 'text', 'password', 'hidden', 'int'
-            @fields << Field.new(node.attributes['name'], node.attributes['value'] || '') 
+            @fields << Field.new(node['name'], node['value'] || '') 
           when 'radio'
-            @radiobuttons << RadioButton.new(node.attributes['name'], node.attributes['value'], node.attributes.has_key?('checked'), self)
+            @radiobuttons << RadioButton.new(node['name'], node['value'], node.has_attribute?('checked'), self)
           when 'checkbox'
-            @checkboxes << CheckBox.new(node.attributes['name'], node.attributes['value'], node.attributes.has_key?('checked'), self)
+            @checkboxes << CheckBox.new(node['name'], node['value'], node.has_attribute?('checked'), self)
           when 'file'
-            @file_uploads << FileUpload.new(node.attributes['name'], nil) 
+            @file_uploads << FileUpload.new(node['name'], nil) 
           when 'submit'
-            @buttons << Button.new(node.attributes['name'], node.attributes['value'])
+            @buttons << Button.new(node['name'], node['value'])
+          when 'button'
+            @buttons << Button.new(node['name'], node['value'])
           when 'image'
-            @buttons << ImageButton.new(node.attributes['name'], node.attributes['value'])
+            @buttons << ImageButton.new(node['name'], node['value'])
           end
         end
 
         # Find all textarea tags
         (@elements_node/'textarea').each do |node|
-          next if node.attributes.nil?
-          next if node.attributes['name'].nil?
-          @fields << Field.new(node.attributes['name'], node.all_text)
+          next if node['name'].nil?
+          @fields << Field.new(node['name'], node.inner_text)
         end
 
         # Find all select tags
         (@elements_node/'select').each do |node|
-          next if node.attributes.nil?
-          next if node.attributes['name'].nil?
-          if node.attributes.has_key? 'multiple'
-            @fields << MultiSelectList.new(node.attributes['name'], node)
+          next if node['name'].nil?
+          if node.has_attribute? 'multiple'
+            @fields << MultiSelectList.new(node['name'], node)
           else
-            @fields << SelectList.new(node.attributes['name'], node)
+            @fields << SelectList.new(node['name'], node)
           end
         end
       end
@@ -172,9 +176,10 @@ module WWW
       end
     
       def file_to_multipart(file)
+        file_name = file.file_name ? ::File.basename(file.file_name) : ''
         body =  "Content-Disposition: form-data; name=\"" +
                 "#{mime_value_quote(file.name)}\"; " +
-                "filename=\"#{mime_value_quote(file.file_name || '')}\"\r\n" +
+                "filename=\"#{mime_value_quote(file_name)}\"\r\n" +
                 "Content-Transfer-Encoding: binary\r\n"
 
         if file.file_data.nil? and ! file.file_name.nil?
@@ -212,15 +217,37 @@ module WWW
     #  puts form['name']
     class Form < GlobalForm
       attr_reader :node
+      attr_reader :page
     
-      def initialize(node)
-        @node = node
-        super(@node, @node)
+      def initialize(node, mech=nil, page=nil)
+        super(node, node)
+        @page = page
+        @mech = mech
       end
 
-      # Fetch the first field whose name is equal to field_name
+      # Returns whether or not the form contains a field with +field_name+
+      def has_field?(field_name)
+        ! fields.find { |f| f.name.eql? field_name }.nil?
+      end
+
+      alias :has_key? :has_field?
+
+      def has_value?(value)
+        ! fields.find { |f| f.value.eql? value }.nil?
+      end
+
+      def keys; fields.map { |f| f.name }; end
+
+      def values; fields.map { |f| f.value }; end
+
+      # Fetch the first field whose name is equal to +field_name+
       def field(field_name)
         fields.find { |f| f.name.eql? field_name }
+      end
+
+      # Add a field with +field_name+ and +value+
+      def add_field!(field_name, value = nil)
+        fields << WWW::Mechanize::Field.new(field_name, value)
       end
 
       # This method sets multiple fields on the form.  It takes a list of field
@@ -248,7 +275,8 @@ module WWW
       # Fetch the value set in the input field 'name'
       #  puts form['name']
       def [](field_name)
-        field(field_name).value
+        f = field(field_name)
+        f && f.value
       end
 
       # Set the value of the first input field with the name passed in
@@ -256,7 +284,12 @@ module WWW
       # Set the value in the input field 'name' to "Aaron"
       #  form['name'] = 'Aaron'
       def []=(field_name, value)
-        field(field_name).value = value
+        f = field(field_name)
+        if f.nil?
+          add_field!(field_name, value)
+        else
+          f.value = value
+        end
       end
 
       # Treat form fields like accessors.
@@ -267,6 +300,11 @@ module WWW
           return field(method).value = args[0]
         end
         super
+      end
+
+      # Submit this form with the button passed in
+      def submit(button=nil)
+        @mech.submit(self, button)
       end
     end
   end

@@ -10,7 +10,7 @@ class TestCheckBoxes < Test::Unit::TestCase
 
   def setup
     @agent = WWW::Mechanize.new
-    @page  = @agent.get("http://localhost:#{PORT}/tc_checkboxes.html")
+    @page = @agent.get('http://localhost/tc_checkboxes.html')
   end
 
   def test_select_one

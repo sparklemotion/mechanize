@@ -1,5 +1,63 @@
 = Mechanize Release Notes
 
+== 0.6.4 (Gwendolyn)
+
+Custom request headers can now be added to Mechanize by subclassing mechanize
+and defining the Mechanize#set_headers method.  For example:
+  class A < WWW::Mechanize
+    def set_headers(u, r, c)
+      super(uri, request, cur_page)
+      request.add_field('Cookie', 'name=Aaron')
+      request
+    end
+  end
+The Mechanize#redirect_ok method has been added to that you can keep mechanize
+from following redirects.
+
+== 0.6.3 (Big Man)
+
+Mechanize 0.6.3 (Big Man) has a few bug fixes and some new features added to
+the Form class.  The Form class is now more hash like.  I've added an
+Form#add_field! method that will add a field to your form.  Form#[]= will now
+add a field if the key doesn't exist.  For example, your form doesn't have
+an input field named 'foo', the following 2 lines of code are equivalent, and
+will create a field named 'foo':
+  form['foo'] = 'bar'
+or
+  form.add_field!('foo', 'bar')
+To make forms more hashlike, has_value?, and has_key? methods.
+
+== 0.6.2 (Bridget)
+
+Mechanize 0.6.2 (Bridget) is a fairly small bug fix release.  You can now
+access the parsed page when a ResponseCodeError is thrown.  For example, this
+loads a page that doesn't exist, but gives you access to the parsed 404 page:
+  begin
+    WWW::Mechanize.new().get('http://google.com/asdfasdfadsf.html')
+  rescue WWW::Mechanize::ResponseCodeError => ex
+    puts ex.page
+  end
+Accessing forms is now more DSL like.  When manipulating a form, for example,
+you can use the following syntax:
+  page.form('formname') { |form|
+    form.first_name = "Aaron"
+  }.submit
+Documentation has also been updated thanks to Paul Smith.
+
+== 0.6.1 (Chuck)
+
+Mechanize version 0.6.1 (Chuck) is done, and is ready for you to use.  This
+post "my trip to europe" release includes many bug fixes and a handful of
+new features.
+
+New features include, a submit method on forms, a click method on links, and an
+REXML pluggable parser.  Now you can submit a form just by calling a method on
+the form, rather than passing the form to the submit method on the mech object.
+The click method on links lets you click the link by calling a method on the
+link rather than passing the link to the click method on the mech object.
+Lastly, the REXML pluggable parser lets you use your pre-0.6.0 code with
+0.6.1.  See the CHANGELOG for more details.
+
 == 0.6.0 (Rufus)
 
 WWW::Mechanize 0.6.0 aka Rufus is ready!  This hpricot flavored pie has

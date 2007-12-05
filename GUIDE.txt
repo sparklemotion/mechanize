@@ -34,19 +34,19 @@ Now that we've fetched google's homepage, lets try listing all of the links:
 We can list the links, but Mechanize gives a few shortcuts to help us find a
 link to click on.  Lets say we wanted to click the link whose text is 'News'.
 Normally, we would have to do this:
- page = agent.click page.links.find { |l| l.name == 'News' }
+ page = agent.click page.links.find { |l| l.text == 'News' }
 But Mechanize gives us a shortcut.  Instead we can say this:
- page = agent.click page.links.name('News')
+ page = agent.click page.links.text('News')
 That shortcut says "find all links with the name 'News'".  You're probably
 thinking "there could be multiple links with that text!", and you would be
 correct!  If you pass a list of links to the "click" method, Mechanize will
 click on the first one.  If you wanted to click on the second news link, you
 could do this:
- agent.click page.links.name('News')[1]
+ agent.click page.links.text('News')[1]
 We can even find a link with a certain href like so:
  page.links.href('/something')
 Or chain them together to find a link with certain text and certain href:
- page.links.name('News').href('/something')
+ page.links.text('News').href('/something')
 
 These shortcuts that mechanize provides are available on any list that you
 can fetch like frames, iframes, or forms.  Now that we know how to find and

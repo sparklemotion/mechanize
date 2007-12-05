@@ -6,9 +6,8 @@ module WWW
   class Mechanize
   # This class is used to represent an HTTP Cookie.
     class Cookie < WEBrick::Cookie
-      def self.parse(uri, str)
-        cookies = []
-        str.gsub(/(,([^;,]*=)|,$)/) { "\r\n#{$2}" }.split(/\r\n/).each { |c|
+      def self.parse(uri, str, log = nil)
+        return str.split(/,(?=[^;,]*=)|,$/).collect { |c|
           cookie_elem = c.split(/;/)
           first_elem = cookie_elem.shift
           first_elem.strip!
@@ -24,25 +23,38 @@ module WWW
             when "domain"  then cookie.domain  = value.sub(/^\./, '')
             when "path"    then cookie.path    = value
             when 'expires'
-              cookie.expires = begin
-                Time::parse(value)
+              begin
+                cookie.expires = Time::parse(value)
               rescue
-                Time.now
+                if log
+                  log.warn("Couldn't parse expires: #{value}")
+                end
               end
-            when "max-age" then cookie.max_age = Integer(value)
+            when "max-age" then
+              begin
+                cookie.max_age = Integer(value)
+              rescue
+                log.warn("Couldn't parse max age '#{value}'") if log
+                cookie.max_age = nil
+              end
             when "comment" then cookie.comment = value
-            when "version" then cookie.version = Integer(value)
+            when "version" then
+              begin
+                cookie.version = Integer(value)
+              rescue
+                log.warn("Couldn't parse version '#{value}'") if log
+                cookie.version = nil
+              end
             when "secure"  then cookie.secure = true
             end
           }
-          cookie.path    ||= uri.path
+
+          cookie.path    ||= uri.path.to_s.sub(/[^\/]*$/, '')
           cookie.secure  ||= false
           cookie.domain  ||= uri.host
           # Move this in to the cookie jar
           yield cookie if block_given?
-          cookies << cookie
         }
-        return cookies
       end
     
       def to_s
@@ -61,12 +73,13 @@ module WWW
     
       # Add a cookie to the Jar.
       def add(uri, cookie)
-        return unless uri.host =~ /#{cookie.domain}$/
-        unless @jar.has_key?(cookie.domain)
-          @jar[cookie.domain] = Hash.new
+        return unless uri.host =~ /#{cookie.domain}$/i
+        normal_domain = cookie.domain.downcase
+        unless @jar.has_key?(normal_domain)
+          @jar[normal_domain] = Hash.new
         end
     
-        @jar[cookie.domain][cookie.name] = cookie
+        @jar[normal_domain][cookie.name] = cookie
         cleanup()
         cookie
       end
@@ -77,7 +90,7 @@ module WWW
         cookies = []
         url.path = '/' if url.path.empty?
         @jar.each_key do |domain|
-          if url.host =~ /#{domain}$/
+          if url.host =~ /#{domain}$/i
             @jar[domain].each_key do |name|
               if url.path =~ /^#{@jar[domain][name].path}/
                 if @jar[domain][name].expires.nil?

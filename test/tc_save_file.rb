@@ -22,4 +22,35 @@ class TestSaveFile < Test::Unit::TestCase
     FileUtils.rm("test.html")
     assert_equal(length.to_i, file_length)
   end
+
+  def test_save_file_default
+    page = WWW::Mechanize::File.new(
+                                    URI.parse('http://localhost/test.html'),
+                                    {},
+                                    "hello"
+                                   )
+    page.save
+    assert(File.exists?('test.html'))
+    page.save
+    assert(File.exists?('test.html.1'))
+    page.save
+    assert(File.exists?('test.html.2'))
+    FileUtils.rm("test.html")
+    FileUtils.rm("test.html.1")
+    FileUtils.rm("test.html.2")
+  end
+
+  def test_save_file_default_with_dots
+    page = WWW::Mechanize::File.new(
+                                    URI.parse('http://localhost/../test.html'),
+                                    {},
+                                    "hello"
+                                   )
+    page.save
+    assert(File.exists?('test.html'))
+    page.save
+    assert(File.exists?('test.html.1'))
+    FileUtils.rm("test.html")
+    FileUtils.rm("test.html.1")
+  end
 end

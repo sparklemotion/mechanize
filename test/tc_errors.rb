@@ -19,6 +19,14 @@ class MechErrorsTest < Test::Unit::TestCase
     }
   end
 
+  def test_non_exist
+    begin
+      page = @agent.get("http://localhost:#{PORT}/bad_form_test.html")
+    rescue RuntimeError => ex
+      assert_equal("404", ex.inspect)
+    end
+  end
+
   def test_too_many_radio
     page = @agent.get("http://localhost:#{PORT}/form_test.html")
     form = page.forms.name('post_form1').first

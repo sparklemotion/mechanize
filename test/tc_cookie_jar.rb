@@ -15,6 +15,61 @@ class CookieJarTest < Test::Unit::TestCase
     }
     c
   end
+
+  def test_domain_case
+    values = {  :name     => 'Foo',
+                :value    => 'Bar',
+                :path     => '/',
+                :expires  => Time.now + (10 * 86400),
+                :domain   => 'rubyforge.org'
+             }
+    url = URI.parse('http://rubyforge.org/')
+
+    jar = WWW::Mechanize::CookieJar.new
+    assert_equal(0, jar.cookies(url).length)
+
+    # Add one cookie with an expiration date in the future
+    cookie = cookie_from_hash(values)
+    jar.add(url, cookie)
+    assert_equal(1, jar.cookies(url).length)
+
+    jar.add(url, cookie_from_hash( values.merge(  :domain => 'RuByForge.Org',
+                                                  :name   => 'aaron'
+                                               ) ) )
+                  
+    assert_equal(2, jar.cookies(url).length)
+
+    url2 = URI.parse('http://RuByFoRgE.oRg/')
+    assert_equal(2, jar.cookies(url2).length)
+  end
+
+  def test_empty_value
+    values = {  :name     => 'Foo',
+                :value    => '',
+                :path     => '/',
+                :expires  => Time.now + (10 * 86400),
+                :domain   => 'rubyforge.org'
+             }
+    url = URI.parse('http://rubyforge.org/')
+
+    jar = WWW::Mechanize::CookieJar.new
+    assert_equal(0, jar.cookies(url).length)
+
+    # Add one cookie with an expiration date in the future
+    cookie = cookie_from_hash(values)
+    jar.add(url, cookie)
+    assert_equal(1, jar.cookies(url).length)
+
+    jar.add(url, cookie_from_hash( values.merge(  :domain => 'RuByForge.Org',
+                                                  :name   => 'aaron'
+                                               ) ) )
+                  
+    assert_equal(2, jar.cookies(url).length)
+
+    url2 = URI.parse('http://RuByFoRgE.oRg/')
+    assert_equal(2, jar.cookies(url2).length)
+  end
+
   def test_add_future_cookies
     values = {  :name     => 'Foo',
                 :value    => 'Bar',

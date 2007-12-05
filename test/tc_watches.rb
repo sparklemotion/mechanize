@@ -9,7 +9,7 @@ class Area
   attr_reader :name
 
   def initialize(node)
-    @name = node.attributes['name']
+    @name = node['name']
   end
 end
 

@@ -54,12 +54,16 @@ module WWW
       alias :and :with
 
       def method_missing(meth_sym, *args)
-        return first.send(meth_sym) if args.empty?
-        arg = args.first
-        if arg.class == Regexp
-          WWW::Mechanize::List.new(find_all { |e| e.send(meth_sym) =~ arg })
+        if length > 0
+          return first.send(meth_sym) if args.empty?
+          arg = args.first
+          if arg.class == Regexp
+            WWW::Mechanize::List.new(find_all { |e| e.send(meth_sym) =~ arg })
+          else
+            WWW::Mechanize::List.new(find_all { |e| e.send(meth_sym) == arg })
+          end
         else
-          WWW::Mechanize::List.new(find_all { |e| e.send(meth_sym) == arg })
+          ''
         end
       end
     end

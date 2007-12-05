@@ -1,4 +1,4 @@
-#
+# :enddoc:
 # = net/http.rb
 #
 # Copyright (C) 1999-2005 Yukihiro Matsumoto
@@ -1826,7 +1826,7 @@ module Net # :nodoc:
       '416' => HTTPRequestedRangeNotSatisfiable,
       '417' => HTTPExpectationFailed,
 
-      '501' => HTTPInternalServerError,
+      '500' => HTTPInternalServerError,
       '501' => HTTPNotImplemented,
       '502' => HTTPBadGateway,
       '503' => HTTPServiceUnavailable,

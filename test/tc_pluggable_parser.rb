@@ -63,7 +63,7 @@ class PluggableParserTest < Test::Unit::TestCase
     @agent.pluggable_parser.html = Filter
     page = @agent.get("http://localhost:#{PORT}/find_link.html")
     assert_kind_of(Filter, page)
-    assert_equal(16, page.links.length)
+    assert_equal(19, page.links.length)
     assert_not_nil(page.links.text('Net::DAAP::Client').first)
     assert_equal(1, page.links.text('Net::DAAP::Client').length)
   end
@@ -74,7 +74,7 @@ class PluggableParserTest < Test::Unit::TestCase
     assert_kind_of(Class, @agent.pluggable_parser['text/html'])
     assert_equal(Filter, @agent.pluggable_parser['text/html'])
     assert_kind_of(Filter, page)
-    assert_equal(16, page.links.length)
+    assert_equal(19, page.links.length)
     assert_not_nil(page.links.text('Net::DAAP::Client').first)
     assert_equal(1, page.links.text('Net::DAAP::Client').length)
   end

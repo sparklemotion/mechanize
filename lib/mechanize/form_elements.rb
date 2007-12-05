@@ -10,7 +10,12 @@ module WWW
     attr_accessor :name, :value
   
     def initialize(name, value)
-      @name, @value = name, value
+      @name = Util.html_unescape(name)
+      @value = if value.is_a? String
+                 Util.html_unescape(value)
+               else
+                 value
+               end
     end
   
     def query_value
@@ -22,9 +27,8 @@ module WWW
   # class, set WWW::FileUpload#file_data= to the data of the file you want
   # to upload and WWW::FileUpload#mime_type= to the appropriate mime type
   # of the file.
-  # See the example in EXAMPLES[link://files/EXAMPLES.html]
+  # See the example in EXAMPLES[link://files/EXAMPLES_txt.html]
   class FileUpload < Field
-    attr_accessor :name # Field name
     attr_accessor :file_name # File name
     attr_accessor :mime_type # Mime Type (Optional)
     
@@ -32,7 +36,7 @@ module WWW
     alias :file_data= :value=
   
     def initialize(name, file_name)
-      @file_name = file_name
+      @file_name = Util.html_unescape(file_name)
       @file_data = nil
       super(name, @file_data)
     end
@@ -125,7 +129,7 @@ module WWW
     end
 
     def query_value
-      value.collect { |v| [name, v] }
+      value ? value.collect { |v| [name, v] } : ''
     end
 
     # Select no options
@@ -213,9 +217,9 @@ module WWW
     alias :selected? :selected
 
     def initialize(node, select_list)
-      @text     = node.all_text
-      @value    = node.attributes['value']
-      @selected = node.attributes.has_key?('selected') ? true : false
+      @text     = node.inner_text
+      @value    = Util.html_unescape(node['value'])
+      @selected = node.has_attribute? 'selected'
       @select_list = select_list # The select list this option belongs to
     end
 

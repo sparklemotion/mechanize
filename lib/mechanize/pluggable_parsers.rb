@@ -17,20 +17,57 @@ module WWW
     #  agent.get('http://example.com/foo.jpg').class  #=> WWW::Mechanize::File
     #
     class File
-      attr_accessor :uri, :response, :body, :code
+      attr_accessor :uri, :response, :body, :code, :filename
+      alias :header :response
 
       alias :content :body
 
       def initialize(uri=nil, response=nil, body=nil, code=nil)
-        @uri, @response, @body, @code = uri, response, body, code
+        @uri, @body, @code = uri, body, code
+        @response = Headers.new
+
+        # Copy the headers in to a hash to prevent memory leaks
+        if response
+          response.each { |k,v|
+            @response[k] = v
+          }
+        end
+
+        @filename = 'index.html'
+
+        # Set the filename
+        if disposition = @response['content-disposition']
+          disposition.split(/;\s*/).each do |pair|
+            k,v = pair.split(/=/, 2)
+            @filename = v if k.downcase == 'filename'
+          end
+        else
+          if @uri
+            @filename = @uri.path.split(/\//).last || 'index.html'
+            @filename << ".html" unless @filename =~ /\./
+          end
+        end
+
+        yield self if block_given?
       end
 
       # Use this method to save the content of this object to filename
-      def save_as(filename)
+      def save_as(filename = nil)
+        if filename.nil?
+          filename = @filename
+          number = 1
+          while(::File.exists?(filename))
+            filename = "#{@filename}.#{number}"
+            number += 1
+          end
+        end
+
         ::File::open(filename, "wb") { |f|
           f.write body
         }
       end
+
+      alias :save :save_as
     end
 
     # = Synopsis
@@ -50,7 +87,7 @@ module WWW
       attr_reader :filename
 
       def initialize(uri=nil, response=nil, body=nil, code=nil)
-        @uri, @response, @body, @code = uri, response, body, code
+        super(uri, response, body, code)
         path = uri.path.empty? ? 'index.html' : uri.path.gsub(/^[\/]*/, '')
         path += 'index.html' if path =~ /\/$/
 
@@ -152,6 +189,15 @@ module WWW
 
       def []=(content_type, klass)
         @parsers[content_type] = klass
+      end
+    end
+
+    class Headers < Hash
+      def [](key)
+        super(key.downcase)
+      end
+      def []=(key, value)
+        super(key.downcase, value)
       end
     end
   end

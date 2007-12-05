@@ -1,4 +1,4 @@
-#
+# :enddoc:
 # = net/protocol.rb
 #
 #--

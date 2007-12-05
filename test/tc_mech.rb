@@ -13,6 +13,26 @@ class TestMechMethods < Test::Unit::TestCase
     @agent = WWW::Mechanize.new
   end
 
+  def test_weird_url
+    assert_nothing_raised {
+      @agent.get('http://localhost/?action=bing&bang=boom=1|a=|b=|c=')
+    }
+    assert_nothing_raised {
+      @agent.get('http://localhost/?a=b&#038;b=c&#038;c=d')
+    }
+    assert_nothing_raised {
+      @agent.get("http://localhost/?a=#{[0xd6].pack('U')}")
+    }
+  end
+
+  def test_kcode_url
+    $KCODE = 'u'
+    page = @agent.get("http://localhost/?a=#{[0xd6].pack('U')}")
+    assert_not_nil(page)
+    assert_equal('http://localhost/?a=%D6', page.uri.to_s)
+    $KCODE = 'NONE'
+  end
+
   def test_history
     0.upto(25) do |i|
       assert_equal(i, @agent.history.size)
@@ -24,12 +44,32 @@ class TestMechMethods < Test::Unit::TestCase
       @agent.history.last.uri.to_s)
     assert_equal("http://localhost:#{PORT}/",
       @agent.history[-2].uri.to_s)
+    assert_equal("http://localhost:#{PORT}/",
+      @agent.history[-2].uri.to_s)
 
     assert_equal(true, @agent.visited?("http://localhost:#{PORT}/"))
     assert_equal(true, @agent.visited?("/form_test.html"))
     assert_equal(false, @agent.visited?("http://google.com/"))
     assert_equal(true, @agent.visited?(page.links.first))
 
+  end
+
+  def test_visited
+    @agent.get("http://localhost/content_type_test?ct=application/pdf")
+    assert_equal(true,
+      @agent.visited?("http://localhost/content_type_test?ct=application/pdf"))
+    assert_equal(false,
+      @agent.visited?("http://localhost/content_type_test"))
+    assert_equal(false,
+      @agent.visited?("http://localhost/content_type_test?ct=text/html"))
+  end
+
+  def test_visited_after_redirect
+    @agent.get("http://localhost/response_code?code=302")
+    assert_equal("http://localhost/index.html",
+      @agent.current_page.uri.to_s)
+    assert_equal(true,
+                 @agent.visited?('http://localhost/response_code?code=302'))
   end
 
   def test_max_history
@@ -43,6 +83,23 @@ class TestMechMethods < Test::Unit::TestCase
       assert_equal(10, @agent.history.size)
       page = @agent.get("http://localhost:#{PORT}/")
     end
+  end
+
+  def test_max_history_order
+    @agent.max_history = 2
+    assert_equal(0, @agent.history.length)
+
+    @agent.get('http://localhost/form_test.html')
+    assert_equal(1, @agent.history.length)
+
+    @agent.get('http://localhost/empty_form.html')
+    assert_equal(2, @agent.history.length)
+
+    @agent.get('http://localhost/tc_checkboxes.html')
+    assert_equal(2, @agent.history.length)
+    assert_equal('http://localhost/empty_form.html', @agent.history[0].uri.to_s)
+    assert_equal('http://localhost/tc_checkboxes.html',
+                 @agent.history[1].uri.to_s)
   end
 
   def test_back_button

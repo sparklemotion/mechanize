@@ -15,7 +15,7 @@ class CookiesMechTest < Test::Unit::TestCase
   def test_send_cookies
     page = @agent.get("http://localhost:#{PORT}/many_cookies")
     page = @agent.get("http://localhost:#{PORT}/send_cookies")
-    assert_equal(2, page.links.length)
+    assert_equal(3, page.links.length)
     assert_not_nil(page.links.find { |l| l.text == "name:Aaron" })
     assert_not_nil(page.links.find { |l| l.text == "no_expires:nope" })
   end
@@ -57,7 +57,7 @@ class CookiesMechTest < Test::Unit::TestCase
     no_path_cookie = @agent.cookies.find { |k| k.name == "no_path" }
     assert_not_nil(no_path_cookie, "No path cookie is nil")
     assert_equal("no_path", no_path_cookie.value)
-    assert_equal("/many_cookies_as_string", no_path_cookie.path)
+    assert_equal("/", no_path_cookie.path)
     assert_equal(true, Time.now < no_path_cookie.expires)
   end
 
@@ -88,7 +88,7 @@ class CookiesMechTest < Test::Unit::TestCase
     no_path_cookie = @agent.cookies.find { |k| k.name == "no_path" }
     assert_not_nil(no_path_cookie, "No path cookie is nil")
     assert_equal("no_path", no_path_cookie.value)
-    assert_equal("/many_cookies", no_path_cookie.path)
+    assert_equal("/", no_path_cookie.path)
     assert_equal(true, Time.now < no_path_cookie.expires)
   end
 

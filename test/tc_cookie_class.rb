@@ -1,7 +1,7 @@
 $:.unshift File.join(File.dirname(__FILE__), "..", "lib")
 
 require 'test/unit'
-require 'mechanize/cookie'
+require 'www/mechanize/cookie'
 require 'uri'
 require 'test_includes'
 

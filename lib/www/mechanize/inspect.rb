@@ -43,17 +43,17 @@ module WWW
       if RUBY_VERSION > '1.8.4'
         alias :inspect  :pretty_inspect
       end
-    end
 
-    class Link
-      def pretty_print(q)
-        q.object_group(self) {
-          q.breakable; q.pp text
-          q.breakable; q.pp href
-        }
-      end
-      if RUBY_VERSION > '1.8.4'
-        alias :inspect  :pretty_inspect
+      class Link
+        def pretty_print(q)
+          q.object_group(self) {
+            q.breakable; q.pp text
+            q.breakable; q.pp href
+          }
+        end
+        if RUBY_VERSION > '1.8.4'
+          alias :inspect  :pretty_inspect
+        end
       end
     end
 
@@ -83,11 +83,11 @@ module WWW
           }
         }
       end
-    end
 
-    class RadioButton
-      def pretty_print_instance_variables
-        [:@checked, :@name, :@value]
+      class RadioButton
+        def pretty_print_instance_variables
+          [:@checked, :@name, :@value]
+        end
       end
     end
   end

@@ -1,27 +1,28 @@
+require 'www/mechanize/form/field'
+require 'www/mechanize/form/file_upload'
+require 'www/mechanize/form/button'
+require 'www/mechanize/form/image_button'
+require 'www/mechanize/form/radio_button'
+require 'www/mechanize/form/check_box'
+require 'www/mechanize/form/multi_select_list'
+require 'www/mechanize/form/select_list'
+require 'www/mechanize/form/option'
+
 module WWW
   class Mechanize
     # =Synopsis
-    # GlobalForm provides all access to form fields, such as the buttons,
-    # check boxes, and text input.
+    # This class encapsulates a form parsed out of an HTML page.  Each type
+    # of input fields available in a form can be accessed through this object.
+    # See GlobalForm for more methods.
     #
-    # GlobalForm takes two nodes, the node where the form tag is located
-    # (form_node), and another node, from which to start looking for form
-    # elements (elements_node) like buttons and the like. For class Form
-    # both fall together into one and the same node.
-    #
-    # Class Form does not work in the case there is some invalid (unbalanced)
-    # html involved, such as: 
-    #
-    #   <td>
-    #     <form>
-    #   </td>
-    #   <td>
-    #     <input .../>
-    #     </form>
-    #   </td>
-    # 
-    class GlobalForm
-      attr_reader :form_node, :elements_node
+    # ==Example
+    # Find a form and print out its fields
+    #  form = page.forms.first # => WWW::Mechanize::Form
+    #  form.fields.each { |f| puts f.name }
+    # Set the input field 'name' to "Aaron"
+    #  form['name'] = 'Aaron'
+    #  puts form['name']
+    class Form
       attr_accessor :method, :action, :name
     
       attr_reader :fields, :buttons, :file_uploads, :radiobuttons, :checkboxes
@@ -29,18 +30,104 @@ module WWW
 
       alias :elements :fields
     
-      def initialize(form_node, elements_node)
-        @form_node, @elements_node = form_node, elements_node
+      attr_reader :form_node
+      attr_reader :page
     
-        @method = (@form_node['method'] || 'GET').upcase
-        @action = Util::html_unescape(@form_node['action'])
-        @name = @form_node['name']
-        @enctype = @form_node['enctype'] || 'application/x-www-form-urlencoded'
-        @clicked_buttons = []
-    
+      def initialize(node, mech=nil, page=nil)
+        @enctype = node['enctype'] || 'application/x-www-form-urlencoded'
+        @form_node        = node
+        @action           = Util::html_unescape(node['action'])
+        @method           = (node['method'] || 'GET').upcase
+        @name             = node['name']
+        @clicked_buttons  = []
+        @page             = page
+        @mech             = mech
+
         parse
       end
-    
+
+      # Returns whether or not the form contains a field with +field_name+
+      def has_field?(field_name)
+        ! fields.find { |f| f.name.eql? field_name }.nil?
+      end
+
+      alias :has_key? :has_field?
+
+      def has_value?(value)
+        ! fields.find { |f| f.value.eql? value }.nil?
+      end
+
+      def keys; fields.map { |f| f.name }; end
+
+      def values; fields.map { |f| f.value }; end
+
+      # Fetch the first field whose name is equal to +field_name+
+      def field(field_name)
+        fields.find { |f| f.name.eql? field_name }
+      end
+
+      # Add a field with +field_name+ and +value+
+      def add_field!(field_name, value = nil)
+        fields << Field.new(field_name, value)
+      end
+
+      # This method sets multiple fields on the form.  It takes a list of field
+      # name, value pairs.  If there is more than one field found with the
+      # same name, this method will set the first one found.  If you want to
+      # set the value of a duplicate field, use a value which is an Array with
+      # the second value of the array as the index in to the form.  The index
+      # is zero based.  For example, to set the second field named 'foo', you
+      # could do the following:
+      #  form.set_fields( :foo => ['bar', 1] )
+      def set_fields(fields = {})
+        fields.each do |k,v|
+          value = nil
+          index = 0
+          v.each do |val|
+            index = val.to_i unless value.nil?
+            value = val if value.nil?
+          end
+          self.fields.name(k.to_s).[](index).value = value
+        end
+      end
+
+      # Fetch the value of the first input field with the name passed in
+      # ==Example
+      # Fetch the value set in the input field 'name'
+      #  puts form['name']
+      def [](field_name)
+        f = field(field_name)
+        f && f.value
+      end
+
+      # Set the value of the first input field with the name passed in
+      # ==Example
+      # Set the value in the input field 'name' to "Aaron"
+      #  form['name'] = 'Aaron'
+      def []=(field_name, value)
+        f = field(field_name)
+        if f.nil?
+          add_field!(field_name, value)
+        else
+          f.value = value
+        end
+      end
+
+      # Treat form fields like accessors.
+      def method_missing(id,*args)
+        method = id.to_s.gsub(/=$/, '')
+        if field(method)
+          return field(method).value if args.empty?
+          return field(method).value = args[0]
+        end
+        super
+      end
+
+      # Submit this form with the button passed in
+      def submit(button=nil)
+        @mech.submit(self, button)
+      end
+
       # This method builds an array of arrays that represent the query
       # parameters to be used with this form.  The return value can then
       # be used to create a query string for this form.
@@ -119,7 +206,7 @@ module WWW
         @checkboxes   = WWW::Mechanize::List.new
     
         # Find all input tags
-        (@elements_node/'input').each do |node|
+        (form_node/'input').each do |node|
           type = (node['type'] || 'text').downcase
           name = node['name']
           next if name.nil? && !(type == 'submit' || type =='button')
@@ -142,13 +229,13 @@ module WWW
         end
 
         # Find all textarea tags
-        (@elements_node/'textarea').each do |node|
+        (form_node/'textarea').each do |node|
           next if node['name'].nil?
           @fields << Field.new(node['name'], node.inner_text)
         end
 
         # Find all select tags
-        (@elements_node/'select').each do |node|
+        (form_node/'select').each do |node|
           next if node['name'].nil?
           if node.has_attribute? 'multiple'
             @fields << MultiSelectList.new(node['name'], node)
@@ -200,111 +287,6 @@ module WWW
           end
 
         body
-      end
-    end
-    
-    # =Synopsis
-    # This class encapsulates a form parsed out of an HTML page.  Each type
-    # of input fields available in a form can be accessed through this object.
-    # See GlobalForm for more methods.
-    #
-    # ==Example
-    # Find a form and print out its fields
-    #  form = page.forms.first # => WWW::Mechanize::Form
-    #  form.fields.each { |f| puts f.name }
-    # Set the input field 'name' to "Aaron"
-    #  form['name'] = 'Aaron'
-    #  puts form['name']
-    class Form < GlobalForm
-      attr_reader :node
-      attr_reader :page
-    
-      def initialize(node, mech=nil, page=nil)
-        super(node, node)
-        @page = page
-        @mech = mech
-      end
-
-      # Returns whether or not the form contains a field with +field_name+
-      def has_field?(field_name)
-        ! fields.find { |f| f.name.eql? field_name }.nil?
-      end
-
-      alias :has_key? :has_field?
-
-      def has_value?(value)
-        ! fields.find { |f| f.value.eql? value }.nil?
-      end
-
-      def keys; fields.map { |f| f.name }; end
-
-      def values; fields.map { |f| f.value }; end
-
-      # Fetch the first field whose name is equal to +field_name+
-      def field(field_name)
-        fields.find { |f| f.name.eql? field_name }
-      end
-
-      # Add a field with +field_name+ and +value+
-      def add_field!(field_name, value = nil)
-        fields << WWW::Mechanize::Field.new(field_name, value)
-      end
-
-      # This method sets multiple fields on the form.  It takes a list of field
-      # name, value pairs.  If there is more than one field found with the
-      # same name, this method will set the first one found.  If you want to
-      # set the value of a duplicate field, use a value which is an Array with
-      # the second value of the array as the index in to the form.  The index
-      # is zero based.  For example, to set the second field named 'foo', you
-      # could do the following:
-      #  form.set_fields( :foo => ['bar', 1] )
-      def set_fields(fields = {})
-        fields.each do |k,v|
-          value = nil
-          index = 0
-          v.each do |val|
-            index = val.to_i unless value.nil?
-            value = val if value.nil?
-          end
-          self.fields.name(k.to_s).[](index).value = value
-        end
-      end
-
-      # Fetch the value of the first input field with the name passed in
-      # ==Example
-      # Fetch the value set in the input field 'name'
-      #  puts form['name']
-      def [](field_name)
-        f = field(field_name)
-        f && f.value
-      end
-
-      # Set the value of the first input field with the name passed in
-      # ==Example
-      # Set the value in the input field 'name' to "Aaron"
-      #  form['name'] = 'Aaron'
-      def []=(field_name, value)
-        f = field(field_name)
-        if f.nil?
-          add_field!(field_name, value)
-        else
-          f.value = value
-        end
-      end
-
-      # Treat form fields like accessors.
-      def method_missing(id,*args)
-        method = id.to_s.gsub(/=$/, '')
-        if field(method)
-          return field(method).value if args.empty?
-          return field(method).value = args[0]
-        end
-        super
-      end
-
-      # Submit this form with the button passed in
-      def submit(button=nil)
-        @mech.submit(self, button)
       end
     end
   end

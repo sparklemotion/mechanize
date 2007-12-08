@@ -117,11 +117,11 @@ class TestHistory < Test::Unit::TestCase
     page = @agent.get('http://localhost')
 
     node = Struct.new(:href, :inner_text).new('http://localhost/', 'blah')
-    link = WWW::Mechanize::Link.new(node, nil, nil)
+    link = WWW::Mechanize::Page::Link.new(node, nil, nil)
     assert(@agent.visited?(link))
 
     node = Struct.new(:href, :inner_text).new('http://localhost', 'blah')
-    link = WWW::Mechanize::Link.new(node, nil, nil)
+    link = WWW::Mechanize::Page::Link.new(node, nil, nil)
     assert(@agent.visited?(link))
   end
 
@@ -129,11 +129,11 @@ class TestHistory < Test::Unit::TestCase
     page = @agent.get('http://localhost/')
 
     node = Struct.new(:href, :inner_text).new('http://localhost/', 'blah')
-    link = WWW::Mechanize::Link.new(node, nil, nil)
+    link = WWW::Mechanize::Page::Link.new(node, nil, nil)
     assert(@agent.visited?(link))
 
     node = Struct.new(:href, :inner_text).new('http://localhost', 'blah')
-    link = WWW::Mechanize::Link.new(node, nil, nil)
+    link = WWW::Mechanize::Page::Link.new(node, nil, nil)
     assert(@agent.visited?(link))
   end
 

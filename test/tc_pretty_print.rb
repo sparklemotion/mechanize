@@ -19,7 +19,7 @@ class TestPrettyPrint < Test::Unit::TestCase
     assert_match(/\{frames[^"]*"http:\/\/meme/, pretty_string)
     assert_match(/\{iframes[^"]*"http:\/\/meme/, pretty_string)
     assert_match(
-     "{links #<WWW::Mechanize::Link \"Google\" \"http://google.com/\">}",
+     "{links #<WWW::Mechanize::Page::Link \"Google\" \"http://google.com/\">}",
      pretty_string
                 )
     assert_match("form1", pretty_string)

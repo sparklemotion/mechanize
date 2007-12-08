@@ -25,7 +25,7 @@ class SelectTest < Test::Unit::TestCase
   end
 
   def test_correct_class
-    assert_instance_of(WWW::Mechanize::SelectList,
+    assert_instance_of(WWW::Mechanize::Form::SelectList,
       @form.fields.name('list').first)
   end
 

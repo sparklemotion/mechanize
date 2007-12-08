@@ -2,6 +2,11 @@ require 'fileutils'
 require 'hpricot'
 require 'forwardable'
 
+require 'www/mechanize/page/link'
+require 'www/mechanize/page/meta'
+require 'www/mechanize/page/base'
+require 'www/mechanize/page/frame'
+
 module WWW
   class Mechanize
     # = Synopsis
@@ -15,7 +20,7 @@ module WWW
     #  agent = WWW::Mechanize.new
     #  agent.get('http://google.com/').class  #=> WWW::Mechanize::Page
     #
-    class Page < File
+    class Page < WWW::Mechanize::File
       extend Forwardable
 
       attr_reader :parser, :title, :watch_for_set

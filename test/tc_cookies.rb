@@ -1,27 +1,20 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
+require File.dirname(__FILE__) + "/helper"
 
 class CookiesMechTest < Test::Unit::TestCase
-  include TestMethods
-
   def setup
     @agent = WWW::Mechanize.new
   end
 
   def test_send_cookies
-    page = @agent.get("http://localhost:#{PORT}/many_cookies")
-    page = @agent.get("http://localhost:#{PORT}/send_cookies")
+    page = @agent.get("http://localhost/many_cookies")
+    page = @agent.get("http://localhost/send_cookies")
     assert_equal(3, page.links.length)
     assert_not_nil(page.links.find { |l| l.text == "name:Aaron" })
     assert_not_nil(page.links.find { |l| l.text == "no_expires:nope" })
   end
 
   def test_no_space_cookies
-    page = @agent.get("http://localhost:#{PORT}/one_cookie_no_space")
+    page = @agent.get("http://localhost/one_cookie_no_space")
     assert_equal(1, @agent.cookies.length)
     foo_cookie = @agent.cookies.find { |k| k.name == 'foo' }
     assert_not_nil(foo_cookie, 'Foo cookie was nil')
@@ -31,7 +24,7 @@ class CookiesMechTest < Test::Unit::TestCase
   end
 
   def test_many_cookies_as_string
-    page = @agent.get("http://localhost:#{PORT}/many_cookies_as_string")
+    page = @agent.get("http://localhost/many_cookies_as_string")
     assert_equal(4, @agent.cookies.length)
 
     name_cookie = @agent.cookies.find { |k| k.name == "name" }
@@ -62,7 +55,7 @@ class CookiesMechTest < Test::Unit::TestCase
   end
 
   def test_many_cookies
-    page = @agent.get("http://localhost:#{PORT}/many_cookies")
+    page = @agent.get("http://localhost/many_cookies")
     assert_equal(4, @agent.cookies.length)
 
     name_cookie = @agent.cookies.find { |k| k.name == "name" }
@@ -95,11 +88,11 @@ class CookiesMechTest < Test::Unit::TestCase
   def test_get_cookie
     assert_equal(true,
       @agent.cookie_jar.empty?(
-      URI::parse("http://localhost:#{PORT}/one_cookie")))
+      URI::parse("http://localhost/one_cookie")))
 
     assert_equal(0, @agent.cookies.length)
 
-    page = @agent.get("http://localhost:#{PORT}/one_cookie")
+    page = @agent.get("http://localhost/one_cookie")
     assert_equal(1, @agent.cookies.length)
 
     cookie = @agent.cookies.first
@@ -110,8 +103,8 @@ class CookiesMechTest < Test::Unit::TestCase
 
     assert_equal(false,
       @agent.cookie_jar.empty?(
-      URI::parse("http://localhost:#{PORT}/one_cookie")))
-    page = @agent.get("http://localhost:#{PORT}/one_cookie")
+      URI::parse("http://localhost/one_cookie")))
+    page = @agent.get("http://localhost/one_cookie")
 
     assert_equal(1, @agent.cookies.length)
 

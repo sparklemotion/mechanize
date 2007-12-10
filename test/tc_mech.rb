@@ -1,14 +1,6 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'webrick'
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
+require File.dirname(__FILE__) + "/helper"
 
 class TestMechMethods < Test::Unit::TestCase
-  include TestMethods
-
   def setup
     @agent = WWW::Mechanize.new
   end
@@ -36,18 +28,18 @@ class TestMechMethods < Test::Unit::TestCase
   def test_history
     0.upto(25) do |i|
       assert_equal(i, @agent.history.size)
-      page = @agent.get("http://localhost:#{PORT}/")
+      page = @agent.get("http://localhost/")
     end
-    page = @agent.get("http://localhost:#{PORT}/form_test.html")
+    page = @agent.get("http://localhost/form_test.html")
 
-    assert_equal("http://localhost:#{PORT}/form_test.html",
+    assert_equal("http://localhost/form_test.html",
       @agent.history.last.uri.to_s)
-    assert_equal("http://localhost:#{PORT}/",
+    assert_equal("http://localhost/",
       @agent.history[-2].uri.to_s)
-    assert_equal("http://localhost:#{PORT}/",
+    assert_equal("http://localhost/",
       @agent.history[-2].uri.to_s)
 
-    assert_equal(true, @agent.visited?("http://localhost:#{PORT}/"))
+    assert_equal(true, @agent.visited?("http://localhost/"))
     assert_equal(true, @agent.visited?("/form_test.html"))
     assert_equal(false, @agent.visited?("http://google.com/"))
     assert_equal(true, @agent.visited?(page.links.first))
@@ -76,12 +68,12 @@ class TestMechMethods < Test::Unit::TestCase
     @agent.max_history = 10
     0.upto(10) do |i|
       assert_equal(i, @agent.history.size)
-      page = @agent.get("http://localhost:#{PORT}/")
+      page = @agent.get("http://localhost/")
     end
     
     0.upto(10) do |i|
       assert_equal(10, @agent.history.size)
-      page = @agent.get("http://localhost:#{PORT}/")
+      page = @agent.get("http://localhost/")
     end
   end
 
@@ -105,24 +97,24 @@ class TestMechMethods < Test::Unit::TestCase
   def test_back_button
     0.upto(5) do |i|
       assert_equal(i, @agent.history.size)
-      page = @agent.get("http://localhost:#{PORT}/")
+      page = @agent.get("http://localhost/")
     end
-    page = @agent.get("http://localhost:#{PORT}/form_test.html")
+    page = @agent.get("http://localhost/form_test.html")
 
-    assert_equal("http://localhost:#{PORT}/form_test.html",
+    assert_equal("http://localhost/form_test.html",
       @agent.history.last.uri.to_s)
-    assert_equal("http://localhost:#{PORT}/",
+    assert_equal("http://localhost/",
       @agent.history[-2].uri.to_s)
 
     assert_equal(7, @agent.history.size)
     @agent.back
     assert_equal(6, @agent.history.size)
-    assert_equal("http://localhost:#{PORT}/",
+    assert_equal("http://localhost/",
       @agent.history.last.uri.to_s)
   end
 
   def test_google
-    page = @agent.get("http://localhost:#{PORT}/google.html")
+    page = @agent.get("http://localhost/google.html")
     search = page.forms.find { |f| f.name == "f" }
     assert_not_nil(search)
     assert_not_nil(search.fields.name('q').first)
@@ -132,36 +124,36 @@ class TestMechMethods < Test::Unit::TestCase
 
   def test_click
     @agent.user_agent_alias = 'Mac Safari'
-    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
+    page = @agent.get("http://localhost/frame_test.html")
     link = page.links.text("Form Test").first
     assert_not_nil(link)
     page = @agent.click(link)
-    assert_equal("http://localhost:#{PORT}/form_test.html",
+    assert_equal("http://localhost/form_test.html",
       @agent.history.last.uri.to_s)
   end
 
   def test_click_hpricot
-    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
+    page = @agent.get("http://localhost/frame_test.html")
 
     link = (page/"a[@class=bar]").first
     assert_not_nil(link)
     page = @agent.click(link)
-    assert_equal("http://localhost:#{PORT}/form_test.html",
+    assert_equal("http://localhost/form_test.html",
       @agent.history.last.uri.to_s)
   end
 
   def test_click_hpricot_frame
-    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
+    page = @agent.get("http://localhost/frame_test.html")
 
     link = (page/"frame[@name=frame2]").first
     assert_not_nil(link)
     page = @agent.click(link)
-    assert_equal("http://localhost:#{PORT}/form_test.html",
+    assert_equal("http://localhost/form_test.html",
       @agent.history.last.uri.to_s)
   end
 
   def test_new_find
-    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
+    page = @agent.get("http://localhost/frame_test.html")
     assert_equal(3, page.frames.size)
 
     find_orig = page.frames.find_all { |f| f.name == 'frame1' }
@@ -175,18 +167,18 @@ class TestMechMethods < Test::Unit::TestCase
   end
 
   def test_get_file
-    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
+    page = @agent.get("http://localhost/frame_test.html")
     content_length = page.header['Content-Length']
-    page_as_string = @agent.get_file("http://localhost:#{PORT}/frame_test.html")
+    page_as_string = @agent.get_file("http://localhost/frame_test.html")
     assert_equal(content_length.to_i, page_as_string.length.to_i)
   end
 
   def test_transact
-    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
+    page = @agent.get("http://localhost/frame_test.html")
     assert_equal(1, @agent.history.length)
     @agent.transact { |a|
       5.times {
-        @agent.get("http://localhost:#{PORT}/frame_test.html")
+        @agent.get("http://localhost/frame_test.html")
       }
       assert_equal(6, @agent.history.length)
     }

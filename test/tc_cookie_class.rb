@@ -1,9 +1,4 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'www/mechanize/cookie'
-require 'uri'
-require 'test_includes'
+require File.dirname(__FILE__) + "/helper"
 
 module Enumerable
   def combine

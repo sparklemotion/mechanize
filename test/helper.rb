@@ -1,5 +1,8 @@
-require 'net/http'
-require 'test_servlets'
+require File.dirname(__FILE__) + "/servlets"
+
+require 'test/unit'
+require 'rubygems'
+require 'mechanize'
 require 'webrick/httputils'
 
 BASE_DIR = File.dirname(__FILE__)
@@ -106,16 +109,5 @@ class Response
 
   def read_body
     yield body
-  end
-end
-
-
-module TestMethods
-  PORT      = 2000
-  PROXYPORT = 2001
-  SSLPORT   = 2002
-
-  def html_response
-    { 'content-type' => 'text/html' }
   end
 end

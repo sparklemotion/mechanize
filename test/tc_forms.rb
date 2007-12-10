@@ -1,14 +1,6 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'webrick'
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
+require File.dirname(__FILE__) + "/helper"
 
 class FormsMechTest < Test::Unit::TestCase
-  include TestMethods
-
   def setup
     @agent = WWW::Mechanize.new
   end
@@ -21,7 +13,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
   # Test submitting form with two fields of the same name
   def test_post_multival
-    page = @agent.get("http://localhost:#{PORT}/form_multival.html")
+    page = @agent.get("http://localhost/form_multival.html")
     form = page.forms.name('post_form').first
 
     assert_not_nil(form)
@@ -41,7 +33,7 @@ class FormsMechTest < Test::Unit::TestCase
 
   # Test calling submit on the form object
   def test_submit_on_form
-    page = @agent.get("http://localhost:#{PORT}/form_multival.html")
+    page = @agent.get("http://localhost/form_multival.html")
     form = page.forms.name('post_form').first
 
     assert_not_nil(form)
@@ -61,7 +53,7 @@ class FormsMechTest < Test::Unit::TestCase
 
   # Test submitting form with two fields of the same name
   def test_get_multival
-    page = @agent.get("http://localhost:#{PORT}/form_multival.html")
+    page = @agent.get("http://localhost/form_multival.html")
     form = page.forms.name('get_form').first
 
     assert_not_nil(form)
@@ -80,7 +72,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_post
-    page = @agent.get("http://localhost:#{PORT}/form_test.html")
+    page = @agent.get("http://localhost/form_test.html")
     post_form = page.forms.find { |f| f.name == "post_form1" }
     assert_not_nil(post_form, "Post form is null")
     assert_equal("post", post_form.method.downcase)
@@ -157,7 +149,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_select_box
-    page = @agent.get("http://localhost:#{PORT}/form_test.html")
+    page = @agent.get("http://localhost/form_test.html")
     post_form = page.forms.find { |f| f.name == "post_form1" }
     assert_not_nil(post_form, "Post form is null")
     assert_not_nil(page.header)
@@ -189,7 +181,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_get
-    page = @agent.get("http://localhost:#{PORT}/form_test.html")
+    page = @agent.get("http://localhost/form_test.html")
     get_form = page.forms.find { |f| f.name == "get_form1" }
     assert_not_nil(get_form, "Get form is null")
     assert_equal("get", get_form.method.downcase)
@@ -264,7 +256,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_post_with_space_in_action
-    page = @agent.get("http://localhost:#{PORT}/form_test.html")
+    page = @agent.get("http://localhost/form_test.html")
     post_form = page.forms.find { |f| f.name == "post_form2" }
     assert_not_nil(post_form, "Post form is null")
     assert_equal("post", post_form.method.downcase)
@@ -316,7 +308,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_get_with_space_in_action
-    page = @agent.get("http://localhost:#{PORT}/form_test.html")
+    page = @agent.get("http://localhost/form_test.html")
     get_form = page.forms.find { |f| f.name == "get_form2" }
     assert_not_nil(get_form, "Get form is null")
     assert_equal("get", get_form.method.downcase)
@@ -368,7 +360,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_post_with_param_in_action
-    page = @agent.get("http://localhost:#{PORT}/form_test.html")
+    page = @agent.get("http://localhost/form_test.html")
     post_form = page.forms.find { |f| f.name == "post_form3" }
     assert_not_nil(post_form, "Post form is null")
     assert_equal("post", post_form.method.downcase)
@@ -420,7 +412,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_get_with_param_in_action
-    page = @agent.get("http://localhost:#{PORT}/form_test.html")
+    page = @agent.get("http://localhost/form_test.html")
     get_form = page.forms.find { |f| f.name == "get_form3" }
     assert_not_nil(get_form, "Get form is null")
     assert_equal("get", get_form.method.downcase)
@@ -472,14 +464,14 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_field_addition
-    page = @agent.get("http://localhost:#{PORT}/form_test.html")
+    page = @agent.get("http://localhost/form_test.html")
     get_form = page.forms.find { |f| f.name == "get_form1" }
     get_form.field("first_name").value = "Gregory"
     assert_equal( "Gregory", get_form.field("first_name").value ) 
   end
 
   def test_fields_as_accessors
-    page = @agent.get("http://localhost:#{PORT}/form_multival.html")
+    page = @agent.get("http://localhost/form_multival.html")
     form = page.forms.name('post_form').first
 
     assert_not_nil(form)
@@ -490,7 +482,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_add_field
-    page = @agent.get("http://localhost:#{PORT}/form_multival.html")
+    page = @agent.get("http://localhost/form_multival.html")
     form = page.forms.name('post_form').first
 
     assert_not_nil(form)
@@ -502,7 +494,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
   
   def test_delete_field
-    page = @agent.get("http://localhost:#{PORT}/form_multival.html")
+    page = @agent.get("http://localhost/form_multival.html")
     form = page.forms.name('post_form').first
 
     assert_not_nil(form)
@@ -514,7 +506,7 @@ class FormsMechTest < Test::Unit::TestCase
   end
 
   def test_has_field
-    page = @agent.get("http://localhost:#{PORT}/form_multival.html")
+    page = @agent.get("http://localhost/form_multival.html")
     form = page.forms.name('post_form').first
 
     assert_not_nil(form)

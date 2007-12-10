@@ -1,19 +1,12 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
+require File.dirname(__FILE__) + "/helper"
 
 class MechErrorsTest < Test::Unit::TestCase
-  include TestMethods
-
   def setup
     @agent = WWW::Mechanize.new
   end
 
   def test_bad_form_method
-    page = @agent.get("http://localhost:#{PORT}/bad_form_test.html")
+    page = @agent.get("http://localhost/bad_form_test.html")
     assert_raise(RuntimeError) {
       @agent.submit(page.forms.first)
     }
@@ -21,14 +14,14 @@ class MechErrorsTest < Test::Unit::TestCase
 
   def test_non_exist
     begin
-      page = @agent.get("http://localhost:#{PORT}/bad_form_test.html")
+      page = @agent.get("http://localhost/bad_form_test.html")
     rescue RuntimeError => ex
       assert_equal("404", ex.inspect)
     end
   end
 
   def test_too_many_radio
-    page = @agent.get("http://localhost:#{PORT}/form_test.html")
+    page = @agent.get("http://localhost/form_test.html")
     form = page.forms.name('post_form1').first
     form.radiobuttons.each { |r| r.checked = true }
     assert_raise(RuntimeError) {

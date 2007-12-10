@@ -1,9 +1,4 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
+require File.dirname(__FILE__) + "/helper"
 
 class Area
   attr_reader :name
@@ -14,14 +9,12 @@ class Area
 end
 
 class WatchesMechTest < Test::Unit::TestCase
-  include TestMethods
-
   def setup
     @agent = WWW::Mechanize.new
   end
 
   def test_watches
-    page = @agent.get("http://localhost:#{PORT}/find_link.html")
+    page = @agent.get("http://localhost/find_link.html")
     page.watch_for_set = { 'area' => Area }
     watches = page.watches
     assert_equal(3, watches['area'].size)

@@ -1,16 +1,9 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
+require File.dirname(__FILE__) + "/helper"
 
 class TestTextArea < Test::Unit::TestCase
-  include TestMethods
-
   def setup
     @agent = WWW::Mechanize.new
-    @page  = @agent.get("http://localhost:#{PORT}/tc_textarea.html")
+    @page  = @agent.get("http://localhost/tc_textarea.html")
   end
 
   def test_empty_text_area

@@ -1,16 +1,8 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
-
+require File.dirname(__FILE__) + "/helper"
 class SelectAllTest < Test::Unit::TestCase
-  include TestMethods
-
   def setup
     @agent = WWW::Mechanize.new
-    @page = @agent.get("http://localhost:#{PORT}/form_select_all.html")
+    @page = @agent.get("http://localhost/form_select_all.html")
     @form = @page.forms.first
   end
 

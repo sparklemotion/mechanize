@@ -1,13 +1,6 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
+require File.dirname(__FILE__) + "/helper"
 
 class LinksMechTest < Test::Unit::TestCase
-  include TestMethods
-
   def setup
     @agent = WWW::Mechanize.new
   end
@@ -19,7 +12,7 @@ class LinksMechTest < Test::Unit::TestCase
   end
 
   def test_find_meta
-    page = @agent.get("http://localhost:#{PORT}/find_link.html")
+    page = @agent.get("http://localhost/find_link.html")
     assert_equal(3, page.meta.length)
     assert_equal(%w{
       http://www.drphil.com/
@@ -29,12 +22,12 @@ class LinksMechTest < Test::Unit::TestCase
   end
 
   def test_find_link
-    page = @agent.get("http://localhost:#{PORT}/find_link.html")
+    page = @agent.get("http://localhost/find_link.html")
     assert_equal(18, page.links.length)
   end
 
   def test_alt_text
-    page = @agent.get("http://localhost:#{PORT}/alt_text.html")
+    page = @agent.get("http://localhost/alt_text.html")
     assert_equal(5, page.links.length)
     assert_equal(1, page.meta.length)
 
@@ -48,27 +41,27 @@ class LinksMechTest < Test::Unit::TestCase
 
   def test_click_link
     @agent.user_agent_alias = 'Mac Safari'
-    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
+    page = @agent.get("http://localhost/frame_test.html")
     link = page.links.text("Form Test")
     assert_not_nil(link)
     assert_equal('Form Test', link.text)
     page = @agent.click(link)
-    assert_equal("http://localhost:#{PORT}/form_test.html",
+    assert_equal("http://localhost/form_test.html",
       @agent.history.last.uri.to_s)
   end
 
   def test_click_method
-    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
+    page = @agent.get("http://localhost/frame_test.html")
     link = page.links.text("Form Test")
     assert_not_nil(link)
     assert_equal('Form Test', link.text)
     page = link.click
-    assert_equal("http://localhost:#{PORT}/form_test.html",
+    assert_equal("http://localhost/form_test.html",
       @agent.history.last.uri.to_s)
   end
 
   def test_find_bold_link
-    page = @agent.get("http://localhost:#{PORT}/tc_links.html")
+    page = @agent.get("http://localhost/tc_links.html")
     link = page.links.text(/Bold Dude/)
     assert_equal(1, link.length)
     assert_equal('Bold Dude', link.first.text)
@@ -87,19 +80,19 @@ class LinksMechTest < Test::Unit::TestCase
   end
 
   def test_link_with_encoded_space
-    page = @agent.get("http://localhost:#{PORT}/tc_links.html")
+    page = @agent.get("http://localhost/tc_links.html")
     link = page.links.text('encoded space').first
     page = @agent.click link
   end
 
   def test_link_with_space
-    page = @agent.get("http://localhost:#{PORT}/tc_links.html")
+    page = @agent.get("http://localhost/tc_links.html")
     link = page.links.text('not encoded space').first
     page = @agent.click link
   end
 
   def test_link_with_unusual_characters
-    page = @agent.get("http://localhost:#{PORT}/tc_links.html")
+    page = @agent.get("http://localhost/tc_links.html")
     link = page.links.text('unusual characters').first
     assert_nothing_raised { @agent.click link }
   end

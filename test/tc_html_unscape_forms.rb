@@ -1,13 +1,6 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
+require File.dirname(__FILE__) + "/helper"
 
 class TestCheckBoxes < Test::Unit::TestCase
-  include TestMethods
-
   def test_field
     f = WWW::Mechanize::Form::Field.new('a&amp;b', 'a&amp;b')
     assert_equal('a&b', f.name)

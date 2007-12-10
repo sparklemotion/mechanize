@@ -1,19 +1,12 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
+require File.dirname(__FILE__) + "/helper"
 
 class PluggableParserTest < Test::Unit::TestCase
-  include TestMethods
-
   def setup
     @agent = WWW::Mechanize.new
   end
 
   def test_content_type_error
-    page = @agent.get("http://localhost:#{PORT}/bad_content_type")
+    page = @agent.get("http://localhost/bad_content_type")
     assert_raise(WWW::Mechanize::ContentTypeError) {
       page = WWW::Mechanize::Page.new(
                                       page.uri, 
@@ -35,7 +28,7 @@ class PluggableParserTest < Test::Unit::TestCase
   end
 
   def test_content_type
-    page = @agent.get("http://localhost:#{PORT}/content_type_test")
+    page = @agent.get("http://localhost/content_type_test")
     assert_kind_of(WWW::Mechanize::Page, page)
   end
 
@@ -61,7 +54,7 @@ class PluggableParserTest < Test::Unit::TestCase
 
   def test_filter
     @agent.pluggable_parser.html = Filter
-    page = @agent.get("http://localhost:#{PORT}/find_link.html")
+    page = @agent.get("http://localhost/find_link.html")
     assert_kind_of(Filter, page)
     assert_equal(19, page.links.length)
     assert_not_nil(page.links.text('Net::DAAP::Client').first)
@@ -70,7 +63,7 @@ class PluggableParserTest < Test::Unit::TestCase
 
   def test_filter_hash
     @agent.pluggable_parser['text/html'] = Filter
-    page = @agent.get("http://localhost:#{PORT}/find_link.html")
+    page = @agent.get("http://localhost/find_link.html")
     assert_kind_of(Class, @agent.pluggable_parser['text/html'])
     assert_equal(Filter, @agent.pluggable_parser['text/html'])
     assert_kind_of(Filter, page)
@@ -93,7 +86,7 @@ class PluggableParserTest < Test::Unit::TestCase
 
   def test_content_type_pdf
     @agent.pluggable_parser.pdf = FileFilter
-    page = @agent.get("http://localhost:#{PORT}/content_type_test?ct=application/pdf")
+    page = @agent.get("http://localhost/content_type_test?ct=application/pdf")
     assert_kind_of(Class, @agent.pluggable_parser['application/pdf'])
     assert_equal(FileFilter, @agent.pluggable_parser['application/pdf'])
     assert_kind_of(FileFilter, page)
@@ -101,7 +94,7 @@ class PluggableParserTest < Test::Unit::TestCase
 
   def test_content_type_csv
     @agent.pluggable_parser.csv = FileFilter
-    page = @agent.get("http://localhost:#{PORT}/content_type_test?ct=text/csv")
+    page = @agent.get("http://localhost/content_type_test?ct=text/csv")
     assert_kind_of(Class, @agent.pluggable_parser['text/csv'])
     assert_equal(FileFilter, @agent.pluggable_parser['text/csv'])
     assert_kind_of(FileFilter, page)
@@ -109,7 +102,7 @@ class PluggableParserTest < Test::Unit::TestCase
 
   def test_content_type_xml
     @agent.pluggable_parser.xml = FileFilter
-    page = @agent.get("http://localhost:#{PORT}/content_type_test?ct=text/xml")
+    page = @agent.get("http://localhost/content_type_test?ct=text/xml")
     assert_kind_of(Class, @agent.pluggable_parser['text/xml'])
     assert_equal(FileFilter, @agent.pluggable_parser['text/xml'])
     assert_kind_of(FileFilter, page)

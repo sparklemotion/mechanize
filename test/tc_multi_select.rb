@@ -1,19 +1,12 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
+require File.dirname(__FILE__) + "/helper"
 
 class MultiSelectTest < Test::Unit::TestCase
-  include TestMethods
-
   def setup
     @agent = WWW::Mechanize.new
   end
 
   def test_select_none
-    page = @agent.get("http://localhost:#{PORT}/form_multi_select.html")
+    page = @agent.get("http://localhost/form_multi_select.html")
     form = page.forms.first
     form.fields.name('list').first.select_none
     page = @agent.submit(form)
@@ -21,7 +14,7 @@ class MultiSelectTest < Test::Unit::TestCase
   end
 
   def test_select_all
-    page = @agent.get("http://localhost:#{PORT}/form_multi_select.html")
+    page = @agent.get("http://localhost/form_multi_select.html")
     form = page.forms.first
     form.fields.name('list').first.select_all
     page = @agent.submit(form)
@@ -35,7 +28,7 @@ class MultiSelectTest < Test::Unit::TestCase
   end
 
   def test_click_all
-    page = @agent.get("http://localhost:#{PORT}/form_multi_select.html")
+    page = @agent.get("http://localhost/form_multi_select.html")
     form = page.forms.first
     form.fields.name('list').first.options.each { |o| o.click }
     page = @agent.submit(form)
@@ -48,7 +41,7 @@ class MultiSelectTest < Test::Unit::TestCase
   end
 
   def test_select_default
-    page = @agent.get("http://localhost:#{PORT}/form_multi_select.html")
+    page = @agent.get("http://localhost/form_multi_select.html")
     form = page.forms.first
     page = @agent.submit(form)
     assert_equal(1, page.links.length)
@@ -56,7 +49,7 @@ class MultiSelectTest < Test::Unit::TestCase
   end
 
   def test_select_one
-    page = @agent.get("http://localhost:#{PORT}/form_multi_select.html")
+    page = @agent.get("http://localhost/form_multi_select.html")
     form = page.forms.first
     form.list = 'Aaron'
     assert_equal(['Aaron'], form.list)
@@ -66,7 +59,7 @@ class MultiSelectTest < Test::Unit::TestCase
   end
 
   def test_select_two
-    page = @agent.get("http://localhost:#{PORT}/form_multi_select.html")
+    page = @agent.get("http://localhost/form_multi_select.html")
     form = page.forms.first
     form.list = ['1', 'Aaron']
     page = @agent.submit(form)
@@ -76,7 +69,7 @@ class MultiSelectTest < Test::Unit::TestCase
   end
 
   def test_select_three
-    page = @agent.get("http://localhost:#{PORT}/form_multi_select.html")
+    page = @agent.get("http://localhost/form_multi_select.html")
     form = page.forms.first
     form.list = ['1', '2', '3']
     page = @agent.submit(form)
@@ -87,7 +80,7 @@ class MultiSelectTest < Test::Unit::TestCase
   end
 
   def test_select_three_twice
-    page = @agent.get("http://localhost:#{PORT}/form_multi_select.html")
+    page = @agent.get("http://localhost/form_multi_select.html")
     form = page.forms.first
     form.list = ['1', '2', '3']
     form.list = ['1', '2', '3']
@@ -99,7 +92,7 @@ class MultiSelectTest < Test::Unit::TestCase
   end
 
   def test_select_with_click
-    page = @agent.get("http://localhost:#{PORT}/form_multi_select.html")
+    page = @agent.get("http://localhost/form_multi_select.html")
     form = page.forms.first
     form.list = ['1', 'Aaron']
     form.fields.name('list').first.options[3].tick

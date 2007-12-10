@@ -1,19 +1,12 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
+require File.dirname(__FILE__) + "/helper"
 
 class PostForm < Test::Unit::TestCase
-  include TestMethods
-
   def setup
     @agent = WWW::Mechanize.new
   end
 
   def test_post_form
-    page = @agent.post("http://localhost:#{PORT}/form_post",
+    page = @agent.post("http://localhost/form_post",
                         'gender' => 'female'
                       )
     assert_not_nil(
@@ -23,7 +16,7 @@ class PostForm < Test::Unit::TestCase
   end
 
   def test_post_form_multival
-    page = @agent.post("http://localhost:#{PORT}/form_post",
+    page = @agent.post("http://localhost/form_post",
                        [ ['gender', 'female'],
                          ['gender', 'male']
                        ]

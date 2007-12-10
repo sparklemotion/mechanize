@@ -1,10 +1,4 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'www/mechanize/cookie'
-require 'uri'
-require 'test_includes'
-require 'fileutils'
+require File.dirname(__FILE__) + "/helper"
 
 class CookieJarTest < Test::Unit::TestCase
   def cookie_from_hash(hash)

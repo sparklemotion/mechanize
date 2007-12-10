@@ -1,19 +1,12 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
+require File.dirname(__FILE__) + "/helper"
 
 class FramesMechTest < Test::Unit::TestCase
-  include TestMethods
-
   def setup
     @agent = WWW::Mechanize.new
   end
 
   def test_frames
-    page = @agent.get("http://localhost:#{PORT}/frame_test.html")
+    page = @agent.get("http://localhost/frame_test.html")
     assert_equal(3, page.frames.size)
     assert_equal("frame1", page.frames[0].name)
     assert_equal("frame2", page.frames[1].name)
@@ -24,7 +17,7 @@ class FramesMechTest < Test::Unit::TestCase
   end
 
   def test_iframes
-    page = @agent.get("http://localhost:#{PORT}/iframe_test.html")
+    page = @agent.get("http://localhost/iframe_test.html")
     assert_equal(1, page.iframes.size)
     assert_equal("frame4", page.iframes.first.name)
     assert_equal("/file_upload.html", page.iframes.first.src)

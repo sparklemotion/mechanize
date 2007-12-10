@@ -1,14 +1,6 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
-require 'fileutils'
+require File.dirname(__FILE__) + "/helper"
 
 class TestSaveFile < Test::Unit::TestCase
-  include TestMethods
-
   def setup
     @agent = WWW::Mechanize.new
   end

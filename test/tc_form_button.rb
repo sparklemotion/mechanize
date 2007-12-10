@@ -1,13 +1,6 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'test/unit'
-require 'rubygems'
-require 'mechanize'
-require 'test_includes'
+require File.dirname(__FILE__) + "/helper"
 
 class TestFormButtons < Test::Unit::TestCase
-  include TestMethods
-
   def setup
     @agent = WWW::Mechanize.new
   end
@@ -32,5 +25,9 @@ class TestFormButtons < Test::Unit::TestCase
     page = WWW::Mechanize::Page.new(  nil, html_response, html, 200, @agent )
     assert_equal(1, page.forms.length)
     assert_equal(1, page.forms.first.buttons.length)
+  end
+
+  def html_response
+    { 'content-type' => 'text/html' }
   end
 end

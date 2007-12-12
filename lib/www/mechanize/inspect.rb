@@ -39,9 +39,6 @@ module WWW
           }
         }
       end
-      if RUBY_VERSION > '1.8.4'
-        alias :inspect  :pretty_inspect
-      end
 
       class Link
         def pretty_print(q)
@@ -49,9 +46,6 @@ module WWW
             q.breakable; q.pp text
             q.breakable; q.pp href
           }
-        end
-        if RUBY_VERSION > '1.8.4'
-          alias :inspect  :pretty_inspect
         end
       end
     end

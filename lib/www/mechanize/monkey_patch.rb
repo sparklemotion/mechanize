@@ -13,3 +13,22 @@ module Net
   end
 end
 
+# Monkey patch for ruby 1.8.4
+unless RUBY_VERSION > "1.8.4"
+module Net # :nodoc:
+  class HTTPResponse # :nodoc:
+    CODE_TO_OBJ['500'] = HTTPInternalServerError
+  end
+end
+else
+module WWW
+  class Mechanize
+    class Page
+      alias :inspect  :pretty_inspect
+      class Link
+        alias :inspect  :pretty_inspect
+      end
+    end
+  end
+end
+end

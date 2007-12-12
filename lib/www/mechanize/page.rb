@@ -6,6 +6,7 @@ require 'www/mechanize/page/link'
 require 'www/mechanize/page/meta'
 require 'www/mechanize/page/base'
 require 'www/mechanize/page/frame'
+require 'www/mechanize/headers'
 
 module WWW
   class Mechanize

@@ -36,7 +36,7 @@ module WWW
       def initialize(node, mech=nil, page=nil)
         @enctype = node['enctype'] || 'application/x-www-form-urlencoded'
         @form_node        = node
-        @action           = Util::html_unescape(node['action'])
+        @action           = Mechanize.html_unescape(node['action'])
         @method           = (node['method'] || 'GET').upcase
         @name             = node['name']
         @clicked_buttons  = []

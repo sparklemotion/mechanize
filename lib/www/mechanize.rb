@@ -14,8 +14,8 @@ require 'www/mechanize/history'
 require 'www/mechanize/list'
 require 'www/mechanize/form'
 require 'www/mechanize/pluggable_parsers'
-require 'www/mechanize/page'
 require 'www/mechanize/inspect'
+require 'www/mechanize/monkey_patch'
 
 module WWW
   # = Synopsis
@@ -100,6 +100,7 @@ module WWW
       @password       = nil # Auth Password
       @digest         = nil # DigestAuth Digest
       @auth_hash      = {}  # Keep track of urls for sending auth
+      @digest_response = nil
   
       # Proxy settings
       @proxy_addr     = nil
@@ -257,6 +258,22 @@ module WWW
     end
   
     alias :page :current_page
+
+    class << self
+      def html_unescape(s)
+        return s unless s
+        s.gsub(/&(\w+|#[0-9]+);/) { |match|
+          number = case match
+          when /&(\w+);/
+            Hpricot::NamedCharacters[$1]
+          when /&#([0-9]+);/
+            $1.to_i
+          end
+  
+          number ? ([number].pack('U') rescue match) : match
+        }
+      end
+    end
   
     protected
     def set_headers(uri, request, cur_page)
@@ -301,7 +318,6 @@ module WWW
         when :basic
           request.basic_auth(@user, @password)
         when :digest
-          @digest_response ||= nil
           @digest_response = self.gen_auth_header(uri,request,@digest) if @digest
           request.add_field('Authorization', @digest_response) if @digest_response
         end
@@ -358,7 +374,7 @@ module WWW
         }
   
         url = URI.parse(
-                Util.html_unescape(
+                Mechanize.html_unescape(
                   url.split(/%[0-9A-Fa-f]{2}|#/).zip(
                     url.scan(/%[0-9A-Fa-f]{2}|#/)
                   ).map { |x,y|
@@ -608,23 +624,5 @@ module WWW
     def add_to_history(page)
       @history.push(page, to_absolute_uri(page.uri))
     end
-  
-    # :stopdoc:
-    class Util
-      def self.html_unescape(s)
-        return s unless s
-        s.gsub(/&(\w+|#[0-9]+);/) { |match|
-          number = case match
-          when /&(\w+);/
-            Hpricot::NamedCharacters[$1]
-          when /&#([0-9]+);/
-            $1.to_i
-          end
-  
-          number ? ([number].pack('U') rescue match) : match
-        }
-      end
-    end
-    # :startdoc:
   end
 end

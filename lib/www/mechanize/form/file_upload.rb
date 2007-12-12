@@ -14,7 +14,7 @@ module WWW
         alias :file_data= :value=
       
         def initialize(name, file_name)
-          @file_name = Util.html_unescape(file_name)
+          @file_name = Mechanize.html_unescape(file_name)
           @file_data = nil
           super(name, @file_data)
         end

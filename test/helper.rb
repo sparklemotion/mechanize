@@ -1,18 +1,12 @@
-require File.dirname(__FILE__) + "/servlets"
-
 require 'test/unit'
 require 'rubygems'
 require 'mechanize'
 require 'webrick/httputils'
+require 'servlets'
 
 BASE_DIR = File.dirname(__FILE__)
 
 class Net::HTTP
-  #def self.new(*args)
-  #  obj = allocate
-  #  return obj
-  #end
-
   alias :old_do_start :do_start
 
   def do_start

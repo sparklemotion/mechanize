@@ -4,6 +4,7 @@
 
 * Removed Ruby 1.8.2 support
 * Changed parser to lazily parse links
+* Lazily parsing document
 
 == 0.6.11
 

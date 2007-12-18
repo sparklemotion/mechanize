@@ -24,9 +24,7 @@ module WWW
     class Page < WWW::Mechanize::File
       extend Forwardable
 
-      attr_reader :title, :parser
       attr_accessor :mech
-      alias :root :parser
 
       def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
         super(uri, response, body, code)
@@ -35,14 +33,19 @@ module WWW
         raise Mechanize::ContentTypeError.new(response['content-type']) unless
             content_type() =~ /^text\/html/ 
 
-        @links = @forms = @meta = @bases = @frames = @iframes = nil
+        @parser = @links = @forms = @meta = @bases = @frames = @iframes = nil
+      end
 
-        # construct parser and feed with HTML
-        @parser ||= body && response ? Hpricot.parse(body) : nil
-        @title = if @parser && search('title').text.length > 0
+      def title
+        @title ||= if parser && search('title').text.length > 0
           search('title').text
         end
       end
+
+      def parser
+        @parser ||= body && response ? Hpricot.parse(body) : nil
+      end
+      alias :root :parser
 
       # Get the content type
       def content_type
@@ -50,9 +53,9 @@ module WWW
       end
 
       # Search through the page like HPricot
-      def_delegator :@parser, :search, :search
-      def_delegator :@parser, :/, :/
-      def_delegator :@parser, :at, :at
+      def_delegator :parser, :search, :search
+      def_delegator :parser, :/, :/
+      def_delegator :parser, :at, :at
 
       # Find a form with +name+.  Form will be yielded if a block is given.
       def form(name)

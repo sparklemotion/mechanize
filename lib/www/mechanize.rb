@@ -68,6 +68,7 @@ module WWW
     attr_accessor :keep_alive
     attr_accessor :conditional_requests
     attr_accessor :follow_meta_refresh
+    attr_accessor :verify_callback
   
     attr_reader :history
     attr_reader :pluggable_parser
@@ -85,7 +86,12 @@ module WWW
       @read_timeout   = nil
       @user_agent     = AGENT_ALIASES['Mechanize']
       @watch_for_set  = nil
-      @ca_file        = nil
+      @ca_file        = nil # OpenSSL server certificate file
+
+      # callback for OpenSSL errors while verifying the server certificate
+      # chain, can be used for debugging or to ignore errors by always
+      # returning _true_
+      @verify_callback = nil
       @cert           = nil # OpenSSL Certificate
       @key            = nil # OpenSSL Private Key
       @pass           = nil # OpenSSL Password
@@ -465,6 +471,7 @@ module WWW
         if @ca_file
           http_obj.ca_file = @ca_file
           http_obj.verify_mode = OpenSSL::SSL::VERIFY_PEER
+          http_obj.verify_callback = @verify_callback if @verify_callback
         end
         if @cert && @key
           http_obj.cert = OpenSSL::X509::Certificate.new(::File.read(@cert))

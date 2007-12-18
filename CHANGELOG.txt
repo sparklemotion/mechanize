@@ -5,6 +5,7 @@
 * Removed Ruby 1.8.2 support
 * Changed parser to lazily parse links
 * Lazily parsing document
+* Adding verify_callback for SSL requests.  Thanks Mike Dalessio!
 
 == 0.6.11
 

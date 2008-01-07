@@ -6,6 +6,7 @@
 * Changed parser to lazily parse links
 * Lazily parsing document
 * Adding verify_callback for SSL requests.  Thanks Mike Dalessio!
+* Fixed a bug with Accept-Language header.  Thanks Bill Siggelkow.
 
 == 0.6.11
 

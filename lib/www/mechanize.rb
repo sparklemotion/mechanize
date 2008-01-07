@@ -290,7 +290,7 @@ module WWW
         request.add_field('Connection', 'close')
       end
       request.add_field('Accept-Encoding', 'gzip,identity')
-      request.add_field('Accept-Language', 'en-us,en;q0.5')
+      request.add_field('Accept-Language', 'en-us,en;q=0.5')
       request.add_field('Accept-Charset', 'ISO-8859-1,utf-8;q=0.7,*;q=0.7')
   
       unless @cookie_jar.empty?(uri)

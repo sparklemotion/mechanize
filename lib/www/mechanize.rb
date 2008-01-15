@@ -38,7 +38,7 @@ module WWW
   class Mechanize
     ##
     # The version of Mechanize you are using.
-    VERSION = '0.6.11'
+    VERSION = '0.7.0'
   
     ##
     # User Agent aliases

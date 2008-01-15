@@ -12,7 +12,7 @@ a history.
 
 == Dependencies
 
-* ruby 1.8.2
+* ruby 1.8.4
 * hpricot[http://code.whytheluckystiff.net/hpricot/]
 
 Note that the files in the net-overrides/ directory are taken from Ruby 1.9.0.

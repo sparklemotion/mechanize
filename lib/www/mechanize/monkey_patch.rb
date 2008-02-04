@@ -10,6 +10,18 @@ module Net
       return true  if /keep-alive/i =~ res['proxy-connection'].to_s
       (@curr_http_version == '1.1')
     end
+
+    alias :old_begin_transport :begin_transport
+    def begin_transport(req)
+      connect if @socket.eof?
+      old_begin_transport(req)
+    end
+  end
+
+  class BufferedIO
+    def eof?
+      @io.eof?
+    end
   end
 end
 

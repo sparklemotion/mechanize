@@ -1,5 +1,9 @@
 = Mechanize CHANGELOG
 
+== 0.7.1
+
+* Fixed a bug with EOF errors in net/http.  [#17570]
+
 == 0.7.0
 
 * Removed Ruby 1.8.2 support

@@ -3,6 +3,7 @@
 == 0.7.1
 
 * Fixed a bug with EOF errors in net/http.  [#17570]
+* Added iPhone to the user agent aliases. [#17572]
 
 == 0.7.0
 

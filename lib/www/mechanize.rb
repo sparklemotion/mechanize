@@ -535,7 +535,11 @@ module WWW
           case encoding.downcase
           when 'gzip'
             log.debug('gunzip body') if log
-            Zlib::GzipReader.new(body).read
+            if response['Content-Length'].to_i > 0
+              Zlib::GzipReader.new(body).read
+            else
+              ''
+            end
           when 'x-gzip'
             body.read
           else

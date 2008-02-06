@@ -72,16 +72,20 @@ end
 class GzipServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     if req['Accept-Encoding'] =~ /gzip/
-      File.open("#{BASE_DIR}/htdocs/#{req.query['file']}", 'r') do |file|
-        string = ""
-        zipped = StringIO.new string, 'w'
-        gz = Zlib::GzipWriter.new(zipped)
-        gz.write file.read
-        gz.close
-        res['Content-Encoding'] = 'gzip'
-        res['Content-Type'] = "text/html"
-        res.body = string
+      if req.query['file']
+        File.open("#{BASE_DIR}/htdocs/#{req.query['file']}", 'r') do |file|
+          string = ""
+          zipped = StringIO.new string, 'w'
+          gz = Zlib::GzipWriter.new(zipped)
+          gz.write file.read
+          gz.close
+          res.body = string
+        end
+      else
+        res.body = ''
       end
+      res['Content-Encoding'] = 'gzip'
+      res['Content-Type'] = "text/html"
     else
       raise 'no gzip'
     end

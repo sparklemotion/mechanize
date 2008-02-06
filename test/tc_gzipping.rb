@@ -5,6 +5,12 @@ class TestGzip < Test::Unit::TestCase
     @agent = WWW::Mechanize.new
   end
 
+  def test_request_empty_gzip
+    assert_nothing_raised do
+      page = @agent.get("http://localhost/gzip")
+    end
+  end
+
   def test_request_gzip
     page = nil
     assert_nothing_raised do

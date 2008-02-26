@@ -509,60 +509,67 @@ module WWW
       cache_obj[:last_request_time] = Time.now.to_i
   
       # Send the request
-      response = http_obj.request(request, *request_data) {|response|
+      begin
+        response = http_obj.request(request, *request_data) {|response|
   
-        body = StringIO.new
-        total = 0
-        response.read_body { |part|
-          total += part.length
-          body.write(part)
-          log.debug("Read #{total} bytes") if log
-        }
-        body.rewind
+          body = StringIO.new
+          total = 0
+          response.read_body { |part|
+            total += part.length
+            body.write(part)
+            log.debug("Read #{total} bytes") if log
+          }
+          body.rewind
   
-        response.each_header { |k,v|
-          log.debug("response-header: #{ k } => #{ v }")
-        } if log
+          response.each_header { |k,v|
+            log.debug("response-header: #{ k } => #{ v }")
+          } if log
   
-        content_type = nil
-        unless response['Content-Type'].nil?
-          data = response['Content-Type'].match(/^([^;]*)/)
-          content_type = data[1].downcase unless data.nil?
-        end
+          content_type = nil
+          unless response['Content-Type'].nil?
+            data = response['Content-Type'].match(/^([^;]*)/)
+            content_type = data[1].downcase unless data.nil?
+          end
   
-        response_body = 
-        if encoding = response['Content-Encoding']
-          case encoding.downcase
-          when 'gzip'
-            log.debug('gunzip body') if log
-            if response['Content-Length'].to_i > 0
-              Zlib::GzipReader.new(body).read
+          response_body = 
+          if encoding = response['Content-Encoding']
+            case encoding.downcase
+            when 'gzip'
+              log.debug('gunzip body') if log
+              if response['Content-Length'].to_i > 0
+                Zlib::GzipReader.new(body).read
+              else
+                ''
+              end
+            when 'x-gzip'
+              body.read
             else
-              ''
+              raise 'Unsupported content encoding'
             end
-          when 'x-gzip'
-            body.read
           else
-            raise 'Unsupported content encoding'
+            body.read
           end
-        else
-          body.read
-        end
   
-        # Find our pluggable parser
-        page = @pluggable_parser.parser(content_type).new(
-          uri,
-          response,
-          response_body,
-          response.code
-        ) { |parser|
-          parser.mech = self if parser.respond_to? :mech=
-          if parser.respond_to?(:watch_for_set=) && @watch_for_set
-            parser.watch_for_set = @watch_for_set
-          end
+          # Find our pluggable parser
+          page = @pluggable_parser.parser(content_type).new(
+            uri,
+            response,
+            response_body,
+            response.code
+          ) { |parser|
+            parser.mech = self if parser.respond_to? :mech=
+            if parser.respond_to?(:watch_for_set=) && @watch_for_set
+              parser.watch_for_set = @watch_for_set
+            end
+          }
+  
         }
-  
-      }
+      rescue EOFError
+        log.error("Rescuing EOF error") if log
+        http_obj.finish
+        http_obj.start
+        retry
+      end
   
       # If the server sends back keep alive options, save them
       if keep_alive_info = response['keep-alive']

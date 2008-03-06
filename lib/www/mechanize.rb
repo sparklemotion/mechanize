@@ -38,7 +38,7 @@ module WWW
   class Mechanize
     ##
     # The version of Mechanize you are using.
-    VERSION = '0.7.1'
+    VERSION = '0.7.2'
   
     ##
     # User Agent aliases
@@ -536,7 +536,7 @@ module WWW
             case encoding.downcase
             when 'gzip'
               log.debug('gunzip body') if log
-              if response['Content-Length'].to_i > 0
+              if response['Content-Length'].to_i > 0 || body.length > 0
                 Zlib::GzipReader.new(body).read
               else
                 ''

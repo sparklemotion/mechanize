@@ -1,5 +1,9 @@
 = Mechanize CHANGELOG
 
+== 0.7.2
+
+* Handling gzipped responses with no Content-Length header
+
 == 0.7.1
 
 * Added iPhone to the user agent aliases. [#17572]

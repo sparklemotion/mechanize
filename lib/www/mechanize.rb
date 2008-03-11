@@ -157,15 +157,35 @@ module WWW
     end
   
     # Fetches the URL passed in and returns a page.
-    def get(url, referer=nil, &block)
-      cur_page = referer || current_page ||
-                      Page.new( nil, {'content-type'=>'text/html'})
-  
+    def get(url, parameters = [], referer = nil)
+      unless parameters.respond_to?(:each) # FIXME: Remove this in 0.8.0
+        referer = parameters
+        parameters = []
+      end
+
+      referer ||= current_page || Page.new(nil, {'content-type'=>'text/html'})
+
+      # FIXME: Huge hack so that using a URI as a referer works.  I need to
+      # refactor everything to pass around URIs but still support
+      # WWW::Mechanize::Page#base
+      unless referer.is_a?(Page)
+        referer = referer.is_a?(String) ?
+          Page.new(URI.parse(referer), {'content-type' => 'text/html'}) :
+          Page.new(referer, {'content-type' => 'text/html'})
+      end
+      abs_uri = to_absolute_uri(url, referer)
+
+      if parameters.length > 0
+        abs_uri.query ||= ''
+        abs_uri.query << '&' if abs_uri.query.length > 0
+        abs_uri.query << self.class.build_query_string(parameters)
+      end
+
       # fetch the page
-      abs_uri = to_absolute_uri(url, cur_page)
       request = fetch_request(abs_uri)
-      page = fetch_page(abs_uri, request, cur_page, &block)
+      page = fetch_page(abs_uri, request, referer)
       add_to_history(page)
+      yield page if block_given?
       page
     end
   
@@ -633,7 +653,7 @@ module WWW
       parameters.each { |k,v|
         next if k.nil?
         vals <<
-        [WEBrick::HTTPUtils.escape_form(k), 
+        [WEBrick::HTTPUtils.escape_form(k.to_s),
          WEBrick::HTTPUtils.escape_form(v.to_s)].join("=")
       }
   

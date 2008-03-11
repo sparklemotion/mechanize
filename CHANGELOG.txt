@@ -1,5 +1,10 @@
 = Mechanize CHANGELOG
 
+== 0.7.3
+
+* Pages are now yielded to a blocks given to WWW::Mechanize#get
+* WWW::Mechanize#get now takes hash arguments for uri parameters.
+
 == 0.7.2
 
 * Handling gzipped responses with no Content-Length header

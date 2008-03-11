@@ -5,6 +5,27 @@ class TestMechMethods < Test::Unit::TestCase
     @agent = WWW::Mechanize.new
   end
 
+  def test_get_with_params
+    page = @agent.get('http://localhost/', { :q => 'hello' })
+    assert_equal('http://localhost/?q=hello', page.uri.to_s)
+  end
+
+  def test_get_with_referer
+    class << @agent
+      attr_reader :request
+      alias :old_set_headers :set_headers
+      def set_headers(u, request, cur_page)
+        old_set_headers(u, request, cur_page)
+        @request = request
+      end
+    end
+    @agent.get('http://localhost/', URI.parse('http://google.com/'))
+    assert_equal 'http://google.com/', @agent.request['Referer']
+
+    @agent.get('http://localhost/', [], 'http://tenderlovemaking.com/')
+    assert_equal 'http://tenderlovemaking.com/', @agent.request['Referer']
+  end
+
   def test_weird_url
     assert_nothing_raised {
       @agent.get('http://localhost/?action=bing&bang=boom=1|a=|b=|c=')

@@ -38,7 +38,7 @@ module WWW
   class Mechanize
     ##
     # The version of Mechanize you are using.
-    VERSION = '0.7.2'
+    VERSION = '0.7.3'
   
     ##
     # User Agent aliases
@@ -230,7 +230,14 @@ module WWW
   
       form = Form.new(node)
       query.each { |k,v|
-        form.fields << Form::Field.new(k,v)
+        if v.is_a?(IO)
+          form.enctype = 'multipart/form-data'
+          ul = Form::FileUpload.new(k.to_s,::File.basename(v.path))
+          ul.file_data = v.read
+          form.file_uploads << ul
+        else
+          form.fields << Form::Field.new(k.to_s,v)
+        end
       }
       post_form(url, form)
     end

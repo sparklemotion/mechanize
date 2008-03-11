@@ -26,7 +26,7 @@ module WWW
       attr_accessor :method, :action, :name
     
       attr_reader :fields, :buttons, :file_uploads, :radiobuttons, :checkboxes
-      attr_reader :enctype
+      attr_accessor :enctype
 
       alias :elements :fields
     

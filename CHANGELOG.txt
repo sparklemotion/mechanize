@@ -4,6 +4,7 @@
 
 * Pages are now yielded to a blocks given to WWW::Mechanize#get
 * WWW::Mechanize#get now takes hash arguments for uri parameters.
+* WWW::Mechanize#post takes an IO object as a parameter and posts correctly.
 
 == 0.7.2
 

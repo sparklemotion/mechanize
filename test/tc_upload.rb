@@ -6,6 +6,18 @@ class UploadMechTest < Test::Unit::TestCase
     @page = @agent.get("http://localhost/file_upload.html")
   end
 
+  def test_upload_with_post_param
+    page = @agent.post('http://localhost/file_upload', {
+      :name       => 'Some file',
+      :userfile1  => File.open(__FILE__)
+    })
+    assert_match(
+      "Content-Disposition: form-data; name=\"userfile1\"; filename=\"#{File.basename(__FILE__)}\"",
+      page.body
+    )
+    assert page.body.length > File.read(__FILE__).length
+  end
+
   def test_form_enctype
     assert_equal('multipart/form-data', @page.forms[0].enctype)
 

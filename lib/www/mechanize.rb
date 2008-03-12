@@ -564,7 +564,14 @@ module WWW
             when 'gzip'
               log.debug('gunzip body') if log
               if response['Content-Length'].to_i > 0 || body.length > 0
-                Zlib::GzipReader.new(body).read
+                begin
+                  Zlib::GzipReader.new(body).read
+                rescue Zlib::BufError => e
+                  log.error('Caught a Zlib::BufError')
+                  body.rewind
+                  body.read(10)
+                  Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body.read)
+                end
               else
                 ''
               end

@@ -1,5 +1,9 @@
 = Mechanize CHANGELOG
 
+== 0.7.4
+
+* doh!
+
 == 0.7.3
 
 * Pages are now yielded to a blocks given to WWW::Mechanize#get

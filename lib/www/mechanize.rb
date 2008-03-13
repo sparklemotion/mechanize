@@ -38,7 +38,7 @@ module WWW
   class Mechanize
     ##
     # The version of Mechanize you are using.
-    VERSION = '0.7.3'
+    VERSION = '0.7.4'
   
     ##
     # User Agent aliases
@@ -567,7 +567,7 @@ module WWW
                 begin
                   Zlib::GzipReader.new(body).read
                 rescue Zlib::BufError => e
-                  log.error('Caught a Zlib::BufError')
+                  log.error('Caught a Zlib::BufError') if log
                   body.rewind
                   body.read(10)
                   Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body.read)

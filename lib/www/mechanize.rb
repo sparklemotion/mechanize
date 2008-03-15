@@ -38,7 +38,7 @@ module WWW
   class Mechanize
     ##
     # The version of Mechanize you are using.
-    VERSION = '0.7.4'
+    VERSION = '0.7.5'
   
     ##
     # User Agent aliases
@@ -168,7 +168,7 @@ module WWW
       # FIXME: Huge hack so that using a URI as a referer works.  I need to
       # refactor everything to pass around URIs but still support
       # WWW::Mechanize::Page#base
-      unless referer.is_a?(Page)
+      unless referer.is_a?(WWW::Mechanize::File)
         referer = referer.is_a?(String) ?
           Page.new(URI.parse(referer), {'content-type' => 'text/html'}) :
           Page.new(referer, {'content-type' => 'text/html'})

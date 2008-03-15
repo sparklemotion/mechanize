@@ -1,5 +1,9 @@
 = Mechanize CHANGELOG
 
+== 0.7.5
+
+* Fixed a bug when fetching files and not pages.  Thanks Mat Schaffer!
+
 == 0.7.4
 
 * doh!

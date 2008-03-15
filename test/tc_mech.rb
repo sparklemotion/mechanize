@@ -25,6 +25,12 @@ class TestMechMethods < Test::Unit::TestCase
     @agent.get('http://localhost/', [], 'http://tenderlovemaking.com/')
     assert_equal 'http://tenderlovemaking.com/', @agent.request['Referer']
   end
+  
+  def test_get_with_file_referer
+    assert_nothing_raised do
+      @agent.get('http://localhost', [], WWW::Mechanize::File.new(URI.parse('http://tenderlovemaking.com/crossdomain.xml')))
+    end
+  end
 
   def test_weird_url
     assert_nothing_raised {

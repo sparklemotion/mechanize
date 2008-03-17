@@ -456,7 +456,7 @@ module WWW
   
     # Creates a new request object based on the scheme and type
     def fetch_request(uri, type = :get)
-      raise "unsupported scheme" unless ['http', 'https'].include?(uri.scheme)
+      raise "unsupported scheme: #{uri.scheme}" unless ['http', 'https'].include?(uri.scheme.downcase)
       if type == :get
         Net::HTTP::Get.new(uri.request_uri)
       else
@@ -466,7 +466,7 @@ module WWW
   
     # uri is an absolute URI
     def fetch_page(uri, request, cur_page=current_page(), request_data=[])
-      raise "unsupported scheme" unless ['http', 'https'].include?(uri.scheme)
+      raise "unsupported scheme: #{uri.scheme}" unless ['http', 'https'].include?(uri.scheme.downcase)
   
       log.info("#{ request.class }: #{ request.path }") if log
   

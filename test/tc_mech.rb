@@ -10,6 +10,11 @@ class TestMechMethods < Test::Unit::TestCase
     assert_equal('http://localhost/?q=hello', page.uri.to_s)
   end
 
+  def test_get_with_upper_http
+    page = @agent.get('HTTP://localhost/', { :q => 'hello' })
+    assert_equal('HTTP://localhost/?q=hello', page.uri.to_s)
+  end
+
   def test_get_with_referer
     class << @agent
       attr_reader :request

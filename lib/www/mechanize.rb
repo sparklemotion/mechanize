@@ -663,15 +663,11 @@ module WWW
     end
   
     def self.build_query_string(parameters)
-      vals = [] 
-      parameters.each { |k,v|
-        next if k.nil?
-        vals <<
-        [WEBrick::HTTPUtils.escape_form(k.to_s),
-         WEBrick::HTTPUtils.escape_form(v.to_s)].join("=")
-      }
-  
-      vals.join("&")
+      parameters.map { |k,v|
+        k &&
+          [WEBrick::HTTPUtils.escape_form(k.to_s),
+            WEBrick::HTTPUtils.escape_form(v.to_s)].join("=")
+      }.compact.join('&')
     end
   
     def add_to_history(page)

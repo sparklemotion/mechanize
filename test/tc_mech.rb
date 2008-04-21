@@ -5,6 +5,11 @@ class TestMechMethods < Test::Unit::TestCase
     @agent = WWW::Mechanize.new
   end
 
+  def test_get_with_tilde
+    page = @agent.get('http://localhost/?foo=~2')
+    assert_equal('http://localhost/?foo=~2', page.uri.to_s)
+  end
+
   def test_get_with_params
     page = @agent.get('http://localhost/', { :q => 'hello' })
     assert_equal('http://localhost/?q=hello', page.uri.to_s)

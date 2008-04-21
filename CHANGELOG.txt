@@ -9,6 +9,8 @@
 * Resetting request bodys when retrying form posts.  Thanks Bruno. [#19379]
 * Throwing away keep alive connections on EPIPE and ECONNRESET.
 * Duplicating request headers when retrying a 401. Thanks Hiroshi Ichikawa.
+* Simulating an EOF error when a response length is bad.  Thanks Tobias Gruetzmacher.
+  http://rubyforge.org/tracker/index.php?func=detail&aid=19178&group_id=1453&atid=5711
 
 == 0.7.5
 

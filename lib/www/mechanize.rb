@@ -546,6 +546,8 @@ module WWW
             body.write(part)
             log.debug("Read #{total} bytes") if log
           }
+          # Net::HTTP ignores EOFError if Content-length is given, so we emulate it here.
+          raise EOFError if response.content_length() && response.content_length() != total
           body.rewind
   
           response.each_header { |k,v|

@@ -4,6 +4,7 @@
 
 * Ignoring scheme case
   http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=470642
+* Moving text, password, hidden, int to default.  Thanks Tim Harper!
 
 == 0.7.5
 

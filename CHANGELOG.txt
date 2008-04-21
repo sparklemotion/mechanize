@@ -7,7 +7,8 @@
 * Moving text, password, hidden, int to default.  Thanks Tim Harper!
 * Not encoding tildes in uris. Thanks Bruno.  [#19380]
 * Resetting request bodys when retrying form posts.  Thanks Bruno. [#19379]
-* Throwing away keep alive connections on EPIPE and ECONNRESET
+* Throwing away keep alive connections on EPIPE and ECONNRESET.
+* Duplicating request headers when retrying a 401. Thanks Hiroshi Ichikawa.
 
 == 0.7.5
 

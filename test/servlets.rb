@@ -23,6 +23,7 @@ class BasicAuthServlet < WEBrick::HTTPServlet::AbstractServlet
     end
     FileUtils.rm('dot.htpasswd')
   end
+  alias :do_POST :do_GET
 end
 
 class HeaderServlet < WEBrick::HTTPServlet::AbstractServlet

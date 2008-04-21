@@ -598,7 +598,7 @@ module WWW
           }
   
         }
-      rescue EOFError
+      rescue EOFError, Errno::ECONNRESET, Errno::EPIPE
         log.error("Rescuing EOF error") if log
         http_obj.finish
         request.body = nil

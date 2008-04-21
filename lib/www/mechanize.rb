@@ -601,6 +601,7 @@ module WWW
       rescue EOFError
         log.error("Rescuing EOF error") if log
         http_obj.finish
+        request.body = nil
         http_obj.start
         retry
       end

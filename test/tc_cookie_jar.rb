@@ -282,4 +282,33 @@ class CookieJarTest < Test::Unit::TestCase
                                           :expires => Time.now - (10 * 86400))))
     assert_equal(0, jar.cookies(url).length)
   end
+  
+  
+  def test_save_and_read_cookiestxt
+    values = {  :name     => 'Foo',
+                :value    => 'Bar',
+                :path     => '/',
+                :expires  => Time.now + (10 * 86400),
+                :domain   => 'rubyforge.org'
+             }
+    url = URI.parse('http://rubyforge.org/')
+
+    jar = WWW::Mechanize::CookieJar.new
+    assert_equal(0, jar.cookies(url).length)
+
+    # Add one cookie with an expiration date in the future
+    cookie = cookie_from_hash(values)
+    jar.add(url, cookie)
+    jar.add(url, cookie_from_hash(values.merge( :name => 'Baz' )))
+    assert_equal(2, jar.cookies(url).length)
+    
+    jar.save_as("cookies.txt", :cookiestxt)
+    jar.clear!
+    assert_equal(0, jar.cookies(url).length)
+
+    jar.load("cookies.txt", :cookiestxt)
+    assert_equal(2, jar.cookies(url).length)
+
+    FileUtils.rm("cookies.txt")
+  end
 end

@@ -2,6 +2,7 @@
 
 == 0.7.6
 
+* Added support for reading Mozilla cookie jars.  Thanks Chris Riddoch!
 * Ignoring scheme case
   http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=470642
 * Moving text, password, hidden, int to default.  Thanks Tim Harper!

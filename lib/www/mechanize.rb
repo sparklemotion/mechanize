@@ -70,6 +70,7 @@ module WWW
     attr_accessor :conditional_requests
     attr_accessor :follow_meta_refresh
     attr_accessor :verify_callback
+    attr_accessor :history_added
   
     attr_reader :history
     attr_reader :pluggable_parser
@@ -87,6 +88,7 @@ module WWW
       @read_timeout   = nil
       @user_agent     = AGENT_ALIASES['Mechanize']
       @watch_for_set  = nil
+      @history_added  = nil
       @ca_file        = nil # OpenSSL server certificate file
 
       # callback for OpenSSL errors while verifying the server certificate
@@ -126,7 +128,7 @@ module WWW
   
       yield self if block_given?
     end
-  
+
     def max_history=(length); @history.max_size = length; end
     def max_history; @history.max_size; end
   
@@ -676,6 +678,7 @@ module WWW
   
     def add_to_history(page)
       @history.push(page, to_absolute_uri(page.uri))
+      history_added.call(page) if history_added
     end
   end
 end

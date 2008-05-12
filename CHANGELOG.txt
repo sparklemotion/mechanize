@@ -2,18 +2,22 @@
 
 == 0.7.6
 
-* Added support for reading Mozilla cookie jars.  Thanks Chris Riddoch!
-* Ignoring scheme case
-  http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=470642
-* Moving text, password, hidden, int to default.  Thanks Tim Harper!
-* Not encoding tildes in uris. Thanks Bruno.  [#19380]
-* Resetting request bodys when retrying form posts.  Thanks Bruno. [#19379]
-* Throwing away keep alive connections on EPIPE and ECONNRESET.
-* Duplicating request headers when retrying a 401. Thanks Hiroshi Ichikawa.
-* Simulating an EOF error when a response length is bad.  Thanks Tobias Gruetzmacher.
-  http://rubyforge.org/tracker/index.php?func=detail&aid=19178&group_id=1453&atid=5711
-* Defaulting option tags to the inner text.
-  http://rubyforge.org/tracker/index.php?func=detail&aid=19976&group_id=1453&atid=5709
+* New Features:
+  * Added support for reading Mozilla cookie jars.  Thanks Chris Riddoch!
+  * Moving text, password, hidden, int to default.  Thanks Tim Harper!
+  * Mechanize#history_added callback for page loads. Thanks Tobi Reif!
+
+* Bug Fixes:
+  * Ignoring scheme case
+    http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=470642
+  * Not encoding tildes in uris. Thanks Bruno.  [#19380]
+  * Resetting request bodys when retrying form posts.  Thanks Bruno. [#19379]
+  * Throwing away keep alive connections on EPIPE and ECONNRESET.
+  * Duplicating request headers when retrying a 401. Thanks Hiroshi Ichikawa.
+  * Simulating an EOF error when a response length is bad.  Thanks Tobias Gruetzmacher.
+    http://rubyforge.org/tracker/index.php?func=detail&aid=19178&group_id=1453&atid=5711
+  * Defaulting option tags to the inner text.
+    http://rubyforge.org/tracker/index.php?func=detail&aid=19976&group_id=1453&atid=5709
 
 == 0.7.5
 

@@ -18,6 +18,8 @@
     http://rubyforge.org/tracker/index.php?func=detail&aid=19178&group_id=1453&atid=5711
   * Defaulting option tags to the inner text.
     http://rubyforge.org/tracker/index.php?func=detail&aid=19976&group_id=1453&atid=5709
+  * Supporting blank strings for option values.
+    http://rubyforge.org/tracker/index.php?func=detail&aid=19975&group_id=1453&atid=5709
 
 == 0.7.5
 

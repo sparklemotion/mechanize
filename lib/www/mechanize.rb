@@ -403,7 +403,7 @@ module WWW
   
     def to_absolute_uri(url, cur_page=current_page())
       unless url.is_a? URI
-        url = url.to_s.strip.gsub(/[^#{0.chr}-#{125.chr}]/) { |match|
+        url = url.to_s.strip.gsub(/[^#{0.chr}-#{126.chr}]/) { |match|
           sprintf('%%%X', match.unpack($KCODE == 'UTF8' ? 'U' : 'c')[0])
         }
   

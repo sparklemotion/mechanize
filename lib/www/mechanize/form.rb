@@ -211,8 +211,6 @@ module WWW
           name = node['name']
           next if name.nil? && !(type == 'submit' || type =='button')
           case type
-          when 'text', 'password', 'hidden', 'int'
-            @fields << Field.new(node['name'], node['value'] || '') 
           when 'radio'
             @radiobuttons << RadioButton.new(node['name'], node['value'], node.has_attribute?('checked'), self)
           when 'checkbox'
@@ -225,6 +223,8 @@ module WWW
             @buttons << Button.new(node['name'], node['value'])
           when 'image'
             @buttons << ImageButton.new(node['name'], node['value'])
+          else
+            @fields << Field.new(node['name'], node['value'] || '') 
           end
         end
 

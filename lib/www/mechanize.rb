@@ -8,6 +8,7 @@ require 'digest/md5'
 
 require 'www/mechanize/content_type_error'
 require 'www/mechanize/response_code_error'
+require 'www/mechanize/unsupported_scheme_error'
 require 'www/mechanize/cookie'
 require 'www/mechanize/cookie_jar'
 require 'www/mechanize/history'
@@ -71,6 +72,7 @@ module WWW
     attr_accessor :follow_meta_refresh
     attr_accessor :verify_callback
     attr_accessor :history_added
+    attr_accessor :scheme_handlers
   
     attr_reader :history
     attr_reader :pluggable_parser
@@ -125,6 +127,15 @@ module WWW
       @connection_cache = {}
       @keep_alive_time  = 300
       @keep_alive       = true
+
+      @scheme_handlers  = Hash.new { |h,k|
+        h[k] = lambda { |link, page|
+          raise UnsupportedSchemeError.new(k)
+        }
+      }
+      @scheme_handlers['http']      = lambda { |link, page| link }
+      @scheme_handlers['https']     = @scheme_handlers['http']
+      @scheme_handlers['relative']  = @scheme_handlers['http']
   
       yield self if block_given?
     end
@@ -420,6 +431,7 @@ module WWW
               )
       end
   
+      url = @scheme_handlers[url.relative? ? 'relative' : url.scheme.downcase].call(url, cur_page)
       url.path = '/' if url.path.length == 0
   
       # construct an absolute uri

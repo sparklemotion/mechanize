@@ -42,7 +42,7 @@ class MechErrorsTest < Test::Unit::TestCase
   end
 
   def test_unsupported_scheme
-    assert_raise(RuntimeError) {
+    assert_raise(WWW::Mechanize::UnsupportedSchemeError) {
       @agent.get('ftp://server.com/foo.html')
     }
   end

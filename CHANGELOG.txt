@@ -6,6 +6,8 @@
   * Added support for reading Mozilla cookie jars.  Thanks Chris Riddoch!
   * Moving text, password, hidden, int to default.  Thanks Tim Harper!
   * Mechanize#history_added callback for page loads. Thanks Tobi Reif!
+  * Mechanize#scheme_handlers callbacks for handling unsupported schemes on
+    links.
 
 * Bug Fixes:
   * Ignoring scheme case

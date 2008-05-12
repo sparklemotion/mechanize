@@ -5,6 +5,21 @@ class LinksMechTest < Test::Unit::TestCase
     @agent = WWW::Mechanize.new
   end
 
+  def test_unsupported_link_types
+    page = @agent.get("http://google.com/tc_links.html")
+    link = page.links.text('javascript link').first
+    assert_raise(WWW::Mechanize::UnsupportedSchemeError) {
+      link.click
+    }
+
+    @agent.scheme_handlers['javascript'] = lambda { |link, page|
+      URI.parse('http://localhost/tc_links.html')
+    }
+    assert_nothing_raised {
+      link.click
+    }
+  end
+
   def test_base
     page = @agent.get("http://google.com/tc_base_link.html")
     page = page.links.first.click

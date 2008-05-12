@@ -1,7 +1,7 @@
-CHANGELOG.txt
 EXAMPLES.txt
 FAQ.txt
 GUIDE.txt
+History.txt
 LICENSE.txt
 Manifest.txt
 NOTES.txt
@@ -41,6 +41,7 @@ lib/www/mechanize/page/link.rb
 lib/www/mechanize/page/meta.rb
 lib/www/mechanize/pluggable_parsers.rb
 lib/www/mechanize/response_code_error.rb
+lib/www/mechanize/unsupported_scheme_error.rb
 test/data/htpasswd
 test/data/server.crt
 test/data/server.csr
@@ -105,6 +106,7 @@ test/tc_forms.rb
 test/tc_frames.rb
 test/tc_gzipping.rb
 test/tc_history.rb
+test/tc_history_added.rb
 test/tc_html_unscape_forms.rb
 test/tc_if_modified_since.rb
 test/tc_keep_alive.rb
@@ -113,6 +115,7 @@ test/tc_mech.rb
 test/tc_mechanize_file.rb
 test/tc_multi_select.rb
 test/tc_no_attributes.rb
+test/tc_option.rb
 test/tc_page.rb
 test/tc_pluggable_parser.rb
 test/tc_post_form.rb

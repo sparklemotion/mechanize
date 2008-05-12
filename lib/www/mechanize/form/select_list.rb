@@ -35,6 +35,10 @@ module WWW
             super([new.to_s])
           end
         end
+
+        def query_value
+          value ? [[name, value]] : ''
+        end
       end
     end
   end

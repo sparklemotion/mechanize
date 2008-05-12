@@ -73,6 +73,15 @@ class SelectTest < Test::Unit::TestCase
     assert_equal(1, page.links.text('list:1').length)
   end
 
+  def test_select_with_empty_value
+    list = @form.fields.name('list').first
+    list.options.last.instance_variable_set(:@value, '')
+    list.options.last.tick
+    page = @agent.submit(@form)
+    assert_equal(1, page.links.length)
+    assert_equal(1, page.links.text('list:').length)
+  end
+
   def test_select_with_click
     @form.list = ['1', 'Aaron']
     @form.fields.name('list').first.options[3].tick

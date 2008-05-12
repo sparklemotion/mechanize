@@ -653,11 +653,12 @@ module WWW
         else
           @auth_hash[uri.host] = :basic
         end
-        return fetch_page(  uri,
-                            fetch_request(uri, request.method.downcase.to_sym),
-                            cur_page,
-                            request_data
-                         )
+        # Copy the request headers for the second attempt
+        req = fetch_request(uri, request.method.downcase.to_sym)
+        request.each_header do |k,v|
+          req[k] = v
+        end
+        return fetch_page(uri, req, cur_page, request_data)
       end
   
       raise ResponseCodeError.new(page), "Unhandled response", caller

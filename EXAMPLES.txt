@@ -122,3 +122,35 @@ This example also demonstrates subclassing Mechanize.
 
   TestMech.new.process
 
+== Client Certificate Authentication (Mutual Auth)
+
+In most cases a client certificate is created as an additional layer of security
+for certain websites.  The specific case that this was initially tested on was
+for automating the download of archived images from a banks (Wachovia) lockbox 
+system.  Once the certificate is installed into your browser you will have to 
+export it and split the certificate and private key into separate files. Exported
+files are usually in .p12 format (IE 7 & Firefox 2.0) which stands for PKCS #12.
+You can convert them from p12 to pem format by using the following commands:
+
+openssl.exe pkcs12 -in input_file.p12 -clcerts -out example.key -nocerts -nodes
+openssl.exe pkcs12 -in input_file.p12 -clcerts -out example.cer -nokeys
+
+  require 'rubygems'
+  require 'mechanize'
+
+  # create Mechanize instance
+  agent = WWW::Mechanize.new
+  
+  # set the path of the certificate file
+  agent.cert = 'example.cer'
+  
+  # set the path of the private key file
+  agent.key = 'example.key'
+
+  # get the login form & fill it out with the username/password
+  login_form = @agent.get("http://example.com/login_page").form('Login')
+  login_form.Userid = 'TestUser'
+  login_form.Password = 'TestPassword'
+  
+  # submit login form
+  agent.submit(login_form, login_form.buttons.first)

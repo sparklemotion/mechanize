@@ -170,10 +170,18 @@ module WWW
     end
   
     # Fetches the URL passed in and returns a page.
-    def get(url, parameters = [], referer = nil)
-      unless parameters.respond_to?(:each) # FIXME: Remove this in 0.8.0
-        referer = parameters
-        parameters = []
+    def get(options, parameters = [], referer = nil)
+      unless options.is_a? Hash
+        url = options
+        unless parameters.respond_to?(:each) # FIXME: Remove this in 0.8.0
+          referer = parameters
+          parameters = []
+        end
+      else
+        raise ArgumentError.new("url must be specified") unless url = options[:url]
+        parameters = options[:params] || []
+        referer = options[:referer]
+        headers = options[:headers]
       end
 
       referer ||= current_page || Page.new(nil, {'content-type'=>'text/html'})
@@ -196,7 +204,7 @@ module WWW
 
       # fetch the page
       request = fetch_request(abs_uri)
-      page = fetch_page(abs_uri, request, referer)
+      page = fetch_page(:uri => abs_uri, :request => request, :page => referer, :headers => headers)
       add_to_history(page)
       yield page if block_given?
       page
@@ -323,7 +331,13 @@ module WWW
     end
   
     protected
-    def set_headers(uri, request, cur_page)
+    def set_headers(uri, request, options)
+      unless options.is_a? Hash
+        cur_page = options
+      else
+        raise ArgumentError.new("cur_page must be specified") unless cur_page = options[:page]
+        headers = options[:headers]
+      end
       if @keep_alive
         request.add_field('Connection', 'keep-alive')
         request.add_field('Keep-Alive', keep_alive_time.to_s)
@@ -370,6 +384,18 @@ module WWW
         end
       end
   
+      if headers
+        headers.each do |k,v|
+          case k
+          when :etag then request.add_field("ETag", v)
+          when :if_modified_since then request.add_field("If-Modified-Since", v)
+          else
+            raise ArgumentError.new("unknown header symbol #{k}") if k.is_a? Symbol
+            request.add_field(k,v)
+          end
+        end
+      end
+
       request
     end
   
@@ -479,7 +505,17 @@ module WWW
     end
   
     # uri is an absolute URI
-    def fetch_page(uri, request, cur_page=current_page(), request_data=[])
+    def fetch_page(options, request=nil, cur_page=current_page(), request_data=[])
+      unless options.is_a? Hash
+        raise ArgumentError.new("uri must be specified") unless uri = options
+        raise ArgumentError.new("request must be specified") unless request
+      else
+        raise ArgumentError.new("uri must be specified") unless uri = options[:uri]
+        raise ArgumentError.new("request must be specified") unless request = options[:request]
+        cur_page = options[:page] || current_page()
+        request_data = options[:request_data] || []
+        headers = options[:headers]
+      end
       raise "unsupported scheme: #{uri.scheme}" unless ['http', 'https'].include?(uri.scheme.downcase)
   
       log.info("#{ request.class }: #{ request.path }") if log
@@ -538,7 +574,11 @@ module WWW
   
       http_obj.start unless http_obj.started?
   
-      request = set_headers(uri, request, cur_page)
+      if headers
+        request = set_headers(uri, request, {:page => cur_page, :headers => headers})
+      else
+        request = set_headers(uri, request, cur_page)
+      end
   
       # Log specified headers for the request
       if log

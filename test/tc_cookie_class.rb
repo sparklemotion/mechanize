@@ -58,6 +58,15 @@ class CookieClassTest < Test::Unit::TestCase
     end
   end
 
+  def test_double_semicolon
+    double_semi = 'WSIDC=WEST;; domain=.williams-sonoma.com; path=/'
+    url = URI.parse('http://williams-sonoma.com/')
+    WWW::Mechanize::Cookie.parse(url, double_semi) { |cookie|
+      assert_equal('WSIDC', cookie.name)
+      assert_equal('WEST', cookie.value)
+    }
+  end
+
   def test_parse_bad_version
     bad_cookie = 'PRETANET=TGIAqbFXtt; Name=/PRETANET; Path=/; Version=1.2; Content-type=text/html; Domain=192.168.6.196; expires=Friday, 13-November-2026  23:01:46 GMT;'
     url = URI.parse('http://localhost/')

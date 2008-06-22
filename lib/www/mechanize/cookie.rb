@@ -7,7 +7,7 @@ module WWW
     class Cookie < WEBrick::Cookie
       def self.parse(uri, str, log = nil)
         return str.split(/,(?=[^;,]*=)|,$/).collect { |c|
-          cookie_elem = c.split(/;/)
+          cookie_elem = c.split(/;+/)
           first_elem = cookie_elem.shift
           first_elem.strip!
           key, value = first_elem.split(/=/, 2)

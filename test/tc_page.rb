@@ -23,4 +23,21 @@ class TestPage < Test::Unit::TestCase
     page = @agent.get("http://localhost/no_title_test.html")
     assert_equal(nil, page.title)
   end
+
+  def test_find_form_with_hash
+    page  = @agent.get("http://localhost/tc_form_action.html")
+    form = page.form(:name => 'post_form1')
+    assert form
+    yielded = false
+    form = page.form(:name => 'post_form1') { |f|
+      yielded = true
+      assert f
+      assert_equal(form, f)
+    }
+    assert yielded
+
+    form_by_action = page.form(:action => '/form_post?a=b&b=c')
+    assert form_by_action
+    assert_equal(form, form_by_action)
+  end
 end

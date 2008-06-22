@@ -128,6 +128,12 @@ module WWW
         @mech.submit(self, button)
       end
 
+      # Submit form using +button+. Defaults
+      # to the first button.
+      def click_button(button = buttons.first)
+        submit(button)
+      end
+
       # This method builds an array of arrays that represent the query
       # parameters to be used with this form.  The return value can then
       # be used to create a query string for this form.

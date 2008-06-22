@@ -7,7 +7,7 @@ class TestFormAction < Test::Unit::TestCase
   end
 
   def test_post_encoded_action
-    form = @page.form('post_form1') { |f|
+    form = @page.form(:name => 'post_form1') { |f|
       f.first_name = "Aaron"
     }
     assert_equal('/form_post?a=b&b=c', form.action)

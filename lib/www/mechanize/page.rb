@@ -57,12 +57,20 @@ module WWW
       def_delegator :parser, :/, :/
       def_delegator :parser, :at, :at
 
-      # Find a form with +name+.  Form will be yielded if a block is given.
-      def form(name)
-        f = forms.name(name).first
+      # Find a form matching +criteria+.
+      # Example:
+      #   page.form(:action => '/post/login.php') do |f|
+      #     ...
+      #   end
+      def form_with(criteria)
+        criteria = {:name => criteria} if String === criteria
+        f = forms.find do |form|
+          criteria.all? { |k,v| form.send(k) == v }
+        end
         yield f if block_given?
         f
       end
+      alias :form :form_with
     
       def links
         @links ||= WWW::Mechanize::List.new(

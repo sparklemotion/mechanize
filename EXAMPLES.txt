@@ -4,53 +4,68 @@
   require 'rubygems'
   require 'mechanize'
   
-  agent = WWW::Mechanize.new
-  agent.user_agent_alias = 'Mac Safari'
-  page = agent.get("http://www.google.com/")
-  search_form = page.forms.with.name("f").first
-  search_form.q = "Hello"
-  search_results = agent.submit(search_form)
-  puts search_results.body
+  a = WWW::Mechanize.new { |agent|
+    agent.user_agent_alias = 'Mac Safari'
+  }
+  
+  a.get('http://google.com/') do |page|
+    search_result = page.form_with(:name => 'f') do |search|
+      search.q = 'Hello world'
+    end.submit
+  
+    search_result.links.each do |link|
+      puts link.text
+    end
+  end
 
 == Rubyforge
-  require 'mechanize'
+
+  a = WWW::Mechanize.new
+  a.get('http://rubyforge.org/') do |page|
+    # Click the login link
+    login_page = a.click(page.links.text(/Log In/))
   
-  agent = WWW::Mechanize.new
-  page = agent.get('http://rubyforge.org/')
-  link = page.links.text(/Log In/)
-  page = agent.click(link)
-  form = page.forms[1]
-  form.form_loginname = ARGV[0]
-  form.form_pw = ARGV[1]
-  page = agent.submit(form, form.buttons.first)
+    # Submit the login form
+    my_page = login_page.form_with(:action => '/account/login.php') do |f|
+      f.form_loginname  = ARGV[0]
+      f.form_pw         = ARGV[1]
+    end.click_button
   
-  puts page.body
+    my_page.links.each do |link|
+      text = link.text.strip
+      next unless text.length > 0
+      puts text
+    end
+  end
 
 == File Upload
-This example uploads one image as two different images to flickr.
-
- require 'rubygems'
- require 'mechanize'
- 
- agent = WWW::Mechanize.new
- 
- # Get the flickr sign in page
- page  = agent.get('http://flickr.com/signin/flickr/')
- 
- # Fill out the login form
- form  = page.forms.name('flickrloginform').first
- form.email = ARGV[0]
- form.password = ARGV[1]
- page  = agent.submit(form)
- 
- # Go to the upload page
- page  = agent.click page.links.text('Upload')
- 
- # Fill out the form
- form  = page.forms.action('/photos_upload_process.gne').first
- form.file_uploads.name('file1').first.file_name = ARGV[2]
- agent.submit(form)
+Upload a file to flickr.
   
+  a = WWW::Mechanize.new { |agent|
+    # Flickr refreshes after login
+    agent.follow_meta_refresh = true
+  }
+  
+  a.get('http://flickr.com/') do |home_page|
+    signin_page = a.click(home_page.links.text(/Sign In/))
+  
+    my_page = signin_page.form_with(:name => 'login_form') do |form|
+      form.login  = ARGV[0]
+      form.passwd = ARGV[1]
+    end.submit
+  
+    # Click the upload link
+    upload_page = a.click(my_page.links.text(/Upload/))
+  
+    # We want the basic upload page.
+    upload_page = a.click(upload_page.links.text(/basic Uploader/))
+  
+    # Upload the file
+    upload_page.form_with(:method => 'POST') do |upload_form|
+      upload_form.file_uploads.first.file_name = ARGV[2]
+    end.submit
+  end
+
 == Pluggable Parsers
 Lets say you want html pages to automatically be parsed with Rubyful Soup.
 This example shows you how:

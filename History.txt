@@ -5,6 +5,7 @@
 * Bug Fixes:
   * Added more examples.  Thanks Robert Jackson.
   * #20480 Making sure the Host header is set.
+  * #20672 Making sure cookies with weird semicolons work.
 
 === 0.7.6
 

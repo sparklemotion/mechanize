@@ -23,6 +23,9 @@ end
 else
 module WWW
   class Mechanize
+    class Form
+      alias :inspect  :pretty_inspect
+    end
     class Page
       alias :inspect  :pretty_inspect
       class Link

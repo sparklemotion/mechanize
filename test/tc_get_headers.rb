@@ -11,35 +11,35 @@ class TestGetHeaders < Test::Unit::TestCase
     end
   end
 
+  def test_host_header
+    page = @agent.get(:url => 'http://localhost/http_headers', :headers => { :etag => '160604-24bc-9fe2c40'})
+    assert_header(page, 'host' => 'localhost')
+  end
+
   def test_etag_header
     page = @agent.get(:url => 'http://localhost/http_headers', :headers => { :etag => '160604-24bc-9fe2c40'})
-    headers = {}
-    page.body.split(/[\r\n]+/).each do |header|
-      headers.[]=(*header.chomp.split(/\|/))
-    end
-    assert(headers.has_key?('etag'))
-    assert_equal('160604-24bc-9fe2c40', headers['etag'])
+    assert_header(page, 'etag' => '160604-24bc-9fe2c40')
   end
 
   def test_if_modified_since_header
     value = Time.now.strftime("%a, %d %b %Y %H:%M:%S %z")
     page = @agent.get(:url => 'http://localhost/http_headers', :headers => { :if_modified_since => value})
-    headers = {}
-    page.body.split(/[\r\n]+/).each do |header|
-      headers.[]=(*header.chomp.split(/\|/))
-    end
-    assert(headers.has_key?('if-modified-since'))
-    assert_equal(value, headers['if-modified-since'])
+    assert_header(page, 'if-modified-since' => value)
   end
 
   def test_string_header
     page = @agent.get(:url => 'http://localhost/http_headers', :headers => { "X-BS-French-Header" => 'Ou est la bibliotheque?'})
-    headers = {}
-    page.body.split(/[\r\n]+/).each do |header|
-      headers.[]=(*header.chomp.split(/\|/))
-    end
-    assert(headers.has_key?('x-bs-french-header'))
-    assert_equal('Ou est la bibliotheque?', headers['x-bs-french-header'])
+    assert_header(page, 'x-bs-french-header' => 'Ou est la bibliotheque?')
   end
 
+  def assert_header(page, header)
+    headers = {}
+    page.body.split(/[\r\n]+/).each do |page_header|
+      headers.[]=(*page_header.chomp.split(/\|/))
+    end
+    header.each do |key, value|
+      assert(headers.has_key?(key))
+      assert_equal(value, headers[key])
+    end
+  end
 end

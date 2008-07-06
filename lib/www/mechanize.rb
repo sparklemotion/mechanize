@@ -449,8 +449,8 @@ module WWW
   
         url = URI.parse(
                 Mechanize.html_unescape(
-                  url.split(/%[0-9A-Fa-f]{2}|#/).zip(
-                    url.scan(/%[0-9A-Fa-f]{2}|#/)
+                  url.split(/(?:%[0-9A-Fa-f]{2})+|#/).zip(
+                    url.scan(/(?:%[0-9A-Fa-f]{2})+|#/)
                   ).map { |x,y|
                     "#{URI.escape(x)}#{y}"
                   }.join('')

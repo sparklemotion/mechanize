@@ -12,6 +12,8 @@
   * Added more examples.  Thanks Robert Jackson.
   * #20480 Making sure the Host header is set.
   * #20672 Making sure cookies with weird semicolons work.
+  * Fixed bug with percent signs in urls.
+    http://d.hatena.ne.jp/kitamomonga/20080410/ruby_mechanize_percent_url_bug
 
 === 0.7.6
 

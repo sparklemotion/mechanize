@@ -6,6 +6,19 @@ require 'servlets'
 
 BASE_DIR = File.dirname(__FILE__)
 
+# Move this to a test base class
+module MechTestHelper
+  def self.fake_page(agent)
+    html = <<-END
+    <html><body>
+    <form><input type="submit" value="submit" /></form>
+    </body></html>
+    END
+    html_response = { 'content-type' => 'text/html' }
+    page = WWW::Mechanize::Page.new(  nil, html_response, html, 200, agent )
+  end
+end
+
 class Net::HTTP
   alias :old_do_start :do_start
 
@@ -30,6 +43,7 @@ class Net::HTTP
     '/send_cookies'           => SendCookiesTest,
     '/if_modified_since'      => ModifiedSinceServlet,
     '/http_headers'           => HeaderServlet,
+    '/infinite_redirect'      => InfiniteRedirectTest,
   }
 
   PAGE_CACHE = {}

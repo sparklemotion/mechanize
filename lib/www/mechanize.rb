@@ -9,6 +9,7 @@ require 'digest/md5'
 require 'www/mechanize/content_type_error'
 require 'www/mechanize/response_code_error'
 require 'www/mechanize/unsupported_scheme_error'
+require 'www/mechanize/redirect_limit_reached_error'
 require 'www/mechanize/cookie'
 require 'www/mechanize/cookie_jar'
 require 'www/mechanize/history'
@@ -73,6 +74,7 @@ module WWW
     attr_accessor :verify_callback
     attr_accessor :history_added
     attr_accessor :scheme_handlers
+    attr_accessor :redirection_limit
   
     attr_reader :history
     attr_reader :pluggable_parser
@@ -122,6 +124,7 @@ module WWW
       @conditional_requests = true
   
       @follow_meta_refresh  = false
+      @redirection_limit    = 20
   
       # Connection Cache & Keep alive
       @connection_cache = {}
@@ -506,7 +509,7 @@ module WWW
     end
   
     # uri is an absolute URI
-    def fetch_page(options, request=nil, cur_page=current_page(), request_data=[])
+    def fetch_page(options, request=nil, cur_page=current_page(), request_data=[], redirects = 0)
       unless options.is_a? Hash
         raise ArgumentError.new("uri must be specified") unless uri = options
         raise ArgumentError.new("request must be specified") unless request
@@ -702,7 +705,8 @@ module WWW
         log.info("follow redirect to: #{ response['Location'] }") if log
         from_uri  = page.uri
         abs_uri   = to_absolute_uri(response['Location'].to_s, page)
-        page = fetch_page(abs_uri, fetch_request(abs_uri), page)
+        raise RedirectLimitReachedError.new(page, redirects) if redirects + 1 > redirection_limit
+        page = fetch_page(abs_uri, fetch_request(abs_uri), page, request_data, redirects + 1)
         @history.push(page, from_uri)
         return page
       elsif res_klass <= Net::HTTPUnauthorized

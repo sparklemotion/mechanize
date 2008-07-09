@@ -8,6 +8,7 @@
   * Mechanize#get takes custom http headers.  Thanks Mike Dalessio!
   * Form#click_button submits a form defaulting to the current button.
   * Form#set_fields now takes a hash.  Thanks Tobi!
+  * Mechanize#redirection_limit= for setting the max number of redirects.
 
 * Bug Fixes:
   * Added more examples.  Thanks Robert Jackson.

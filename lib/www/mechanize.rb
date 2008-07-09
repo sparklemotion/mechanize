@@ -592,6 +592,7 @@ module WWW
   
       # Send the request
       begin
+        res_klass = nil
         response = http_obj.request(request, *request_data) {|response|
   
           body = StringIO.new
@@ -601,8 +602,13 @@ module WWW
             body.write(part)
             log.debug("Read #{total} bytes") if log
           }
+
+          res_klass = Net::HTTPResponse::CODE_TO_OBJ[response.code.to_s]
+
           # Net::HTTP ignores EOFError if Content-length is given, so we emulate it here.
-          raise EOFError if response.content_length() && response.content_length() != total
+          unless res_klass <= Net::HTTPRedirection
+            raise EOFError if response.content_length() && response.content_length() != total
+          end
           body.rewind
   
           response.each_header { |k,v|
@@ -680,8 +686,6 @@ module WWW
       end
   
       log.info("status: #{ page.code }") if log
-  
-      res_klass = Net::HTTPResponse::CODE_TO_OBJ[page.code.to_s]
   
       if follow_meta_refresh && page.respond_to?(:meta) &&
         (redirect = page.meta.first)

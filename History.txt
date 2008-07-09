@@ -15,6 +15,7 @@
   * #20672 Making sure cookies with weird semicolons work.
   * Fixed bug with percent signs in urls.
     http://d.hatena.ne.jp/kitamomonga/20080410/ruby_mechanize_percent_url_bug
+  * #21132 Not checking for EOF errors on redirect
 
 === 0.7.6
 

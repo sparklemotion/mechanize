@@ -632,7 +632,7 @@ module WWW
               if response['Content-Length'].to_i > 0 || body.length > 0
                 begin
                   Zlib::GzipReader.new(body).read
-                rescue Zlib::BufError => e
+                rescue Zlib::BufError, Zlib::GzipFile::Error
                   log.error('Caught a Zlib::BufError') if log
                   body.rewind
                   body.read(10)

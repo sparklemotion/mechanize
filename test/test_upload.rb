@@ -22,14 +22,14 @@ class UploadMechTest < Test::Unit::TestCase
     assert_equal('multipart/form-data', @page.forms[0].enctype)
 
     form = @page.forms.first
-    form.file_uploads.first.file_name = "#{BASE_DIR}/test_all.rb"
+    form.file_uploads.first.file_name = "#{BASE_DIR}/helper.rb"
     form.file_uploads.first.mime_type = "text/plain"
     form.file_uploads.first.file_data = "Hello World\n\n"
 
     @page = @agent.submit(form)
 
     assert_match(
-      "Content-Disposition: form-data; name=\"userfile1\"; filename=\"test_all.rb\"",
+      "Content-Disposition: form-data; name=\"userfile1\"; filename=\"helper.rb\"",
       @page.body
     )
     assert_match(
@@ -45,14 +45,14 @@ class UploadMechTest < Test::Unit::TestCase
     assert_equal('multipart/form-data', @page.forms[1].enctype)
 
     form = @page.forms[1]
-    form.file_uploads.first.file_name = "#{BASE_DIR}/test_all.rb"
+    form.file_uploads.first.file_name = "#{BASE_DIR}/helper.rb"
     form.file_uploads.first.mime_type = "text/plain"
     form.file_uploads.first.file_data = "Hello World\n\n"
 
     @page = @agent.submit(form)
 
     assert_match(
-      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"test_all.rb\"",
+      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"helper.rb\"",
       @page.body
     )
   end
@@ -61,13 +61,13 @@ class UploadMechTest < Test::Unit::TestCase
     assert_equal('multipart/form-data', @page.forms[1].enctype)
 
     form = @page.forms[1]
-    form.file_uploads.first.file_name = "#{BASE_DIR}/test_all.rb"
+    form.file_uploads.first.file_name = "#{BASE_DIR}/helper.rb"
 
     @page = @agent.submit(form)
 
-    contents = File.open("#{BASE_DIR}/test_all.rb", 'rb') { |f| f.read }
+    contents = File.open("#{BASE_DIR}/helper.rb", 'rb') { |f| f.read }
     assert_match(
-      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"test_all.rb\"",
+      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"helper.rb\"",
       @page.body
     )
     assert_match(contents, @page.body)
@@ -77,14 +77,14 @@ class UploadMechTest < Test::Unit::TestCase
     assert_equal('multipart/form-data', @page.forms[1].enctype)
 
     form = @page.forms[1]
-    form.file_uploads.first.file_name = "#{BASE_DIR}/test_all.rb"
-    form.file_uploads.first.file_data = File.open("#{BASE_DIR}/test_all.rb", 'rb')
+    form.file_uploads.first.file_name = "#{BASE_DIR}/helper.rb"
+    form.file_uploads.first.file_data = File.open("#{BASE_DIR}/helper.rb", 'rb')
 
     @page = @agent.submit(form)
 
-    contents = File.open("#{BASE_DIR}/test_all.rb", 'rb') { |f| f.read }
+    contents = File.open("#{BASE_DIR}/helper.rb", 'rb') { |f| f.read }
     assert_match(
-      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"test_all.rb\"",
+      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"helper.rb\"",
       @page.body
     )
     assert_match(contents, @page.body)

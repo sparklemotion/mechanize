@@ -192,9 +192,9 @@ module WWW
       def request_data
         query_params = build_query()
         case @enctype.downcase
-        when 'multipart/form-data'
+        when /^multipart\/form-data/
           boundary = rand_string(20)
-          @enctype << "; boundary=#{boundary}"
+          @enctype = "multipart/form-data; boundary=#{boundary}"
           params = []
           query_params.each { |k,v| params << param_to_multipart(k, v) }
           @file_uploads.each { |f| params << file_to_multipart(f) }

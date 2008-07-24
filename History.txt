@@ -18,6 +18,7 @@
     http://d.hatena.ne.jp/kitamomonga/20080410/ruby_mechanize_percent_url_bug
   * #21132 Not checking for EOF errors on redirect
   * Fixed a weird gzipping error.
+  * #21233 Smarter multipart boundry. Thanks Todd Willey!
 
 === 0.7.6
 

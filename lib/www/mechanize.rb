@@ -681,6 +681,15 @@ module WWW
         end
       end
   
+      if page.is_a?(Page) && page.body =~ /Set-Cookie/
+        page.search('//meta[@http-equiv="Set-Cookie"]').each do |meta|
+          Cookie::parse(uri, meta['content'], log) { |c|
+            log.debug("saved cookie: #{c}") if log
+            @cookie_jar.add(uri, c)
+          }
+        end
+      end
+
       (response.get_fields('Set-Cookie')||[]).each do |cookie|
         Cookie::parse(uri, cookie, log) { |c|
           log.debug("saved cookie: #{c}") if log

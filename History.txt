@@ -19,6 +19,7 @@
   * #21132 Not checking for EOF errors on redirect
   * Fixed a weird gzipping error.
   * #21233 Smarter multipart boundry. Thanks Todd Willey!
+  * #20097 Supporting meta tag cookies.
 
 === 0.7.6
 

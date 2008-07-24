@@ -5,6 +5,12 @@ class CookiesMechTest < Test::Unit::TestCase
     @agent = WWW::Mechanize.new
   end
 
+  def test_meta_tag_cookies
+    cookies = @agent.cookies.length
+    page = @agent.get("http://localhost/meta_cookie.html")
+    assert_equal(cookies + 1, @agent.cookies.length)
+  end
+
   def test_send_cookies
     page = @agent.get("http://localhost/many_cookies")
     page = @agent.get("http://localhost/send_cookies")

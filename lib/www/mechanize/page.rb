@@ -37,13 +37,13 @@ module WWW
       end
 
       def title
-        @title ||= if parser && search('title').text.length > 0
-          search('title').text
+        @title ||= if parser && search('//title').text.length > 0
+          search('//title').text
         end
       end
 
       def parser
-        @parser ||= body && response ? Hpricot.parse(body) : nil
+        @parser ||= body && response ? Mechanize.html_parser.parse(body) : nil
       end
       alias :root :parser
 
@@ -74,7 +74,7 @@ module WWW
     
       def links
         @links ||= WWW::Mechanize::List.new(
-          %w{ a area }.map do |tag|
+          %w{ //a //area }.map do |tag|
             search(tag).map do |node|
               Link.new(node, @mech, self)
             end
@@ -84,7 +84,7 @@ module WWW
 
       def forms
         @forms ||= WWW::Mechanize::List.new(
-          search('form').map do |html_form|
+          search('//form').map do |html_form|
             form = Form.new(html_form, @mech, self)
             form.action ||= @uri
             form
@@ -94,7 +94,7 @@ module WWW
 
       def meta
         @meta ||= WWW::Mechanize::List.new(
-          search('meta').map do |node|
+          search('//meta').map do |node|
             next unless node['http-equiv'] && node['content']
             (equiv, content) = node['http-equiv'], node['content']
             if equiv && equiv.downcase == 'refresh'
@@ -109,19 +109,19 @@ module WWW
 
       def bases
         @bases ||= WWW::Mechanize::List.new(
-          search('base').map { |node| Base.new(node, @mech, self) }
+          search('//base').map { |node| Base.new(node, @mech, self) }
         )
       end
 
       def frames
         @frames ||= WWW::Mechanize::List.new(
-          search('frame').map { |node| Frame.new(node, @mech, self) }
+          search('//frame').map { |node| Frame.new(node, @mech, self) }
         )
       end
 
       def iframes
         @iframes ||= WWW::Mechanize::List.new(
-          search('iframe').map { |node| Frame.new(node, @mech, self) }
+          search('//iframe').map { |node| Frame.new(node, @mech, self) }
         )
       end
     end

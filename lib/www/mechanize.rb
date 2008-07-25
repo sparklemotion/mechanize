@@ -83,6 +83,8 @@ module WWW
   
     @@nonce_count = -1
     CNONCE = Digest::MD5.hexdigest("%x" % (Time.now.to_i + rand(65535)))
+    @html_parser = Hpricot
+    class << self; attr_accessor :html_parser end
   
     def initialize
       # attr_accessors
@@ -248,7 +250,11 @@ module WWW
     # or
     #  agent.post('http://example.com/', [ ["foo", "bar"] ])
     def post(url, query={})
-      node = Hpricot::Elem.new(Hpricot::STag.new('form'))
+      node = {}
+      # Create a fake form
+      class << node
+        def search(*args); []; end
+      end
       node['method'] = 'POST'
       node['enctype'] = 'application/x-www-form-urlencoded'
   
@@ -323,7 +329,7 @@ module WWW
         s.gsub(/&(\w+|#[0-9]+);/) { |match|
           number = case match
           when /&(\w+);/
-            Hpricot::NamedCharacters[$1]
+            Mechanize.html_parser::NamedCharacters[$1]
           when /&#([0-9]+);/
             $1.to_i
           end

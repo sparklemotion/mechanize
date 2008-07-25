@@ -219,7 +219,7 @@ module WWW
         @checkboxes   = WWW::Mechanize::List.new
     
         # Find all input tags
-        (form_node/'input').each do |node|
+        form_node.search('//input').each do |node|
           type = (node['type'] || 'text').downcase
           name = node['name']
           next if name.nil? && !(type == 'submit' || type =='button')
@@ -242,13 +242,13 @@ module WWW
         end
 
         # Find all textarea tags
-        (form_node/'textarea').each do |node|
+        form_node.search('//textarea').each do |node|
           next if node['name'].nil?
           @fields << Field.new(node['name'], node.inner_text)
         end
 
         # Find all select tags
-        (form_node/'select').each do |node|
+        form_node.search('//select').each do |node|
           next if node['name'].nil?
           if node.has_attribute? 'multiple'
             @fields << MultiSelectList.new(node['name'], node)

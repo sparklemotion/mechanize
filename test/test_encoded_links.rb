@@ -14,7 +14,7 @@ class TestEncodedLinks < Test::Unit::TestCase
   end
 
   def test_hpricot_link
-    page = @agent.click(@page.search('a').first)
+    page = @agent.click(@page.search('//a').first)
     assert_equal("http://localhost/form_post?a=b&b=c", page.uri.to_s)
   end
 end

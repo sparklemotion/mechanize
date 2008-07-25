@@ -5,6 +5,9 @@ require 'webrick/httputils'
 require 'zlib'
 require 'stringio'
 require 'digest/md5'
+require 'fileutils'
+require 'hpricot'
+require 'forwardable'
 
 require 'www/mechanize/content_type_error'
 require 'www/mechanize/response_code_error'
@@ -230,10 +233,9 @@ module WWW
         rescue
           nil
         end
-      uri = to_absolute_uri(
-        link.attributes['href'] || link.attributes['src'] || link.href,
-        referer || current_page()
-      )
+      href = link.respond_to?(:has_attribute?) ?
+        (link['href'] || link['src']) : link.href
+      uri = to_absolute_uri(href, referer || current_page())
       get(uri, referer)
     end
   

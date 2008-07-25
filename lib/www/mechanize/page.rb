@@ -1,7 +1,3 @@
-require 'fileutils'
-require 'hpricot'
-require 'forwardable'
-
 require 'www/mechanize/page/link'
 require 'www/mechanize/page/meta'
 require 'www/mechanize/page/base'
@@ -37,8 +33,8 @@ module WWW
       end
 
       def title
-        @title ||= if parser && search('//title').text.length > 0
-          search('//title').text
+        @title ||= if parser && search('//title').inner_text.length > 0
+          search('//title').inner_text
         end
       end
 

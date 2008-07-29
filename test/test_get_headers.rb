@@ -22,9 +22,16 @@ class TestGetHeaders < Test::Unit::TestCase
   end
 
   def test_if_modified_since_header
-    value = Time.now.strftime("%a, %d %b %Y %H:%M:%S %z")
+    value = (Time.now - 600).strftime("%a, %d %b %Y %H:%M:%S %z")
     page = @agent.get(:url => 'http://localhost/http_headers', :headers => { :if_modified_since => value})
     assert_header(page, 'if-modified-since' => value)
+  end
+
+  def test_if_modified_since_response
+    value = (Time.now - 600).strftime("%a, %d %b %Y %H:%M:%S %z")
+    page = @agent.get(:url => 'http://localhost/if_modified_since', :headers => { :if_modified_since => value})
+    assert_equal "304", page.code
+    assert_equal "0", page.header['content-length']
   end
 
   def test_string_header

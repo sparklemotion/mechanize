@@ -716,7 +716,7 @@ module WWW
   
       if res_klass == Net::HTTPNotModified
         log.debug("Got cached page") if log
-        return visited_page(uri)
+        return visited_page(uri) || page
       elsif res_klass <= Net::HTTPRedirection
         return page unless follow_redirect?
         log.info("follow redirect to: #{ response['Location'] }") if log

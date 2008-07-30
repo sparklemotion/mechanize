@@ -1,5 +1,11 @@
 = Mechanize CHANGELOG
 
+=== master (unreleased)
+
+* Bug Fixes:
+  * Fixed bug when receiving a 304 response (HTTPNotModified) on a page not
+    cached in history.
+
 === 0.7.7
 
 * New Features:

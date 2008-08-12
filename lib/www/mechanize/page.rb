@@ -27,7 +27,7 @@ module WWW
         @mech           ||= mech
 
         raise Mechanize::ContentTypeError.new(response['content-type']) unless
-            content_type() =~ /^text\/html/ 
+            content_type() =~ /^(text\/html)|(application\/xhtml\+xml)/ 
 
         @parser = @links = @forms = @meta = @bases = @frames = @iframes = nil
       end

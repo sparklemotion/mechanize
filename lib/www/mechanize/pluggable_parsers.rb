@@ -45,6 +45,7 @@ module WWW
     class PluggableParser
       CONTENT_TYPES = {
         :html => 'text/html',
+        :xhtml => 'application/xhtml+xml',
         :pdf  => 'application/pdf',
         :csv  => 'text/csv',
         :xml  => 'text/xml',
@@ -53,7 +54,8 @@ module WWW
       attr_accessor :default
 
       def initialize
-        @parsers = { CONTENT_TYPES[:html] => Page }
+        @parsers = { CONTENT_TYPES[:html] => Page,
+                     CONTENT_TYPES[:xhtml] => Page }
         @default = File
       end
 
@@ -67,6 +69,11 @@ module WWW
 
       def html=(klass)
         register_parser(CONTENT_TYPES[:html], klass)
+        register_parser(CONTENT_TYPES[:xhtml], klass)
+      end
+
+      def xhtml=(klass)
+        register_parser(CONTENT_TYPES[:xhtml], klass)
       end
 
       def pdf=(klass)

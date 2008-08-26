@@ -4,24 +4,7 @@ require 'hoe'
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "lib")
 require 'mechanize'
 
-class MechHoe < Hoe
-  def define_tasks
-    super
-    desc "Update SSL Certificate"
-    Rake::Task.define_task('ssl_cert') do |p|
-      sh "openssl genrsa -des3 -out server.key 1024"
-      sh "openssl req -new -key server.key -out server.csr"
-      sh "cp server.key server.key.org"
-      sh "openssl rsa -in server.key.org -out server.key"
-      sh "openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt"
-      sh "cp server.key server.pem"
-      sh "mv server.key server.csr server.crt server.pem test/data/"
-      sh "rm server.key.org"
-    end
-  end
-end
-
-MechHoe.new('mechanize', WWW::Mechanize::VERSION) do |p|
+HOE = Hoe.new('mechanize', WWW::Mechanize::VERSION) do |p|
   p.rubyforge_name  = 'mechanize'
   p.author          = 'Aaron Patterson'
   p.email           = 'aaronp@rubyforge.org'
@@ -29,3 +12,24 @@ MechHoe.new('mechanize', WWW::Mechanize::VERSION) do |p|
   p.extra_deps      = [['hpricot', '>= 0.5.0']]
 end
 
+desc "Update SSL Certificate"
+task('ssl_cert') do |p|
+  sh "openssl genrsa -des3 -out server.key 1024"
+  sh "openssl req -new -key server.key -out server.csr"
+  sh "cp server.key server.key.org"
+  sh "openssl rsa -in server.key.org -out server.key"
+  sh "openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt"
+  sh "cp server.key server.pem"
+  sh "mv server.key server.csr server.crt server.pem test/data/"
+  sh "rm server.key.org"
+end
+
+namespace :gem do
+  desc 'Generate a gem spec'
+  task :spec do
+    File.open("#{HOE.name}.gemspec", 'w') do |f|
+      HOE.spec.version = "#{HOE.version}.#{Time.now.strftime("%Y%m%d%H%M%S")}"
+      f.write(HOE.spec.to_ruby)
+    end
+  end
+end

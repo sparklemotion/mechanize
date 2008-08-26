@@ -94,6 +94,7 @@ test/test_authenticate.rb
 test/test_bad_links.rb
 test/test_blank_form.rb
 test/test_checkboxes.rb
+test/test_content_type.rb
 test/test_cookie_class.rb
 test/test_cookie_jar.rb
 test/test_cookies.rb

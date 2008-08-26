@@ -43,6 +43,7 @@ lib/www/mechanize/pluggable_parsers.rb
 lib/www/mechanize/redirect_limit_reached_error.rb
 lib/www/mechanize/response_code_error.rb
 lib/www/mechanize/unsupported_scheme_error.rb
+mechanize.gemspec
 test/data/htpasswd
 test/data/server.crt
 test/data/server.csr

@@ -723,7 +723,7 @@ module WWW
         from_uri  = page.uri
         abs_uri   = to_absolute_uri(response['Location'].to_s, page)
         raise RedirectLimitReachedError.new(page, redirects) if redirects + 1 > redirection_limit
-        page = fetch_page(abs_uri, fetch_request(abs_uri), page, request_data, redirects + 1)
+        page = fetch_page(abs_uri, fetch_request(abs_uri), page, [], redirects + 1)
         @history.push(page, from_uri)
         return page
       elsif res_klass <= Net::HTTPUnauthorized

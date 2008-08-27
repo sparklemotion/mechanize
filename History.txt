@@ -1,11 +1,12 @@
 = Mechanize CHANGELOG
 
-=== master (unreleased)
+=== 0.7.8
 
 * Bug Fixes:
   * Fixed bug when receiving a 304 response (HTTPNotModified) on a page not
     cached in history.
   * #21428 Default to HTML parser for 'application/xhtml+xml' content-type.
+  * Fixed an issue where redirects were resending posted data
 
 === 0.7.7
 

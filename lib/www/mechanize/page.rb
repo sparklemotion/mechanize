@@ -60,11 +60,17 @@ module WWW
       #   end
       [:form, :link, :base, :frame, :iframe].each do |type|
         eval(<<-eomethod)
-          def #{type}_with(criteria)
+          def #{type}s_with(criteria)
             criteria = {:name => criteria} if String === criteria
-            f = #{type}s.find do |thing|
+            f = #{type}s.find_all do |thing|
               criteria.all? { |k,v| v === thing.send(k) }
             end
+            yield f if block_given?
+            f
+          end
+
+          def #{type}_with(criteria)
+            f = #{type}s_with(criteria).first
             yield f if block_given?
             f
           end

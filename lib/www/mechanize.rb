@@ -165,6 +165,7 @@ module WWW
     end
   
     # Sets the proxy address, port, user, and password
+    # +addr+ should be a host, with no "http://"
     def set_proxy(addr, port, user = nil, pass = nil)
       @proxy_addr, @proxy_port, @proxy_user, @proxy_pass = addr, port, user, pass
     end

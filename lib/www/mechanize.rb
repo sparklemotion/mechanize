@@ -233,8 +233,8 @@ module WWW
     # page fetched.
     def click(link)
       referer = link.page rescue referer = nil
-      href = link.respond_to?(:has_attribute?) ?
-        (link['href'] || link['src']) : link.href
+      href = link.respond_to?(:href) ? link.href :
+        (link['href'] || link['src'])
       get(:url => href, :referer => (referer || current_page()))
     end
   

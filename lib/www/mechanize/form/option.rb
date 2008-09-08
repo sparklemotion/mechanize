@@ -15,7 +15,7 @@ module WWW
         def initialize(node, select_list)
           @text     = node.inner_text
           @value    = Util.html_unescape(node['value'] || node.inner_text)
-          @selected = node.has_attribute? 'selected'
+          @selected = node.attributes.include? 'selected'
           @select_list = select_list # The select list this option belongs to
         end
 

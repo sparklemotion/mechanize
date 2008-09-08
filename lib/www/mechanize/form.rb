@@ -225,9 +225,9 @@ module WWW
           next if name.nil? && !(type == 'submit' || type =='button')
           case type
           when 'radio'
-            @radiobuttons << RadioButton.new(node['name'], node['value'], node.has_attribute?('checked'), self)
+            @radiobuttons << RadioButton.new(node['name'], node['value'], !!node['checked'], self)
           when 'checkbox'
-            @checkboxes << CheckBox.new(node['name'], node['value'], node.has_attribute?('checked'), self)
+            @checkboxes << CheckBox.new(node['name'], node['value'], !!node['checked'], self)
           when 'file'
             @file_uploads << FileUpload.new(node['name'], nil) 
           when 'submit'
@@ -250,7 +250,7 @@ module WWW
         # Find all select tags
         form_node.search('//select').each do |node|
           next if node['name'].nil?
-          if node.has_attribute? 'multiple'
+          if node.attributes.include? 'multiple'
             @fields << MultiSelectList.new(node['name'], node)
           else
             @fields << SelectList.new(node['name'], node)

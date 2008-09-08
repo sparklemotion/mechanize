@@ -7,6 +7,7 @@ class OptionTest < Test::Unit::TestCase
       @inner_text = inner_text
     end
     alias :has_attribute? :has_key?
+    alias :attributes :keys
   end
 
   def test_option_missing_value

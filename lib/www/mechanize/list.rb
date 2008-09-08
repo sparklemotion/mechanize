@@ -53,6 +53,10 @@ module WWW
 
       alias :and :with
 
+      def respond_to?(method_sym)
+        first.respond_to?(method_sym)
+      end
+
       def method_missing(meth_sym, *args)
         if length > 0
           return first.send(meth_sym) if args.empty?

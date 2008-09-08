@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + "/helper"
+require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class BasicAuthTest < Test::Unit::TestCase
   def setup
@@ -11,14 +11,21 @@ class BasicAuthTest < Test::Unit::TestCase
     assert_equal('You are authenticated', page.body)
   end
 
+  def test_digest_auth_success
+    @agent.basic_auth('user', 'pass')
+    page = @agent.get("http://localhost/digest_auth")
+    assert_equal('You are authenticated', page.body)
+  end
+
   def test_post_auth_success
     class << @agent
-      alias :old_fetch_request :fetch_request
+      alias :old_fetch_page :fetch_page
       attr_accessor :requests
-      def fetch_request(*args)
+      def fetch_page(args)
         @requests ||= []
-        @requests << old_fetch_request(*args)
-        @requests.last
+        x = old_fetch_page(args)
+        @requests << args[:verb]
+        x
       end
     end
     @agent.basic_auth('user', 'pass')
@@ -27,13 +34,7 @@ class BasicAuthTest < Test::Unit::TestCase
     assert_equal(2, @agent.requests.length)
     r1 = @agent.requests[0]
     r2 = @agent.requests[1]
-    assert r1['Content-Type']
-    assert r2['Content-Type']
-    assert_equal(r1['Content-Type'], r2['Content-Type'])
-
-    assert r1['Content-Length']
-    assert r2['Content-Length']
-    assert_equal(r1['Content-Length'], r2['Content-Length'])
+    assert_equal(r1, r2)
   end
 
   def test_auth_bad_user_pass

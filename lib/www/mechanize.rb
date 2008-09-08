@@ -9,6 +9,7 @@ require 'fileutils'
 require 'hpricot'
 require 'forwardable'
 
+require 'www/mechanize/util'
 require 'www/mechanize/content_type_error'
 require 'www/mechanize/response_code_error'
 require 'www/mechanize/unsupported_scheme_error'
@@ -19,7 +20,9 @@ require 'www/mechanize/history'
 require 'www/mechanize/list'
 require 'www/mechanize/form'
 require 'www/mechanize/pluggable_parsers'
+require 'www/mechanize/file_response'
 require 'www/mechanize/inspect'
+require 'www/mechanize/chain'
 require 'www/mechanize/monkey_patch'
 
 module WWW
@@ -61,7 +64,6 @@ module WWW
     }
   
     attr_accessor :cookie_jar
-    attr_accessor :log
     attr_accessor :open_timeout, :read_timeout
     attr_accessor :user_agent
     attr_accessor :watch_for_set
@@ -84,10 +86,8 @@ module WWW
   
     alias :follow_redirect? :redirect_ok
   
-    @@nonce_count = -1
-    CNONCE = Digest::MD5.hexdigest("%x" % (Time.now.to_i + rand(65535)))
     @html_parser = Hpricot
-    class << self; attr_accessor :html_parser end
+    class << self; attr_accessor :html_parser, :log end
   
     def initialize
       # attr_accessors
@@ -118,7 +118,6 @@ module WWW
       @password       = nil # Auth Password
       @digest         = nil # DigestAuth Digest
       @auth_hash      = {}  # Keep track of urls for sending auth
-      @digest_response = nil
   
       # Proxy settings
       @proxy_addr     = nil
@@ -144,12 +143,26 @@ module WWW
       @scheme_handlers['http']      = lambda { |link, page| link }
       @scheme_handlers['https']     = @scheme_handlers['http']
       @scheme_handlers['relative']  = @scheme_handlers['http']
+      @scheme_handlers['file']      = @scheme_handlers['http']
+
+      @pre_connect_hook = Chain::PreConnectHook.new
+      @post_connect_hook = Chain::PostConnectHook.new
   
       yield self if block_given?
     end
 
-    def max_history=(length); @history.max_size = length; end
-    def max_history; @history.max_size; end
+    def max_history=(length); @history.max_size = length end
+    def max_history; @history.max_size end
+    def log=(l); self.class.log = l end
+    def log; self.class.log end
+
+    def pre_connect_hooks
+      @pre_connect_hook.hooks
+    end
+
+    def post_connect_hooks
+      @post_connect_hook.hooks
+    end
   
     # Sets the proxy address, port, user, and password
     def set_proxy(addr, port, user = nil, pass = nil)
@@ -167,15 +180,12 @@ module WWW
       @cookie_jar.to_a
     end
   
-    # Sets the user and password to be used for basic authentication.
-    def basic_auth(user, password)
-      auth(user, password)
-    end
-  
+    # Sets the user and password to be used for authentication.
     def auth(user, password)
       @user       = user
       @password   = password
     end
+    alias :basic_auth :auth
   
     # Fetches the URL passed in and returns a page.
     def get(options, parameters = [], referer = nil)
@@ -202,17 +212,13 @@ module WWW
           Page.new(URI.parse(referer), {'content-type' => 'text/html'}) :
           Page.new(referer, {'content-type' => 'text/html'})
       end
-      abs_uri = to_absolute_uri(url, referer)
-
-      if parameters.length > 0
-        abs_uri.query ||= ''
-        abs_uri.query << '&' if abs_uri.query.length > 0
-        abs_uri.query << self.class.build_query_string(parameters)
-      end
 
       # fetch the page
-      request = fetch_request(abs_uri)
-      page = fetch_page(:uri => abs_uri, :request => request, :page => referer, :headers => headers)
+      page = fetch_page(  :uri      => url,
+                          :referer  => referer,
+                          :headers  => headers || {},
+                          :params   => parameters
+                       )
       add_to_history(page)
       yield page if block_given?
       page
@@ -223,20 +229,13 @@ module WWW
       get(url).body
     end
   
-  
     # Clicks the WWW::Mechanize::Link object passed in and returns the
     # page fetched.
     def click(link)
-      referer =
-        begin
-          link.page
-        rescue
-          nil
-        end
+      referer = link.page rescue referer = nil
       href = link.respond_to?(:has_attribute?) ?
         (link['href'] || link['src']) : link.href
-      uri = to_absolute_uri(href, referer || current_page())
-      get(uri, referer)
+      get(:url => href, :referer => (referer || current_page()))
     end
   
     # Equivalent to the browser back button.  Returns the most recent page
@@ -282,13 +281,14 @@ module WWW
     #  agent.submit(page.forms.first, page.forms.first.buttons.first)
     def submit(form, button=nil)
       form.add_button_to_query(button) if button
-      uri = to_absolute_uri(form.action, form.page)
       case form.method.upcase
       when 'POST'
-        post_form(uri, form) 
+        post_form(form.action, form)
       when 'GET'
-        uri.query = WWW::Mechanize.build_query_string(form.build_query)
-        get(uri)
+        get(  :url      => form.action.gsub(/\?[^\?]*$/, ''),
+              :params   => form.build_query,
+              :referer  => form.page
+           )
       else
         raise "unsupported method: #{form.method.upcase}"
       end
@@ -309,7 +309,7 @@ module WWW
       if url.respond_to? :href
         url = url.href
       end
-      @history.visited_page(to_absolute_uri(url))
+      @history.visited_page(resolve(url))
     end
   
     # Runs given block, then resets the page history as it was before. self is
@@ -325,166 +325,14 @@ module WWW
   
     alias :page :current_page
 
-    class << self
-      def html_unescape(s)
-        return s unless s
-        s.gsub(/&(\w+|#[0-9]+);/) { |match|
-          number = case match
-          when /&(\w+);/
-            Mechanize.html_parser::NamedCharacters[$1]
-          when /&#([0-9]+);/
-            $1.to_i
-          end
-  
-          number ? ([number].pack('U') rescue match) : match
-        }
-      end
-    end
-  
-    protected
-    def set_headers(uri, request, options)
-      unless options.is_a? Hash
-        cur_page = options
-      else
-        raise ArgumentError.new("cur_page must be specified") unless cur_page = options[:page]
-        headers = options[:headers]
-      end
-      if @keep_alive
-        request.add_field('Connection', 'keep-alive')
-        request.add_field('Keep-Alive', keep_alive_time.to_s)
-      else
-        request.add_field('Connection', 'close')
-      end
-      request.add_field('Accept-Encoding', 'gzip,identity')
-      request.add_field('Accept-Language', 'en-us,en;q=0.5')
-      request.add_field('Host', uri.host)
-      request.add_field('Accept-Charset', 'ISO-8859-1,utf-8;q=0.7,*;q=0.7')
-  
-      unless @cookie_jar.empty?(uri)
-        cookies = @cookie_jar.cookies(uri)
-        cookie = cookies.length > 0 ? cookies.join("; ") : nil
-        if log
-          cookies.each do |c|
-            log.debug("using cookie: #{c}")
-          end
-        end
-        request.add_field('Cookie', cookie)
-      end
-  
-      # Add Referer header to request
-      unless cur_page.uri.nil?
-        request.add_field('Referer', cur_page.uri.to_s)
-      end
-  
-      # Add User-Agent header to request
-      request.add_field('User-Agent', @user_agent) if @user_agent 
-  
-      # Add If-Modified-Since if page is in history
-      if @conditional_requests
-        if( (page = visited_page(uri)) && page.response['Last-Modified'] )
-          request.add_field('If-Modified-Since', page.response['Last-Modified'])
-        end
-      end
-  
-      if( @auth_hash[uri.host] )
-        case @auth_hash[uri.host]
-        when :basic
-          request.basic_auth(@user, @password)
-        when :digest
-          @digest_response = self.gen_auth_header(uri,request,@digest) if @digest
-          request.add_field('Authorization', @digest_response) if @digest_response
-        end
-      end
-  
-      if headers
-        headers.each do |k,v|
-          case k
-          when :etag then request.add_field("ETag", v)
-          when :if_modified_since then request.add_field("If-Modified-Since", v)
-          else
-            raise ArgumentError.new("unknown header symbol #{k}") if k.is_a? Symbol
-            request.add_field(k,v)
-          end
-        end
-      end
-
-      request
-    end
-  
-    def gen_auth_header(uri, request, auth_header, is_IIS = false)
-      @@nonce_count += 1
-  
-      user = @digest_user
-      password = @digest_password
-  
-      auth_header =~ /^(\w+) (.*)/
-  
-      params = {}
-      $2.gsub(/(\w+)="(.*?)"/) { params[$1] = $2 }
-  
-      a_1 = "#{@user}:#{params['realm']}:#{@password}"
-      a_2 = "#{request.method}:#{uri.path}"
-      request_digest = ''
-      request_digest << Digest::MD5.hexdigest(a_1)
-      request_digest << ':' << params['nonce']
-      request_digest << ':' << ('%08x' % @@nonce_count)
-      request_digest << ':' << CNONCE
-      request_digest << ':' << params['qop']
-      request_digest << ':' << Digest::MD5.hexdigest(a_2)
-  
-      header = ''
-      header << "Digest username=\"#{@user}\", "
-      header << "realm=\"#{params['realm']}\", "
-      if is_IIS then
-        header << "qop=\"#{params['qop']}\", "
-      else
-        header << "qop=#{params['qop']}, "
-      end
-      header << "uri=\"#{uri.path}\", "
-      header << "algorithm=MD5, "
-      header << "nonce=\"#{params['nonce']}\", "
-      header << "nc=#{'%08x' % @@nonce_count}, "
-      header << "cnonce=\"#{CNONCE}\", "
-      header << "response=\"#{Digest::MD5.hexdigest(request_digest)}\""
-  
-      return header
-    end
-  
     private
   
-    def to_absolute_uri(url, cur_page=current_page())
-      unless url.is_a? URI
-        url = url.to_s.strip.gsub(/[^#{0.chr}-#{126.chr}]/) { |match|
-          sprintf('%%%X', match.unpack($KCODE == 'UTF8' ? 'U' : 'c')[0])
-        }
-  
-        url = URI.parse(
-                Mechanize.html_unescape(
-                  url.split(/(?:%[0-9A-Fa-f]{2})+|#/).zip(
-                    url.scan(/(?:%[0-9A-Fa-f]{2})+|#/)
-                  ).map { |x,y|
-                    "#{URI.escape(x)}#{y}"
-                  }.join('')
-                )
-              )
-      end
-  
-      url = @scheme_handlers[url.relative? ? 'relative' : url.scheme.downcase].call(url, cur_page)
-      url.path = '/' if url.path.length == 0
-  
-      # construct an absolute uri
-      if url.relative?
-        raise 'no history. please specify an absolute URL' unless cur_page.uri
-        base = cur_page.respond_to?(:bases) ? cur_page.bases.last : nil
-        url = ((base && base.uri && base.uri.absolute?) ?
-                base.uri :
-                cur_page.uri) + url
-        url = cur_page.uri + url
-        # Strip initial "/.." bits from the path
-        url.path.sub!(/^(\/\.\.)+(?=\/)/, '')
-      end
-  
-      return url
+    def resolve(url, referer = current_page())
+      hash = { :uri => url, :referer => referer }
+      chain = Chain.new([
+        Chain::URIResolver.new(@scheme_handlers)
+      ]).handle(hash)
+      hash[:uri].to_s
     end
   
     def post_form(url, form)
@@ -493,218 +341,113 @@ module WWW
   
       request_data = form.request_data
   
-      abs_url = to_absolute_uri(url, cur_page)
-      request = fetch_request(abs_url, :post)
-      request.add_field('Content-Type', form.enctype)
-      request.add_field('Content-Length', request_data.size.to_s)
-  
       log.debug("query: #{ request_data.inspect }") if log
   
       # fetch the page
-      page = fetch_page(abs_url, request, cur_page, [request_data])
+      page = fetch_page(  :uri      => url,
+                          :referer  => cur_page,
+                          :verb     => :post,
+                          :params   => [request_data],
+                          :headers  => {
+                            'Content-Type'    => form.enctype,
+                            'Content-Length'  => request_data.size.to_s,
+                          })
       add_to_history(page) 
       page
     end
   
-    # Creates a new request object based on the scheme and type
-    def fetch_request(uri, type = :get)
-      raise "unsupported scheme: #{uri.scheme}" unless ['http', 'https'].include?(uri.scheme.downcase)
-      if type == :get
-        Net::HTTP::Get.new(uri.request_uri)
-      else
-        Net::HTTP::Post.new(uri.request_uri)
-      end
-    end
-  
     # uri is an absolute URI
-    def fetch_page(options, request=nil, cur_page=current_page(), request_data=[], redirects = 0)
-      unless options.is_a? Hash
-        raise ArgumentError.new("uri must be specified") unless uri = options
-        raise ArgumentError.new("request must be specified") unless request
-      else
-        raise ArgumentError.new("uri must be specified") unless uri = options[:uri]
-        raise ArgumentError.new("request must be specified") unless request = options[:request]
-        cur_page = options[:page] || current_page()
-        request_data = options[:request_data] || []
-        headers = options[:headers]
-      end
-      raise "unsupported scheme: #{uri.scheme}" unless ['http', 'https'].include?(uri.scheme.downcase)
-  
-      log.info("#{ request.class }: #{ request.path }") if log
-  
-      page = nil
-  
-      cache_obj = (@connection_cache["#{uri.host}:#{uri.port}"] ||= {
-        :connection         => nil,
-        :keep_alive_options => {},
-      })
-      http_obj = cache_obj[:connection]
-      if http_obj.nil? || ! http_obj.started?
-        http_obj = cache_obj[:connection] =
-            Net::HTTP.new( uri.host,
-                    uri.port,
-                    @proxy_addr,
-                    @proxy_port,
-                    @proxy_user,
-                    @proxy_pass
-                  )
-        cache_obj[:keep_alive_options] = {}
-  
-        # Specify timeouts if given
-        http_obj.open_timeout = @open_timeout if @open_timeout
-        http_obj.read_timeout = @read_timeout if @read_timeout
-      end
-  
-      if uri.scheme == 'https' && ! http_obj.started?
-        http_obj.use_ssl = true
-        http_obj.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        if @ca_file
-          http_obj.ca_file = @ca_file
-          http_obj.verify_mode = OpenSSL::SSL::VERIFY_PEER
-          http_obj.verify_callback = @verify_callback if @verify_callback
-        end
-        if @cert && @key
-          http_obj.cert = OpenSSL::X509::Certificate.new(::File.read(@cert))
-          http_obj.key  = OpenSSL::PKey::RSA.new(::File.read(@key), @pass)
-        end
-      end
-  
-      # If we're keeping connections alive and the last request time is too
-      # long ago, stop the connection.  Or, if the max requests left is 1,
-      # reset the connection.
-      if @keep_alive && http_obj.started?
-        opts = cache_obj[:keep_alive_options]
-        if((opts[:timeout] &&
-           Time.now.to_i - cache_obj[:last_request_time] > opts[:timeout].to_i) ||
-            opts[:max] && opts[:max].to_i == 1)
-  
-          log.debug('Finishing stale connection') if log
-          http_obj.finish
-  
-        end
-      end
-  
+    def fetch_page(params)
+      options = {
+        :request    => nil,
+        :response   => nil,
+        :connection => nil,
+        :referer    => current_page(),
+        :uri        => nil,
+        :verb       => :get,
+        :agent      => self,
+        :redirects  => 0,
+        :params     => [],
+        :headers    => {},
+      }.merge(params)
+
+      before_connect = Chain.new([
+        Chain::URIResolver.new(@scheme_handlers),
+        Chain::ParameterResolver.new,
+        Chain::RequestResolver.new,
+        Chain::ConnectionResolver.new(
+          @connection_cache,
+          @keep_alive,
+          @proxy_addr,
+          @proxy_port,
+          @proxy_user,
+          @proxy_pass
+        ),
+        Chain::SSLResolver.new(@ca_file, @verify_callback, @cert, @key, @pass),
+        Chain::AuthHeaders.new(@auth_hash, @user, @password, @digest),
+        Chain::HeaderResolver.new(  @keep_alive,
+                                    @keep_alive_time,
+                                    @cookie_jar,
+                                    @user_agent),
+        Chain::CustomHeaders.new,
+        @pre_connect_hook,
+      ])
+      before_connect.handle(options)
+
+      uri           = options[:uri]
+      request       = options[:request]
+      cur_page      = options[:referer]
+      request_data  = options[:params]
+      redirects     = options[:redirects]
+      http_obj      = options[:connection]
+
+      # Add If-Modified-Since if page is in history
+      if( (page = visited_page(uri)) && cur_page.response['Last-Modified'] )
+        request['If-Modified-Since'] = cur_page.response['Last-Modified']
+      end if(@conditional_requests)
+
+      # Specify timeouts if given
+      http_obj.open_timeout = @open_timeout if @open_timeout
+      http_obj.read_timeout = @read_timeout if @read_timeout
       http_obj.start unless http_obj.started?
-  
-      if headers
-        request = set_headers(uri, request, {:page => cur_page, :headers => headers})
-      else
-        request = set_headers(uri, request, cur_page)
-      end
-  
+
       # Log specified headers for the request
-      if log
-        request.each_header do |k, v|
-          log.debug("request-header: #{ k } => #{ v }")
-        end
-      end
-  
-      cache_obj[:last_request_time] = Time.now.to_i
-  
+      log.info("#{ request.class }: #{ request.path }") if log
+      request.each_header do |k, v|
+        log.debug("request-header: #{ k } => #{ v }")
+      end if log
+
       # Send the request
+      attempts = 0
       begin
-        res_klass = nil
-        response = http_obj.request(request, *request_data) {|response|
-  
-          body = StringIO.new
-          total = 0
-          response.read_body { |part|
-            total += part.length
-            body.write(part)
-            log.debug("Read #{total} bytes") if log
-          }
-
-          res_klass = Net::HTTPResponse::CODE_TO_OBJ[response.code.to_s]
-
-          # Net::HTTP ignores EOFError if Content-length is given, so we emulate it here.
-          unless res_klass <= Net::HTTPRedirection
-            raise EOFError if response.content_length() && response.content_length() != total
-          end
-          body.rewind
-  
-          response.each_header { |k,v|
-            log.debug("response-header: #{ k } => #{ v }")
-          } if log
-  
-          content_type = nil
-          unless response['Content-Type'].nil?
-            data = response['Content-Type'].match(/^([^;]*)/)
-            content_type = data[1].downcase unless data.nil?
-          end
-  
-          response_body = 
-          if encoding = response['Content-Encoding']
-            case encoding.downcase
-            when 'gzip'
-              log.debug('gunzip body') if log
-              if response['Content-Length'].to_i > 0 || body.length > 0
-                begin
-                  Zlib::GzipReader.new(body).read
-                rescue Zlib::BufError, Zlib::GzipFile::Error
-                  log.error('Caught a Zlib::BufError') if log
-                  body.rewind
-                  body.read(10)
-                  Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body.read)
-                end
-              else
-                ''
-              end
-            when 'x-gzip'
-              body.read
-            else
-              raise 'Unsupported content encoding'
-            end
-          else
-            body.read
-          end
-  
-          # Find our pluggable parser
-          page = @pluggable_parser.parser(content_type).new(
-            uri,
-            response,
-            response_body,
-            response.code
-          ) { |parser|
-            parser.mech = self if parser.respond_to? :mech=
-            if parser.respond_to?(:watch_for_set=) && @watch_for_set
-              parser.watch_for_set = @watch_for_set
-            end
-          }
-  
+        response = http_obj.request(request, *request_data) { |response|
+          connection_chain = Chain.new([
+            Chain::ResponseReader.new(response),
+            Chain::BodyDecodingHandler.new,
+          ])
+          connection_chain.handle(options)
         }
-      rescue EOFError, Errno::ECONNRESET, Errno::EPIPE
+      rescue EOFError, Errno::ECONNRESET, Errno::EPIPE => x
         log.error("Rescuing EOF error") if log
         http_obj.finish
+        raise x if attempts >= 2
         request.body = nil
         http_obj.start
+        attempts += 1
         retry
       end
-  
-      # If the server sends back keep alive options, save them
-      if keep_alive_info = response['keep-alive']
-        keep_alive_info.split(/,\s*/).each do |option|
-          k, v = option.split(/=/)
-          cache_obj[:keep_alive_options] ||= {}
-          cache_obj[:keep_alive_options][k.intern] = v
-        end
-      end
-  
-      if page.is_a?(Page) && page.body =~ /Set-Cookie/
-        page.search('//meta[@http-equiv="Set-Cookie"]').each do |meta|
-          Cookie::parse(uri, meta['content'], log) { |c|
-            log.debug("saved cookie: #{c}") if log
-            @cookie_jar.add(uri, c)
-          }
-        end
-      end
 
-      (response.get_fields('Set-Cookie')||[]).each do |cookie|
-        Cookie::parse(uri, cookie, log) { |c|
-          log.debug("saved cookie: #{c}") if log
-          @cookie_jar.add(uri, c)
-        }
-      end
-  
+      after_connect = Chain.new([
+        @post_connect_hook,
+        Chain::ResponseBodyParser.new(@pluggable_parser, @watch_for_set),
+        Chain::ResponseHeaderHandler.new(@cookie_jar, @connection_cache),
+      ])
+      after_connect.handle(options)
+
+      res_klass = options[:res_klass]
+      response_body = options[:response_body]
+      page = options[:page]
+
       log.info("status: #{ page.code }") if log
   
       if follow_meta_refresh && page.respond_to?(:meta) &&
@@ -721,9 +464,12 @@ module WWW
         return page unless follow_redirect?
         log.info("follow redirect to: #{ response['Location'] }") if log
         from_uri  = page.uri
-        abs_uri   = to_absolute_uri(response['Location'].to_s, page)
         raise RedirectLimitReachedError.new(page, redirects) if redirects + 1 > redirection_limit
-        page = fetch_page(abs_uri, fetch_request(abs_uri), page, [], redirects + 1)
+        page = fetch_page(  :uri => response['Location'].to_s,
+                            :referer => page,
+                            :params  => [],
+                            :redirects => redirects + 1
+                         )
         @history.push(page, from_uri)
         return page
       elsif res_klass <= Net::HTTPUnauthorized
@@ -735,27 +481,19 @@ module WWW
         else
           @auth_hash[uri.host] = :basic
         end
-        # Copy the request headers for the second attempt
-        req = fetch_request(uri, request.method.downcase.to_sym)
-        request.each_header do |k,v|
-          req[k] = v
-        end
-        return fetch_page(uri, req, cur_page, request_data)
+        return fetch_page(  :uri      => uri,
+                            :referer  => cur_page,
+                            :verb     => request.method.downcase.to_sym,
+                            :params   => request_data,
+                            :headers  => request.to_hash
+                         )
       end
   
       raise ResponseCodeError.new(page), "Unhandled response", caller
     end
   
-    def self.build_query_string(parameters)
-      parameters.map { |k,v|
-        k &&
-          [WEBrick::HTTPUtils.escape_form(k.to_s),
-            WEBrick::HTTPUtils.escape_form(v.to_s)].join("=")
-      }.compact.join('&')
-    end
-  
     def add_to_history(page)
-      @history.push(page, to_absolute_uri(page.uri))
+      @history.push(page, resolve(page.uri))
       history_added.call(page) if history_added
     end
   end

@@ -1,8 +1,14 @@
-require File.dirname(__FILE__) + "/helper"
+require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class ResponseCodeMechTest < Test::Unit::TestCase
   def setup
     @agent = WWW::Mechanize.new
+  end
+
+  def test_eof_error_loop
+    assert_raises(EOFError) {
+      @agent.get("http://localhost/http_headers?Content-Length=300")
+    }
   end
 
   def test_redirect

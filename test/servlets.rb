@@ -26,9 +26,40 @@ class BasicAuthServlet < WEBrick::HTTPServlet::AbstractServlet
   alias :do_POST :do_GET
 end
 
+class DigestAuthServlet < WEBrick::HTTPServlet::AbstractServlet
+  htpd = WEBrick::HTTPAuth::Htdigest.new('digest.htpasswd')
+  htpd.set_passwd('Blah', 'user', 'pass')
+  @@authenticator = WEBrick::HTTPAuth::DigestAuth.new({
+                                                   :UserDB => htpd,
+                                                   :Realm  => 'Blah',
+                                                   :Algorithm => 'MD5',
+                                                   :Logger => Logger.new(nil)
+  }
+  )
+  def do_GET(req,res)
+    def req.request_time; Time.now; end
+    def req.request_uri; '/digest_auth'; end
+    def req.request_method; "GET"; end
+
+    begin
+      @@authenticator.authenticate(req,res)
+      res.body = 'You are authenticated'
+    rescue WEBrick::HTTPStatus::Unauthorized => ex
+      res.status = 401
+    end
+    FileUtils.rm('digest.htpasswd') if File.exists?('digest.htpasswd')
+  end
+  alias :do_POST :do_GET
+end
+
 class HeaderServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     res['Content-Type'] = "text/html"
+
+    req.query.each do |x,y|
+      res[x] = y
+    end
+
     body = ''
     req.each_header do |k,v|
       body << "#{k}|#{v}\n"

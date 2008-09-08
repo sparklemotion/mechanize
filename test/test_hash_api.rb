@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + "/helper"
+require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class TestHashApi < Test::Unit::TestCase
   def setup
@@ -25,18 +25,21 @@ class TestHashApi < Test::Unit::TestCase
   end
 
   def test_get_with_referer
-    class << @agent
-      attr_reader :request
-      alias :old_set_headers :set_headers
-      def set_headers(u, request, cur_page)
-        old_set_headers(u, request, cur_page)
-        @request = request
-      end
-    end
-    @agent.get(:url => 'http://localhost/', :referer => URI.parse('http://google.com/'))
-    assert_equal 'http://google.com/', @agent.request['Referer']
+    request = nil
+    @agent.pre_connect_hooks << lambda { |params|
+      request = params[:request]
+    }
 
-    @agent.get(:url => 'http://localhost/', :params => [], :referer => 'http://tenderlovemaking.com/')
-    assert_equal 'http://tenderlovemaking.com/', @agent.request['Referer']
+    @agent.get( :url => 'http://localhost/',
+                :referer => URI.parse('http://google.com/')
+              )
+
+    assert request
+    assert_equal 'http://google.com/', request['Referer']
+
+    @agent.get( :url => 'http://localhost/',
+                :params => [],
+                :referer => 'http://tenderlovemaking.com/')
+    assert_equal 'http://tenderlovemaking.com/', request['Referer']
   end
 end

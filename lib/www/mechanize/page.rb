@@ -27,7 +27,7 @@ module WWW
         @mech           ||= mech
 
         raise Mechanize::ContentTypeError.new(response['content-type']) unless
-            content_type() =~ /^(text\/html)|(application\/xhtml\+xml)/ 
+            response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/ 
 
         @parser = @links = @forms = @meta = @bases = @frames = @iframes = nil
       end
@@ -82,7 +82,7 @@ module WWW
         @forms ||= WWW::Mechanize::List.new(
           search('//form').map do |html_form|
             form = Form.new(html_form, @mech, self)
-            form.action ||= @uri
+            form.action ||= @uri.to_s
             form
           end
         )

@@ -11,9 +11,9 @@ module WWW
         attr_accessor :name, :value
       
         def initialize(name, value)
-          @name = Mechanize.html_unescape(name)
+          @name = Util.html_unescape(name)
           @value = if value.is_a? String
-                     Mechanize.html_unescape(value)
+                     Util.html_unescape(value)
                    else
                      value
                    end

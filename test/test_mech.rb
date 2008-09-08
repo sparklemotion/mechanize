@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + "/helper"
+require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class TestMechMethods < Test::Unit::TestCase
   def setup
@@ -20,20 +20,27 @@ class TestMechMethods < Test::Unit::TestCase
     assert_equal('HTTP://localhost/?q=hello', page.uri.to_s)
   end
 
+  def test_post_connect_hook_gets_called
+    response = nil
+    @agent.post_connect_hooks << lambda { |params|
+      response = params[:response]
+    }
+
+    @agent.get('http://localhost/')
+    assert(response)
+  end
+
   def test_get_with_referer
-    class << @agent
-      attr_reader :request
-      alias :old_set_headers :set_headers
-      def set_headers(u, request, cur_page)
-        old_set_headers(u, request, cur_page)
-        @request = request
-      end
-    end
+    request = nil
+    @agent.pre_connect_hooks << lambda { |params|
+      request = params[:request]
+    }
+
     @agent.get('http://localhost/', URI.parse('http://google.com/'))
-    assert_equal 'http://google.com/', @agent.request['Referer']
+    assert_equal 'http://google.com/', request['Referer']
 
     @agent.get('http://localhost/', [], 'http://tenderlovemaking.com/')
-    assert_equal 'http://tenderlovemaking.com/', @agent.request['Referer']
+    assert_equal 'http://tenderlovemaking.com/', request['Referer']
   end
   
   def test_get_with_file_referer

@@ -33,3 +33,9 @@ namespace :gem do
     end
   end
 end
+
+desc "Run code-coverage analysis"
+task :coverage do
+  rm_rf "coverage"
+  sh "rcov -x Library -I lib:test #{Dir[*HOE.test_globs].join(' ')}"
+end

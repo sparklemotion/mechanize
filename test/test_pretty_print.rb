@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + "/helper"
+require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class TestPrettyPrint < Test::Unit::TestCase
   def setup

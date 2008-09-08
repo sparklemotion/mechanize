@@ -5,7 +5,7 @@ module WWW
   class Mechanize
   # This class is used to represent an HTTP Cookie.
     class Cookie < WEBrick::Cookie
-      def self.parse(uri, str, log = nil)
+      def self.parse(uri, str, log = Mechanize.log)
         return str.split(/,(?=[^;,]*=)|,$/).collect { |c|
           cookie_elem = c.split(/;+/)
           first_elem = cookie_elem.shift

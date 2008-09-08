@@ -36,7 +36,7 @@ module WWW
       def initialize(node, mech=nil, page=nil)
         @enctype = node['enctype'] || 'application/x-www-form-urlencoded'
         @form_node        = node
-        @action           = Mechanize.html_unescape(node['action'])
+        @action           = Util.html_unescape(node['action'])
         @method           = (node['method'] || 'GET').upcase
         @name             = node['name']
         @clicked_buttons  = []
@@ -201,7 +201,7 @@ module WWW
           params.collect { |p| "--#{boundary}\r\n#{p}" }.join('') +
             "--#{boundary}--\r\n"
         else
-          WWW::Mechanize.build_query_string(query_params)
+          WWW::Mechanize::Util.build_query_string(query_params)
         end
       end
     

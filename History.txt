@@ -1,5 +1,14 @@
 = Mechanize CHANGELOG
 
+=== 0.8.0
+
+* New Features:
+  * Lifecycle hooks.  Mechanize#pre_connect_hooks, Mechanize#post_connect_hooks
+  * file:/// urls are now supported
+
+* Bug Fixes:
+  * Fixed an infinite loop when content-length and body length don't match.
+
 === 0.7.8
 
 * Bug Fixes:

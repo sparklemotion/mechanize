@@ -58,15 +58,19 @@ module WWW
       #   page.form(:action => '/post/login.php') do |f|
       #     ...
       #   end
-      def form_with(criteria)
-        criteria = {:name => criteria} if String === criteria
-        f = forms.find do |form|
-          criteria.all? { |k,v| form.send(k) == v }
-        end
-        yield f if block_given?
-        f
+      [:form, :link, :base, :frame, :iframe].each do |type|
+        eval(<<-eomethod)
+          def #{type}_with(criteria)
+            criteria = {:name => criteria} if String === criteria
+            f = #{type}s.find do |thing|
+              criteria.all? { |k,v| thing.send(k) == v }
+            end
+            yield f if block_given?
+            f
+          end
+          alias :#{type} :#{type}_with
+        eomethod
       end
-      alias :form :form_with
     
       def links
         @links ||= WWW::Mechanize::List.new(

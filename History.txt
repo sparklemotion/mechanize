@@ -5,6 +5,8 @@
 * New Features:
   * Lifecycle hooks.  Mechanize#pre_connect_hooks, Mechanize#post_connect_hooks
   * file:/// urls are now supported
+  * Added Mechanize::Page#link_with, frame_with for searching for links using
+    +criteria+.
 
 * Bug Fixes:
   * Fixed an infinite loop when content-length and body length don't match.

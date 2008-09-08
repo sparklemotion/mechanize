@@ -63,7 +63,7 @@ module WWW
           def #{type}_with(criteria)
             criteria = {:name => criteria} if String === criteria
             f = #{type}s.find do |thing|
-              criteria.all? { |k,v| thing.send(k) == v }
+              criteria.all? { |k,v| v === thing.send(k) }
             end
             yield f if block_given?
             f

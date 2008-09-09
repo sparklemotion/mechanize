@@ -250,7 +250,7 @@ module WWW
         # Find all select tags
         form_node.search('//select').each do |node|
           next if node['name'].nil?
-          if node.attributes.include? 'multiple'
+          if node.has_attribute? 'multiple'
             @fields << MultiSelectList.new(node['name'], node)
           else
             @fields << SelectList.new(node['name'], node)

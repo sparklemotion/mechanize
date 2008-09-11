@@ -2,7 +2,7 @@ require 'test/unit'
 require 'rubygems'
 require 'mechanize'
 require 'webrick/httputils'
-require 'servlets'
+require File.join(File.dirname(__FILE__),'servlets')
 
 BASE_DIR = File.dirname(__FILE__)
 

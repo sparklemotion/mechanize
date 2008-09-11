@@ -499,6 +499,7 @@ class FormsMechTest < Test::Unit::TestCase
 
     assert_not_nil(form)
     number_of_fields = form.fields.length
+    assert_equal 2, number_of_fields
 
     form.delete_field!('first')
     assert_nil(form['first'])

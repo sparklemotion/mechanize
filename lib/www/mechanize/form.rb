@@ -256,6 +256,14 @@ module WWW
             @fields << SelectList.new(node['name'], node)
           end
         end
+
+        # Find all submit button tags
+        # FIXME: what can I do with the reset buttons?
+        form_node.search('//button').each do |node|
+          type = (node['type'] || 'submit').downcase
+          next if type == 'reset'
+          @buttons << Button.new(node['name'], node['value'])
+        end
       end
 
       def rand_string(len = 10)

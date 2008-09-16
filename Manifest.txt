@@ -165,3 +165,4 @@ test/test_ssl_server.rb
 test/test_subclass.rb
 test/test_textarea.rb
 test/test_upload.rb
+test/test_verbs.rb

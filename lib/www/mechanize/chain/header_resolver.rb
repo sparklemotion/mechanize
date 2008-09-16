@@ -16,15 +16,15 @@ module WWW
           request = params[:request]
 
           if @keep_alive
-            request.add_field('Connection', 'keep-alive')
-            request.add_field('Keep-Alive', @keep_alive_time.to_s)
+            request['Connection'] = 'keep-alive'
+            request['Keep-Alive'] = @keep_alive_time.to_s
           else
-            request.add_field('Connection', 'close')
+            request['Connection'] = 'close'
           end
-          request.add_field('Accept-Encoding', 'gzip,identity')
-          request.add_field('Accept-Language', 'en-us,en;q=0.5')
-          request.add_field('Host', uri.host)
-          request.add_field('Accept-Charset', 'ISO-8859-1,utf-8;q=0.7,*;q=0.7')
+          request['Accept-Encoding'] = 'gzip,identity'
+          request['Accept-Language'] = 'en-us,en;q=0.5'
+          request['Host'] = uri.host
+          request['Accept-Charset'] = 'ISO-8859-1,utf-8;q=0.7,*;q=0.7'
   
           unless @cookie_jar.empty?(uri)
             cookies = @cookie_jar.cookies(uri)
@@ -34,11 +34,11 @@ module WWW
   
           # Add Referer header to request
           unless referer.uri.nil?
-            request.add_field('Referer', referer.uri.to_s)
+            request['Referer'] = referer.uri.to_s
           end
   
           # Add User-Agent header to request
-          request.add_field('User-Agent', @user_agent) if @user_agent 
+          request['User-Agent'] = @user_agent if @user_agent 
           super
         end
       end

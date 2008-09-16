@@ -33,7 +33,7 @@ module WWW
           end
   
           # Add Referer header to request
-          unless referer.uri.nil?
+          if referer && referer.uri
             request['Referer'] = referer.uri.to_s
           end
   

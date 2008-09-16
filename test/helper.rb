@@ -45,6 +45,7 @@ class Net::HTTP
     '/http_headers'           => HeaderServlet,
     '/infinite_redirect'      => InfiniteRedirectTest,
     '/digest_auth'            => DigestAuthServlet,
+    '/verb'                   => VerbServlet,
   }
 
   PAGE_CACHE = {}

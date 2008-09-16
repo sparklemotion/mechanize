@@ -5,6 +5,18 @@ require 'zlib'
 require 'stringio'
 require 'base64'
 
+class VerbServlet < WEBrick::HTTPServlet::AbstractServlet
+  def do_HEAD(req, res)
+    res.body = "method: HEAD"
+  end
+
+  def method_missing(method, *args, &block)
+    super unless method.to_s =~ /^do_([A-Z]*)$/
+    res = args[1]
+    res.body = "method: #{$1}"
+  end
+end
+
 class BasicAuthServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req,res)
     htpd = WEBrick::HTTPAuth::Htpasswd.new('dot.htpasswd')

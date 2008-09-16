@@ -7,9 +7,11 @@
   * file:/// urls are now supported
   * Added Mechanize::Page#link_with, frame_with for searching for links using
     +criteria+.
+  * Implementing PUT, DELETE, and HEAD requests
 
 * Bug Fixes:
   * Fixed an infinite loop when content-length and body length don't match.
+  * Only setting headers once
 
 === 0.7.8
 

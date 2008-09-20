@@ -1,6 +1,7 @@
 = WWW::Mechanize
 
   http://mechanize.rubyforge.org/
+  http://github.com/tenderlove/mechanize/tree/master
 
 == DESCRIPTION
 
@@ -15,8 +16,6 @@ a history.
 * ruby 1.8.4
 * hpricot[http://code.whytheluckystiff.net/hpricot/]
 
-Note that the files in the net-overrides/ directory are taken from Ruby 1.9.0.
-
 
 == Examples
 
@@ -25,11 +24,12 @@ Also, check out the EXAMPLES[link://files/EXAMPLES_txt.html] file.
 
 == Authors
 
-Original Code: 
 Copyright (c) 2005 by Michael Neumann (mneumann@ntecs.de) 
 
-New Code:
-Copyright (c) 2007 by Aaron Patterson (aaronp@rubyforge.org) 
+Copyright (c) 2006-2008:
+
+* {Aaron Patterson}[http://tenderlovemaking.com] (aaronp@rubyforge.org)
+* Mike Dalessio (mike@csa.net)
 
 This library comes with a shameless plug for employing me
 (Aaron[http://tenderlovemaking.com/]) programming

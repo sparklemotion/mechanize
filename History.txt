@@ -12,6 +12,7 @@
 * Bug Fixes:
   * Fixed an infinite loop when content-length and body length don't match.
   * Only setting headers once
+  * Adding IIS authentication support
 
 === 0.7.8
 

@@ -22,6 +22,9 @@ module WWW
             case @auth_hash[uri.host]
             when :basic
               request.basic_auth(@user, @password)
+            when :iis_digest
+                digest_response = self.gen_auth_header(uri,request, @digest, true)
+                request.add_field('Authorization', digest_response)
             when :digest
               if @digest
                 digest_response = self.gen_auth_header(uri,request, @digest)

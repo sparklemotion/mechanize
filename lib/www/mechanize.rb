@@ -515,6 +515,9 @@ module WWW
         raise ResponseCodeError.new(page) if @auth_hash.has_key?(uri.host)
         if response['www-authenticate'] =~ /Digest/i
           @auth_hash[uri.host] = :digest
+          if response['server'] =~ /Microsoft-IIS/
+            @auth_hash[uri.host] = :iis_digest
+          end
           @digest = response['www-authenticate']
         else
           @auth_hash[uri.host] = :basic

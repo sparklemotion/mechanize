@@ -7,11 +7,11 @@ Manifest.txt
 NOTES.txt
 README.txt
 Rakefile
-eg/flickr_upload.rb
-eg/mech-dump.rb
-eg/proxy_req.rb
-eg/rubyforge.rb
-eg/spider.rb
+examples/flickr_upload.rb
+examples/mech-dump.rb
+examples/proxy_req.rb
+examples/rubyforge.rb
+examples/spider.rb
 lib/mechanize.rb
 lib/www/mechanize.rb
 lib/www/mechanize/chain.rb

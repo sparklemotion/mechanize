@@ -27,7 +27,7 @@ module WWW
             raise EOFError if @response.content_length() && @response.content_length() != total
           end
   
-          response.each_header { |k,v|
+          @response.each_header { |k,v|
             Mechanize.log.debug("response-header: #{ k } => #{ v }")
           } if Mechanize.log
 

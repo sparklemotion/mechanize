@@ -1,3 +1,5 @@
+require 'pp'
+
 module WWW
   # :stopdoc:
   class Mechanize

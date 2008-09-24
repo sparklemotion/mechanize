@@ -526,7 +526,7 @@ module WWW
                             :referer  => cur_page,
                             :verb     => request.method.downcase.to_sym,
                             :params   => request_data,
-                            :headers  => request.to_hash
+                            :headers  => options[:headers]
                          )
       end
   

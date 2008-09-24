@@ -1,4 +1,5 @@
 require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
+require 'pp'
 
 class BasicAuthTest < Test::Unit::TestCase
   def setup
@@ -15,6 +16,19 @@ class BasicAuthTest < Test::Unit::TestCase
     @agent.basic_auth('user', 'pass')
     page = @agent.get("http://localhost/digest_auth")
     assert_equal('You are authenticated', page.body)
+  end
+
+  def test_no_duplicate_headers
+    block_called = false
+    @agent.pre_connect_hooks << lambda { |params|
+      block_called = true
+      params[:request].to_hash.each do |k,v|
+        assert_equal(1, v.length)
+      end
+    }
+    @agent.basic_auth('user', 'pass')
+    page = @agent.get("http://localhost/digest_auth")
+    assert block_called
   end
 
   def test_post_auth_success

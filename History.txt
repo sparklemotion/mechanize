@@ -1,5 +1,10 @@
 = Mechanize CHANGELOG
 
+=== 0.8.2
+
+* Bug Fixes:
+  * Doh!  I was accidentally setting headers twice.
+
 === 0.8.1
 
 * Bug Fixes:

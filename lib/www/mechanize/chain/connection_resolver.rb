@@ -51,7 +51,7 @@ module WWW
                  Time.now.to_i - cache_obj[:last_request_time] > opts[:timeout].to_i) ||
                   opts[:max] && opts[:max].to_i == 1)
   
-                log.debug('Finishing stale connection') if log
+                Mechanize.log.debug('Finishing stale connection') if Mechanize.log
                 http_obj.finish
   
               end

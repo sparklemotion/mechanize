@@ -1,10 +1,10 @@
 Gem::Specification.new do |s|
   s.name = %q{mechanize}
-  s.version = "0.8.1.20080924125215"
+  s.version = "0.8.2.20080925083219"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Aaron Patterson"]
-  s.date = %q{2008-09-24}
+  s.date = %q{2008-09-25}
   s.description = %q{The Mechanize library is used for automating interaction with websites.  Mechanize automatically stores and sends cookies, follows redirects, can follow links, and submit forms.  Form fields can be populated and submitted.  Mechanize also keeps track of the sites that you have visited as a history.}
   s.email = %q{aaronp@rubyforge.org}
   s.extra_rdoc_files = ["EXAMPLES.txt", "FAQ.txt", "GUIDE.txt", "History.txt", "LICENSE.txt", "Manifest.txt", "NOTES.txt", "README.txt"]

@@ -23,7 +23,8 @@ module WWW
           end
           request['Accept-Encoding'] = 'gzip,identity'
           request['Accept-Language'] = 'en-us,en;q=0.5'
-          request['Host'] = uri.host
+          host = "#{uri.host}#{uri.port.to_i == 80 ? '' : ':' + uri.port.to_s}"
+          request['Host'] = host
           request['Accept-Charset'] = 'ISO-8859-1,utf-8;q=0.7,*;q=0.7'
   
           unless @cookie_jar.empty?(uri)

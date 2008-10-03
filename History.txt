@@ -1,9 +1,10 @@
 = Mechanize CHANGELOG
 
-=== 0.8.4 (unreleased)
+=== 0.8.4
 
 * Bug Fixes:
   * Setting the port number on the host header.
+  * Fixing Authorization headers for picky servers
 
 === 0.8.3
 

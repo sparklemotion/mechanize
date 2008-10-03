@@ -24,11 +24,11 @@ module WWW
               request.basic_auth(@user, @password)
             when :iis_digest
                 digest_response = self.gen_auth_header(uri,request, @digest, true)
-                request.add_field('Authorization', digest_response)
+                request['Authorization'] = digest_response
             when :digest
               if @digest
                 digest_response = self.gen_auth_header(uri,request, @digest)
-                request.add_field('Authorization', digest_response)
+                request['Authorization'] = digest_response
               end
             end
           end
@@ -57,16 +57,17 @@ module WWW
   
           header = ''
           header << "Digest username=\"#{@user}\", "
-          header << "realm=\"#{params['realm']}\", "
           if is_IIS then
             header << "qop=\"#{params['qop']}\", "
           else
             header << "qop=#{params['qop']}, "
           end
           header << "uri=\"#{uri.path}\", "
-          header << "algorithm=\"#{params['algorithm']}\", "
-          header << "opaque=\"#{params['opaque']}\", " if params['opaque']
-          header << "nonce=\"#{params['nonce']}\", "
+          header << %w{ algorithm opaque nonce realm }.map { |field|
+            next unless params[field]
+            "#{field}=\"#{params[field]}\""
+          }.compact.join(', ')
+
           header << "nc=#{'%08x' % @@nonce_count}, "
           header << "cnonce=\"#{CNONCE}\", "
           header << "response=\"#{Digest::MD5.hexdigest(request_digest)}\""

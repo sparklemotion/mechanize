@@ -3,6 +3,10 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 class SchemeTest < Test::Unit::TestCase
   def setup
     @agent = WWW::Mechanize.new
+    @agent.log = Class.new(Object) do
+      def method_missing(*args)
+      end
+    end.new
   end
 
   def test_file_scheme

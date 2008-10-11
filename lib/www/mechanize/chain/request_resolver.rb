@@ -16,6 +16,10 @@ module WWW
             class << o
               def add_field(*args); end
               alias :[]= :add_field
+              def path
+                uri.path
+              end
+              def each_header; end
             end
             params[:request] ||= o
           end

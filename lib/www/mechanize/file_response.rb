@@ -28,6 +28,8 @@ module WWW
         ::File.exists?(@file_path) ? ::File.stat(@file_path).size : 0
       end
 
+      def each_header; end
+
       def [](key)
         return nil unless key.downcase == 'content-type'
         return 'text/html' if directory?

@@ -24,7 +24,7 @@ module WWW
 
           # Net::HTTP ignores EOFError if Content-length is given, so we emulate it here.
           unless res_klass <= Net::HTTPRedirection
-            raise EOFError if @response.content_length() && @response.content_length() != total
+            raise EOFError if (!params[:request].is_a?(Net::HTTP::Head)) && @response.content_length() && @response.content_length() != total
           end
   
           @response.each_header { |k,v|

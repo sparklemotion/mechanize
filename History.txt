@@ -1,5 +1,11 @@
 = Mechanize CHANGELOG
 
+=== 0.8.5
+
+* Bug Fixes:
+  * Stopped raising EOF exceptions on HEAD requests. ありがとう：HIRAKU Kuroda
+  * Fixed exceptions when a logger is set and file:// requests are made.
+
 === 0.8.4
 
 * Bug Fixes:

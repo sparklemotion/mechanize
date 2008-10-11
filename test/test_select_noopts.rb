@@ -8,7 +8,7 @@ class SelectNoOptionsTest < Test::Unit::TestCase
   end
 
   def test_select_default
-    assert_not_nil(@form.fields.name('list').first)
+    assert_not_nil(@form.field('list'))
     assert_nil(@form.list)
     page = @agent.submit(@form)
     assert_equal(0, page.links.length)

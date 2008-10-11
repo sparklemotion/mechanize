@@ -27,7 +27,7 @@ module WWW
 
         private
         def uncheck_peers
-          @form.radiobuttons.name(name).each do |b|
+          @form.radiobuttons_with(:name => name).each do |b|
             next if b.value == value
             b.uncheck
           end

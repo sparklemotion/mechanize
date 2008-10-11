@@ -68,9 +68,9 @@ module WWW
       def save_as(file, format = :yaml)
         ::File.open(file, "w") { |f|
           case format
-          when :yaml:
+          when :yaml then
             YAML::dump(@jar, f)
-          when :cookiestxt:
+          when :cookiestxt then
             dump_cookiestxt(f)
           else
             raise "Unknown cookie jar file format"
@@ -86,9 +86,9 @@ module WWW
       def load(file, format = :yaml)
         @jar = ::File.open(file) { |f|
           case format
-          when :yaml:
+          when :yaml then
             YAML::load(f)
-          when :cookiestxt:
+          when :cookiestxt then
             load_cookiestxt(f)
           else
             raise "Unknown cookie jar file format"

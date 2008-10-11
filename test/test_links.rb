@@ -12,7 +12,7 @@ class LinksMechTest < Test::Unit::TestCase
       link.click
     }
 
-    @agent.scheme_handlers['javascript'] = lambda { |link, page|
+    @agent.scheme_handlers['javascript'] = lambda { |my_link, my_page|
       URI.parse('http://localhost/tc_links.html')
     }
     assert_nothing_raised {

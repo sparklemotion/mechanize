@@ -458,9 +458,9 @@ module WWW
       # Send the request
       attempts = 0
       begin
-        response = http_obj.request(request, *request_data) { |response|
+        response = http_obj.request(request, *request_data) { |r|
           connection_chain = Chain.new([
-            Chain::ResponseReader.new(response),
+            Chain::ResponseReader.new(r),
             Chain::BodyDecodingHandler.new,
           ])
           connection_chain.handle(options)

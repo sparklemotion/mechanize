@@ -51,8 +51,9 @@ class CookieClassTest < Test::Unit::TestCase
     dates.each do |date|
       cookie = "PREF=1; expires=#{date}"
       silently do
-        WWW::Mechanize::Cookie.parse(url, cookie) { |cookie|
-          assert_equal(true, cookie.expires < yesterday)
+        WWW::Mechanize::Cookie.parse(url, cookie) { |c|
+          assert c.expires, "Tried parsing: #{date}"
+          assert_equal(true, c.expires < yesterday)
         }
       end
     end
@@ -93,8 +94,8 @@ class CookieClassTest < Test::Unit::TestCase
     silently do
       dates.each do |date|
         cookie = "PREF=1; expires=#{date}"
-        WWW::Mechanize::Cookie.parse(url, cookie) { |cookie|
-          assert_equal(true, cookie.expires.nil?)
+        WWW::Mechanize::Cookie.parse(url, cookie) { |c|
+          assert_equal(true, c.expires.nil?)
         }
       end
     end

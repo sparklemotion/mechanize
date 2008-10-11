@@ -47,7 +47,7 @@ module WWW
 
         def value=(values)
           select_none
-          values.each do |value|
+          [values].flatten.each do |value|
             option = options.find { |o| o.value == value }
             if option.nil?
               @value.push(value)

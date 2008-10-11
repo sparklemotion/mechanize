@@ -61,11 +61,6 @@ module WWW
 
       def values; fields.map { |f| f.value }; end
 
-      # Fetch the first field whose name is equal to +field_name+
-      def field(field_name)
-        fields.find { |f| f.name.eql? field_name }
-      end
-
       # Add a field with +field_name+ and +value+
       def add_field!(field_name, value = nil)
         fields << Field.new(field_name, value)
@@ -89,7 +84,7 @@ module WWW
           else
             value = nil
             index = 0
-            v.each do |val|
+            [v].flatten.each do |val|
               index = val.to_i unless value.nil?
               value = val if value.nil?
             end
@@ -209,7 +204,32 @@ module WWW
       def delete_field!(field_name)
         @fields.delete_if{ |f| f.name == field_name}
       end
-          
+
+      [ :field,
+        :button,
+        :file_upload,
+        :radiobutton,
+        :checkboxe
+      ].each do |type|
+        eval(<<-eomethod)
+          def #{type}s_with criteria = {}
+            criteria = {:name => criteria} if String === criteria
+            f = #{type}s.find_all do |thing|
+              criteria.all? { |k,v| v === thing.send(k) }
+            end
+            yield f if block_given?
+            f
+          end
+
+          def #{type}_with criteria = {}
+            f = #{type}s_with(criteria).first
+            yield f if block_given?
+            f
+          end
+          alias :#{type} :#{type}_with
+        eomethod
+      end
+ 
       private
       def parse
         @fields       = WWW::Mechanize::List.new

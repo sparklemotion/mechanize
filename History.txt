@@ -5,6 +5,7 @@
 * Bug Fixes:
   * Stopped raising EOF exceptions on HEAD requests. ありがとう：HIRAKU Kuroda
   * Fixed exceptions when a logger is set and file:// requests are made.
+  * Made Mechanize 1.9 compatible
 
 === 0.8.4
 

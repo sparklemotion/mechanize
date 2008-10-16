@@ -44,6 +44,7 @@ class Net::HTTP
     '/if_modified_since'      => ModifiedSinceServlet,
     '/http_headers'           => HeaderServlet,
     '/infinite_redirect'      => InfiniteRedirectTest,
+    '/redirect'               => RedirectTest,
     '/digest_auth'            => DigestAuthServlet,
     '/verb'                   => VerbServlet,
   }

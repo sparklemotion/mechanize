@@ -14,6 +14,7 @@ require 'www/mechanize/content_type_error'
 require 'www/mechanize/response_code_error'
 require 'www/mechanize/unsupported_scheme_error'
 require 'www/mechanize/redirect_limit_reached_error'
+require 'www/mechanize/redirect_not_get_or_head_error'
 require 'www/mechanize/cookie'
 require 'www/mechanize/cookie_jar'
 require 'www/mechanize/history'
@@ -500,12 +501,14 @@ module WWW
         return visited_page(uri) || page
       elsif res_klass <= Net::HTTPRedirection
         return page unless follow_redirect?
+        raise RedirectNotGetOrHeadError.new(page, options[:verb]) unless [:get, :head].include? options[:verb]
         log.info("follow redirect to: #{ response['Location'] }") if log
         from_uri  = page.uri
         raise RedirectLimitReachedError.new(page, redirects) if redirects + 1 > redirection_limit
         page = fetch_page(  :uri => response['Location'].to_s,
                             :referer => page,
                             :params  => [],
+                            :verb => options[:verb],
                             :redirects => redirects + 1
                          )
         @history.push(page, from_uri)

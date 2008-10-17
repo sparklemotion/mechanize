@@ -33,6 +33,7 @@ class Net::HTTP
     '/basic_auth'             => BasicAuthServlet,
     '/form post'              => FormTest,
     '/response_code'          => ResponseCodeTest,
+    '/http_refresh'           => HttpRefreshTest,
     '/bad_content_type'       => BadContentTypeTest,
     '/content_type_test'      => ContentTypeTest,
     '/referer'                => RefererServlet,

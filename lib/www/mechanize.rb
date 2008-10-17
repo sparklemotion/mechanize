@@ -492,8 +492,8 @@ module WWW
       if follow_meta_refresh
         if (page.respond_to?(:meta) && (redirect = page.meta.first))
           return redirect.click
-        elsif refresh = response.instance_variable_get("@header")['refresh']
-          parsed_refresh = refresh.first.match(/^\s*(\d+\.?\d*);url=(\S*)\s*$/)
+        elsif refresh = response['refresh']
+          parsed_refresh = refresh.match(/^\s*(\d+\.?\d*);url=(\S*)\s*$/)
           raise StandardError, "Invalid refresh http header" unless parsed_refresh
           delay = parsed_refresh[1]
           location = parsed_refresh[2]

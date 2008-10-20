@@ -24,6 +24,17 @@ class FollowMetaTest < Test::Unit::TestCase
     assert_equal('http://localhost/index.html', page.uri.to_s)
     assert_equal(2, @agent.history.length)
   end
+
+  def test_infinite_refresh_throws_exception
+    @agent.follow_meta_refresh = true
+    assert_raises(WWW::Mechanize::RedirectLimitReachedError) {
+      begin
+        @agent.get('http://localhost/infinite_refresh')
+      rescue WWW::Mechanize::RedirectLimitReachedError => ex
+        raise ex
+      end
+    }
+  end
   
   def test_dont_honor_http_refresh_by_default
     page = @agent.get('http://localhost/http_refresh?refresh_time=0')
@@ -39,9 +50,15 @@ class FollowMetaTest < Test::Unit::TestCase
 
   def test_honor_http_refresh_delay_if_set
     @agent.follow_meta_refresh = true
-    start = Time.now
+    class << @agent
+      attr_accessor :slept
+      def sleep *args
+        @slept = args
+      end
+    end
+
     page = @agent.get('http://localhost/http_refresh?refresh_time=1')
-    assert Time.now >= start + 1
+    assert_equal [1], @agent.slept
   end
 
 end

@@ -498,8 +498,18 @@ module WWW
           delay = parsed_refresh[1]
           location = parsed_refresh[3]
           location = "http://#{uri.host}#{location}" unless location.include?("http")
+          if redirects + 1 > redirection_limit
+            raise RedirectLimitReachedError.new(page, redirects)
+          end
           sleep delay.to_i
-          return get(location)
+          @history.push(page, page.uri)
+          return fetch_page(
+            :uri        => location,
+            :referer    => page,
+            :params     => [],
+            :verb       => :get,
+            :redirects  => redirects + 1
+          )
         end
       end
   

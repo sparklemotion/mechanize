@@ -7,6 +7,7 @@
   * Fixed exceptions when a logger is set and file:// requests are made.
   * Made Mechanize 1.9 compatible
   * Not setting the port in the host header for SSL sites.
+  * Following refresh headers.  Thanks Tim Connor!
 
 === 0.8.4
 

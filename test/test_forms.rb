@@ -11,64 +11,65 @@ class FormsMechTest < Test::Unit::TestCase
     page = @agent.submit(page.forms.first)
     assert_match('/form_no_action.html?first=Aaron', page.uri.to_s)
   end
+
   # Test submitting form with two fields of the same name
   def test_post_multival
     page = @agent.get("http://localhost/form_multival.html")
-    form = page.forms.name('post_form').first
+    form = page.form_with(:name => 'post_form')
 
     assert_not_nil(form)
-    assert_equal(2, form.fields.name('first').length)
+    assert_equal(2, form.fields_with(:name => 'first').length)
 
-    form.fields.name('first')[0].value = 'Aaron'
-    form.fields.name('first')[1].value = 'Patterson'
+    form.fields_with(:name => 'first')[0].value = 'Aaron'
+    form.fields_with(:name => 'first')[1].value = 'Patterson'
 
     page = @agent.submit(form)
 
     assert_not_nil(page)
 
     assert_equal(2, page.links.length)
-    assert_not_nil(page.links.text('first:Aaron').first)
-    assert_not_nil(page.links.text('first:Patterson').first)
+    assert_not_nil(page.link_with(:text => 'first:Aaron'))
+    assert_not_nil(page.link_with(:text => 'first:Patterson'))
   end
 
   # Test calling submit on the form object
   def test_submit_on_form
     page = @agent.get("http://localhost/form_multival.html")
-    form = page.forms.name('post_form').first
+    form = page.form_with(:name => 'post_form')
 
     assert_not_nil(form)
-    assert_equal(2, form.fields.name('first').length)
+    assert_equal(2, form.fields_with(:name => 'first').length)
 
-    form.fields.name('first')[0].value = 'Aaron'
-    form.fields.name('first')[1].value = 'Patterson'
+    form.fields_with(:name => 'first')[0].value = 'Aaron'
+    form.fields_with(:name => 'first')[1].value = 'Patterson'
 
     page = form.submit
 
     assert_not_nil(page)
 
     assert_equal(2, page.links.length)
-    assert_not_nil(page.links.text('first:Aaron').first)
-    assert_not_nil(page.links.text('first:Patterson').first)
+    assert_not_nil(page.link_with(:text => 'first:Aaron'))
+    assert_not_nil(page.link_with(:text => 'first:Patterson'))
   end
 
   # Test submitting form with two fields of the same name
   def test_get_multival
     page = @agent.get("http://localhost/form_multival.html")
-    form = page.forms.name('get_form').first
+    form = page.form_with(:name => 'get_form')
 
     assert_not_nil(form)
-    assert_equal(2, form.fields.name('first').length)
+    assert_equal(2, form.fields_with(:name => 'first').length)
 
-    form.fields.name('first')[0].value = 'Aaron'
-    form.fields.name('first')[1].value = 'Patterson'
+    form.fields_with(:name => 'first')[0].value = 'Aaron'
+    form.fields_with(:name => 'first')[1].value = 'Patterson'
 
     page = @agent.submit(form)
 
     assert_not_nil(page)
 
     assert_equal(2, page.links.length)
-    assert_not_nil(page.links.text('first:Aaron').first)
-    assert_not_nil(page.links.text('first:Patterson').first)
+    assert_not_nil(page.link_with(:text => 'first:Aaron'))
+    assert_not_nil(page.link_with(:text => 'first:Patterson'))
   end
 
   def test_post
@@ -159,7 +160,7 @@ class FormsMechTest < Test::Unit::TestCase
     assert_equal("/form_post", post_form.action)
 
     # Find the select list
-    s = post_form.fields.name(/country/).first
+    s = post_form.field_with(:name => /country/)
     assert_not_nil(s, "Couldn't find country select list")
     assert_equal(2, s.options.length)
     assert_equal("USA", s.value)
@@ -169,7 +170,7 @@ class FormsMechTest < Test::Unit::TestCase
     assert_equal("CANADA", s.options[1].text)
 
     # Now set all the fields
-    post_form.fields.name(/country/).value = s.options[1]
+    post_form.field_with(:name => /country/).value = s.options[1]
     assert_equal('CANADA', post_form.country)
     page = @agent.submit(post_form, post_form.buttons.first)
 
@@ -382,13 +383,13 @@ class FormsMechTest < Test::Unit::TestCase
       "Gender female button was nil"
     )
 
-    assert_not_nil(post_form.checkboxes.name("cool person").first,
+    assert_not_nil(post_form.checkbox_with(:name => "cool person"),
       "couldn't find cool person checkbox")
     assert_not_nil(post_form.checkboxes.find { |f| f.name == "likes ham" },
       "couldn't find likes ham checkbox")
 
     # Now set all the fields
-    post_form.fields.name('first_name').value = "Aaron"
+    post_form.field_with(:name => 'first_name').value = "Aaron"
     post_form.radiobuttons.find { |f| 
       f.name == "gender" && f.value == "male" 
     }.checked = true
@@ -472,10 +473,10 @@ class FormsMechTest < Test::Unit::TestCase
 
   def test_fields_as_accessors
     page = @agent.get("http://localhost/form_multival.html")
-    form = page.forms.name('post_form').first
+    form = page.form_with(:name => 'post_form')
 
     assert_not_nil(form)
-    assert_equal(2, form.fields.name('first').length)
+    assert_equal(2, form.fields_with(:name => 'first').length)
 
     form.first = 'Aaron'
     assert_equal('Aaron', form.first)
@@ -483,7 +484,7 @@ class FormsMechTest < Test::Unit::TestCase
 
   def test_add_field
     page = @agent.get("http://localhost/form_multival.html")
-    form = page.forms.name('post_form').first
+    form = page.form_with(:name => 'post_form')
 
     assert_not_nil(form)
     number_of_fields = form.fields.length
@@ -495,7 +496,7 @@ class FormsMechTest < Test::Unit::TestCase
   
   def test_delete_field
     page = @agent.get("http://localhost/form_multival.html")
-    form = page.forms.name('post_form').first
+    form = page.form_with(:name => 'post_form')
 
     assert_not_nil(form)
     number_of_fields = form.fields.length
@@ -508,7 +509,7 @@ class FormsMechTest < Test::Unit::TestCase
 
   def test_has_field
     page = @agent.get("http://localhost/form_multival.html")
-    form = page.forms.name('post_form').first
+    form = page.form_with(:name => 'post_form')
 
     assert_not_nil(form)
     assert_equal(false, form.has_field?('intarweb'))

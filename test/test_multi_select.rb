@@ -8,7 +8,7 @@ class MultiSelectTest < Test::Unit::TestCase
   def test_select_none
     page = @agent.get("http://localhost/form_multi_select.html")
     form = page.forms.first
-    form.fields.name('list').first.select_none
+    form.field_with(:name => 'list').select_none
     page = @agent.submit(form)
     assert_equal(0, page.links.length)
   end
@@ -16,28 +16,28 @@ class MultiSelectTest < Test::Unit::TestCase
   def test_select_all
     page = @agent.get("http://localhost/form_multi_select.html")
     form = page.forms.first
-    form.fields.name('list').first.select_all
+    form.field_with(:name => 'list').select_all
     page = @agent.submit(form)
     assert_equal(6, page.links.length)
-    assert_equal(1, page.links.text('list:1').length)
-    assert_equal(1, page.links.text('list:2').length)
-    assert_equal(1, page.links.text('list:3').length)
-    assert_equal(1, page.links.text('list:4').length)
-    assert_equal(1, page.links.text('list:5').length)
-    assert_equal(1, page.links.text('list:6').length)
+    assert_equal(1, page.links_with(:text => 'list:1').length)
+    assert_equal(1, page.links_with(:text => 'list:2').length)
+    assert_equal(1, page.links_with(:text => 'list:3').length)
+    assert_equal(1, page.links_with(:text => 'list:4').length)
+    assert_equal(1, page.links_with(:text => 'list:5').length)
+    assert_equal(1, page.links_with(:text => 'list:6').length)
   end
 
   def test_click_all
     page = @agent.get("http://localhost/form_multi_select.html")
     form = page.forms.first
-    form.fields.name('list').first.options.each { |o| o.click }
+    form.field_with(:name => 'list').options.each { |o| o.click }
     page = @agent.submit(form)
     assert_equal(5, page.links.length)
-    assert_equal(1, page.links.text('list:1').length)
-    assert_equal(1, page.links.text('list:3').length)
-    assert_equal(1, page.links.text('list:4').length)
-    assert_equal(1, page.links.text('list:5').length)
-    assert_equal(1, page.links.text('list:6').length)
+    assert_equal(1, page.links_with(:text => 'list:1').length)
+    assert_equal(1, page.links_with(:text => 'list:3').length)
+    assert_equal(1, page.links_with(:text => 'list:4').length)
+    assert_equal(1, page.links_with(:text => 'list:5').length)
+    assert_equal(1, page.links_with(:text => 'list:6').length)
   end
 
   def test_select_default
@@ -45,7 +45,7 @@ class MultiSelectTest < Test::Unit::TestCase
     form = page.forms.first
     page = @agent.submit(form)
     assert_equal(1, page.links.length)
-    assert_equal(1, page.links.text('list:2').length)
+    assert_equal(1, page.links_with(:text => 'list:2').length)
   end
 
   def test_select_one
@@ -64,8 +64,8 @@ class MultiSelectTest < Test::Unit::TestCase
     form.list = ['1', 'Aaron']
     page = @agent.submit(form)
     assert_equal(2, page.links.length)
-    assert_equal(1, page.links.text('list:1').length)
-    assert_equal(1, page.links.text('list:Aaron').length)
+    assert_equal(1, page.links_with(:text => 'list:1').length)
+    assert_equal(1, page.links_with(:text => 'list:Aaron').length)
   end
 
   def test_select_three
@@ -74,9 +74,9 @@ class MultiSelectTest < Test::Unit::TestCase
     form.list = ['1', '2', '3']
     page = @agent.submit(form)
     assert_equal(3, page.links.length)
-    assert_equal(1, page.links.text('list:1').length)
-    assert_equal(1, page.links.text('list:2').length)
-    assert_equal(1, page.links.text('list:3').length)
+    assert_equal(1, page.links_with(:text => 'list:1').length)
+    assert_equal(1, page.links_with(:text => 'list:2').length)
+    assert_equal(1, page.links_with(:text => 'list:3').length)
   end
 
   def test_select_three_twice
@@ -86,21 +86,21 @@ class MultiSelectTest < Test::Unit::TestCase
     form.list = ['1', '2', '3']
     page = @agent.submit(form)
     assert_equal(3, page.links.length)
-    assert_equal(1, page.links.text('list:1').length)
-    assert_equal(1, page.links.text('list:2').length)
-    assert_equal(1, page.links.text('list:3').length)
+    assert_equal(1, page.links_with(:text => 'list:1').length)
+    assert_equal(1, page.links_with(:text => 'list:2').length)
+    assert_equal(1, page.links_with(:text => 'list:3').length)
   end
 
   def test_select_with_click
     page = @agent.get("http://localhost/form_multi_select.html")
     form = page.forms.first
     form.list = ['1', 'Aaron']
-    form.fields.name('list').first.options[3].tick
+    form.field_with(:name => 'list').options[3].tick
     assert_equal(['1', 'Aaron', '4'].sort, form.list.sort)
     page = @agent.submit(form)
     assert_equal(3, page.links.length)
-    assert_equal(1, page.links.text('list:1').length)
-    assert_equal(1, page.links.text('list:Aaron').length)
-    assert_equal(1, page.links.text('list:4').length)
+    assert_equal(1, page.links_with(:text => 'list:1').length)
+    assert_equal(1, page.links_with(:text => 'list:Aaron').length)
+    assert_equal(1, page.links_with(:text => 'list:4').length)
   end
 end

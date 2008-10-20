@@ -92,7 +92,7 @@ class UploadMechTest < Test::Unit::TestCase
 
   def test_submit_no_file
     form = @page.forms.first
-    form.fields.name('name').value = 'Aaron'
+    form.field_with(:name => 'name').value = 'Aaron'
     @page = @agent.submit(form)
     assert_match('Aaron', @page.body)
     assert_match(

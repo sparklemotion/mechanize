@@ -26,19 +26,19 @@ class TestSetFields < Test::Unit::TestCase
                     )
     assert_equal('male', @form.gender)
     assert_equal('Aaron', @form.first_name)
-    assert_equal('Ham', @form.fields.name('green[eggs]').first.value)
+    assert_equal('Ham', @form.fields_with(:name => 'green[eggs]').first.value)
   end
 
   def test_set_multiple_duplicate_fields
     page = @agent.get("http://localhost/form_multival.html")
     form = page.form('post_form')
     form.set_fields( :first => { 0 => 'a', 1 => 'b' } )
-    assert_equal('a', form.fields.name('first')[0].value)
-    assert_equal('b', form.fields.name('first')[1].value)
+    assert_equal('a', form.fields_with(:name => 'first')[0].value)
+    assert_equal('b', form.fields_with(:name => 'first')[1].value)
   end
 
   def test_set_second_field
     @form.set_fields( :first_name => ['Aaron', 1] )
-    assert_equal('Aaron', @form.fields.name('first_name')[1].value)
+    assert_equal('Aaron', @form.fields_with(:name => 'first_name')[1].value)
   end
 end

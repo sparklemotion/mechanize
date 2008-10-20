@@ -22,7 +22,7 @@ class MechErrorsTest < Test::Unit::TestCase
 
   def test_too_many_radio
     page = @agent.get("http://localhost/form_test.html")
-    form = page.forms.name('post_form1').first
+    form = page.form_with(:name => 'post_form1')
     form.radiobuttons.each { |r| r.checked = true }
     assert_raise(RuntimeError) {
       @agent.submit(form)

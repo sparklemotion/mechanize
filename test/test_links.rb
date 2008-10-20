@@ -7,7 +7,7 @@ class LinksMechTest < Test::Unit::TestCase
 
   def test_unsupported_link_types
     page = @agent.get("http://google.com/tc_links.html")
-    link = page.links.text('javascript link').first
+    link = page.link_with(:text => 'javascript link')
     assert_raise(WWW::Mechanize::UnsupportedSchemeError) {
       link.click
     }
@@ -47,17 +47,17 @@ class LinksMechTest < Test::Unit::TestCase
     assert_equal(1, page.meta.length)
 
     assert_equal('', page.meta.first.text)
-    assert_equal('alt text', page.links.href('alt_text.html').first.text)
-    assert_equal('', page.links.href('no_alt_text.html').first.text)
-    assert_equal('no image', page.links.href('no_image.html').first.text)
-    assert_equal('', page.links.href('no_text.html').first.text)
-    assert_equal('', page.links.href('nil_alt_text.html').first.text)
+    assert_equal('alt text', page.link_with(:href => 'alt_text.html').text)
+    assert_equal('', page.link_with(:href => 'no_alt_text.html').text)
+    assert_equal('no image', page.link_with(:href => 'no_image.html').text)
+    assert_equal('', page.link_with(:href => 'no_text.html').text)
+    assert_equal('', page.link_with(:href => 'nil_alt_text.html').text)
   end
 
   def test_click_link
     @agent.user_agent_alias = 'Mac Safari'
     page = @agent.get("http://localhost/frame_test.html")
-    link = page.links.text("Form Test")
+    link = page.link_with(:text => "Form Test")
     assert_not_nil(link)
     assert_equal('Form Test', link.text)
     page = @agent.click(link)
@@ -67,7 +67,7 @@ class LinksMechTest < Test::Unit::TestCase
 
   def test_click_method
     page = @agent.get("http://localhost/frame_test.html")
-    link = page.links.text("Form Test")
+    link = page.link_with(:text => "Form Test")
     assert_not_nil(link)
     assert_equal('Form Test', link.text)
     page = link.click
@@ -77,38 +77,38 @@ class LinksMechTest < Test::Unit::TestCase
 
   def test_find_bold_link
     page = @agent.get("http://localhost/tc_links.html")
-    link = page.links.text(/Bold Dude/)
+    link = page.links_with(:text => /Bold Dude/)
     assert_equal(1, link.length)
     assert_equal('Bold Dude', link.first.text)
 
-    link = page.links.text('Aaron James Patterson')
+    link = page.links_with(:text => 'Aaron James Patterson')
     assert_equal(1, link.length)
     assert_equal('Aaron James Patterson', link.first.text)
 
-    link = page.links.text('Aaron Patterson')
+    link = page.links_with(:text => 'Aaron Patterson')
     assert_equal(1, link.length)
     assert_equal('Aaron Patterson', link.first.text)
 
-    link = page.links.text('Ruby Rocks!')
+    link = page.links_with(:text => 'Ruby Rocks!')
     assert_equal(1, link.length)
     assert_equal('Ruby Rocks!', link.first.text)
   end
 
   def test_link_with_encoded_space
     page = @agent.get("http://localhost/tc_links.html")
-    link = page.links.text('encoded space').first
+    link = page.link_with(:text => 'encoded space')
     page = @agent.click link
   end
 
   def test_link_with_space
     page = @agent.get("http://localhost/tc_links.html")
-    link = page.links.text('not encoded space').first
+    link = page.link_with(:text => 'not encoded space')
     page = @agent.click link
   end
 
   def test_link_with_unusual_characters
     page = @agent.get("http://localhost/tc_links.html")
-    link = page.links.text('unusual characters').first
+    link = page.link_with(:text => 'unusual characters')
     assert_nothing_raised { @agent.click link }
   end
 end

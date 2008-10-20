@@ -2,6 +2,10 @@
 
 === 0.8.5
 
+* Deprecations
+  * WWW::Mechanize::List will be deprecated in 0.9.0, and warnings have
+    been added to help you upgrade.
+
 * Bug Fixes:
   * Stopped raising EOF exceptions on HEAD requests. ありがとう：HIRAKU Kuroda
   * Fixed exceptions when a logger is set and file:// requests are made.

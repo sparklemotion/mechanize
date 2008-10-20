@@ -57,8 +57,8 @@ class PluggableParserTest < Test::Unit::TestCase
     page = @agent.get("http://localhost/find_link.html")
     assert_kind_of(Filter, page)
     assert_equal(19, page.links.length)
-    assert_not_nil(page.links.text('Net::DAAP::Client').first)
-    assert_equal(1, page.links.text('Net::DAAP::Client').length)
+    assert_not_nil(page.link_with(:text => 'Net::DAAP::Client'))
+    assert_equal(1, page.links_with(:text => 'Net::DAAP::Client').length)
   end
 
   def test_filter_hash
@@ -68,8 +68,8 @@ class PluggableParserTest < Test::Unit::TestCase
     assert_equal(Filter, @agent.pluggable_parser['text/html'])
     assert_kind_of(Filter, page)
     assert_equal(19, page.links.length)
-    assert_not_nil(page.links.text('Net::DAAP::Client').first)
-    assert_equal(1, page.links.text('Net::DAAP::Client').length)
+    assert_not_nil(page.link_with(:text => 'Net::DAAP::Client'))
+    assert_equal(1, page.links_with(:text => 'Net::DAAP::Client').length)
   end
 
   def test_file_saver

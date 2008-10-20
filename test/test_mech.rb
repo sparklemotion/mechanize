@@ -161,15 +161,15 @@ class TestMechMethods < Test::Unit::TestCase
     page = @agent.get("http://localhost/google.html")
     search = page.forms.find { |f| f.name == "f" }
     assert_not_nil(search)
-    assert_not_nil(search.fields.name('q').first)
-    assert_not_nil(search.fields.name('hl').first)
+    assert_not_nil(search.field_with(:name => 'q'))
+    assert_not_nil(search.field_with(:name => 'hl'))
     assert_not_nil(search.fields.find { |f| f.name == 'ie' })
   end
 
   def test_click
     @agent.user_agent_alias = 'Mac Safari'
     page = @agent.get("http://localhost/frame_test.html")
-    link = page.links.text("Form Test").first
+    link = page.link_with(:text => "Form Test")
     assert_not_nil(link)
     page = @agent.click(link)
     assert_equal("http://localhost/form_test.html",
@@ -201,12 +201,10 @@ class TestMechMethods < Test::Unit::TestCase
     assert_equal(3, page.frames.size)
 
     find_orig = page.frames.find_all { |f| f.name == 'frame1' }
-    find1 = page.frames.with.name('frame1')
-    find2 = page.frames.name('frame1')
+    find1 = page.frames_with(:name => 'frame1')
 
-    find_orig.zip(find1, find2).each { |a,b,c|
+    find_orig.zip(find1).each { |a,b|
       assert_equal(a, b)
-      assert_equal(a, c)
     }
   end
 

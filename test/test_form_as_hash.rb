@@ -7,7 +7,7 @@ class TestFormHash < Test::Unit::TestCase
   end
 
   def test_form_hash
-    form = @page.forms.name('post_form').first
+    form = @page.form_with(:name => 'post_form')
 
     assert_not_nil(form)
     field_length = form.fields.length
@@ -19,7 +19,7 @@ class TestFormHash < Test::Unit::TestCase
   end
 
   def test_add_field_via_hash
-    form = @page.forms.name('post_form').first
+    form = @page.form_with(:name => 'post_form')
 
     assert_not_nil(form)
     field_length = form.fields.length
@@ -31,14 +31,14 @@ class TestFormHash < Test::Unit::TestCase
   end
 
   def test_fields_as_hash
-    form = @page.forms.name('post_form').first
+    form = @page.form_with(:name => 'post_form')
 
     assert_not_nil(form)
-    assert_equal(2, form.fields.name('first').length)
+    assert_equal(2, form.fields_with(:name => 'first').length)
 
     form['first'] = 'Aaron'
     assert_equal('Aaron', form['first'])
-    assert_equal('Aaron', form.fields.name('first').first.value)
+    assert_equal('Aaron', form.field_with(:name => 'first').value)
   end
 
   def test_keys

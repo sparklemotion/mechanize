@@ -79,7 +79,7 @@ module WWW
           case v
           when Hash
             v.each do |index, value|
-              self.fields.name(k.to_s).[](index).value = value
+              self.fields_with(:name => k.to_s).[](index).value = value
             end
           else
             value = nil
@@ -88,7 +88,7 @@ module WWW
               index = val.to_i unless value.nil?
               value = val if value.nil?
             end
-            self.fields.name(k.to_s).[](index).value = value
+            self.fields_with(:name => k.to_s).[](index).value = value
           end
         end
       end

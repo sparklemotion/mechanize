@@ -520,14 +520,14 @@ module WWW
         return visited_page(uri) || page
       elsif res_klass <= Net::HTTPRedirection
         return page unless follow_redirect?
-        raise RedirectNotGetOrHeadError.new(page, options[:verb]) unless [:get, :head].include? options[:verb]
         log.info("follow redirect to: #{ response['Location'] }") if log
         from_uri  = page.uri
         raise RedirectLimitReachedError.new(page, redirects) if redirects + 1 > redirection_limit
+        redirect_verb = options[:verb] == :head ? :head : :get
         page = fetch_page(  :uri => response['Location'].to_s,
                             :referer => page,
                             :params  => [],
-                            :verb => options[:verb],
+                            :verb => redirect_verb,
                             :redirects => redirects + 1
                          )
         @history.push(page, from_uri)

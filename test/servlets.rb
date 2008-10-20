@@ -6,14 +6,12 @@ require 'stringio'
 require 'base64'
 
 class VerbServlet < WEBrick::HTTPServlet::AbstractServlet
-  def do_HEAD(req, res)
-    res.body = "method: HEAD"
-  end
-
-  def method_missing(method, *args, &block)
-    super unless method.to_s =~ /^do_([A-Z]*)$/
-    res = args[1]
-    res.body = "method: #{$1}"
+  %w(HEAD GET POST PUT DELETE).each do |verb|
+    eval(<<-eomethod)
+      def do_#{verb}(req, res)
+        res.body = "method: #{verb}"
+      end
+    eomethod
   end
 end
 

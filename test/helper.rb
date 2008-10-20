@@ -1,4 +1,5 @@
 require 'test/unit'
+$:.unshift(File.expand_path(File.join(File.dirname(__FILE__),'..','lib')))
 require 'rubygems'
 require 'mechanize'
 require 'webrick/httputils'
@@ -32,6 +33,7 @@ class Net::HTTP
     '/basic_auth'             => BasicAuthServlet,
     '/form post'              => FormTest,
     '/response_code'          => ResponseCodeTest,
+    '/http_refresh'           => HttpRefreshTest,
     '/bad_content_type'       => BadContentTypeTest,
     '/content_type_test'      => ContentTypeTest,
     '/referer'                => RefererServlet,

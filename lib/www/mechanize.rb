@@ -489,9 +489,18 @@ module WWW
 
       log.info("status: #{ page.code }") if log
   
-      if follow_meta_refresh && page.respond_to?(:meta) &&
-        (redirect = page.meta.first)
-        return redirect.click
+      if follow_meta_refresh
+        if (page.respond_to?(:meta) && (redirect = page.meta.first))
+          return redirect.click
+        elsif refresh = response['refresh']
+          parsed_refresh = refresh.match(/^\s*(\d+\.?\d*);\s*(url|URL)=(\S*)\s*$/)
+          raise StandardError, "Invalid refresh http header" unless parsed_refresh
+          delay = parsed_refresh[1]
+          location = parsed_refresh[3]
+          location = "http://#{uri.host}#{location}" unless location.include?("http")
+          sleep delay.to_i
+          return get(location)
+        end
       end
   
       return page if res_klass <= Net::HTTPSuccess

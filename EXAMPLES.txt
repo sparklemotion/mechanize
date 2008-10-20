@@ -117,7 +117,7 @@ This example also demonstrates subclassing Mechanize.
       search_form.words = 'WWW'
       submit search_form
 
-      page.links.with.href( %r{/projects/} ).each do |link|
+      page.links_with(:href => %r{/projects/} ).each do |link|
         next if link.href =~ %r{/projects/support/}
 
         puts 'Loading %-30s %s' % [link.href, link.text]

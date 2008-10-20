@@ -55,7 +55,7 @@ module WWW
 
       # Find a form matching +criteria+.
       # Example:
-      #   page.form(:action => '/post/login.php') do |f|
+      #   page.form_with(:action => '/post/login.php') do |f|
       #     ...
       #   end
       [:form, :link, :base, :frame, :iframe].each do |type|

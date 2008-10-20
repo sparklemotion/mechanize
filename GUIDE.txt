@@ -36,17 +36,16 @@ link to click on.  Lets say we wanted to click the link whose text is 'News'.
 Normally, we would have to do this:
  page = agent.click page.links.find { |l| l.text == 'News' }
 But Mechanize gives us a shortcut.  Instead we can say this:
- page = agent.click page.links.text('News')
+ page = agent.click page.link_with(:text => 'News')
 That shortcut says "find all links with the name 'News'".  You're probably
 thinking "there could be multiple links with that text!", and you would be
-correct!  If you pass a list of links to the "click" method, Mechanize will
-click on the first one.  If you wanted to click on the second news link, you
-could do this:
- agent.click page.links.text('News')[1]
+correct!  If you use the plural form, you can access the list.
+If you wanted to click on the second news link, you could do this:
+ agent.click page.links_with(:text => 'News')[1]
 We can even find a link with a certain href like so:
- page.links.href('/something')
+ page.links_with(:href => '/something')
 Or chain them together to find a link with certain text and certain href:
- page.links.text('News').href('/something')
+ page.links_with(:text => 'News', :href => '/something')
 
 These shortcuts that mechanize provides are available on any list that you
 can fetch like frames, iframes, or forms.  Now that we know how to find and
@@ -102,18 +101,18 @@ have many options associated with them.  If you select one option, mechanize
 will deselect the other options (unless it is a multi select!).
 
 For example, lets select an option on a list:
- form.fields.name('list').options[0].select
+ form.field_with(:name => 'list').options[0].select
 
 Now lets take a look at checkboxes and radio buttons.  To select a checkbox,
 just check it like this:
- form.checkboxes.name('box').check
+ form.checkbox_with(:name => 'box').check
 Radio buttons are very similar to checkboxes, but they know how to uncheck
 other radio buttons of the same name.  Just check a radio button like you
 would a checkbox:
- form.radiobuttons.name('box')[1].check
+ form.radiobuttons_with(:name => 'box')[1].check
 Mechanize also makes file uploads easy!  Just find the file upload field, and
 tell it what file name you want to upload:
-  form.file_uploads.file_name = "somefile.jpg"
+  form.file_uploads.first.file_name = "somefile.jpg"
 
 == Scraping Data
 Mechanize uses hpricot[http://code.whytheluckystiff.net/hpricot/] to parse

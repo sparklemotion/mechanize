@@ -23,7 +23,7 @@ module WWW
           end
           request['Accept-Encoding'] = 'gzip,identity'
           request['Accept-Language'] = 'en-us,en;q=0.5'
-          host = "#{uri.host}#{uri.port.to_i == 80 ? '' : ':' + uri.port.to_s}"
+          host = "#{uri.host}#{[80, 443].include?(uri.port.to_i) ? '' : ':' + uri.port.to_s}"
           request['Host'] = host
           request['Accept-Charset'] = 'ISO-8859-1,utf-8;q=0.7,*;q=0.7'
   

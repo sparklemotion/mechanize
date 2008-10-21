@@ -15,7 +15,7 @@ module WWW
         def handle(ctx, params)
           uri       = params[:uri]
           http_obj  = params[:connection]
-          if uri.scheme == 'https' && ! http_obj.started?
+          if uri.scheme == 'https' && ! http_obj.started? && ! http_obj.frozen?
             http_obj.use_ssl = true
             http_obj.verify_mode = OpenSSL::SSL::VERIFY_NONE
             if @ca_file

@@ -29,7 +29,7 @@ Copyright (c) 2005 by Michael Neumann (mneumann@ntecs.de)
 Copyright (c) 2006-2008:
 
 * {Aaron Patterson}[http://tenderlovemaking.com] (aaronp@rubyforge.org)
-* Mike Dalessio (mike@csa.net)
+* {Mike Dalessio}[http://mike.daless.io] (mike@csa.net)
 
 This library comes with a shameless plug for employing me
 (Aaron[http://tenderlovemaking.com/]) programming

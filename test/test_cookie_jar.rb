@@ -311,4 +311,33 @@ class CookieJarTest < Test::Unit::TestCase
 
     FileUtils.rm("cookies.txt")
   end
+
+  def test_ssl_cookies
+    # thanks to michal "ocher" ochman for reporting the bug responsible for this test.
+    values = {  :name     => 'Foo',
+      :value    => 'Bar',
+      :path     => '/login',
+      :expires  => nil,
+      :domain   => 'rubyforge.org'
+    }
+    values_ssl = {  :name     => 'Foo',
+      :value    => 'Bar',
+      :path     => '/login',
+      :expires  => nil,
+      :domain   => 'rubyforge.org:443'
+    }
+    url = URI.parse('https://rubyforge.org/login')
+
+    jar = WWW::Mechanize::CookieJar.new
+    assert_equal(0, jar.cookies(url).length)
+
+    cookie = cookie_from_hash(values)
+    jar.add(url, cookie)
+    assert_equal(1, jar.cookies(url).length, "did not handle SSL cookie")
+
+    cookie = cookie_from_hash(values_ssl)
+    jar.add(url, cookie)
+    assert_equal(2, jar.cookies(url).length, "did not handle SSL cookie with :443")
+  end
+
 end

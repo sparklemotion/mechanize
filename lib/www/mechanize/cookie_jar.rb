@@ -13,7 +13,7 @@ module WWW
     
       # Add a cookie to the Jar.
       def add(uri, cookie)
-        return unless uri.host =~ /#{cookie.domain}$/i
+        return unless uri.host =~ /#{CookieJar.strip_port(cookie.domain)}$/i
         normal_domain = cookie.domain.downcase
         unless @jar.has_key?(normal_domain)
           @jar[normal_domain] = Hash.new
@@ -30,7 +30,7 @@ module WWW
         cookies = []
         url.path = '/' if url.path.empty?
         @jar.each_key do |domain|
-          if url.host =~ /#{domain}$/i
+          if url.host =~ /#{CookieJar.strip_port(domain)}$/i
             @jar[domain].each_key do |name|
               if url.path =~ /^#{@jar[domain][name].path}/
                 if @jar[domain][name].expires.nil?
@@ -181,6 +181,11 @@ module WWW
           end
         end
       end
+
+      def self.strip_port(host)
+        host.gsub(/:[0-9]+$/,'')
+      end
+
     end
   end
 end

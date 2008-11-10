@@ -4,7 +4,6 @@ GUIDE.txt
 History.txt
 LICENSE.txt
 Manifest.txt
-NOTES.txt
 README.txt
 Rakefile
 examples/flickr_upload.rb

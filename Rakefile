@@ -6,8 +6,8 @@ require 'mechanize'
 
 HOE = Hoe.new('mechanize', WWW::Mechanize::VERSION) do |p|
   p.rubyforge_name  = 'mechanize'
-  p.author          = 'Aaron Patterson'
-  p.email           = 'aaronp@rubyforge.org'
+  p.developer('Aaron Patterson','aaronp@rubyforge.org')
+  p.developer('Mike Dalessio','mike.dalessio@gmail.com')
   p.summary         = "Mechanize provides automated web-browsing"
   p.extra_deps      = [['hpricot', '>= 0.5.0']]
 end

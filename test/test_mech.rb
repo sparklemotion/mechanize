@@ -20,6 +20,11 @@ class TestMechMethods < Test::Unit::TestCase
     assert_equal('HTTP://localhost/?q=hello', page.uri.to_s)
   end
 
+  def test_with_anchor
+    page = @agent.get('http://localhost/?foo=bar&#34;')
+    assert_equal('http://localhost/?foo=bar%22', page.uri.to_s)
+  end
+
   def test_post_connect_hook_gets_called
     response = nil
     @agent.post_connect_hooks << lambda { |params|

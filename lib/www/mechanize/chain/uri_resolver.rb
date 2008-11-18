@@ -17,15 +17,20 @@ module WWW
               sprintf('%%%X', match.unpack($KCODE == 'UTF8' ? 'U' : 'c')[0])
             }
 
-            uri = URI.parse(
-                    Util.html_unescape(
-                      uri.split(/(?:%[0-9A-Fa-f]{2})+|#/).zip(
-                        uri.scan(/(?:%[0-9A-Fa-f]{2})+|#/)
-                      ).map { |x,y|
-                        "#{URI.escape(x)}#{y}"
-                      }.join('')
-                    )
-                  )
+            escaped_uri = Util.html_unescape(
+              uri.split(/(?:%[0-9A-Fa-f]{2})+|#/).zip(
+                uri.scan(/(?:%[0-9A-Fa-f]{2})+|#/)
+              ).map { |x,y|
+                "#{URI.escape(x)}#{y}"
+              }.join('')
+            )
+
+            begin
+              uri = URI.parse(escaped_uri)
+            rescue
+              uri = URI.parse(URI.escape(escaped_uri))
+            end
+
           end
           uri = @scheme_handlers[
             uri.relative? ? 'relative' : uri.scheme.downcase

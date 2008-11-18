@@ -20,6 +20,12 @@ class LinksMechTest < Test::Unit::TestCase
     }
   end
 
+  def test_link_with_no_path
+    page = @agent.get("http://localhost/relative/tc_relative_links.html")
+    page = page.link_with(:text => 'just the query string').click
+    assert_equal('http://localhost/relative/tc_relative_links.html?a=b', page.uri.to_s)
+  end
+
   def test_base
     page = @agent.get("http://google.com/tc_base_link.html")
     page = page.links.first.click

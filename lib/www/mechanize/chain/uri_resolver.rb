@@ -35,6 +35,13 @@ module WWW
           uri = @scheme_handlers[
             uri.relative? ? 'relative' : uri.scheme.downcase
           ].call(uri, params[:referer])
+
+          if params[:referer] && params[:referer].uri
+            if uri.path.length == 0 && uri.relative?
+              uri.path = params[:referer].uri.path
+            end
+          end
+
           uri.path = '/' if uri.path.length == 0
 
           if uri.relative?

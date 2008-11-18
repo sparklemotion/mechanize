@@ -17,7 +17,7 @@ module WWW
           content_type = nil
           unless response['Content-Type'].nil?
             data = response['Content-Type'].match(/^([^;]*)/)
-            content_type = data[1].downcase unless data.nil?
+            content_type = data[1].downcase.split(',')[0] unless data.nil?
           end
 
           # Find our pluggable parser

@@ -6,6 +6,7 @@
   * Cookie Jar handles cookie domains containing ports, like
     'mydomain.com:443' (Thanks Michal Ochman!)
   * Fixing strange uri escaping problems [#22604]
+  * Making content-type determintation more robust.  (thanks Han Holl!)
 
 === 0.8.5
 

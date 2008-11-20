@@ -490,8 +490,9 @@ module WWW
       log.info("status: #{ page.code }") if log
   
       if follow_meta_refresh
+        redirect_uri = nil
         if (page.respond_to?(:meta) && (redirect = page.meta.first))
-          return redirect.click
+          redirect_uri = redirect.uri.to_s
         elsif refresh = response['refresh']
           parsed_refresh = refresh.match(/^\s*(\d+\.?\d*);\s*(url|URL)=(\S*)\s*$/)
           raise StandardError, "Invalid refresh http header" unless parsed_refresh
@@ -502,9 +503,12 @@ module WWW
             raise RedirectLimitReachedError.new(page, redirects)
           end
           sleep delay.to_i
+          redirect_uri = location
+        end
+        if redirect_uri
           @history.push(page, page.uri)
           return fetch_page(
-            :uri        => location,
+            :uri        => redirect_uri,
             :referer    => page,
             :params     => [],
             :verb       => :get,

@@ -10,6 +10,8 @@
   * Dealing with links that are query string only.  [#22402]
   * Nokogiri may be dropped in as a replacement.
       WWW::Mechanize.html_parser = Nokogiri::HTML
+  * Making sure the correct page is added to the history on meta refresh.
+    [#22708]
 
 === 0.8.5
 

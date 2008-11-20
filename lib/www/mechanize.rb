@@ -204,7 +204,13 @@ module WWW
         headers = options[:headers]
       end
 
-      referer ||= current_page || Page.new(nil, {'content-type'=>'text/html'})
+      unless referer
+        if url =~ /^http/
+          referer = Page.new(nil, {'content-type'=>'text/html'})
+        else
+          referer = current_page || Page.new(nil, {'content-type'=>'text/html'})
+        end
+      end
 
       # FIXME: Huge hack so that using a URI as a referer works.  I need to
       # refactor everything to pass around URIs but still support
@@ -441,8 +447,8 @@ module WWW
       http_obj      = options[:connection]
 
       # Add If-Modified-Since if page is in history
-      if( (page = visited_page(uri)) && cur_page.response['Last-Modified'] )
-        request['If-Modified-Since'] = cur_page.response['Last-Modified']
+      if( (page = visited_page(uri)) && page.response['Last-Modified'] )
+        request['If-Modified-Since'] = page.response['Last-Modified']
       end if(@conditional_requests)
 
       # Specify timeouts if given

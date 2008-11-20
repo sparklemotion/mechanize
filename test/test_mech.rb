@@ -20,6 +20,20 @@ class TestMechMethods < Test::Unit::TestCase
     assert_equal('HTTP://localhost/?q=hello', page.uri.to_s)
   end
 
+  def test_get_no_referer
+    requests = []
+    @agent.pre_connect_hooks << lambda { |params|
+      requests << params[:request]
+    }
+
+    @agent.get('http://localhost/')
+    @agent.get('http://localhost/')
+    assert_equal(2, requests.length)
+    requests.each do |request|
+      assert_nil request['referer']
+    end
+  end
+
   def test_with_anchor
     page = @agent.get('http://localhost/?foo=bar&#34;')
     assert_equal('http://localhost/?foo=bar%22', page.uri.to_s)

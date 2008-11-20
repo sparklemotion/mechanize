@@ -12,6 +12,8 @@
       WWW::Mechanize.html_parser = Nokogiri::HTML
   * Making sure the correct page is added to the history on meta refresh.
     [#22708]
+  * Mechanize#get requests no longer send a referer unless they are relative
+    requests.
 
 === 0.8.5
 

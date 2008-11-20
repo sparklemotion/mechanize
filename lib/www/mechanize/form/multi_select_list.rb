@@ -17,7 +17,7 @@ module WWW
           @options = WWW::Mechanize::List.new
       
           # parse
-          node.search('//option').each do |n|
+          node.search('option').each do |n|
             option = Option.new(n, self)
             @options << option
           end

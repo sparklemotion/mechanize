@@ -8,6 +8,8 @@
   * Fixing strange uri escaping problems [#22604]
   * Making content-type determintation more robust.  (thanks Han Holl!)
   * Dealing with links that are query string only.  [#22402]
+  * Nokogiri may be dropped in as a replacement.
+      WWW::Mechanize.html_parser = Nokogiri::HTML
 
 === 0.8.5
 

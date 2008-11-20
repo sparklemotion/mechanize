@@ -27,9 +27,9 @@ module WWW
           @attributes = node
 
           # If there is no text, try to find an image and use it's alt text
-          if (@text.nil? || @text.length == 0) && node.search('//img').length > 0
+          if (@text.nil? || @text.length == 0) && node.search('img').length > 0
             @text = ''
-            node.search('//img').each do |e|
+            node.search('img').each do |e|
               @text << ( e['alt'] || '')
             end
           end

@@ -119,6 +119,6 @@ Mechanize uses hpricot[http://code.whytheluckystiff.net/hpricot/] to parse
 html.  What does this mean for you?  You can treat a mechanize page like
 an hpricot object.  After you have used Mechanize to navigate to the page
 that you need to scrape, then scrape it using hpricot methods:
-  agent.get('http://someurl.com/').search("//p[@class='posted']")
+  agent.get('http://someurl.com/').search(".//p[@class='posted']")
 For more information on this powerful scraper, take a look at
 HpricotBasics[http://code.whytheluckystiff.net/hpricot/wiki/HpricotBasics]

@@ -10,7 +10,7 @@ module WWW
       #
       def with
         if !@@notified
-          $stderr.puts("This method is deprecated and will be removed in version 0.9.0.  Please use: *_with(:#{meth_sym} => #{args.first ? args.first.inspect : 'nil'})")
+          $stderr.puts("WWW::Mechanize::List#with is deprecated and will be removed in Mechanize 0.9.0.")
           @@notified = true
         end
         self
@@ -18,7 +18,7 @@ module WWW
 
       def value=(arg)
         if !@@notified
-          $stderr.puts("This method is deprecated and will be removed in version 0.9.0.  Please use: *_with(:#{meth_sym} => #{args.first ? args.first.inspect : 'nil'})")
+          $stderr.puts("WWW::Mechanize::List#value= is deprecated and will be removed in Mechanize 0.9.0.")
           @@notified = true
         end
         first().value=(arg)
@@ -32,7 +32,7 @@ module WWW
 
       def method_missing(meth_sym, *args)
         if !@@notified
-          $stderr.puts("This method is deprecated and will be removed in version 0.9.0.  Please use: *_with(:#{meth_sym} => #{args.first ? args.first.inspect : 'nil'})")
+          $stderr.puts("WWW::Mechanize::List##{meth_sym} is deprecated and will be removed in version 0.9.0.  Please use: *_with(:#{meth_sym} => #{args.first ? args.first.inspect : 'nil'})")
           @@notified = true
         end
         if length > 0

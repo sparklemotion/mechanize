@@ -46,7 +46,11 @@ module WWW
 
           if uri.relative?
             raise 'need absolute URL' unless referer && referer.uri
-            base = referer.respond_to?(:bases) ? referer.bases.last : nil
+            base = nil
+            if referer.respond_to?(:bases) && referer.parser
+              base = referer.bases.last
+            end
+
             uri = ((base && base.uri && base.uri.absolute?) ?
                     base.uri :
                     referer.uri) + uri

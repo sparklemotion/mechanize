@@ -1,14 +1,5 @@
 = Mechanize CHANGELOG
 
-=== HEAD
-
-* Bug Fixes:
-  * Cookie Jar handles cookie domains containing ports, like
-    'mydomain.com:443' (Thanks Michal Ochman!)
-  * Fixing strange uri escaping problems [#22604]
-  * Making content-type determintation more robust.  (thanks Han Holl!)
-  * Dealing with links that are query string only.  [#22402]
-
 === 0.8.5
 
 * Deprecations
@@ -21,6 +12,17 @@
   * Made Mechanize 1.9 compatible
   * Not setting the port in the host header for SSL sites.
   * Following refresh headers.  Thanks Tim Connor!
+  * Cookie Jar handles cookie domains containing ports, like
+    'mydomain.com:443' (Thanks Michal Ochman!)
+  * Fixing strange uri escaping problems [#22604]
+  * Making content-type determintation more robust.  (thanks Han Holl!)
+  * Dealing with links that are query string only.  [#22402]
+  * Nokogiri may be dropped in as a replacement.
+      WWW::Mechanize.html_parser = Nokogiri::HTML
+  * Making sure the correct page is added to the history on meta refresh.
+    [#22708]
+  * Mechanize#get requests no longer send a referer unless they are relative
+    requests.
 
 === 0.8.4
 

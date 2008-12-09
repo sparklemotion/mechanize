@@ -57,6 +57,7 @@ lib/www/mechanize/page/link.rb
 lib/www/mechanize/page/meta.rb
 lib/www/mechanize/pluggable_parsers.rb
 lib/www/mechanize/redirect_limit_reached_error.rb
+lib/www/mechanize/redirect_not_get_or_head_error.rb
 lib/www/mechanize/response_code_error.rb
 lib/www/mechanize/unsupported_scheme_error.rb
 lib/www/mechanize/util.rb
@@ -150,6 +151,7 @@ test/test_post_form.rb
 test/test_pretty_print.rb
 test/test_radiobutton.rb
 test/test_redirect_limit_reached.rb
+test/test_redirect_verb_handling.rb
 test/test_referer.rb
 test/test_relative_links.rb
 test/test_response_code.rb

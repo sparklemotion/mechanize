@@ -47,7 +47,7 @@ module WWW
   class Mechanize
     ##
     # The version of Mechanize you are using.
-    VERSION = '0.8.4'
+    VERSION = '0.8.5'
   
     ##
     # User Agent aliases
@@ -204,7 +204,13 @@ module WWW
         headers = options[:headers]
       end
 
-      referer ||= current_page || Page.new(nil, {'content-type'=>'text/html'})
+      unless referer
+        if url =~ /^http/
+          referer = Page.new(nil, {'content-type'=>'text/html'})
+        else
+          referer = current_page || Page.new(nil, {'content-type'=>'text/html'})
+        end
+      end
 
       # FIXME: Huge hack so that using a URI as a referer works.  I need to
       # refactor everything to pass around URIs but still support
@@ -441,8 +447,8 @@ module WWW
       http_obj      = options[:connection]
 
       # Add If-Modified-Since if page is in history
-      if( (page = visited_page(uri)) && cur_page.response['Last-Modified'] )
-        request['If-Modified-Since'] = cur_page.response['Last-Modified']
+      if( (page = visited_page(uri)) && page.response['Last-Modified'] )
+        request['If-Modified-Since'] = page.response['Last-Modified']
       end if(@conditional_requests)
 
       # Specify timeouts if given
@@ -490,8 +496,9 @@ module WWW
       log.info("status: #{ page.code }") if log
   
       if follow_meta_refresh
+        redirect_uri = nil
         if (page.respond_to?(:meta) && (redirect = page.meta.first))
-          return redirect.click
+          redirect_uri = redirect.uri.to_s
         elsif refresh = response['refresh']
           parsed_refresh = refresh.match(/^\s*(\d+\.?\d*);\s*(url|URL)=(\S*)\s*$/)
           raise StandardError, "Invalid refresh http header" unless parsed_refresh
@@ -502,9 +509,12 @@ module WWW
             raise RedirectLimitReachedError.new(page, redirects)
           end
           sleep delay.to_i
+          redirect_uri = location
+        end
+        if redirect_uri
           @history.push(page, page.uri)
           return fetch_page(
-            :uri        => location,
+            :uri        => redirect_uri,
             :referer    => page,
             :params     => [],
             :verb       => :get,

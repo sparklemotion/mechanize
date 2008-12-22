@@ -48,7 +48,6 @@ lib/www/mechanize/form/select_list.rb
 lib/www/mechanize/headers.rb
 lib/www/mechanize/history.rb
 lib/www/mechanize/inspect.rb
-lib/www/mechanize/list.rb
 lib/www/mechanize/monkey_patch.rb
 lib/www/mechanize/page.rb
 lib/www/mechanize/page/base.rb

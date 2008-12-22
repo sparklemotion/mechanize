@@ -6,7 +6,7 @@ require 'zlib'
 require 'stringio'
 require 'digest/md5'
 require 'fileutils'
-require 'hpricot'
+require 'nokogiri'
 require 'forwardable'
 
 require 'www/mechanize/util'
@@ -18,7 +18,6 @@ require 'www/mechanize/redirect_not_get_or_head_error'
 require 'www/mechanize/cookie'
 require 'www/mechanize/cookie_jar'
 require 'www/mechanize/history'
-require 'www/mechanize/list'
 require 'www/mechanize/form'
 require 'www/mechanize/pluggable_parsers'
 require 'www/mechanize/file_response'
@@ -87,7 +86,7 @@ module WWW
   
     alias :follow_redirect? :redirect_ok
   
-    @html_parser = Hpricot
+    @html_parser = Nokogiri::HTML
     class << self; attr_accessor :html_parser, :log end
   
     def initialize

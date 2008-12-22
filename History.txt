@@ -1,5 +1,15 @@
 = Mechanize CHANGELOG
 
+=== 0.9.0
+
+* Deprecations
+  * WWW::Mechanize::List is gone!
+  * Mechanize uses Nokogiri as it's HTML parser but you may switch to
+    Hpricot by using WWW::Mechanize.html_parser = Hpricot
+
+* Bug Fixes:
+  * Nil check on page when base tag is used #23021
+
 === 0.8.5
 
 * Deprecations

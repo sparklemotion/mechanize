@@ -9,7 +9,7 @@ HOE = Hoe.new('mechanize', WWW::Mechanize::VERSION) do |p|
   p.developer('Aaron Patterson','aaronp@rubyforge.org')
   p.developer('Mike Dalessio','mike.dalessio@gmail.com')
   p.summary         = "Mechanize provides automated web-browsing"
-  p.extra_deps      = [['hpricot', '>= 0.5.0']]
+  p.extra_deps      = [['nokogiri', '>= 1.0.7']]
 end
 
 desc "Update SSL Certificate"

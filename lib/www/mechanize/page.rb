@@ -86,56 +86,47 @@ module WWW
       end
     
       def links
-        @links ||= WWW::Mechanize::List.new(
-          %w{ a area }.map do |tag|
-            search(tag).map do |node|
-              Link.new(node, @mech, self)
-            end
-          end.flatten
-        )
+        @links ||= %w{ a area }.map do |tag|
+          search(tag).map do |node|
+            Link.new(node, @mech, self)
+          end
+        end.flatten
       end
 
       def forms
-        @forms ||= WWW::Mechanize::List.new(
-          search('form').map do |html_form|
-            form = Form.new(html_form, @mech, self)
-            form.action ||= @uri.to_s
-            form
-          end
-        )
+        @forms ||= search('form').map do |html_form|
+          form = Form.new(html_form, @mech, self)
+          form.action ||= @uri.to_s
+          form
+        end
       end
 
       def meta
-        @meta ||= WWW::Mechanize::List.new(
-          search('meta').map do |node|
-            next unless node['http-equiv'] && node['content']
-            (equiv, content) = node['http-equiv'], node['content']
-            if equiv && equiv.downcase == 'refresh'
-              if content && content =~ /^\d+\s*;\s*url\s*=\s*'?([^\s']+)/i
-                node['href'] = $1
-                Meta.new(node, @mech, self)
-              end
+        @meta ||= search('meta').map do |node|
+          next unless node['http-equiv'] && node['content']
+          (equiv, content) = node['http-equiv'], node['content']
+          if equiv && equiv.downcase == 'refresh'
+            if content && content =~ /^\d+\s*;\s*url\s*=\s*'?([^\s']+)/i
+              node['href'] = $1
+              Meta.new(node, @mech, self)
             end
-          end.compact
-        )
+          end
+        end.compact
       end
 
       def bases
-        @bases ||= WWW::Mechanize::List.new(
+        @bases ||=
           search('base').map { |node| Base.new(node, @mech, self) }
-        )
       end
 
       def frames
-        @frames ||= WWW::Mechanize::List.new(
+        @frames ||=
           search('frame').map { |node| Frame.new(node, @mech, self) }
-        )
       end
 
       def iframes
-        @iframes ||= WWW::Mechanize::List.new(
+        @iframes ||= 
           search('iframe').map { |node| Frame.new(node, @mech, self) }
-        )
       end
     end
   end

@@ -14,7 +14,7 @@ module WWW
       
         def initialize(name, node)
           value = []
-          @options = WWW::Mechanize::List.new
+          @options = []
       
           # parse
           node.search('option').each do |n|

@@ -232,11 +232,11 @@ module WWW
  
       private
       def parse
-        @fields       = WWW::Mechanize::List.new
-        @buttons      = WWW::Mechanize::List.new
-        @file_uploads = WWW::Mechanize::List.new
-        @radiobuttons = WWW::Mechanize::List.new
-        @checkboxes   = WWW::Mechanize::List.new
+        @fields       = []
+        @buttons      = []
+        @file_uploads = []
+        @radiobuttons = []
+        @checkboxes   = []
     
         # Find all input tags
         form_node.search('input').each do |node|

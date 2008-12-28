@@ -196,7 +196,7 @@ module WWW
           params.collect { |p| "--#{boundary}\r\n#{p}" }.join('') +
             "--#{boundary}--\r\n"
         else
-          WWW::Mechanize::Util.build_query_string(query_params)
+          WWW::Mechanize::Util.build_query_string(query_params, page.encoding)
         end
       end
     

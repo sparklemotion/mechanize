@@ -8,6 +8,7 @@ require 'digest/md5'
 require 'fileutils'
 require 'nokogiri'
 require 'forwardable'
+require 'iconv'
 
 require 'www/mechanize/util'
 require 'www/mechanize/content_type_error'

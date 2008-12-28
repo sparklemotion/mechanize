@@ -27,6 +27,7 @@ module WWW
       extend Forwardable
 
       attr_accessor :mech
+      attr_reader :encoding
 
       def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
         super(uri, response, body, code)
@@ -58,7 +59,8 @@ module WWW
             }
             enc = CODE_DIC[enc.intern]
           end
-          @parser = Mechanize.html_parser.parse(html_body, nil, enc)
+          @encoding = enc || "UTF-8"
+          @parser = Mechanize.html_parser.parse(html_body, nil, @encoding)
         end
 
         @parser

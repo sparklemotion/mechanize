@@ -1,5 +1,10 @@
 = Mechanize CHANGELOG
 
+=== HEAD
+
+* Bug Fixes:
+  * m17n fixes. ありがとう konn!
+
 === 0.9.0
 
 * Deprecations

@@ -12,8 +12,13 @@ module WWW
           #p parameters
           parameters.map { |k,v|
             if k
+              # WEBrick::HTTP.escape* has some problems about m17n on ruby-1.9.*.
+              [URI.escape(k.to_s), URI.escape(v.to_s)].join("=")
+=begin
               [WEBrick::HTTPUtils.escape_form(k.to_s),
                 WEBrick::HTTPUtils.escape_form(v.to_s)].join("=")
+=end
+              
             end
           }.compact.join('&')
         end

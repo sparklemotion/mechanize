@@ -22,7 +22,7 @@ module WWW
           }.compact.join('&')
         end
 
-        def to_utf8(s, code=nil)
+        def to_native_charset(s, code=nil)
           if Mechanize.html_parser == Nokogiri::HTML
             return unless s
             code ||= detect_charset(s)
@@ -32,7 +32,7 @@ module WWW
           end
         end
 
-        def from_utf8(s, code)
+        def from_native_charset(s, code)
           if Mechanize.html_parser == Nokogiri::HTML
             return unless s
             Iconv.iconv(code, "UTF-8", s).join("")

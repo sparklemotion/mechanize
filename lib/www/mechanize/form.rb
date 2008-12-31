@@ -140,20 +140,20 @@ module WWW
       # It converts charset of query value of fields into excepted one.
       def proc_query(field)
         field.query_value.map{|(name, val)| 
-          [from_utf8(name), from_utf8(val)]
+          [from_native_charset(name), from_native_charset(val)]
         }
       end
       private :proc_query
 
-      def from_utf8(str, enc=nil)
+      def from_native_charset(str, enc=nil)
         if page
           enc ||= page.encoding
-          Util.from_utf8(str,enc)
+          Util.from_native_charset(str,enc)
         else
           str
         end
       end
-      private :from_utf8
+      private :from_native_charset
 
       # This method builds an array of arrays that represent the query
       # parameters to be used with this form.  The return value can then
@@ -175,7 +175,7 @@ module WWW
     
         radio_groups = {}
         radiobuttons().each do |f|
-          fname = from_utf8(f.name)
+          fname = from_native_charset(f.name)
           radio_groups[fname] ||= []
           radio_groups[fname] << f 
         end

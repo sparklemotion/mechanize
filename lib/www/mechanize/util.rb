@@ -9,7 +9,6 @@ module WWW
 
       class << self
         def build_query_string(parameters, enc=nil)
-          #p parameters
           parameters.map { |k,v|
             if k
               # WEBrick::HTTP.escape* has some problems about m17n on ruby-1.9.*.

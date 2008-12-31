@@ -26,8 +26,8 @@ module WWW
               cache_obj[:keep_alive_options][k.intern] = v
             end
           end
-  
-          if page.is_a?(Page) && page.body =~ /Set-Cookie/
+          body = Util.to_utf8(page.body)
+          if page.is_a?(Page) && body =~ /Set-Cookie/
             page.search('//meta[@http-equiv="Set-Cookie"]').each do |meta|
               Cookie::parse(uri, meta['content']) { |c|
                 Mechanize.log.debug("saved cookie: #{c}") if Mechanize.log

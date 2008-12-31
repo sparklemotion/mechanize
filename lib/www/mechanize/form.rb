@@ -136,6 +136,25 @@ module WWW
         submit(button)
       end
 
+      # This method is sub-method of build_query.
+      # It converts charset of query value of fields into excepted one.
+      def proc_query(field)
+        field.query_value.map{|(name, val)| 
+          [from_utf8(name), from_utf8(val)]
+        }
+      end
+      private :proc_query
+
+      def from_utf8(str, enc=nil)
+        if page
+          enc ||= page.encoding
+          Util.from_utf8(str,enc)
+        else
+          str
+        end
+      end
+      private :from_utf8
+
       # This method builds an array of arrays that represent the query
       # parameters to be used with this form.  The return value can then
       # be used to create a query string for this form.
@@ -143,17 +162,22 @@ module WWW
         query = []
     
         fields().each do |f|
-          query.push(*f.query_value)
+          qval = proc_query(f)
+          query.push(*qval)
         end
     
         checkboxes().each do |f|
-          query.push(*f.query_value) if f.checked
+          if f.checked
+            qval = proc_query(f)
+            query.push(*qval)
+          end
         end
     
         radio_groups = {}
         radiobuttons().each do |f|
-          radio_groups[f.name] ||= []
-          radio_groups[f.name] << f 
+          fname = from_utf8(f.name)
+          radio_groups[fname] ||= []
+          radio_groups[fname] << f 
         end
     
         # take one radio button from each group
@@ -162,16 +186,17 @@ module WWW
     
           if checked.size == 1
             f = checked.first
-            query.push(*f.query_value)
+            qval = proc_query(f)
+            query.push(*qval)
           elsif checked.size > 1 
             raise "multiple radiobuttons are checked in the same group!" 
           end
         end
 
         @clicked_buttons.each { |b|
-          query.push(*b.query_value)
+          qval = proc_query(b)
+          query.push(*qval)
         }
-    
         query
       end
 
@@ -196,7 +221,7 @@ module WWW
           params.collect { |p| "--#{boundary}\r\n#{p}" }.join('') +
             "--#{boundary}--\r\n"
         else
-          WWW::Mechanize::Util.build_query_string(query_params, page.encoding)
+          WWW::Mechanize::Util.build_query_string(query_params)
         end
       end
     

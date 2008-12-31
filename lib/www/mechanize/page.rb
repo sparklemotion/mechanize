@@ -3,15 +3,9 @@ require 'www/mechanize/page/meta'
 require 'www/mechanize/page/base'
 require 'www/mechanize/page/frame'
 require 'www/mechanize/headers'
-require 'nkf'
 
 module WWW
   class Mechanize
-    CODE_DIC = {
-      :JIS => "ISO-2022-JP",
-      :EUC => "EUC-JP", 
-      :SJIS => "SHIFT_JIS",
-      :UTF8 => "UTF-8", :UTF16 => "UTF-16", :UTF32 => "UTF-32"}
     # = Synopsis
     # This class encapsulates an HTML page.  If Mechanize finds a content
     # type of 'text/html', this class will be instantiated and returned.
@@ -31,6 +25,7 @@ module WWW
 
       def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
         super(uri, response, body, code)
+        @encoding = Util.detect_charset(body)
         @mech           ||= mech
 
         raise Mechanize::ContentTypeError.new(response['content-type']) unless
@@ -50,16 +45,6 @@ module WWW
 
         if body && response
           html_body = body.length > 0 ? body : '<html></html>'
-          tmp = NKF.guess(html_body)
-          if RUBY_VERSION >= "1.9.0"
-            enc = tmp.to_s.upcase
-          else
-            enc = NKF.constants.find{|c|
-              NKF.const_get(c) == tmp
-            }
-            enc = CODE_DIC[enc.intern]
-          end
-          @encoding = enc || "UTF-8"
           @parser = Mechanize.html_parser.parse(html_body, nil, @encoding)
         end
 

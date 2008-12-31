@@ -45,7 +45,11 @@ module WWW
 
         if body && response
           html_body = body.length > 0 ? body : '<html></html>'
-          @parser = Mechanize.html_parser.parse(html_body, nil, @encoding)
+          if @parser == Nokogiri::HTML
+            @parser = Mechanize.html_parser.parse(html_body, nil, @encoding)
+          else
+            @parser = Mechanize.html_parser.parse(html_body)
+          end
         end
 
         @parser

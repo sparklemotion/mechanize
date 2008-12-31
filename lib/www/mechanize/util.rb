@@ -23,14 +23,22 @@ module WWW
         end
 
         def to_utf8(s, code=nil)
-          return unless s
-          code ||= detect_charset(s)
-          Iconv.iconv("UTF-8", code, s).join("")
+          if Mechanize.html_parser == Nokogiri::HTML
+            return unless s
+            code ||= detect_charset(s)
+            Iconv.iconv("UTF-8", code, s).join("")
+          else
+            s
+          end
         end
 
         def from_utf8(s, code)
-          return unless s
-          Iconv.iconv(code, "UTF-8", s).join("")
+          if Mechanize.html_parser == Nokogiri::HTML
+            return unless s
+            Iconv.iconv(code, "UTF-8", s).join("")
+          else
+            return s
+          end
         end
 
         def html_unescape(s)

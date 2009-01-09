@@ -145,7 +145,20 @@
       </table><br />
       <input type="submit" value="Submit" />
     </form>
-    <h1>Get Form 3</h1>
+
+	<!-- Post form with multipart/form-data -->
+	<h1>Post Form 4 - Multipart</h1>
+	<form name="post_form4_multipart" enctype="multipart/form-data" method="post" action="/form_post">
+    <table>
+      <tr>
+        <td>First Name</td>
+        <td><input type="text" name="first_name" /></td>
+      </tr>
+  	</table><br />
+  	<input type="submit" value="Submit" />
+	</form>
+    
+	<h1>Get Form 3</h1>
     <form name="get_form3" method="get" action="/form_post?great day=yes&one=two">
       <table>
         <tr>

@@ -216,7 +216,7 @@ module WWW
           boundary = rand_string(20)
           @enctype = "multipart/form-data; boundary=#{boundary}"
           params = []
-          query_params.each { |k,v| params << param_to_multipart(k, v) }
+          query_params.each { |k,v| params << param_to_multipart(k, v) unless k.nil? }
           @file_uploads.each { |f| params << file_to_multipart(f) }
           params.collect { |p| "--#{boundary}\r\n#{p}" }.join('') +
             "--#{boundary}--\r\n"

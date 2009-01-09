@@ -149,6 +149,21 @@ class FormsMechTest < Test::Unit::TestCase
     )
   end
 
+  def test_post_multipart
+    page = @agent.get("http://localhost/form_test.html")
+    post_form = page.forms.find { |f| f.name == "post_form4_multipart" }
+    assert_not_nil(post_form, "Post form is null")
+    assert_equal("post", post_form.method.downcase)
+    assert_equal("/form_post", post_form.action)
+    
+    assert_equal(1, post_form.fields.size)
+    assert_equal(1, post_form.buttons.size)
+    
+    page = @agent.submit(post_form, post_form.buttons.first)
+    
+    assert_not_nil(page)
+  end
+
   def test_select_box
     page = @agent.get("http://localhost/form_test.html")
     post_form = page.forms.find { |f| f.name == "post_form1" }

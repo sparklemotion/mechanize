@@ -447,7 +447,6 @@ class FormsMechTest < Test::Unit::TestCase
     }.checked = true
     get_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
     page = @agent.submit(get_form, get_form.buttons.first)
-
     # Check that the submitted fields exist
     assert_equal(3, page.links.size, "Not enough links")
     assert_not_nil(

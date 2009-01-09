@@ -37,7 +37,7 @@ module WWW
         end
 
         def uri
-          URI.parse(@href)
+          @href && URI.parse(@href)
         end
 
         # Click on this link

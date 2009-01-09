@@ -4,6 +4,7 @@
 
 * Bug Fixes:
   * m17n fixes. ありがとう konn!
+  * Fixed a problem with base tags.  ありがとう Keisuke
 
 === 0.9.0
 

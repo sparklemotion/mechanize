@@ -239,16 +239,8 @@ module WWW
     #   put('http://tenderlovemaking.com/', {'q' => 'foo'}, :headers => {})
     #
     def put(url, query_params = {}, options = {})
-      options = {
-        :uri      => url,
-        :headers  => {},
-        :params   => query_params,
-        :verb     => :put
-      }.merge(options)
-      # fetch the page
-      page = fetch_page(options)
+      page = head(url, query_params, options.merge({:verb => :put}))
       add_to_history(page)
-      yield page if block_given?
       page
     end
 
@@ -258,7 +250,9 @@ module WWW
     #   delete('http://tenderlovemaking.com/', {'q' => 'foo'}, :headers => {})
     #
     def delete(url, query_params = {}, options = {})
-      put(url, query_params, options.merge({:verb => :delete}))
+      page = head(url, query_params, options.merge({:verb => :delete}))
+      add_to_history(page)
+      page
     end
 
     ####
@@ -267,7 +261,16 @@ module WWW
     #   head('http://tenderlovemaking.com/', {'q' => 'foo'}, :headers => {})
     #
     def head(url, query_params = {}, options = {})
-      put(url, query_params, options.merge({:verb => :head}))
+      options = {
+        :uri      => url,
+        :headers  => {},
+        :params   => query_params,
+        :verb     => :head
+      }.merge(options)
+      # fetch the page
+      page = fetch_page(options)
+      yield page if block_given?
+      page
     end
   
     # Fetch a file and return the contents of the file.

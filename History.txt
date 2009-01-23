@@ -5,6 +5,7 @@
 * Bug Fixes:
   * m17n fixes. ありがとう konn!
   * Fixed a problem with base tags.  ありがとう Keisuke
+  * HEAD requests do not record in the history
 
 === 0.9.0
 

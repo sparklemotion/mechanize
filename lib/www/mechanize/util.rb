@@ -65,7 +65,7 @@ module WWW
             }
             enc = CODE_DIC[enc.intern]
           end
-          enc || "ASCII"
+          enc || "ISO-8859-1"
         end
 
       end

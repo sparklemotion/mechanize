@@ -153,6 +153,7 @@ test/test_redirect_limit_reached.rb
 test/test_redirect_verb_handling.rb
 test/test_referer.rb
 test/test_relative_links.rb
+test/test_request.rb
 test/test_response_code.rb
 test/test_save_file.rb
 test/test_scheme.rb

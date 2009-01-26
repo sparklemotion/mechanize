@@ -10,6 +10,7 @@ module WWW
 
         def handle(ctx, params)
           raise ArgumentError.new('uri must be specified') unless params[:uri]
+          params[:uri] = params[:uri].dup if params[:uri].is_a?(URI)
           uri     = params[:uri]
           referer = params[:referer]
           unless uri.is_a?(URI)

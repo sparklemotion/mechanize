@@ -9,6 +9,7 @@
   * Default encoding to ISO-8859-1 instead of ASCII
   * Requests with URI instances should not be polluted RF #23472
   * Nonce count fixed for digest auth requests.  Thanks Adrian Slapa!
+  * Fixed a referer issue with requests using a uri.  RF #23472
 
 === 0.9.0
 

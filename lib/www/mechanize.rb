@@ -206,7 +206,7 @@ module WWW
       end
 
       unless referer
-        if url =~ /^http/
+        if url.to_s =~ /^http/
           referer = Page.new(nil, {'content-type'=>'text/html'})
         else
           referer = current_page || Page.new(nil, {'content-type'=>'text/html'})

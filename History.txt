@@ -8,6 +8,7 @@
   * HEAD requests do not record in the history
   * Default encoding to ISO-8859-1 instead of ASCII
   * Requests with URI instances should not be polluted RF #23472
+  * Nonce count fixed for digest auth requests.  Thanks Adrian Slapa!
 
 === 0.9.0
 

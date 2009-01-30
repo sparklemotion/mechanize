@@ -4,7 +4,7 @@ module WWW
       class AuthHeaders
         include WWW::Handler
 
-        @@nonce_count = -1
+        @@nonce_count = Hash.new(0)
         CNONCE = Digest::MD5.hexdigest("%x" % (Time.now.to_i + rand(65535)))
 
         def initialize(auth_hash, user, password, digest)
@@ -36,8 +36,6 @@ module WWW
         end
 
         def gen_auth_header(uri, request, auth_header, is_IIS = false)
-          @@nonce_count += 1
-  
           auth_header =~ /^(\w+) (.*)/
   
           params = {}
@@ -45,12 +43,14 @@ module WWW
             params[$1] = $2.gsub(/^"/, '').gsub(/"$/, '')
           }
   
+          @@nonce_count[params['nonce']] += 1
+
           a_1 = "#{@user}:#{params['realm']}:#{@password}"
           a_2 = "#{request.method}:#{uri.path}"
           request_digest = ''
           request_digest << Digest::MD5.hexdigest(a_1)
           request_digest << ':' << params['nonce']
-          request_digest << ':' << ('%08x' % @@nonce_count)
+          request_digest << ':' << ('%08x' % @@nonce_count[params['nonce']])
           request_digest << ':' << CNONCE
           request_digest << ':' << params['qop']
           request_digest << ':' << Digest::MD5.hexdigest(a_2)
@@ -68,7 +68,7 @@ module WWW
             "#{field}=\"#{params[field]}\""
           }.compact.join(', ')
 
-          header << "nc=#{'%08x' % @@nonce_count}, "
+          header << "nc=#{'%08x' % @@nonce_count[params['nonce']]}, "
           header << "cnonce=\"#{CNONCE}\", "
           header << "response=\"#{Digest::MD5.hexdigest(request_digest)}\""
   

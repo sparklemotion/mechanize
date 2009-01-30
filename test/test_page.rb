@@ -5,6 +5,12 @@ class TestPage < Test::Unit::TestCase
     @agent = WWW::Mechanize.new
   end
 
+  def test_set_encoding
+    page = @agent.get("http://localhost/file_upload.html")
+    page.encoding = 'UTF-8'
+    assert_equal 'UTF-8', page.parser.encoding
+  end
+
   def test_page_gets_yielded
     pages = nil
     @agent.get("http://localhost/file_upload.html") { |page|

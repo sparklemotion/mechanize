@@ -2,6 +2,9 @@
 
 === HEAD
 
+* New Features:
+  * Encoding may be specified for a page: Page#encoding=
+
 * Bug Fixes:
   * m17n fixes. ありがとう konn!
   * Fixed a problem with base tags.  ありがとう Keisuke

@@ -45,6 +45,8 @@ module WWW
     class PluggableParser
       CONTENT_TYPES = {
         :html => 'text/html',
+        :html => 'application/vnd.wap.xhtml+xml',
+        :html => 'application/xhtml+xml',
         :xhtml => 'application/xhtml+xml',
         :pdf  => 'application/pdf',
         :csv  => 'text/csv',

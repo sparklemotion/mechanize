@@ -1,6 +1,6 @@
 = Mechanize CHANGELOG
 
-=== HEAD
+=== 0.9.1 2009/02/23
 
 * New Features:
   * Encoding may be specified for a page: Page#encoding=

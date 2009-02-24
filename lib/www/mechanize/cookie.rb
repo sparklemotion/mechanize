@@ -11,7 +11,13 @@ module WWW
           first_elem = cookie_elem.shift
           first_elem.strip!
           key, value = first_elem.split(/=/, 2)
-          cookie = new(key, WEBrick::HTTPUtils.dequote(value))
+
+          begin
+            cookie = new(key, WEBrick::HTTPUtils.dequote(value))
+          rescue
+            log.warn("Couldn't parse key/value: #{first_elem}") if log
+          end
+
           cookie_elem.each{|pair|
             pair.strip!
             key, value = pair.split(/=/, 2)

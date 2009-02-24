@@ -14,7 +14,7 @@ a history.
 == Dependencies
 
 * ruby 1.8.4
-* hpricot[http://code.whytheluckystiff.net/hpricot/]
+* nokogiri[http://nokogiri.rubyforge.org]
 
 
 == Examples

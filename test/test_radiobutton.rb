@@ -60,4 +60,16 @@ class TestRadioButtons < Test::Unit::TestCase
                                                ).checked)
     end
   end
+
+  def test_click_all
+    form = @page.forms.first
+    form.radiobuttons_with(:name => 'color').each do |button|
+      button.click
+    end
+    c = form.radiobuttons_with(:name => 'color').inject(0) do |m,button|
+      m += 1 if button.checked
+      m
+    end
+    assert_equal 1, c, 'Only one radio button should be checked'
+  end
 end

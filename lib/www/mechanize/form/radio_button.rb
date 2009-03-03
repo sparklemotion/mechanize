@@ -22,7 +22,7 @@ module WWW
         end
 
         def click
-          @checked = !@checked
+          checked ? uncheck : check
         end
 
         private

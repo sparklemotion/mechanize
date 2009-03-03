@@ -1,8 +1,15 @@
 require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
+require 'cgi'
+
 class TestPage < Test::Unit::TestCase
   def setup
     @agent = WWW::Mechanize.new
+  end
+
+  def test_page_gets_charset_sent_by_server
+    page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/html; charset=UTF-8')}")
+    assert_equal 'UTF-8', page.encoding
   end
 
   def test_set_encoding

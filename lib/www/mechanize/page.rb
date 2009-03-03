@@ -24,13 +24,19 @@ module WWW
       attr_accessor :encoding
 
       def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
+        @encoding = nil
+        response.each do |header,v|
+          next unless v =~ /charset/i
+          @encoding = v.split('=').last.strip
+        end
+        @encoding ||= Util.detect_charset(body)
+        body = Util.to_native_charset(body, @encoding)
+
         super(uri, response, body, code)
-        @encoding = Util.detect_charset(body)
         @mech           ||= mech
 
         raise Mechanize::ContentTypeError.new(response['content-type']) unless
-            response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/ 
-
+           response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/ 
         @parser = @links = @forms = @meta = @bases = @frames = @iframes = nil
       end
 

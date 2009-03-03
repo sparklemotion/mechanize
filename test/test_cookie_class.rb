@@ -59,6 +59,15 @@ class CookieClassTest < Test::Unit::TestCase
     end
   end
 
+  def test_parse_weird_cookie
+    cookie = 'n/a, ASPSESSIONIDCSRRQDQR=FBLDGHPBNDJCPCGNCPAENELB; path=/'
+    url = URI.parse('http://www.searchinnovation.com/')
+    WWW::Mechanize::Cookie.parse(url, cookie) { |cookie|
+      assert_equal('ASPSESSIONIDCSRRQDQR', cookie.name)
+      assert_equal('FBLDGHPBNDJCPCGNCPAENELB', cookie.value)
+    }
+  end
+
   def test_double_semicolon
     double_semi = 'WSIDC=WEST;; domain=.williams-sonoma.com; path=/'
     url = URI.parse('http://williams-sonoma.com/')

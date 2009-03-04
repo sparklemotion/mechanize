@@ -56,5 +56,5 @@ library!
   
 == License
 
-This library is distributed under the GPL.  Please see the LICENSE[link://files/LICENSE_txt.html] file.
+This library is distributed under the GPL.  Please see the LICENSE[link://files/LICENSE_rdoc.html] file.
 

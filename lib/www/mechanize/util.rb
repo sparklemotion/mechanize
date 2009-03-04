@@ -1,3 +1,5 @@
+require 'cgi'
+
 module WWW
   class Mechanize
     class Util
@@ -12,7 +14,7 @@ module WWW
           parameters.map { |k,v|
             if k
               # WEBrick::HTTP.escape* has some problems about m17n on ruby-1.9.*.
-              [URI.escape(k.to_s), URI.escape(v.to_s)].join("=")
+              [CGI.escape(k.to_s), CGI.escape(v.to_s)].join("=")
 =begin
               [WEBrick::HTTPUtils.escape_form(k.to_s),
                 WEBrick::HTTPUtils.escape_form(v.to_s)].join("=")

@@ -6,6 +6,7 @@
   * Fixed a bug with bad cookie parsing
   * Form::RadioButton#click unchecks other buttons (RF #24159)
   * Fixed problems with Iconv (RF #24190, RF #24192, RF #24043)
+  * POST parameters should be CGI escaped
 
 === 0.9.1 2009/02/23
 

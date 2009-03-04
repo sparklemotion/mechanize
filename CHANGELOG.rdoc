@@ -2,6 +2,9 @@
 
 === HEAD
 
+* New Features:
+  * Mechanize#submit and Form#submit take arbitrary headers(thanks penguincoder)
+
 * Bug Fixes:
   * Fixed a bug with bad cookie parsing
   * Form::RadioButton#click unchecks other buttons (RF #24159)

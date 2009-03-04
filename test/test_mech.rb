@@ -10,6 +10,17 @@ class TestMechMethods < Test::Unit::TestCase
     assert_equal('http://localhost/?foo=~2', page.uri.to_s)
   end
 
+  def test_submit_takes_arbirary_headers
+    page = @agent.get('http://localhost:2000/form_no_action.html')
+    assert form = page.forms.first
+    form.action = '/http_headers'
+    page = @agent.submit(form, nil, { 'foo' => 'bar' })
+    headers = Hash[*(
+      page.body.split("\n").map { |x| x.split('|') }.flatten
+    )]
+    assert_equal 'bar', headers['foo']
+  end
+
   def test_get_with_params
     page = @agent.get('http://localhost/', { :q => 'hello' })
     assert_equal('http://localhost/?q=hello', page.uri.to_s)

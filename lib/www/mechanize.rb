@@ -328,14 +328,15 @@ module WWW
     #  agent.submit(page.forms.first)
     # With a button
     #  agent.submit(page.forms.first, page.forms.first.buttons.first)
-    def submit(form, button=nil)
+    def submit(form, button=nil, headers={})
       form.add_button_to_query(button) if button
       case form.method.upcase
       when 'POST'
-        post_form(form.action, form)
+        post_form(form.action, form, headers)
       when 'GET'
         get(  :url      => form.action.gsub(/\?[^\?]*$/, ''),
               :params   => form.build_query,
+              :headers  => headers,
               :referer  => form.page
            )
       else
@@ -384,7 +385,7 @@ module WWW
       hash[:uri].to_s
     end
   
-    def post_form(url, form)
+    def post_form(url, form, headers = {})
       cur_page = form.page || current_page ||
                       Page.new( nil, {'content-type'=>'text/html'})
   
@@ -400,7 +401,7 @@ module WWW
                           :headers  => {
                             'Content-Type'    => form.enctype,
                             'Content-Length'  => request_data.size.to_s,
-                          })
+                          }.merge(headers))
       add_to_history(page) 
       page
     end

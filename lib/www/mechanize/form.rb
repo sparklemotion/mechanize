@@ -126,8 +126,8 @@ module WWW
       end
 
       # Submit this form with the button passed in
-      def submit(button=nil)
-        @mech.submit(self, button)
+      def submit button=nil, headers = {}
+        @mech.submit(self, button, headers)
       end
 
       # Submit form using +button+. Defaults

@@ -8,6 +8,9 @@ HOE = Hoe.new('mechanize', WWW::Mechanize::VERSION) do |p|
   p.rubyforge_name  = 'mechanize'
   p.developer('Aaron Patterson','aaronp@rubyforge.org')
   p.developer('Mike Dalessio','mike.dalessio@gmail.com')
+  p.readme_file     = 'README.rdoc'
+  p.history_file    = 'CHANGELOG.rdoc'
+  p.extra_rdoc_files  = FileList['*.rdoc']
   p.summary         = "Mechanize provides automated web-browsing"
   p.extra_deps      = [['nokogiri', '>= 1.2.1']]
 end

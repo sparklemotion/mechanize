@@ -1,10 +1,10 @@
-EXAMPLES.txt
-FAQ.txt
-GUIDE.txt
-History.txt
-LICENSE.txt
+CHANGELOG.rdoc
+EXAMPLES.rdoc
+FAQ.rdoc
+GUIDE.rdoc
+LICENSE.rdoc
 Manifest.txt
-README.txt
+README.rdoc
 Rakefile
 examples/flickr_upload.rb
 examples/mech-dump.rb

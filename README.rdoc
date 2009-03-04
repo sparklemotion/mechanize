@@ -13,20 +13,29 @@ a history.
 
 == Dependencies
 
-* ruby 1.8.4
+* ruby 1.8.6
 * nokogiri[http://nokogiri.rubyforge.org]
 
+== SUPPORT:
+
+The mechanize mailing list is available here:
+
+  * http://rubyforge.org/mailman/listinfo/mechanize-users
+
+The bug tracker is available here:
+
+  * http://rubyforge.org/tracker/?atid=5709&group_id=1453
 
 == Examples
 
-If you are just starting, check out the GUIDE[link://files/GUIDE_txt.html].  
-Also, check out the EXAMPLES[link://files/EXAMPLES_txt.html] file.
+If you are just starting, check out the GUIDE[link://files/GUIDE_rdoc.html].  
+Also, check out the EXAMPLES[link://files/EXAMPLES_rdoc.html] file.
 
 == Authors
 
 Copyright (c) 2005 by Michael Neumann (mneumann@ntecs.de) 
 
-Copyright (c) 2006-2008:
+Copyright (c) 2006-2009:
 
 * {Aaron Patterson}[http://tenderlovemaking.com] (aaronp@rubyforge.org)
 * {Mike Dalessio}[http://mike.daless.io] (mike@csa.net)

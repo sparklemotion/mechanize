@@ -11,6 +11,7 @@
   * Fixed problems with Iconv (RF #24190, RF #24192, RF #24043)
   * POST parameters should be CGI escaped
   * Made Content-Type match case insensitive (Thanks Kelly Reynolds)
+  * Non-string form parameters work
 
 === 0.9.1 2009/02/23
 

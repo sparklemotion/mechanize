@@ -94,6 +94,13 @@ class FormsMechTest < Test::Unit::TestCase
     assert_not_nil(page.link_with(:text => 'first:Patterson'))
   end
 
+  def test_post_with_non_strings
+    page = @agent.get("http://localhost/form_test.html")
+    page.form('post_form1') do |form|
+      form.first_name = 10
+    end.submit
+  end
+
   def test_post
     page = @agent.get("http://localhost/form_test.html")
     post_form = page.forms.find { |f| f.name == "post_form1" }

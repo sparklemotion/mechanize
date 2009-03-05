@@ -140,7 +140,7 @@ module WWW
       # It converts charset of query value of fields into excepted one.
       def proc_query(field)
         field.query_value.map{|(name, val)| 
-          [from_native_charset(name), from_native_charset(val)]
+          [from_native_charset(name), from_native_charset(val.to_s)]
         }
       end
       private :proc_query

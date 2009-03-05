@@ -7,6 +7,17 @@ class TestPage < Test::Unit::TestCase
     @agent = WWW::Mechanize.new
   end
 
+  def test_broken_charset
+    page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/html; charset=akldsjfhaldjfksh')}")
+    assert page.parser
+  end
+
+  def test_upper_case_content_type
+    page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/HTML')}")
+    assert_instance_of WWW::Mechanize::Page, page
+    assert_equal 'text/HTML', page.content_type
+  end
+
   def test_page_gets_charset_sent_by_server
     page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/html; charset=UTF-8')}")
     assert_equal 'UTF-8', page.encoding

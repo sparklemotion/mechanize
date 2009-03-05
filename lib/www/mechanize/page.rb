@@ -30,13 +30,13 @@ module WWW
           @encoding = v.split('=').last.strip
         end
         @encoding ||= Util.detect_charset(body)
-        body = Util.to_native_charset(body, @encoding)
+        body = Util.to_native_charset(body, @encoding) rescue body
 
         super(uri, response, body, code)
         @mech           ||= mech
 
         raise Mechanize::ContentTypeError.new(response['content-type']) unless
-           response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/ 
+           response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/i
         @parser = @links = @forms = @meta = @bases = @frames = @iframes = nil
       end
 

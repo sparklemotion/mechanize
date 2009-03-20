@@ -22,6 +22,34 @@ class FollowMetaTest < Test::Unit::TestCase
     assert_equal('http://localhost/index.html', page.uri.to_s)
     assert_equal('http://localhost/index.html', @agent.history.last.uri.to_s)
   end
+  
+  def test_follow_meta_with_empty_url
+    @agent.follow_meta_refresh = true
+  
+    page = @agent.get('http://localhost/refresh_with_empty_url')
+  
+    assert_equal(3, @agent.history.length)
+    assert_equal('http://localhost/refresh_with_empty_url',
+                 @agent.history[0].uri.to_s)
+    assert_equal('http://localhost/refresh_with_empty_url',
+                 @agent.history[1].uri.to_s)
+    assert_equal('http://localhost/index.html', page.uri.to_s)
+    assert_equal('http://localhost/index.html', @agent.history.last.uri.to_s)
+  end
+  
+  def test_follow_meta_without_url
+    @agent.follow_meta_refresh = true
+  
+    page = @agent.get('http://localhost/refresh_without_url')
+  
+    assert_equal(3, @agent.history.length)
+    assert_equal('http://localhost/refresh_without_url',
+                 @agent.history[0].uri.to_s)
+    assert_equal('http://localhost/refresh_without_url',
+                 @agent.history[1].uri.to_s)
+    assert_equal('http://localhost/index.html', page.uri.to_s)
+    assert_equal('http://localhost/index.html', @agent.history.last.uri.to_s)
+  end
 
   def test_always_follow_302
     @agent.follow_meta_refresh = false

@@ -48,6 +48,8 @@ class Net::HTTP
     '/infinite_redirect'      => InfiniteRedirectTest,
     '/infinite_refresh'       => InfiniteRefreshTest,
     '/redirect'               => RedirectTest,
+    '/refresh_without_url'    => RefreshWithoutUrl,
+    '/refresh_with_empty_url' => RefreshWithEmptyUrl,
     '/digest_auth'            => DigestAuthServlet,
     '/verb'                   => VerbServlet,
   }

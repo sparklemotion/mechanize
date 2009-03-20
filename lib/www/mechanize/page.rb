@@ -119,8 +119,9 @@ module WWW
           next unless node['http-equiv'] && node['content']
           (equiv, content) = node['http-equiv'], node['content']
           if equiv && equiv.downcase == 'refresh'
-            if content && content =~ /^\d+\s*;\s*url\s*=\s*'?([^\s']+)/i
-              node['href'] = $1
+            Meta.parse(content, uri) do |delay, href|
+              node['delay'] = delay
+              node['href'] = href
               Meta.new(node, @mech, self)
             end
           end

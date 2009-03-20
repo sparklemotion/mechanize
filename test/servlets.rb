@@ -164,6 +164,32 @@ class InfiniteRefreshTest < WEBrick::HTTPServlet::AbstractServlet
   end
 end
 
+class RefreshWithoutUrl < WEBrick::HTTPServlet::AbstractServlet
+  @@count = 0
+  def do_GET(req, res)
+    res['Content-Type'] = "text/html"
+    @@count += 1
+    if @@count > 1
+      res['Refresh'] = "0; url=http://localhost/index.html";
+    else
+      res['Refresh'] = "0";
+    end
+  end
+end
+
+class RefreshWithEmptyUrl < WEBrick::HTTPServlet::AbstractServlet
+  @@count = 0
+  def do_GET(req, res)
+    res['Content-Type'] = "text/html"
+    @@count += 1
+    if @@count > 1
+      res['Refresh'] = "0; url=http://localhost/index.html";
+    else
+      res['Refresh'] = "0; url=";
+    end
+  end
+end
+
 class InfiniteRedirectTest < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     res['Content-Type'] = req.query['ct'] || "text/html"

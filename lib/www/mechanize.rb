@@ -504,17 +504,14 @@ module WWW
         redirect_uri = nil
         if (page.respond_to?(:meta) && (redirect = page.meta.first))
           redirect_uri = redirect.uri.to_s
+          sleep redirect.node['delay'].to_f
         elsif refresh = response['refresh']
-          parsed_refresh = refresh.match(/^\s*(\d+\.?\d*);\s*(url|URL)=(\S*)\s*$/)
-          raise StandardError, "Invalid refresh http header" unless parsed_refresh
-          delay = parsed_refresh[1]
-          location = parsed_refresh[3]
-          location = "http://#{uri.host}#{location}" unless location.include?("http")
+          delay, redirect_uri = Page::Meta.parse(refresh, uri)
+          raise StandardError, "Invalid refresh http header" unless delay
           if redirects + 1 > redirection_limit
             raise RedirectLimitReachedError.new(page, redirects)
           end
-          sleep delay.to_i
-          redirect_uri = location
+          sleep delay.to_f
         end
         if redirect_uri
           @history.push(page, page.uri)

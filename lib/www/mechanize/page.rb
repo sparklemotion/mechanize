@@ -25,12 +25,12 @@ module WWW
 
       def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
         @encoding = nil
-        response.each do |header,v|
+        method = response.respond_to?(:each_header) ? :each_header : :each
+        response.send(method) do |header,v|
           next unless v =~ /charset/i
           @encoding = v.split('=').last.strip
         end
         @encoding ||= Util.detect_charset(body)
-        body = Util.to_native_charset(body, @encoding) rescue body
 
         super(uri, response, body, code)
         @mech           ||= mech

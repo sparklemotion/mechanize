@@ -48,6 +48,17 @@ class TestPage < Test::Unit::TestCase
     assert_equal(nil, page.title)
   end
 
+  def test_page_decoded_with_charset
+    page = WWW::Mechanize::Page.new(
+      URI.parse('http://tenderlovemaking.com/'),
+      { 'content-type' => 'text/html; charset=EUC-JP' },
+      '<html><body>hello</body></html>',
+      400,
+      @agent
+    )
+    assert_equal 'EUC-JP', page.parser.encoding
+  end
+
   def test_find_form_with_hash
     page  = @agent.get("http://localhost/tc_form_action.html")
     form = page.form(:name => 'post_form1')

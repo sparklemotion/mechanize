@@ -1,5 +1,11 @@
 = Mechanize CHANGELOG
 
+=== HEAD
+
+* Bug Fixes:
+
+  * Do not apply encoding if encoding equals 'none' Thanks Akinori MUSHA!
+
 === 0.9.2 / 2009/03/05
 
 * New Features:

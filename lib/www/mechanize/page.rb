@@ -28,7 +28,8 @@ module WWW
         method = response.respond_to?(:each_header) ? :each_header : :each
         response.send(method) do |header,v|
           next unless v =~ /charset/i
-          @encoding = v.split('=').last.strip
+          encoding = v.split('=').last.strip
+          @encoding = encoding unless encoding == 'none'
         end
         @encoding ||= Util.detect_charset(body)
 

@@ -37,7 +37,7 @@ module WWW
         end
 
         def query_value
-          value ? [[name, value]] : ''
+          value ? [[name, value]] : nil
         end
       end
     end

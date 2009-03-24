@@ -139,6 +139,7 @@ module WWW
       # This method is sub-method of build_query.
       # It converts charset of query value of fields into excepted one.
       def proc_query(field)
+        return unless field.query_value
         field.query_value.map{|(name, val)| 
           [from_native_charset(name), from_native_charset(val.to_s)]
         }

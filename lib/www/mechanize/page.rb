@@ -21,7 +21,7 @@ module WWW
       extend Forwardable
 
       attr_accessor :mech
-      attr_accessor :encoding
+      attr_writer :encoding
 
       def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
         @encoding = nil
@@ -47,12 +47,17 @@ module WWW
         end
       end
 
+      def encoding
+        parser.encoding
+      end
+
       def parser
         return @parser if @parser
 
         if body && response
           html_body = body.length > 0 ? body : '<html></html>'
           if WWW::Mechanize.html_parser == Nokogiri::HTML
+            @encoding = nil if html_body =~ /<meta[^>]*charset[^>]*>/i
             @parser = Mechanize.html_parser.parse(html_body, nil, @encoding)
           else
             @parser = Mechanize.html_parser.parse(html_body)

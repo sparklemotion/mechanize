@@ -9,6 +9,7 @@
     RF #24516
   * HTML Parser may be set on a per instance level WWW::Mechanize#html_parser
     RF #24693
+  * Fixed string encoding in ruby 1.9.  RF #2433
 
 === 0.9.2 / 2009/03/05
 

@@ -24,7 +24,9 @@ module WWW
       attr_accessor :encoding
 
       def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
-        @encoding = nil
+        # Default to ISO-8859-1 RFC2616 3.7.1
+        @encoding = 'ISO-8859-1'
+
         method = response.respond_to?(:each_header) ? :each_header : :each
         response.send(method) do |header,v|
           next unless v =~ /charset/i
@@ -32,6 +34,10 @@ module WWW
           @encoding = encoding unless encoding == 'none'
         end
         @encoding ||= Util.detect_charset(body)
+
+        if defined?(Encoding) && body && encoding = Encoding.find(@encoding)
+          body.encode!(encoding, encoding)
+        end
 
         super(uri, response, body, code)
         @mech           ||= mech

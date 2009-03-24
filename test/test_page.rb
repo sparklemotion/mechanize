@@ -7,6 +7,11 @@ class TestPage < Test::Unit::TestCase
     @agent = WWW::Mechanize.new
   end
 
+  def test_page_gets_charset_from_page
+    page = @agent.get("http://localhost/tc_charset.html")
+    assert_equal 'windows-1255', page.encoding
+  end
+
   def test_broken_charset
     page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/html; charset=akldsjfhaldjfksh')}")
     assert page.parser

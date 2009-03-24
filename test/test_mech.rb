@@ -10,6 +10,13 @@ class TestMechMethods < Test::Unit::TestCase
     assert_equal('http://localhost/?foo=~2', page.uri.to_s)
   end
 
+  def test_parser_can_be_set
+    @agent.html_parser = {}
+    assert_raises(NoMethodError) {
+      @agent.get('http://localhost/?foo=~2').links
+    }
+  end
+
   def test_submit_takes_arbirary_headers
     page = @agent.get('http://localhost:2000/form_no_action.html')
     assert form = page.forms.first

@@ -7,6 +7,8 @@
   * Do not apply encoding if encoding equals 'none' Thanks Akinori MUSHA!
   * Custom request headers may be supplied WWW::Mechanize#request_headers
     RF #24516
+  * HTML Parser may be set on a per instance level WWW::Mechanize#html_parser
+    RF #24693
 
 === 0.9.2 / 2009/03/05
 

@@ -85,6 +85,9 @@ module WWW
 
     # A hash of custom request headers
     attr_accessor :request_headers
+
+    # The HTML parser to be used when parsing documents
+    attr_accessor :html_parser
   
     attr_reader :history
     attr_reader :pluggable_parser
@@ -153,6 +156,8 @@ module WWW
 
       @pre_connect_hook = Chain::PreConnectHook.new
       @post_connect_hook = Chain::PostConnectHook.new
+
+      @html_parser = self.class.html_parser
   
       yield self if block_given?
     end

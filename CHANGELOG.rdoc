@@ -5,6 +5,8 @@
 * Bug Fixes:
 
   * Do not apply encoding if encoding equals 'none' Thanks Akinori MUSHA!
+  * Custom request headers may be supplied WWW::Mechanize#request_headers
+    RF #24516
 
 === 0.9.2 / 2009/03/05
 

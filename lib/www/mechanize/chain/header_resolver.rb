@@ -3,11 +3,12 @@ module WWW
     class Chain
       class HeaderResolver
         include WWW::Handler
-        def initialize(keep_alive, keep_alive_time, cookie_jar, user_agent)
+        def initialize(keep_alive, keep_alive_time, cookie_jar, user_agent, headers)
           @keep_alive = keep_alive
           @keep_alive_time = keep_alive_time
           @cookie_jar = cookie_jar
           @user_agent = user_agent
+          @headers = headers
         end
 
         def handle(ctx, params)
@@ -40,6 +41,10 @@ module WWW
   
           # Add User-Agent header to request
           request['User-Agent'] = @user_agent if @user_agent 
+
+          @headers.each do |k,v|
+            request[k] = v
+          end if request
           super
         end
       end

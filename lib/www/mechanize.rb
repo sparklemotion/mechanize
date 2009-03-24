@@ -82,6 +82,9 @@ module WWW
     attr_accessor :history_added
     attr_accessor :scheme_handlers
     attr_accessor :redirection_limit
+
+    # A hash of custom request headers
+    attr_accessor :request_headers
   
     attr_reader :history
     attr_reader :pluggable_parser
@@ -120,6 +123,7 @@ module WWW
       @password       = nil # Auth Password
       @digest         = nil # DigestAuth Digest
       @auth_hash      = {}  # Keep track of urls for sending auth
+      @request_headers= {}  # A hash of request headers to be used
   
       # Proxy settings
       @proxy_addr     = nil
@@ -435,10 +439,13 @@ module WWW
         ),
         Chain::SSLResolver.new(@ca_file, @verify_callback, @cert, @key, @pass),
         Chain::AuthHeaders.new(@auth_hash, @user, @password, @digest),
-        Chain::HeaderResolver.new(  @keep_alive,
-                                    @keep_alive_time,
-                                    @cookie_jar,
-                                    @user_agent),
+        Chain::HeaderResolver.new(
+          @keep_alive,
+          @keep_alive_time,
+          @cookie_jar,
+          @user_agent,
+          {}
+        ),
         Chain::CustomHeaders.new,
         @pre_connect_hook,
       ])

@@ -36,7 +36,7 @@ module WWW
         @encoding ||= Util.detect_charset(body)
 
         if defined?(Encoding) && body && encoding = Encoding.find(@encoding)
-          body.encode!(encoding, encoding)
+          body.force_encoding(encoding)
         end
 
         super(uri, response, body, code)

@@ -24,8 +24,7 @@ module WWW
       attr_writer :encoding
 
       def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
-        # Default to ISO-8859-1 RFC2616 3.7.1
-        @encoding = 'ISO-8859-1'
+        @encoding = nil
 
         method = response.respond_to?(:each_header) ? :each_header : :each
         response.send(method) do |header,v|

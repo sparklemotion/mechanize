@@ -23,6 +23,11 @@ module WWW
                     body.rewind
                     body.read(10)
                     Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body.read)
+                  rescue Zlib::DataError
+                    if Mechanize.log
+                      Mechanize.log.error("Caught a Zlib::DataError, unable to decode page: #{$!.to_s}")
+                    end
+                    ''
                   end
                 else
                   ''

@@ -11,6 +11,17 @@ class FollowMetaTest < Test::Unit::TestCase
     assert_equal(1, page.meta.length)
   end
 
+  def test_meta_refresh_does_not_send_referer
+    @agent.follow_meta_refresh = true
+    requests = []
+    @agent.pre_connect_hooks << lambda { |params|
+      requests << params[:request]
+    }
+
+    page = @agent.get('http://localhost/tc_follow_meta.html')
+    assert_nil requests[1]['referer']
+  end
+
   def test_follow_meta_if_set
     @agent.follow_meta_refresh = true
 

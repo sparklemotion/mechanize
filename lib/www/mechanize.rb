@@ -513,10 +513,12 @@ module WWW
       log.info("status: #{ page.code }") if log
   
       if follow_meta_refresh
-        redirect_uri = nil
+        redirect_uri  = nil
+        referer       = page
         if (page.respond_to?(:meta) && (redirect = page.meta.first))
           redirect_uri = redirect.uri.to_s
           sleep redirect.node['delay'].to_f
+          referer = Page.new(nil, {'content-type'=>'text/html'})
         elsif refresh = response['refresh']
           delay, redirect_uri = Page::Meta.parse(refresh, uri)
           raise StandardError, "Invalid refresh http header" unless delay
@@ -529,7 +531,7 @@ module WWW
           @history.push(page, page.uri)
           return fetch_page(
             :uri        => redirect_uri,
-            :referer    => page,
+            :referer    => referer,
             :params     => [],
             :verb       => :get,
             :redirects  => redirects + 1

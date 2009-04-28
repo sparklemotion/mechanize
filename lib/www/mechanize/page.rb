@@ -32,11 +32,12 @@ module WWW
           encoding = v.split('=').last.strip
           @encoding = encoding unless encoding == 'none'
         end
-        @encoding ||= Util.detect_charset(body)
 
-        if defined?(Encoding) && body && encoding = Encoding.find(@encoding)
-          body.force_encoding(encoding)
-        end
+        # Force the encoding to be 8BIT so we can perform regular expressions.
+        # We'll set it to the detected encoding later
+        body.force_encoding('ASCII-8BIT') if defined?(Encoding) && body
+
+        @encoding ||= Util.detect_charset(body)
 
         super(uri, response, body, code)
         @mech           ||= mech

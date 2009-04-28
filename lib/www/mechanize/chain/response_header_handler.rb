@@ -27,7 +27,6 @@ module WWW
             end
           end
 
-
           if page.is_a?(Page) && page.body =~ /Set-Cookie/n
             page.search('//meta[@http-equiv="Set-Cookie"]').each do |meta|
               Cookie::parse(uri, meta['content']) { |c|

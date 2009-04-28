@@ -53,7 +53,7 @@ module WWW
       end
 
       def encoding
-        parser.encoding
+        parser.respond_to?(:encoding) ? parser.encoding : nil
       end
 
       def parser

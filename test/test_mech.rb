@@ -98,12 +98,14 @@ class TestMechMethods < Test::Unit::TestCase
     }
   end
 
-  def test_kcode_url
-    $KCODE = 'u'
-    page = @agent.get("http://localhost/?a=#{[0xd6].pack('U')}")
-    assert_not_nil(page)
-    assert_equal('http://localhost/?a=%D6', page.uri.to_s)
-    $KCODE = 'NONE'
+  unless RUBY_VERSION >= '1.9.0'
+    def test_kcode_url
+      $KCODE = 'u'
+      page = @agent.get("http://localhost/?a=#{[0xd6].pack('U')}")
+      assert_not_nil(page)
+      assert_equal('http://localhost/?a=%D6', page.uri.to_s)
+      $KCODE = 'NONE'
+    end
   end
 
   def test_history

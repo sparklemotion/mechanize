@@ -15,7 +15,11 @@ module WWW
           referer = params[:referer]
           unless uri.is_a?(URI)
             uri = uri.to_s.strip.gsub(/[^#{0.chr}-#{126.chr}]/) { |match|
-              sprintf('%%%X', match.unpack($KCODE == 'UTF8' ? 'U' : 'c')[0])
+              if RUBY_VERSION >= "1.9.0"
+                CGI.escape(match)
+              else
+                sprintf('%%%X', match.unpack($KCODE == 'UTF8' ? 'U' : 'c')[0])
+              end
             }
 
             escaped_uri = Util.html_unescape(

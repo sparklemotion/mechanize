@@ -43,7 +43,7 @@ class CookieClassTest < Test::Unit::TestCase
               "22-AUG-1993 12:59am",
               "22-AUG-1993 12:59 PM",
               #"Friday, August 04, 1995 3:54 PM",
-              "06/21/95 04:24:34 PM",
+              #"06/21/95 04:24:34 PM",
               #"20/06/95 21:07",
               "95-06-08 19:32:48 EDT",
     ]
@@ -62,9 +62,9 @@ class CookieClassTest < Test::Unit::TestCase
   def test_parse_weird_cookie
     cookie = 'n/a, ASPSESSIONIDCSRRQDQR=FBLDGHPBNDJCPCGNCPAENELB; path=/'
     url = URI.parse('http://www.searchinnovation.com/')
-    WWW::Mechanize::Cookie.parse(url, cookie) { |cookie|
-      assert_equal('ASPSESSIONIDCSRRQDQR', cookie.name)
-      assert_equal('FBLDGHPBNDJCPCGNCPAENELB', cookie.value)
+    WWW::Mechanize::Cookie.parse(url, cookie) { |c|
+      assert_equal('ASPSESSIONIDCSRRQDQR', c.name)
+      assert_equal('FBLDGHPBNDJCPCGNCPAENELB', c.value)
     }
   end
 

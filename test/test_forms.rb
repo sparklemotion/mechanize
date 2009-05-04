@@ -23,17 +23,6 @@ class FormsMechTest < Test::Unit::TestCase
     assert_equal 'bar', headers['foo']
   end
 
-  def test_submit_takes_arbirary_headers
-    page = @agent.get('http://localhost:2000/form_no_action.html')
-    assert form = page.forms.first
-    form.action = '/http_headers'
-    page = form.submit(nil, { 'foo' => 'bar' })
-    headers = Hash[*(
-      page.body.split("\n").map { |x| x.split('|') }.flatten
-    )]
-    assert_equal 'bar', headers['foo']
-  end
-
   # Test submitting form with two fields of the same name
   def test_post_multival
     page = @agent.get("http://localhost/form_multival.html")

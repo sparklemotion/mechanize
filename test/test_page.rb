@@ -22,6 +22,12 @@ class TestPage < Test::Unit::TestCase
     assert_equal 'ISO_8859-1', page.encoding
   end
 
+  def test_another_mostly_broken_charset
+    page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/html; charset=UTF8')}")
+    assert_equal 'UTF8', page.parser.encoding
+    assert_equal 'UTF8', page.encoding
+  end
+
   def test_upper_case_content_type
     page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/HTML')}")
     assert_instance_of WWW::Mechanize::Page, page

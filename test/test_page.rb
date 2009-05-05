@@ -12,6 +12,11 @@ class TestPage < Test::Unit::TestCase
     assert_equal 'windows-1255', page.encoding
   end
 
+  def test_double_semicolon
+    page = @agent.get("http://localhost/http_headers?content-disposition=#{CGI.escape('attachment;; filename=fooooo')}")
+    assert page.parser
+  end
+
   def test_broken_charset
     page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/html; charset=akldsjfhaldjfksh')}")
     assert page.parser

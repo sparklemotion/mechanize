@@ -39,7 +39,7 @@ module WWW
         if disposition = @response['content-disposition']
           disposition.split(/;\s*/).each do |pair|
             k,v = pair.split(/=/, 2)
-            @filename = v if k.downcase == 'filename'
+            @filename = v if k && k.downcase == 'filename'
           end
         else
           if @uri

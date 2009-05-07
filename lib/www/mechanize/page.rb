@@ -21,7 +21,6 @@ module WWW
       extend Forwardable
 
       attr_accessor :mech
-      attr_writer :encoding
 
       def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
         @encoding = nil
@@ -42,6 +41,8 @@ module WWW
         super(uri, response, body, code)
         @mech           ||= mech
 
+        @encoding = nil if html_body =~ /<meta[^>]*charset[^>]*>/i
+
         raise Mechanize::ContentTypeError.new(response['content-type']) unless
            response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/i
         @parser = @links = @forms = @meta = @bases = @frames = @iframes = nil
@@ -53,6 +54,15 @@ module WWW
         end
       end
 
+      def encoding=(encoding)
+        @encoding = encoding
+
+        if @parser && @parser.encoding.downcase != encoding.downcase
+          # lazy reinitialize the parser with the new encoding
+          @parser = nil
+        end
+      end
+
       def encoding
         parser.respond_to?(:encoding) ? parser.encoding : nil
       end
@@ -61,9 +71,7 @@ module WWW
         return @parser if @parser
 
         if body && response
-          html_body = body.length > 0 ? body : '<html></html>'
           if mech.html_parser == Nokogiri::HTML
-            @encoding = nil if html_body =~ /<meta[^>]*charset[^>]*>/i
             @parser = mech.html_parser.parse(html_body, nil, @encoding)
           else
             @parser = mech.html_parser.parse(html_body)
@@ -152,6 +160,16 @@ module WWW
       def iframes
         @iframes ||= 
           search('iframe').map { |node| Frame.new(node, @mech, self) }
+      end
+
+      private
+
+      def html_body
+        if body
+          body.length > 0 ? body : '<html></html>'
+        else
+          ''
+        end
       end
     end
   end

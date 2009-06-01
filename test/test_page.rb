@@ -39,6 +39,25 @@ class TestPage < Test::Unit::TestCase
     assert_equal 'text/HTML', page.content_type
   end
 
+  def test_encoding_override_before_parser_initialized
+    # document has a bad encoding information - windows-1255
+    page = @agent.get("http://localhost/tc_bad_charset.html")
+    # encoding is wrong, so user wants to force ISO-8859-2
+    page.encoding = 'ISO-8859-2'
+    assert_equal 'ISO-8859-2', page.encoding
+  end
+
+  def test_encoding_override_after_parser_was_initialized
+    # document has a bad encoding information - windows-1255
+    page = @agent.get("http://localhost/tc_bad_charset.html")
+    page.parser
+    # autodetection sets encoding to windows-1255
+    assert_equal 'windows-1255', page.encoding
+    # encoding is wrong, so user wants to force ISO-8859-2
+    page.encoding = 'ISO-8859-2'
+    assert_equal 'ISO-8859-2', page.encoding
+  end
+
   def test_page_gets_charset_sent_by_server
     page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/html; charset=UTF-8')}")
     assert_equal 'UTF-8', page.encoding
@@ -97,3 +116,4 @@ class TestPage < Test::Unit::TestCase
     assert_equal(form, form_by_action)
   end
 end
+

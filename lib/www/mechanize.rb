@@ -37,7 +37,7 @@ module WWW
   #  require 'rubygems'
   #  require 'mechanize'
   #  require 'logger'
-  #  
+  #
   #  agent = WWW::Mechanize.new { |a| a.log = Logger.new("mech.log") }
   #  agent.user_agent_alias = 'Mac Safari'
   #  page = agent.get("http://www.google.com/")
@@ -49,7 +49,7 @@ module WWW
     ##
     # The version of Mechanize you are using.
     VERSION = '0.9.2'
-  
+
     ##
     # User Agent aliases
     AGENT_ALIASES = {
@@ -64,7 +64,7 @@ module WWW
       'iPhone' => 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1C28 Safari/419.3',
       'Mechanize' => "WWW-Mechanize/#{VERSION} (http://rubyforge.org/projects/mechanize/)"
     }
-  
+
     attr_accessor :cookie_jar
     attr_accessor :open_timeout, :read_timeout
     attr_accessor :user_agent
@@ -88,15 +88,15 @@ module WWW
 
     # The HTML parser to be used when parsing documents
     attr_accessor :html_parser
-  
+
     attr_reader :history
     attr_reader :pluggable_parser
-  
+
     alias :follow_redirect? :redirect_ok
-  
+
     @html_parser = Nokogiri::HTML
     class << self; attr_accessor :html_parser, :log end
-  
+
     def initialize
       # attr_accessors
       @cookie_jar     = CookieJar.new
@@ -116,29 +116,29 @@ module WWW
       @key            = nil # OpenSSL Private Key
       @pass           = nil # OpenSSL Password
       @redirect_ok    = true # Should we follow redirects?
-      
+
       # attr_readers
       @history        = WWW::Mechanize::History.new
       @pluggable_parser = PluggableParser.new
-  
+
       # Auth variables
       @user           = nil # Auth User
       @password       = nil # Auth Password
       @digest         = nil # DigestAuth Digest
       @auth_hash      = {}  # Keep track of urls for sending auth
       @request_headers= {}  # A hash of request headers to be used
-  
+
       # Proxy settings
       @proxy_addr     = nil
       @proxy_pass     = nil
       @proxy_port     = nil
       @proxy_user     = nil
-  
+
       @conditional_requests = true
-  
+
       @follow_meta_refresh  = false
       @redirection_limit    = 20
-  
+
       # Connection Cache & Keep alive
       @connection_cache = {}
       @keep_alive_time  = 300
@@ -158,7 +158,7 @@ module WWW
       @post_connect_hook = Chain::PostConnectHook.new
 
       @html_parser = self.class.html_parser
-  
+
       yield self if block_given?
     end
 
@@ -174,31 +174,31 @@ module WWW
     def post_connect_hooks
       @post_connect_hook.hooks
     end
-  
+
     # Sets the proxy address, port, user, and password
     # +addr+ should be a host, with no "http://"
     def set_proxy(addr, port, user = nil, pass = nil)
       @proxy_addr, @proxy_port, @proxy_user, @proxy_pass = addr, port, user, pass
     end
-  
+
     # Set the user agent for the Mechanize object.
     # See AGENT_ALIASES
     def user_agent_alias=(al)
       self.user_agent = AGENT_ALIASES[al] || raise("unknown agent alias")
     end
-  
+
     # Returns a list of cookies stored in the cookie jar.
     def cookies
       @cookie_jar.to_a
     end
-  
+
     # Sets the user and password to be used for authentication.
     def auth(user, password)
       @user       = user
       @password   = password
     end
     alias :basic_auth :auth
-  
+
     # Fetches the URL passed in and returns a page.
     def get(options, parameters = [], referer = nil)
       unless options.is_a? Hash
@@ -281,12 +281,12 @@ module WWW
       yield page if block_given?
       page
     end
-  
+
     # Fetch a file and return the contents of the file.
     def get_file(url)
       get(url).body
     end
-  
+
     # Clicks the WWW::Mechanize::Link object passed in and returns the
     # page fetched.
     def click(link)
@@ -295,13 +295,13 @@ module WWW
         (link['href'] || link['src'])
       get(:url => href, :referer => (referer || current_page()))
     end
-  
+
     # Equivalent to the browser back button.  Returns the most recent page
     # visited.
     def back
       @history.pop
     end
-  
+
     # Posts to the given URL wht the query parameters passed in.  Query
     # parameters can be passed as a hash, or as an array of arrays.
     # Example:
@@ -316,7 +316,7 @@ module WWW
       end
       node['method'] = 'POST'
       node['enctype'] = 'application/x-www-form-urlencoded'
-  
+
       form = Form.new(node)
       query.each { |k,v|
         if v.is_a?(IO)
@@ -330,7 +330,7 @@ module WWW
       }
       post_form(url, form)
     end
-  
+
     # Submit a form with an optional button.
     # Without a button:
     #  page = agent.get('http://example.com')
@@ -352,17 +352,17 @@ module WWW
         raise "unsupported method: #{form.method.upcase}"
       end
     end
-  
+
     # Returns the current page loaded by Mechanize
     def current_page
       @history.last
     end
-  
+
     # Returns whether or not a url has been visited
     def visited?(url)
       ! visited_page(url).nil?
     end
-  
+
     # Returns a visited page for the url passed in, otherwise nil
     def visited_page(url)
       if url.respond_to? :href
@@ -370,7 +370,7 @@ module WWW
       end
       @history.visited_page(resolve(url))
     end
-  
+
     # Runs given block, then resets the page history as it was before. self is
     # given as a parameter to the block. Returns the value of the block.
     def transact
@@ -381,11 +381,11 @@ module WWW
         @history = history_backup
       end
     end
-  
+
     alias :page :current_page
 
     private
-  
+
     def resolve(url, referer = current_page())
       hash = { :uri => url, :referer => referer }
       chain = Chain.new([
@@ -393,15 +393,15 @@ module WWW
       ]).handle(hash)
       hash[:uri].to_s
     end
-  
+
     def post_form(url, form, headers = {})
       cur_page = form.page || current_page ||
                       Page.new( nil, {'content-type'=>'text/html'})
-  
+
       request_data = form.request_data
-  
+
       log.debug("query: #{ request_data.inspect }") if log
-  
+
       # fetch the page
       page = fetch_page(  :uri      => url,
                           :referer  => cur_page,
@@ -411,10 +411,10 @@ module WWW
                             'Content-Type'    => form.enctype,
                             'Content-Length'  => request_data.size.to_s,
                           }.merge(headers))
-      add_to_history(page) 
+      add_to_history(page)
       page
     end
-  
+
     # uri is an absolute URI
     def fetch_page(params)
       options = {
@@ -511,7 +511,7 @@ module WWW
       page = options[:page]
 
       log.info("status: #{ page.code }") if log
-  
+
       if follow_meta_refresh
         redirect_uri  = nil
         referer       = page
@@ -538,9 +538,9 @@ module WWW
           )
         end
       end
-  
+
       return page if res_klass <= Net::HTTPSuccess
-  
+
       if res_klass == Net::HTTPNotModified
         log.debug("Got cached page") if log
         return visited_page(uri) || page
@@ -577,10 +577,10 @@ module WWW
                             :headers  => options[:headers]
                          )
       end
-  
+
       raise ResponseCodeError.new(page), "Unhandled response", caller
     end
-  
+
     def add_to_history(page)
       @history.push(page, resolve(page.uri))
       history_added.call(page) if history_added

@@ -10,6 +10,25 @@ class CookieJarTest < Test::Unit::TestCase
     c
   end
 
+  def test_two_cookies_same_domain_and_name_different_paths
+    values = {  :name     => 'Foo',
+                :value    => 'Bar',
+                :path     => '/',
+                :expires  => Time.now + (10 * 86400),
+                :domain   => 'rubyforge.org'
+             }
+
+    url = URI.parse('http://rubyforge.org/')
+
+    jar = WWW::Mechanize::CookieJar.new
+    cookie = cookie_from_hash(values)
+    jar.add(url, cookie)
+    jar.add(url, cookie_from_hash(values.merge(:path => '/onetwo')))
+
+    assert_equal(1, jar.cookies(url).length)
+    assert_equal 2, jar.cookies(URI.parse('http://rubyforge.org/onetwo')).length
+  end
+
   def test_domain_case
     values = {  :name     => 'Foo',
                 :value    => 'Bar',
@@ -30,7 +49,7 @@ class CookieJarTest < Test::Unit::TestCase
     jar.add(url, cookie_from_hash( values.merge(  :domain => 'RuByForge.Org',
                                                   :name   => 'aaron'
                                                ) ) )
-                  
+
     assert_equal(2, jar.cookies(url).length)
 
     url2 = URI.parse('http://RuByFoRgE.oRg/')
@@ -57,7 +76,7 @@ class CookieJarTest < Test::Unit::TestCase
     jar.add(url, cookie_from_hash( values.merge(  :domain => 'RuByForge.Org',
                                                   :name   => 'aaron'
                                                ) ) )
-                  
+
     assert_equal(2, jar.cookies(url).length)
 
     url2 = URI.parse('http://RuByFoRgE.oRg/')
@@ -240,11 +259,11 @@ class CookieJarTest < Test::Unit::TestCase
     # When given a URI with a blank path, CookieJar#cookies should return
     # cookies with the path '/':
     url = URI.parse('http://rubyforge.org')
-    assert_equal '', url.path    
-    assert_equal(0, jar.cookies(url).length)    
+    assert_equal '', url.path
+    assert_equal(0, jar.cookies(url).length)
     # Now add a cookie with the path set to '/':
-    jar.add(url, cookie_from_hash(values.merge( :name => 'has_root_path', 
-                                          :path => '/')))    
+    jar.add(url, cookie_from_hash(values.merge( :name => 'has_root_path',
+                                          :path => '/')))
     assert_equal(1, jar.cookies(url).length)
   end
 
@@ -282,8 +301,8 @@ class CookieJarTest < Test::Unit::TestCase
                                           :expires => Time.now - (10 * 86400))))
     assert_equal(0, jar.cookies(url).length)
   end
-  
-  
+
+
   def test_save_and_read_cookiestxt
     values = {  :name     => 'Foo',
                 :value    => 'Bar',
@@ -301,7 +320,7 @@ class CookieJarTest < Test::Unit::TestCase
     jar.add(url, cookie)
     jar.add(url, cookie_from_hash(values.merge( :name => 'Baz' )))
     assert_equal(2, jar.cookies(url).length)
-    
+
     jar.save_as("cookies.txt", :cookiestxt)
     jar.clear!
     assert_equal(0, jar.cookies(url).length)

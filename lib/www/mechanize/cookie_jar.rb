@@ -10,54 +10,56 @@ module WWW
       def initialize
         @jar = {}
       end
-    
+
       # Add a cookie to the Jar.
       def add(uri, cookie)
         return unless uri.host =~ /#{CookieJar.strip_port(cookie.domain)}$/i
+
         normal_domain = cookie.domain.downcase
+
         unless @jar.has_key?(normal_domain)
-          @jar[normal_domain] = Hash.new
+          @jar[normal_domain] = Hash.new { |h,k| h[k] = {} }
         end
-    
-        @jar[normal_domain][cookie.name] = cookie
-        cleanup()
+
+        @jar[normal_domain][cookie.path][cookie.name] = cookie
+        cleanup
         cookie
       end
-    
+
       # Fetch the cookies that should be used for the URI object passed in.
       def cookies(url)
         cleanup
-        cookies = []
         url.path = '/' if url.path.empty?
-        @jar.each_key do |domain|
-          if url.host =~ /#{CookieJar.strip_port(domain)}$/i
-            @jar[domain].each_key do |name|
-              if url.path =~ /^#{@jar[domain][name].path}/
-                if @jar[domain][name].expires.nil?
-                  cookies << @jar[domain][name]
-                elsif Time.now < @jar[domain][name].expires
-                  cookies << @jar[domain][name]
-                end
-              end
-            end
-          end
-        end
-    
-        cookies
+
+        domains = @jar.find_all { |domain, _|
+          url.host =~ /#{CookieJar.strip_port(domain)}$/i
+        }
+
+        return [] unless domains.length > 0
+
+        cookies = domains.map { |_,paths|
+          paths.find_all { |path, _|
+            url.path =~ /^#{Regexp.escape(path)}/
+          }.map { |_,cookie| cookie.values }
+        }.flatten
+
+        cookies.find_all { |cookie|
+          !cookie.expires || Time.now < cookie.expires
+        }
       end
-    
+
       def empty?(url)
         cookies(url).length > 0 ? false : true
       end
 
       def to_a
         cookies = []
-        @jar.each_key do |domain|
-          @jar[domain].each_key do |name|
-            cookies << @jar[domain][name]
+        @jar.each do |domain, paths|
+          paths.each do |path, names|
+            cookies << names.values
           end
         end
-        cookies
+        cookies.flatten
       end
 
       # Save the cookie jar to a file in the format specified.
@@ -106,14 +108,14 @@ module WWW
       def load_cookiestxt(io)
         now = Time.now
         fakeuri = Struct.new(:host)    # add_cookie wants something resembling a URI.
-        
+
         io.each_line do |line|
           line.chomp!
           line.gsub!(/#.+/, '')
           fields = line.split("\t")
-          
+
           next if fields.length != 7
-          
+
           expires_seconds = fields[4].to_i
           begin
             expires = Time.at(expires_seconds)
@@ -123,7 +125,7 @@ module WWW
             # expires = DateTime.new(1970,1,1) + ((expires_seconds + 1) / (60*60*24.0))
           end
           next if expires < now
-          
+
           c = WWW::Mechanize::Cookie.new(fields[5], fields[6])
           c.domain = fields[0]
           # Field 1 indicates whether the cookie can be read by other machines at the same domain.
@@ -132,50 +134,48 @@ module WWW
           c.secure = (fields[3] == "TRUE") # Requires a secure connection
           c.expires = expires             # Time the cookie expires.
           c.version = 0                   # Conforms to Netscape cookie spec.
-          
+
           add(fakeuri.new(c.domain), c)
         end
         @jar
       end
-      
+
       # Write cookies to Mozilla cookies.txt-style IO stream
       def dump_cookiestxt(io)
-        @jar.each_pair do |domain, cookies|
-          cookies.each_pair do |name, cookie|
-            fields = []
-            fields[0] = cookie.domain
-            
-            if cookie.domain =~ /^\./
-              fields[1] = "TRUE"
-            else
-              fields[1] = "FALSE"
-            end
-            
-            fields[2] = cookie.path
-            
-            if cookie.secure == true
-              fields[3] = "TRUE"
-            else
-              fields[3] = "FALSE"
-            end
-            
-            fields[4] = cookie.expires.to_i.to_s
-            
-            fields[5] = cookie.name
-            fields[6] = cookie.value
-            io.puts(fields.join("\t"))
-          end 
+        to_a.each do |cookie|
+          fields = []
+          fields[0] = cookie.domain
+
+          if cookie.domain =~ /^\./
+            fields[1] = "TRUE"
+          else
+            fields[1] = "FALSE"
+          end
+
+          fields[2] = cookie.path
+
+          if cookie.secure == true
+            fields[3] = "TRUE"
+          else
+            fields[3] = "FALSE"
+          end
+
+          fields[4] = cookie.expires.to_i.to_s
+
+          fields[5] = cookie.name
+          fields[6] = cookie.value
+          io.puts(fields.join("\t"))
         end
       end
 
       private
       # Remove expired cookies
       def cleanup
-        @jar.each_key do |domain|
-          @jar[domain].each_key do |name|
-            unless @jar[domain][name].expires.nil?
-              if Time.now > @jar[domain][name].expires
-                @jar[domain].delete(name)
+        @jar.each do |domain, paths|
+          paths.each do |path, names|
+            names.each do |cookie_name, cookie|
+              if cookie.expires && Time.now > cookie.expires
+                paths[path].delete(cookie_name)
               end
             end
           end

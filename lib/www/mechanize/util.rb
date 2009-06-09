@@ -19,7 +19,7 @@ module WWW
               [WEBrick::HTTPUtils.escape_form(k.to_s),
                 WEBrick::HTTPUtils.escape_form(v.to_s)].join("=")
 =end
-              
+
             end
           }.compact.join('&')
         end

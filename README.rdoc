@@ -1,7 +1,7 @@
 = WWW::Mechanize
 
-  http://mechanize.rubyforge.org/
-  http://github.com/tenderlove/mechanize/tree/master
+* http://mechanize.rubyforge.org/
+* http://github.com/tenderlove/mechanize/tree/master
 
 == DESCRIPTION
 

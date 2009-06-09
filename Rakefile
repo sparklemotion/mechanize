@@ -5,7 +5,6 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "lib")
 require 'mechanize'
 
 HOE = Hoe.new('mechanize', WWW::Mechanize::VERSION) do |p|
-  p.rubyforge_name  = 'mechanize'
   p.developer('Aaron Patterson','aaronp@rubyforge.org')
   p.developer('Mike Dalessio','mike.dalessio@gmail.com')
   p.readme_file     = 'README.rdoc'

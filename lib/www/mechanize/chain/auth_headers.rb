@@ -37,7 +37,7 @@ module WWW
 
         def gen_auth_header(uri, request, auth_header, is_IIS = false)
           auth_header =~ /^(\w+) (.*)/
-  
+
           params = {}
           $2.gsub(/(\w+)=("[^"]*"|[^,]*)/) {
             params[$1] = $2.gsub(/^"/, '').gsub(/"$/, '')
@@ -68,7 +68,7 @@ module WWW
             "#{field}=\"#{params[field]}\""
           }.compact.join(', ')
 
-          header << "nc=#{'%08x' % @@nonce_count[params['nonce']]}, "
+          header << ", nc=#{'%08x' % @@nonce_count[params['nonce']]}, "
           header << "cnonce=\"#{CNONCE}\", "
           header << "response=\"#{Digest::MD5.hexdigest(request_digest)}\""
   

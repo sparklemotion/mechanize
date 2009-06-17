@@ -302,13 +302,20 @@ module WWW
       @history.pop
     end
 
-    # Posts to the given URL wht the query parameters passed in.  Query
-    # parameters can be passed as a hash, or as an array of arrays.
-    # Example:
+    # Posts to the given URL with the request entity.  The request
+    # entity is specified by either a string, or a list of key-value
+    # pairs represented by a hash or an array of arrays.
+    #
+    # Examples:
     #  agent.post('http://example.com/', "foo" => "bar")
-    # or
+    #
     #  agent.post('http://example.com/', [ ["foo", "bar"] ])
-    def post(url, query={})
+    #
+    #  agent.post('http://example.com/', "<message>hello</message>", 'Content-Type' => 'application/xml')
+    def post(url, query={}, headers={})
+      if query.is_a?(String)
+        return request_with_entity(:post, url, query, :headers => headers)
+      end
       node = {}
       # Create a fake form
       class << node
@@ -328,7 +335,7 @@ module WWW
           form.fields << Form::Field.new(k.to_s,v)
         end
       }
-      post_form(url, form)
+      post_form(url, form, headers)
     end
 
     # Submit a form with an optional button.
@@ -351,6 +358,31 @@ module WWW
       else
         raise "unsupported method: #{form.method.upcase}"
       end
+    end
+
+    def request_with_entity(verb, url, entity, options={})
+      cur_page = current_page || Page.new( nil, {'content-type'=>'text/html'})
+
+      options = {
+        :uri      => url,
+        :referer  => cur_page,
+        :headers  => {},
+      }.update(options)
+
+      headers = {
+        'Content-Type' => 'application/octet-stream',
+        'Content-Length' => entity.size.to_s,
+      }.update(options[:headers])
+
+      options.update({
+        :verb => verb,
+        :params => [entity],
+        :headers => headers,
+      })
+
+      page = fetch_page(options)
+      add_to_history(page)
+      page
     end
 
     # Returns the current page loaded by Mechanize

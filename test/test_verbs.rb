@@ -6,7 +6,7 @@ class VerbsTest < Test::Unit::TestCase
   end
 
   def test_put
-    page = @agent.put('http://localhost/verb', { 'q' => 'foo' })
+    page = @agent.put('http://localhost/verb', 'foo')
     assert_equal 1, @agent.history.length
     assert_equal('method: PUT', page.body)
   end

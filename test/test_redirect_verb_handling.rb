@@ -32,7 +32,7 @@ class TestRedirectNotGetOrHead < Test::Unit::TestCase
   end
 
   def test_put_redirect_results_in_get_request
-    page = @agent.put('http://localhost/redirect')
+    page = @agent.put('http://localhost/redirect', 'foo')
     assert_equal(page.uri.to_s, 'http://localhost/verb')
     assert_equal(page.body, "method: GET")
   end

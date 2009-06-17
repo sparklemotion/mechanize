@@ -248,7 +248,7 @@ module WWW
     #   put('http://tenderlovemaking.com/', 'new content', :headers => {'Content-Type' => 'text/plain'})
     #
     def put(url, entity, options = {})
-      request_with_entity(:put, url, query_params, options)
+      request_with_entity(:put, url, entity, options)
     end
 
     ####

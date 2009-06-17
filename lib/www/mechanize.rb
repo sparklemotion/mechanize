@@ -243,14 +243,12 @@ module WWW
     end
 
     ####
-    # PUT to +url+ with +query_params+, and setting +options+:
+    # PUT to +url+ with +entity+, and setting +options+:
     #
-    #   put('http://tenderlovemaking.com/', {'q' => 'foo'}, :headers => {})
+    #   put('http://tenderlovemaking.com/', 'new content', :headers => {'Content-Type' => 'text/plain'})
     #
-    def put(url, query_params = {}, options = {})
-      page = head(url, query_params, options.merge({:verb => :put}))
-      add_to_history(page)
-      page
+    def put(url, entity, options = {})
+      request_with_entity(:put, url, query_params, options)
     end
 
     ####

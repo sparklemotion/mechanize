@@ -7,7 +7,8 @@ module WWW
         def handle(ctx, params)
           parameters  = params[:params]
           uri         = params[:uri]
-          if params[:verb] == :get
+          case params[:verb]
+          when :head, :get, :delete, :trace
             if parameters.length > 0
               uri.query ||= ''
               uri.query << '&' if uri.query.length > 0

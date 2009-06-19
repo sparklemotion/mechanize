@@ -57,10 +57,15 @@ module WWW
       def encoding=(encoding)
         @encoding = encoding
 
-        if @parser && @parser.encoding.downcase != encoding.downcase
-          # lazy reinitialize the parser with the new encoding
-          @parser = nil
+        if @parser
+          parser_encoding = @parser.encoding
+          if (parser_encoding && parser_encoding.downcase) != (encoding && encoding.downcase)
+            # lazy reinitialize the parser with the new encoding
+            @parser = nil
+          end
         end
+
+        encoding
       end
 
       def encoding

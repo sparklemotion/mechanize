@@ -479,7 +479,7 @@ module WWW
           @keep_alive_time,
           @cookie_jar,
           @user_agent,
-          {}
+          @request_headers
         ),
         Chain::CustomHeaders.new,
         @pre_connect_hook,

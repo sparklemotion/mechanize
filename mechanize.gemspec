@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mechanize}
-  s.version = "0.9.3.20090617085936"
+  s.version = "0.9.3.20090623142847"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Aaron Patterson", "Mike Dalessio"]
-  s.date = %q{2009-06-17}
+  s.date = %q{2009-06-23}
   s.description = %q{The Mechanize library is used for automating interaction with websites. 
 Mechanize automatically stores and sends cookies, follows redirects,
 can follow links, and submit forms.  Form fields can be populated and
@@ -29,13 +29,13 @@ a history.}
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<nokogiri>, [">= 1.2.1"])
-      s.add_development_dependency(%q<hoe>, [">= 2.1.0"])
+      s.add_development_dependency(%q<hoe>, [">= 2.2.0"])
     else
       s.add_dependency(%q<nokogiri>, [">= 1.2.1"])
-      s.add_dependency(%q<hoe>, [">= 2.1.0"])
+      s.add_dependency(%q<hoe>, [">= 2.2.0"])
     end
   else
     s.add_dependency(%q<nokogiri>, [">= 1.2.1"])
-    s.add_dependency(%q<hoe>, [">= 2.1.0"])
+    s.add_dependency(%q<hoe>, [">= 2.2.0"])
   end
 end

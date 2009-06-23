@@ -24,15 +24,15 @@ module WWW
     #  puts form['name']
     class Form
       attr_accessor :method, :action, :name
-    
+
       attr_reader :fields, :buttons, :file_uploads, :radiobuttons, :checkboxes
       attr_accessor :enctype
 
       alias :elements :fields
-    
+
       attr_reader :form_node
       attr_reader :page
-    
+
       def initialize(node, mech=nil, page=nil)
         @enctype = node['enctype'] || 'application/x-www-form-urlencoded'
         @form_node        = node
@@ -137,10 +137,10 @@ module WWW
       end
 
       # This method is sub-method of build_query.
-      # It converts charset of query value of fields into excepted one.
+      # It converts charset of query value of fields into expected one.
       def proc_query(field)
         return unless field.query_value
-        field.query_value.map{|(name, val)| 
+        field.query_value.map{|(name, val)|
           [from_native_charset(name), from_native_charset(val.to_s)]
         }
       end
@@ -149,7 +149,7 @@ module WWW
       def from_native_charset(str, enc=nil)
         if page
           enc ||= page.encoding
-          Util.from_native_charset(str,enc)
+          Util.from_native_charset(str,enc) rescue str
         else
           str
         end
@@ -161,36 +161,36 @@ module WWW
       # be used to create a query string for this form.
       def build_query(buttons = [])
         query = []
-    
+
         fields().each do |f|
           qval = proc_query(f)
           query.push(*qval)
         end
-    
+
         checkboxes().each do |f|
           if f.checked
             qval = proc_query(f)
             query.push(*qval)
           end
         end
-    
+
         radio_groups = {}
         radiobuttons().each do |f|
           fname = from_native_charset(f.name)
           radio_groups[fname] ||= []
-          radio_groups[fname] << f 
+          radio_groups[fname] << f
         end
-    
+
         # take one radio button from each group
         radio_groups.each_value do |g|
           checked = g.select {|f| f.checked}
-    
+
           if checked.size == 1
             f = checked.first
             qval = proc_query(f)
             query.push(*qval)
-          elsif checked.size > 1 
-            raise "multiple radiobuttons are checked in the same group!" 
+          elsif checked.size > 1
+            raise "multiple radiobuttons are checked in the same group!"
           end
         end
 
@@ -206,7 +206,7 @@ module WWW
       def add_button_to_query(button)
         @clicked_buttons << button
       end
-    
+
       # This method calculates the request data to be sent back to the server
       # for this form, depending on if this is a regular post, get, or a
       # multi-part post,
@@ -225,8 +225,8 @@ module WWW
           WWW::Mechanize::Util.build_query_string(query_params)
         end
       end
-    
-      # Removes all fields with name +field_name+. 
+
+      # Removes all fields with name +field_name+.
       def delete_field!(field_name)
         @fields.delete_if{ |f| f.name == field_name}
       end
@@ -255,7 +255,7 @@ module WWW
           alias :#{singular} :#{singular}_with
         eomethod
       end
- 
+
       private
       def parse
         @fields       = []
@@ -263,7 +263,7 @@ module WWW
         @file_uploads = []
         @radiobuttons = []
         @checkboxes   = []
-    
+
         # Find all input tags
         form_node.search('input').each do |node|
           type = (node['type'] || 'text').downcase
@@ -275,7 +275,7 @@ module WWW
           when 'checkbox'
             @checkboxes << CheckBox.new(node['name'], node['value'], !!node['checked'], self)
           when 'file'
-            @file_uploads << FileUpload.new(node['name'], nil) 
+            @file_uploads << FileUpload.new(node['name'], nil)
           when 'submit'
             @buttons << Button.new(node['name'], node['value'])
           when 'button'
@@ -283,7 +283,7 @@ module WWW
           when 'image'
             @buttons << ImageButton.new(node['name'], node['value'])
           else
-            @fields << Field.new(node['name'], node['value'] || '') 
+            @fields << Field.new(node['name'], node['value'] || '')
           end
         end
 
@@ -318,7 +318,7 @@ module WWW
         1.upto(len) { |i| string << chars[rand(chars.size-1)] }
         string
       end
-    
+
       def mime_value_quote(str)
         str.gsub(/(["\r\\])/){|s| '\\' + s}
       end
@@ -328,7 +328,7 @@ module WWW
                 "#{mime_value_quote(name)}\"\r\n" +
                 "\r\n#{value}\r\n"
       end
-    
+
       def file_to_multipart(file)
         file_name = file.file_name ? ::File.basename(file.file_name) : ''
         body =  "Content-Disposition: form-data; name=\"" +
@@ -345,7 +345,7 @@ module WWW
         if file.mime_type != nil
           body << "Content-Type: #{file.mime_type}\r\n"
         end
-    
+
         body <<
           if file.file_data.respond_to? :read
             "\r\n#{file.file_data.read}\r\n"

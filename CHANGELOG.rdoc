@@ -4,6 +4,12 @@
 
 * Bug Fixes:
 
+  * Rescue errors from bogus encodings
+
+=== 0.9.3
+
+* Bug Fixes:
+
   * Do not apply encoding if encoding equals 'none' Thanks Akinori MUSHA!
   * Fixed Page#encoding= when changing the value from or to nil.  Made
     it return the assigned value while at it. (Akinori MUSHA)

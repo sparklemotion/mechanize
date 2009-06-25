@@ -28,7 +28,7 @@ module WWW
         method = response.respond_to?(:each_header) ? :each_header : :each
         response.send(method) do |header,v|
           next unless v =~ /charset/i
-          encoding = v.split('=').last.strip
+          encoding = v[/charset=([^; ]+)/, 1]
           @encoding = encoding unless encoding == 'none'
         end
 

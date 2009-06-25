@@ -63,6 +63,11 @@ class TestPage < Test::Unit::TestCase
     assert_equal 'UTF-8', page.encoding
   end
 
+  def test_page_gets_charset_sent_by_server_with_trailing_semicolon
+    page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/html; charset=UTF-8;')}")
+    assert_equal 'UTF-8', page.encoding
+  end
+
   def test_set_encoding
     page = @agent.get("http://localhost/file_upload.html")
     page.encoding = 'UTF-8'

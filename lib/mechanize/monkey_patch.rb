@@ -15,11 +15,11 @@ end
 
 # Monkey patch for ruby 1.8.4
 unless RUBY_VERSION > "1.8.4"
-module Net # :nodoc:
-  class HTTPResponse # :nodoc:
-    CODE_TO_OBJ['500'] = HTTPInternalServerError
+  module Net # :nodoc:
+    class HTTPResponse # :nodoc:
+      CODE_TO_OBJ['500'] = HTTPInternalServerError
+    end
   end
-end
 else
   class Mechanize
     class Form

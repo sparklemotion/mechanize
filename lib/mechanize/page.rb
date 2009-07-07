@@ -4,105 +4,105 @@ require 'mechanize/page/base'
 require 'mechanize/page/frame'
 require 'mechanize/headers'
 
-  class Mechanize
-    # = Synopsis
-    # This class encapsulates an HTML page.  If Mechanize finds a content
-    # type of 'text/html', this class will be instantiated and returned.
-    #
-    # == Example
-    #  require 'rubygems'
-    #  require 'mechanize'
-    #
-    #  agent = Mechanize.new
-    #  agent.get('http://google.com/').class  #=> Mechanize::Page
-    #
-    class Page < Mechanize::File
-      extend Forwardable
+class Mechanize
+  # = Synopsis
+  # This class encapsulates an HTML page.  If Mechanize finds a content
+  # type of 'text/html', this class will be instantiated and returned.
+  #
+  # == Example
+  #  require 'rubygems'
+  #  require 'mechanize'
+  #
+  #  agent = Mechanize.new
+  #  agent.get('http://google.com/').class  #=> Mechanize::Page
+  #
+  class Page < Mechanize::File
+    extend Forwardable
 
-      attr_accessor :mech
+    attr_accessor :mech
 
-      def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
-        @encoding = nil
+    def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
+      @encoding = nil
 
-        method = response.respond_to?(:each_header) ? :each_header : :each
-        response.send(method) do |header,v|
-          next unless v =~ /charset/i
-          encoding = v.split('=').last.strip
-          @encoding = encoding unless encoding == 'none'
+      method = response.respond_to?(:each_header) ? :each_header : :each
+      response.send(method) do |header,v|
+        next unless v =~ /charset/i
+        encoding = v.split('=').last.strip
+        @encoding = encoding unless encoding == 'none'
+      end
+
+      # Force the encoding to be 8BIT so we can perform regular expressions.
+      # We'll set it to the detected encoding later
+      body.force_encoding('ASCII-8BIT') if defined?(Encoding) && body
+
+      @encoding ||= Util.detect_charset(body)
+
+      super(uri, response, body, code)
+      @mech           ||= mech
+
+      @encoding = nil if html_body =~ /<meta[^>]*charset[^>]*>/i
+
+      raise Mechanize::ContentTypeError.new(response['content-type']) unless
+        response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/i
+      @parser = @links = @forms = @meta = @bases = @frames = @iframes = nil
+    end
+
+    def title
+      @title ||= if parser && search('title').inner_text.length > 0
+                   search('title').inner_text
+                 end
+    end
+
+    def encoding=(encoding)
+      @encoding = encoding
+
+      if @parser
+        parser_encoding = @parser.encoding
+        if (parser_encoding && parser_encoding.downcase) != (encoding && encoding.downcase)
+          # lazy reinitialize the parser with the new encoding
+          @parser = nil
         end
-
-        # Force the encoding to be 8BIT so we can perform regular expressions.
-        # We'll set it to the detected encoding later
-        body.force_encoding('ASCII-8BIT') if defined?(Encoding) && body
-
-        @encoding ||= Util.detect_charset(body)
-
-        super(uri, response, body, code)
-        @mech           ||= mech
-
-        @encoding = nil if html_body =~ /<meta[^>]*charset[^>]*>/i
-
-        raise Mechanize::ContentTypeError.new(response['content-type']) unless
-           response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/i
-        @parser = @links = @forms = @meta = @bases = @frames = @iframes = nil
       end
 
-      def title
-        @title ||= if parser && search('title').inner_text.length > 0
-          search('title').inner_text
+      encoding
+    end
+
+    def encoding
+      parser.respond_to?(:encoding) ? parser.encoding : nil
+    end
+
+    def parser
+      return @parser if @parser
+
+      if body && response
+        if mech.html_parser == Nokogiri::HTML
+          @parser = mech.html_parser.parse(html_body, nil, @encoding)
+        else
+          @parser = mech.html_parser.parse(html_body)
         end
       end
 
-      def encoding=(encoding)
-        @encoding = encoding
+      @parser
+    end
+    alias :root :parser
 
-        if @parser
-          parser_encoding = @parser.encoding
-          if (parser_encoding && parser_encoding.downcase) != (encoding && encoding.downcase)
-            # lazy reinitialize the parser with the new encoding
-            @parser = nil
-          end
-        end
+    # Get the content type
+    def content_type
+      response['content-type']
+    end
 
-        encoding
-      end
+    # Search through the page like HPricot
+    def_delegator :parser, :search, :search
+    def_delegator :parser, :/, :/
+    def_delegator :parser, :at, :at
 
-      def encoding
-        parser.respond_to?(:encoding) ? parser.encoding : nil
-      end
-
-      def parser
-        return @parser if @parser
-
-        if body && response
-          if mech.html_parser == Nokogiri::HTML
-            @parser = mech.html_parser.parse(html_body, nil, @encoding)
-          else
-            @parser = mech.html_parser.parse(html_body)
-          end
-        end
-
-        @parser
-      end
-      alias :root :parser
-
-      # Get the content type
-      def content_type
-        response['content-type']
-      end
-
-      # Search through the page like HPricot
-      def_delegator :parser, :search, :search
-      def_delegator :parser, :/, :/
-      def_delegator :parser, :at, :at
-
-      # Find a form matching +criteria+.
-      # Example:
-      #   page.form_with(:action => '/post/login.php') do |f|
-      #     ...
-      #   end
-      [:form, :link, :base, :frame, :iframe].each do |type|
-        eval(<<-eomethod)
+    # Find a form matching +criteria+.
+    # Example:
+    #   page.form_with(:action => '/post/login.php') do |f|
+    #     ...
+    #   end
+    [:form, :link, :base, :frame, :iframe].each do |type|
+      eval(<<-eomethod)
           def #{type}s_with(criteria)
             criteria = {:name => criteria} if String === criteria
             f = #{type}s.find_all do |thing|
@@ -120,7 +120,7 @@ require 'mechanize/headers'
           alias :#{type} :#{type}_with
         eomethod
       end
-    
+
       def links
         @links ||= %w{ a area }.map do |tag|
           search(tag).map do |node|
@@ -162,7 +162,7 @@ require 'mechanize/headers'
       end
 
       def iframes
-        @iframes ||= 
+        @iframes ||=
           search('iframe').map { |node| Frame.new(node, @mech, self) }
       end
 

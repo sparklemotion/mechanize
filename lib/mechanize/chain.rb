@@ -13,21 +13,21 @@ require 'mechanize/chain/response_header_handler'
 require 'mechanize/chain/response_reader'
 require 'mechanize/chain/body_decoding_handler'
 
-  class Mechanize
-    class Chain
-      def initialize(list)
-        @list = list
-        @list.each { |l| l.chain = self }
-      end
+class Mechanize
+  class Chain
+    def initialize(list)
+      @list = list
+      @list.each { |l| l.chain = self }
+    end
 
-      def handle(request)
-        @list.first.handle(self, request)
-      end
+    def handle(request)
+      @list.first.handle(self, request)
+    end
 
-      def pass(obj, request)
-        next_link = @list[@list.index(obj) + 1]
-        next_link.handle(self, request) if next_link
-      end
+    def pass(obj, request)
+      next_link = @list[@list.index(obj) + 1]
+      next_link.handle(self, request) if next_link
     end
   end
+end
 

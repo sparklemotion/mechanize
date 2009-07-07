@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class TestNoAttributes < Test::Unit::TestCase
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
   end
 
   def test_parse_no_attributes

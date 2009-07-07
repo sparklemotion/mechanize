@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class TestPrettyPrint < Test::Unit::TestCase
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
   end
   
   def test_pretty_print
@@ -12,7 +12,7 @@ class TestPrettyPrint < Test::Unit::TestCase
     assert_match(/\{frames[^"]*"http:\/\/meme/, pretty_string)
     assert_match(/\{iframes[^"]*"http:\/\/meme/, pretty_string)
     assert_match(
-     "{links #<WWW::Mechanize::Page::Link \"Google\" \"http://google.com/\">}",
+     "{links #<Mechanize::Page::Link \"Google\" \"http://google.com/\">}",
      pretty_string
                 )
     assert_match("form1", pretty_string)

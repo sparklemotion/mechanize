@@ -4,8 +4,8 @@ class TestAuthHeaders < Test::Unit::TestCase
   def test_auth
     url = URI.parse('http://www.anthonychaves.net/tests.xml')
     digest = %Q!Digest realm="www.anthonychaves.net", qop="auth", algorithm=MD5, nonce="MTI0NTEyMTYyNjo0ZTY2MjhlZWMyZmM1ZjA0M2Y1Njc1MGU0YTA2MWY5OQ==", opaque="9f455d4e71e8d46a6d3aaef8bf8b0d9e"!
-    v = WWW::Mechanize::Chain.new([
-      WWW::Mechanize::Chain::AuthHeaders.new({(url.host) => :digest}, "anthony", "password", digest)
+    v = Mechanize::Chain.new([
+      Mechanize::Chain::AuthHeaders.new({(url.host) => :digest}, "anthony", "password", digest)
     ])
     
     hash = {

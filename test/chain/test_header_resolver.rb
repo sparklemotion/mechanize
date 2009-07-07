@@ -2,11 +2,11 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', "helper"))
 
 class TestHeaderResolver < Test::Unit::TestCase
   def setup
-    @chain = WWW::Mechanize::Chain.new([
-      WWW::Mechanize::Chain::HeaderResolver.new(
+    @chain = Mechanize::Chain.new([
+      Mechanize::Chain::HeaderResolver.new(
         true,
         300,
-        WWW::Mechanize::CookieJar.new,
+        Mechanize::CookieJar.new,
         'foobar',
         {
           'hello' => 'world',

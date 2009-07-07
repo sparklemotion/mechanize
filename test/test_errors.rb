@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class MechErrorsTest < Test::Unit::TestCase
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
   end
 
   def test_bad_form_method
@@ -42,7 +42,7 @@ class MechErrorsTest < Test::Unit::TestCase
   end
 
   def test_unsupported_scheme
-    assert_raise(WWW::Mechanize::UnsupportedSchemeError) {
+    assert_raise(Mechanize::UnsupportedSchemeError) {
       @agent.get('ftp://server.com/foo.html')
     }
   end

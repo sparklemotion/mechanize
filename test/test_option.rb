@@ -12,7 +12,7 @@ class OptionTest < Test::Unit::TestCase
 
   def test_option_missing_value
     attribute = FakeAttribute.new('blah')
-    option = WWW::Mechanize::Form::Option.new(attribute, nil)
+    option = Mechanize::Form::Option.new(attribute, nil)
     assert_equal('blah', option.value)
   end
 end

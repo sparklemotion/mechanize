@@ -1,10 +1,8 @@
 require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class TestRedirectLimitReached < Test::Unit::TestCase
-  include WWW
-
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
   end
 
   def test_to_s

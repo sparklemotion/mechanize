@@ -2,8 +2,8 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class TestHistory < Test::Unit::TestCase
   def setup
-    @agent    = WWW::Mechanize.new
-    @history  = WWW::Mechanize::History.new
+    @agent    = Mechanize.new
+    @history  = Mechanize::History.new
   end
 
   def test_push
@@ -72,7 +72,7 @@ class TestHistory < Test::Unit::TestCase
   end
 
   def test_max_size
-    @history  = WWW::Mechanize::History.new(10)
+    @history  = Mechanize::History.new(10)
     1.upto(20) do |i|
       page = @agent.get('http://localhost/index.html')
       @history.push page
@@ -110,11 +110,11 @@ class TestHistory < Test::Unit::TestCase
     page = @agent.get('http://localhost')
 
     node = Struct.new(:href, :inner_text).new('http://localhost/', 'blah')
-    link = WWW::Mechanize::Page::Link.new(node, nil, nil)
+    link = Mechanize::Page::Link.new(node, nil, nil)
     assert(@agent.visited?(link))
 
     node = Struct.new(:href, :inner_text).new('http://localhost', 'blah')
-    link = WWW::Mechanize::Page::Link.new(node, nil, nil)
+    link = Mechanize::Page::Link.new(node, nil, nil)
     assert(@agent.visited?(link))
   end
 
@@ -122,11 +122,11 @@ class TestHistory < Test::Unit::TestCase
     page = @agent.get('http://localhost/')
 
     node = Struct.new(:href, :inner_text).new('http://localhost/', 'blah')
-    link = WWW::Mechanize::Page::Link.new(node, nil, nil)
+    link = Mechanize::Page::Link.new(node, nil, nil)
     assert(@agent.visited?(link))
 
     node = Struct.new(:href, :inner_text).new('http://localhost', 'blah')
-    link = WWW::Mechanize::Page::Link.new(node, nil, nil)
+    link = Mechanize::Page::Link.new(node, nil, nil)
     assert(@agent.visited?(link))
   end
 

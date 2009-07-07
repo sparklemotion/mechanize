@@ -4,7 +4,7 @@ require 'cgi'
 
 class TestPage < Test::Unit::TestCase
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
   end
 
   def test_page_gets_charset_from_page
@@ -35,7 +35,7 @@ class TestPage < Test::Unit::TestCase
 
   def test_upper_case_content_type
     page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/HTML')}")
-    assert_instance_of WWW::Mechanize::Page, page
+    assert_instance_of Mechanize::Page, page
     assert_equal 'text/HTML', page.content_type
   end
 
@@ -89,7 +89,7 @@ class TestPage < Test::Unit::TestCase
   end
 
   def test_page_decoded_with_charset
-    page = WWW::Mechanize::Page.new(
+    page = Mechanize::Page.new(
       URI.parse('http://tenderlovemaking.com/'),
       { 'content-type' => 'text/html; charset=EUC-JP' },
       '<html><body>hello</body></html>',

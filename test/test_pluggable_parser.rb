@@ -2,13 +2,13 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class PluggableParserTest < Test::Unit::TestCase
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
   end
 
   def test_content_type_error
     page = @agent.get("http://localhost/bad_content_type")
-    assert_raise(WWW::Mechanize::ContentTypeError) {
-      page = WWW::Mechanize::Page.new(
+    assert_raise(Mechanize::ContentTypeError) {
+      page = Mechanize::Page.new(
                                       page.uri, 
                                       page.response, 
                                       page.body,
@@ -16,23 +16,23 @@ class PluggableParserTest < Test::Unit::TestCase
                                      )
     }
     begin
-      page = WWW::Mechanize::Page.new(
+      page = Mechanize::Page.new(
                                       page.uri, 
                                       page.response, 
                                       page.body,
                                       page.code
                                      )
-    rescue WWW::Mechanize::ContentTypeError => ex
+    rescue Mechanize::ContentTypeError => ex
       assert_equal('text/xml', ex.content_type)
     end
   end
 
   def test_content_type
     page = @agent.get("http://localhost/content_type_test")
-    assert_kind_of(WWW::Mechanize::Page, page)
+    assert_kind_of(Mechanize::Page, page)
   end
 
-  class Filter < WWW::Mechanize::Page
+  class Filter < Mechanize::Page
     def initialize(uri=nil, response=nil, body=nil, code=nil)
       super(  uri,
             response,
@@ -42,7 +42,7 @@ class PluggableParserTest < Test::Unit::TestCase
     end
   end
 
-  class FileFilter < WWW::Mechanize::File
+  class FileFilter < Mechanize::File
     def initialize(uri=nil, response=nil, body=nil, code=nil)
       super(  uri,
             response,
@@ -73,7 +73,7 @@ class PluggableParserTest < Test::Unit::TestCase
   end
 
   def test_file_saver
-    @agent.pluggable_parser.html = WWW::Mechanize::FileSaver
+    @agent.pluggable_parser.html = Mechanize::FileSaver
     page = @agent.get('http://localhost:2000/form_no_action.html')
     length = page.response['Content-Length']
     file_length = nil
@@ -110,35 +110,35 @@ class PluggableParserTest < Test::Unit::TestCase
 
   def test_file_saver_no_path
     url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '', nil, nil, nil)
-    fs = WWW::Mechanize::FileSaver.new(url, nil, 'hello world', 200)
+    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
     assert_equal('example.com/index.html', fs.filename)
     FileUtils.rm_rf('example.com')
   end
 
   def test_file_saver_slash
     url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '/', nil, nil, nil)
-    fs = WWW::Mechanize::FileSaver.new(url, nil, 'hello world', 200)
+    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
     assert_equal('example.com/index.html', fs.filename)
     FileUtils.rm_rf('example.com')
   end
 
   def test_file_saver_slash_file
     url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '/foo.html', nil, nil, nil)
-    fs = WWW::Mechanize::FileSaver.new(url, nil, 'hello world', 200)
+    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
     assert_equal('example.com/foo.html', fs.filename)
     FileUtils.rm_rf('example.com')
   end
 
   def test_file_saver_long_path_no_file
     url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '/one/two/', nil, nil, nil)
-    fs = WWW::Mechanize::FileSaver.new(url, nil, 'hello world', 200)
+    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
     assert_equal('example.com/one/two/index.html', fs.filename)
     FileUtils.rm_rf('example.com')
   end
 
   def test_file_saver_long_path
     url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '/one/two/foo.html', nil, nil, nil)
-    fs = WWW::Mechanize::FileSaver.new(url, nil, 'hello world', 200)
+    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
     assert_equal('example.com/one/two/foo.html', fs.filename)
     FileUtils.rm_rf('example.com')
   end

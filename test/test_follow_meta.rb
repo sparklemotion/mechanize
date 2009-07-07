@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'helper'))
 
 class FollowMetaTest < Test::Unit::TestCase
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
   end
 
   def test_dont_follow_meta_by_default
@@ -71,10 +71,10 @@ class FollowMetaTest < Test::Unit::TestCase
 
   def test_infinite_refresh_throws_exception
     @agent.follow_meta_refresh = true
-    assert_raises(WWW::Mechanize::RedirectLimitReachedError) {
+    assert_raises(Mechanize::RedirectLimitReachedError) {
       begin
         @agent.get('http://localhost/infinite_refresh')
-      rescue WWW::Mechanize::RedirectLimitReachedError => ex
+      rescue Mechanize::RedirectLimitReachedError => ex
         raise ex
       end
     }

@@ -1,7 +1,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class MetaTest < Test::Unit::TestCase
-  Meta = WWW::Mechanize::Page::Meta
+  Meta = Mechanize::Page::Meta
   
   #
   # CONTENT_REGEXP test

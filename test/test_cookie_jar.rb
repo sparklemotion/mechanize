@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class CookieJarTest < Test::Unit::TestCase
   def cookie_from_hash(hash)
-    c = WWW::Mechanize::Cookie.new(hash[:name], hash[:value])
+    c = Mechanize::Cookie.new(hash[:name], hash[:value])
     hash.each { |k,v|
       next if k == :name || k == :value
       c.send("#{k}=", v)
@@ -20,7 +20,7 @@ class CookieJarTest < Test::Unit::TestCase
 
     url = URI.parse('http://rubyforge.org/')
 
-    jar = WWW::Mechanize::CookieJar.new
+    jar = Mechanize::CookieJar.new
     cookie = cookie_from_hash(values)
     jar.add(url, cookie)
     jar.add(url, cookie_from_hash(values.merge(:path => '/onetwo')))
@@ -38,7 +38,7 @@ class CookieJarTest < Test::Unit::TestCase
              }
     url = URI.parse('http://rubyforge.org/')
 
-    jar = WWW::Mechanize::CookieJar.new
+    jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
@@ -65,7 +65,7 @@ class CookieJarTest < Test::Unit::TestCase
              }
     url = URI.parse('http://rubyforge.org/')
 
-    jar = WWW::Mechanize::CookieJar.new
+    jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
@@ -92,7 +92,7 @@ class CookieJarTest < Test::Unit::TestCase
              }
     url = URI.parse('http://rubyforge.org/')
 
-    jar = WWW::Mechanize::CookieJar.new
+    jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
@@ -120,7 +120,7 @@ class CookieJarTest < Test::Unit::TestCase
              }
     url = URI.parse('http://rubyforge.org/')
 
-    jar = WWW::Mechanize::CookieJar.new
+    jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
@@ -148,7 +148,7 @@ class CookieJarTest < Test::Unit::TestCase
              }
     url = URI.parse('http://rubyforge.org/')
 
-    jar = WWW::Mechanize::CookieJar.new
+    jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
@@ -171,7 +171,7 @@ class CookieJarTest < Test::Unit::TestCase
              }
     url = URI.parse('http://rubyforge.org/')
 
-    jar = WWW::Mechanize::CookieJar.new
+    jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
@@ -198,7 +198,7 @@ class CookieJarTest < Test::Unit::TestCase
              }
     url = URI.parse('http://rubyforge.org/')
 
-    jar = WWW::Mechanize::CookieJar.new
+    jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
@@ -232,7 +232,7 @@ class CookieJarTest < Test::Unit::TestCase
              }
     url = URI.parse('http://rubyforge.org/')
 
-    jar = WWW::Mechanize::CookieJar.new
+    jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
@@ -276,7 +276,7 @@ class CookieJarTest < Test::Unit::TestCase
              }
     url = URI.parse('http://rubyforge.org/login')
 
-    jar = WWW::Mechanize::CookieJar.new
+    jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
@@ -312,7 +312,7 @@ class CookieJarTest < Test::Unit::TestCase
              }
     url = URI.parse('http://rubyforge.org/')
 
-    jar = WWW::Mechanize::CookieJar.new
+    jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
@@ -347,7 +347,7 @@ class CookieJarTest < Test::Unit::TestCase
     }
     url = URI.parse('https://rubyforge.org/login')
 
-    jar = WWW::Mechanize::CookieJar.new
+    jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     cookie = cookie_from_hash(values)

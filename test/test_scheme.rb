@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class SchemeTest < Test::Unit::TestCase
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
     @agent.log = Class.new(Object) do
       def method_missing(*args)
       end
@@ -20,14 +20,14 @@ class SchemeTest < Test::Unit::TestCase
                File.join(File.dirname(__FILE__), "htdocs", 'google.html'))
     page = @agent.get("file://#{f}")
     assert_equal(File.read(f), page.body)
-    assert_kind_of(WWW::Mechanize::Page, page)
+    assert_kind_of(Mechanize::Page, page)
   end
 
   def test_file_scheme_supports_directories
     f = File.expand_path(File.join(File.dirname(__FILE__), "htdocs"))
     page = @agent.get("file://#{f}")
     assert_equal(Dir[File.join(f, '*')].length, page.links.length)
-    assert_kind_of(WWW::Mechanize::Page, page)
+    assert_kind_of(Mechanize::Page, page)
   end
 
   def test_click_file_link

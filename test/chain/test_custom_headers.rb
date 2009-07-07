@@ -2,8 +2,8 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', "helper"))
 
 class TestCustomHeaders < Test::Unit::TestCase
   def test_handle
-    v = WWW::Mechanize::Chain.new([
-      WWW::Mechanize::Chain::CustomHeaders.new
+    v = Mechanize::Chain.new([
+      Mechanize::Chain::CustomHeaders.new
     ])
     url = URI.parse('http://tenderlovemaking.com/')
     hash = {

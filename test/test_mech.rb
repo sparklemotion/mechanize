@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class TestMechMethods < Test::Unit::TestCase
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
   end
 
   def test_get_with_tilde
@@ -82,7 +82,7 @@ class TestMechMethods < Test::Unit::TestCase
   
   def test_get_with_file_referer
     assert_nothing_raised do
-      @agent.get('http://localhost', [], WWW::Mechanize::File.new(URI.parse('http://tenderlovemaking.com/crossdomain.xml')))
+      @agent.get('http://localhost', [], Mechanize::File.new(URI.parse('http://tenderlovemaking.com/crossdomain.xml')))
     end
   end
 

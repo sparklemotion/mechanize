@@ -2,8 +2,8 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', "helper"))
 
 class TestParameterResolver < Test::Unit::TestCase
   def test_handle_get
-    v = WWW::Mechanize::Chain.new([
-      WWW::Mechanize::Chain::ParameterResolver.new
+    v = Mechanize::Chain.new([
+      Mechanize::Chain::ParameterResolver.new
     ])
     hash = {
       :uri    => URI.parse('http://google.com/'),
@@ -18,8 +18,8 @@ class TestParameterResolver < Test::Unit::TestCase
   end
 
   def test_handle_post
-    v = WWW::Mechanize::Chain.new([
-      WWW::Mechanize::Chain::ParameterResolver.new
+    v = Mechanize::Chain.new([
+      Mechanize::Chain::ParameterResolver.new
     ])
     hash = {
       :uri    => URI.parse('http://google.com/'),

@@ -9,10 +9,10 @@ class TestResponseReader < Test::Unit::TestCase
       def code; 999; end
     end
 
-    v = WWW::Mechanize::Chain.new([
-      WWW::Mechanize::Chain::ResponseReader.new(response)
+    v = Mechanize::Chain.new([
+      Mechanize::Chain::ResponseReader.new(response)
     ])
-    assert_raises(WWW::Mechanize::ResponseCodeError) {
+    assert_raises(Mechanize::ResponseCodeError) {
       begin
         v.handle({})
       rescue Exception => x

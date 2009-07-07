@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class TestFormButtons < Test::Unit::TestCase
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
   end
 
   def test_submit_input_tag
@@ -22,7 +22,7 @@ class TestFormButtons < Test::Unit::TestCase
   end
 
   def assert_form_contains_button(button)
-    page = WWW::Mechanize::Page.new(nil, html_response, html(button), 200, @agent)
+    page = Mechanize::Page.new(nil, html_response, html(button), 200, @agent)
     assert_equal(1, page.forms.length)
     assert_equal(1, page.forms.first.buttons.length)
   end

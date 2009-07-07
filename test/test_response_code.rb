@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class ResponseCodeMechTest < Test::Unit::TestCase
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
   end
 
   def test_eof_error_loop
@@ -42,10 +42,10 @@ class ResponseCodeMechTest < Test::Unit::TestCase
   end
 
   def test_error
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
     begin
       @agent.get("http://localhost/response_code?code=500")
-    rescue WWW::Mechanize::ResponseCodeError => err
+    rescue Mechanize::ResponseCodeError => err
       assert_equal("500", err.response_code)
     end
   end

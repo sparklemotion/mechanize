@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class TestSaveFile < Test::Unit::TestCase
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
   end
 
   def test_save_file
@@ -16,7 +16,7 @@ class TestSaveFile < Test::Unit::TestCase
   end
 
   def test_save_file_default
-    page = WWW::Mechanize::File.new(
+    page = Mechanize::File.new(
                                     URI.parse('http://localhost/test.html'),
                                     {},
                                     "hello"
@@ -33,7 +33,7 @@ class TestSaveFile < Test::Unit::TestCase
   end
 
   def test_save_file_default_with_dots
-    page = WWW::Mechanize::File.new(
+    page = Mechanize::File.new(
                                     URI.parse('http://localhost/../test.html'),
                                     {},
                                     "hello"

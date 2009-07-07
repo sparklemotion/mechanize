@@ -2,8 +2,8 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', "helper"))
 
 class TestURIResolver < Test::Unit::TestCase
   def test_handle
-    v = WWW::Mechanize::Chain.new([
-      WWW::Mechanize::Chain::URIResolver.new(Hash.new { |h,k|
+    v = Mechanize::Chain.new([
+      Mechanize::Chain::URIResolver.new(Hash.new { |h,k|
         h[k] = lambda { |u,r| u }
       })
     ])

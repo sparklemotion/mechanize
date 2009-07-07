@@ -2,13 +2,13 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class LinksMechTest < Test::Unit::TestCase
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
   end
 
   def test_unsupported_link_types
     page = @agent.get("http://google.com/tc_links.html")
     link = page.link_with(:text => 'javascript link')
-    assert_raise(WWW::Mechanize::UnsupportedSchemeError) {
+    assert_raise(Mechanize::UnsupportedSchemeError) {
       link.click
     }
 

@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class SelectTest < Test::Unit::TestCase
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
     @page = @agent.get("http://localhost/form_select.html")
     @form = @page.forms.first
   end
@@ -18,7 +18,7 @@ class SelectTest < Test::Unit::TestCase
   end
 
   def test_correct_class
-    assert_instance_of(WWW::Mechanize::Form::SelectList,
+    assert_instance_of(Mechanize::Form::SelectList,
       @form.field_with(:name => 'list'))
   end
 

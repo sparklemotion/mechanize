@@ -3,7 +3,7 @@ require 'pp'
 
 class BasicAuthTest < Test::Unit::TestCase
   def setup
-    @agent = WWW::Mechanize.new
+    @agent = Mechanize.new
   end
 
   def test_auth_success
@@ -55,7 +55,7 @@ class BasicAuthTest < Test::Unit::TestCase
     @agent.basic_auth('aaron', 'aaron')
     begin
       page = @agent.get("http://localhost/basic_auth")
-    rescue WWW::Mechanize::ResponseCodeError => e
+    rescue Mechanize::ResponseCodeError => e
       assert_equal("401", e.response_code)
     end
   end
@@ -63,7 +63,7 @@ class BasicAuthTest < Test::Unit::TestCase
   def test_auth_failure
     begin
       page = @agent.get("http://localhost/basic_auth")
-    rescue WWW::Mechanize::ResponseCodeError => e
+    rescue Mechanize::ResponseCodeError => e
       assert_equal("401", e.response_code)
     end
   end

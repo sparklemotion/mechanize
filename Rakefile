@@ -1,17 +1,14 @@
 require 'rubygems'
 require 'hoe'
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__), "lib")
-require 'mechanize'
+Hoe.spec 'mechanize' do
+  developer 'Aaron Patterson', 'aaronp@rubyforge.org'
+  developer 'Mike Dalessio',   'mike.dalessio@gmail.com'
 
-HOE = Hoe.new('mechanize', WWW::Mechanize::VERSION) do |p|
-  p.developer('Aaron Patterson','aaronp@rubyforge.org')
-  p.developer('Mike Dalessio','mike.dalessio@gmail.com')
-  p.readme_file     = 'README.rdoc'
-  p.history_file    = 'CHANGELOG.rdoc'
-  p.extra_rdoc_files  = FileList['*.rdoc']
-  p.summary         = "Mechanize provides automated web-browsing"
-  p.extra_deps      = [['nokogiri', '>= 1.2.1']]
+  self.readme_file      = 'README.rdoc'
+  self.history_file     = 'CHANGELOG.rdoc'
+  self.extra_rdoc_files << Dir['*.rdoc']
+  self.extra_deps       << ['nokogiri', '>= 1.2.1']
 end
 
 desc "Update SSL Certificate"
@@ -26,18 +23,11 @@ task('ssl_cert') do |p|
   sh "rm server.key.org"
 end
 
-namespace :gem do
-  desc 'Generate a gem spec'
-  task :spec do
-    File.open("#{HOE.name}.gemspec", 'w') do |f|
-      HOE.spec.version = "#{HOE.version}.#{Time.now.strftime("%Y%m%d%H%M%S")}"
-      f.write(HOE.spec.to_ruby)
-    end
+desc 'Generate a gem spec'
+task "gem:spec" do
+  File.open("mechanize.gemspec", 'w') do |f|
+    now = Time.now.strftime("%Y%m%d%H%M%S")
+    f.write `rake debug_gem`.sub(/(s.version = ".*)(")/) { "#{$1}.#{now}#{$2}" }
   end
 end
 
-desc "Run code-coverage analysis"
-task :coverage do
-  rm_rf "coverage"
-  sh "rcov -x Library -I lib:test #{Dir[*HOE.test_globs].join(' ')}"
-end

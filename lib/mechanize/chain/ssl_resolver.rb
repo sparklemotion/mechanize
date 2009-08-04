@@ -17,7 +17,7 @@ class Mechanize
 
         ssl = nil
         if http_obj.instance_variable_defined?(:@ssl_context)
-          http_obj.instance_variable_get(:@ssl_context)
+          ssl = http_obj.instance_variable_get(:@ssl_context)
         end
 
         if uri.scheme == 'https' && ! http_obj.started? && ! ssl.frozen?

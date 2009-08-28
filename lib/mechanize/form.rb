@@ -60,6 +60,30 @@ class Mechanize
 
     def values; fields.map { |f| f.value }; end
 
+    def texts
+      @texts ||= fields.select { |f| f.class == Text }
+    end
+
+    def hiddens
+      @hiddens ||= fields.select { |f| f.class == Hidden }
+    end
+
+    def textareas
+      @textareas ||= fields.select { |f| f.class == Textarea }
+    end
+
+    def text_field?(field_name)
+      ! texts.find { |f| f.name.eql? field_name }.nil?
+    end
+
+    def hidden_field?(field_name)
+      ! hiddens.find { |f| f.name.eql? field_name }.nil?
+    end
+
+    def textarea_field?(field_name)
+      ! textareas.find { |f| f.name.eql? field_name }.nil?
+    end
+
     # Add a field with +field_name+ and +value+
     def add_field!(field_name, value = nil)
       fields << Field.new(field_name, value)
@@ -281,6 +305,12 @@ class Mechanize
           @buttons << Button.new(node['name'], node['value'])
         when 'image'
           @buttons << ImageButton.new(node['name'], node['value'])
+        when 'hidden'
+          @fields << Hidden.new(node['name'], node['value'] || '')
+        when 'text'
+          @fields << Text.new(node['name'], node['value'] || '')
+        when 'textarea'
+          @fields << Textarea.new(node['name'], node['value'] || '')
         else
           @fields << Field.new(node['name'], node['value'] || '')
         end

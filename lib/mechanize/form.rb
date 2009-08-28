@@ -60,29 +60,17 @@ class Mechanize
 
     def values; fields.map { |f| f.value }; end
 
-    def texts
-      @texts ||= fields.select { |f| f.class == Text }
-    end
+    def submits  ; @submits   ||= buttons.select { |f| f.class == Submit   }; end
+    def resets   ; @resets    ||= buttons.select { |f| f.class == Reset    }; end
+    def texts    ; @texts     ||=  fields.select { |f| f.class == Text     }; end
+    def hiddens  ; @hiddens   ||=  fields.select { |f| f.class == Hidden   }; end
+    def textareas; @textareas ||=  fields.select { |f| f.class == Textarea }; end
 
-    def hiddens
-      @hiddens ||= fields.select { |f| f.class == Hidden }
-    end
-
-    def textareas
-      @textareas ||= fields.select { |f| f.class == Textarea }
-    end
-
-    def text_field?(field_name)
-      ! texts.find { |f| f.name.eql? field_name }.nil?
-    end
-
-    def hidden_field?(field_name)
-      ! hiddens.find { |f| f.name.eql? field_name }.nil?
-    end
-
-    def textarea_field?(field_name)
-      ! textareas.find { |f| f.name.eql? field_name }.nil?
-    end
+    def submit_button?(button_name) !!  submits.find{|f| f.name == button_name}; end
+    def reset_button?(button_name)  !!   resets.find{|f| f.name == button_name}; end
+    def text_field?(field_name)     !!    texts.find{|f| f.name == field_name}; end
+    def hidden_field?(field_name)   !!  hiddens.find{|f| f.name == field_name}; end
+    def textarea_field?(field_name) !!textareas.find{|f| f.name == field_name}; end
 
     # Add a field with +field_name+ and +value+
     def add_field!(field_name, value = nil)
@@ -300,9 +288,11 @@ class Mechanize
         when 'file'
           @file_uploads << FileUpload.new(node['name'], nil)
         when 'submit'
-          @buttons << Button.new(node['name'], node['value'])
+          @buttons << Submit.new(node['name'], node['value'])
         when 'button'
           @buttons << Button.new(node['name'], node['value'])
+        when 'reset'
+          @buttons << Reset.new(node['name'], node['value'])
         when 'image'
           @buttons << ImageButton.new(node['name'], node['value'])
         when 'hidden'

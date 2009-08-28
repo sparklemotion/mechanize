@@ -23,13 +23,8 @@ class Mechanize
       end
     end
 
-    class Text < Field
-    end
-
-    class Textarea < Field
-    end
-
-    class Hidden < Field
-    end
+    class Text     < Field; end
+    class Textarea < Field; end
+    class Hidden   < Field; end
   end
 end

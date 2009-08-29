@@ -5,9 +5,10 @@ class Mechanize
     class RadioButton < Field
       attr_accessor :checked
 
-      def initialize(name, value, checked, form)
+      def initialize(name, value, checked, form, node)
         @checked = checked
         @form    = form
+        @node    = node
         super(name, value)
       end
 
@@ -22,6 +23,14 @@ class Mechanize
 
       def click
         checked ? uncheck : check
+      end
+
+      def label
+        (id = @node['id']) && @form.page.labels_hash[id] || nil
+      end
+
+      def text
+        label.text rescue nil
       end
 
       private

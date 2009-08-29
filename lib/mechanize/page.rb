@@ -2,6 +2,8 @@ require 'mechanize/page/link'
 require 'mechanize/page/meta'
 require 'mechanize/page/base'
 require 'mechanize/page/frame'
+require 'mechanize/page/image'
+require 'mechanize/page/label'
 require 'mechanize/headers'
 
 class Mechanize
@@ -164,6 +166,31 @@ class Mechanize
       def iframes
         @iframes ||=
           search('iframe').map { |node| Frame.new(node, @mech, self) }
+      end
+
+      def images
+        @images ||=
+          search('img').map { |node| Image.new(node, self) }
+      end
+
+      def image_urls
+        @image_urls ||= images.map(&:url).uniq
+      end
+
+      def labels
+        @labels ||=
+          search('label').map { |node| Label.new(node, self) }
+      end
+
+      def labels_hash
+        unless @labels_hash
+          hash = {}
+          labels.each do |label|
+            hash[label.node['for']] = label if label.for
+          end
+          @labels_hash = hash
+        end
+        return @labels_hash
       end
 
       private

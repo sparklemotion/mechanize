@@ -7,7 +7,7 @@ Hoe.spec 'mechanize' do
 
   self.readme_file      = 'README.rdoc'
   self.history_file     = 'CHANGELOG.rdoc'
-  self.extra_rdoc_files << Dir['*.rdoc']
+  self.extra_rdoc_files += Dir['*.rdoc']
   self.extra_deps       << ['nokogiri', '>= 1.2.1']
 end
 

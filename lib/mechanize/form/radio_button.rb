@@ -26,11 +26,15 @@ class Mechanize
       end
 
       def label
-        (id = @node['id']) && @form.page.labels_hash[id] || nil
+        (id = self['id']) && @form.page.labels_hash[id] || nil
       end
 
       def text
         label.text rescue nil
+      end
+
+      def [](key)
+        @node[key]
       end
 
       private

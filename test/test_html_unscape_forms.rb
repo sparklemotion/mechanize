@@ -32,7 +32,7 @@ class TestCheckBoxes < Test::Unit::TestCase
   end
 
   def test_radio_button
-    f = Mechanize::Form::RadioButton.new('a&amp;b', 'a&amp;b', nil, nil)
+    f = Mechanize::Form::RadioButton.new('a&amp;b', 'a&amp;b', nil, nil, nil)
     assert_equal('a&b', f.name)
     assert_equal('a&b', f.value)
   end

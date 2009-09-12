@@ -51,6 +51,8 @@ lib/mechanize/monkey_patch.rb
 lib/mechanize/page.rb
 lib/mechanize/page/base.rb
 lib/mechanize/page/frame.rb
+lib/mechanize/page/image.rb
+lib/mechanize/page/label.rb
 lib/mechanize/page/link.rb
 lib/mechanize/page/meta.rb
 lib/mechanize/pluggable_parsers.rb

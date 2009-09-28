@@ -86,6 +86,12 @@ class Mechanize
   # A hash of custom request headers
   attr_accessor :request_headers
 
+  # Proxy settings
+  attr_reader :proxy_addr
+  attr_reader :proxy_pass
+  attr_reader :proxy_port
+  attr_reader :proxy_user
+
   # The HTML parser to be used when parsing documents
   attr_accessor :html_parser
 

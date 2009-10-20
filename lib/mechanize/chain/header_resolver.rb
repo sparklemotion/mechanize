@@ -2,11 +2,13 @@ class Mechanize
   class Chain
     class HeaderResolver
       include Mechanize::Handler
-      def initialize(keep_alive, keep_alive_time, cookie_jar, user_agent, headers)
+      def initialize(keep_alive, keep_alive_time, cookie_jar, user_agent, 
+                     gzip_enabled, headers)
         @keep_alive = keep_alive
         @keep_alive_time = keep_alive_time
         @cookie_jar = cookie_jar
         @user_agent = user_agent
+        @gzip_enabled = gzip_enabled
         @headers = headers
       end
 
@@ -21,7 +23,11 @@ class Mechanize
         else
           request['Connection'] = 'close'
         end
-        request['Accept-Encoding'] = 'gzip,identity'
+        if @gzip_enabled
+          request['Accept-Encoding'] = 'gzip,identity'
+        else
+          request['Accept-Encoding'] = 'identity'
+        end
         request['Accept-Language'] = 'en-us,en;q=0.5'
         host = "#{uri.host}#{[80, 443].include?(uri.port.to_i) ? '' : ':' + uri.port.to_s}"
         request['Host'] = host

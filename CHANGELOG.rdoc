@@ -5,6 +5,7 @@
 * Bug Fixes:
 
   * Rescue errors from bogus encodings
+  * 7bit content-encoding support.  Thanks sporkmonger! GH #2
 
 === 0.9.3
 

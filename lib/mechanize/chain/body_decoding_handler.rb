@@ -33,6 +33,8 @@ class Mechanize
               end
             when 'x-gzip'
               body.read
+            when '7bit'
+              body.read
             else
               raise 'Unsupported content encoding'
             end

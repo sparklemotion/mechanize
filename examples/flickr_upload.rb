@@ -15,7 +15,7 @@ form.password = ARGV[1]
 page  = agent.submit(form)
 
 # Go to the upload page
-page  = agent.click page.links.text('Upload')
+page  = agent.click page.link_with(:text => 'Upload')
 
 # Fill out the form
 form  = page.forms.action('/photos_upload_process.gne').first

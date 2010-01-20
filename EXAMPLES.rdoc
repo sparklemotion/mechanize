@@ -23,7 +23,7 @@
   a = WWW::Mechanize.new
   a.get('http://rubyforge.org/') do |page|
     # Click the login link
-    login_page = a.click(page.links.text(/Log In/))
+    login_page = a.click(page.links_with(:text => /Log In/))
   
     # Submit the login form
     my_page = login_page.form_with(:action => '/account/login.php') do |f|
@@ -47,7 +47,7 @@ Upload a file to flickr.
   }
   
   a.get('http://flickr.com/') do |home_page|
-    signin_page = a.click(home_page.links.text(/Sign In/))
+    signin_page = a.click(home_page.links_with(:text => /Sign In/))
   
     my_page = signin_page.form_with(:name => 'login_form') do |form|
       form.login  = ARGV[0]
@@ -55,10 +55,10 @@ Upload a file to flickr.
     end.submit
   
     # Click the upload link
-    upload_page = a.click(my_page.links.text(/Upload/))
+    upload_page = a.click(my_page.links_with(:text => /Upload/))
   
     # We want the basic upload page.
-    upload_page = a.click(upload_page.links.text(/basic Uploader/))
+    upload_page = a.click(upload_page.link_with(:text => /basic Uploader/))
   
     # Upload the file
     upload_page.form_with(:method => 'POST') do |upload_form|

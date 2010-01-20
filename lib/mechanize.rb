@@ -94,7 +94,15 @@ class Mechanize
   alias :follow_redirect? :redirect_ok
 
   @html_parser = Nokogiri::HTML
-  class << self; attr_accessor :html_parser, :log end
+  class << self
+    attr_accessor :html_parser, :log
+    
+    def inherited(child)
+      child.html_parser ||= html_parser
+      child.log ||= log
+      super
+    end
+  end
 
   def initialize
     # attr_accessors

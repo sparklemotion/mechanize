@@ -11,4 +11,20 @@ class TestSubclass < Test::Unit::TestCase
     assert_equal(1, page.links.length)
     assert_not_nil(page.links.find { |l| l.text == "name:Aaron" })
   end
+  
+  class Parent < Mechanize
+    @html_parser = :parser
+    @log = :log
+  end
+  
+  class Child < Parent
+  end
+  
+  def test_subclass_inherits_html_parser
+    assert_equal :parser, Child.html_parser
+  end
+  
+  def test_subclass_inherits_log
+    assert_equal :log, Child.log
+  end
 end

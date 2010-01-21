@@ -5,6 +5,14 @@ class LinksMechTest < Test::Unit::TestCase
     @agent = Mechanize.new
   end
 
+  def test_weird_uri
+    doc = Nokogiri::HTML::Document.new
+    node = Nokogiri::XML::Node.new('foo', doc)
+    node['href'] = 'http://foo.bar/ baz'
+    link = Mechanize::Page::Link.new(node, nil, nil)
+    assert_equal 'http://foo.bar/%20/baz', link.uri.to_s
+  end
+
   def test_unsupported_link_types
     page = @agent.get("http://google.com/tc_links.html")
     link = page.link_with(:text => 'javascript link')

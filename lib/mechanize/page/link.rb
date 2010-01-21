@@ -36,7 +36,7 @@ class Mechanize
       end
 
       def uri
-        @href && URI.parse(@href)
+        @href && URI.parse(URI.encode(@href))
       end
 
       # Click on this link

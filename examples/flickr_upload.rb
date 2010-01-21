@@ -3,16 +3,16 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "lib")
 require 'rubygems'
 require 'mechanize'
 
-agent = WWW::Mechanize.new
+agent = Mechanize.new
 
 # Get the flickr sign in page
 page  = agent.get('http://flickr.com/signin/flickr/')
 
 # Fill out the login form
-form  = page.forms.name('flickrloginform').first
-form.email = ARGV[0]
+form          = page.form_with(:name => 'flickrloginform')
+form.email    = ARGV[0]
 form.password = ARGV[1]
-page  = agent.submit(form)
+page          = agent.submit(form)
 
 # Go to the upload page
 page  = agent.click page.link_with(:text => 'Upload')

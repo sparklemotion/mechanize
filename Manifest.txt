@@ -61,7 +61,6 @@ lib/mechanize/redirect_not_get_or_head_error.rb
 lib/mechanize/response_code_error.rb
 lib/mechanize/unsupported_scheme_error.rb
 lib/mechanize/util.rb
-mechanize.gemspec
 test/chain/test_argument_validator.rb
 test/chain/test_auth_headers.rb
 test/chain/test_custom_headers.rb
@@ -173,4 +172,5 @@ test/test_ssl_server.rb
 test/test_subclass.rb
 test/test_textarea.rb
 test/test_upload.rb
+test/test_util.rb
 test/test_verbs.rb

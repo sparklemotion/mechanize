@@ -27,7 +27,7 @@ class Mechanize
         end
 
         if page.is_a?(Page) && page.body =~ /Set-Cookie/n
-          page.search('//meta[@http-equiv="Set-Cookie"]').each do |meta|
+          page.search('//head/meta[@http-equiv="Set-Cookie"]').each do |meta|
             Cookie::parse(uri, meta['content']) { |c|
               Mechanize.log.debug("saved cookie: #{c}") if Mechanize.log
               @cookie_jar.add(uri, c)

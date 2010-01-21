@@ -140,7 +140,7 @@ class Mechanize
       end
 
       def meta
-        @meta ||= search('meta').map do |node|
+        @meta ||= search('head > meta').map do |node|
           next unless node['http-equiv'] && node['content']
           (equiv, content) = node['http-equiv'], node['content']
           if equiv && equiv.downcase == 'refresh'

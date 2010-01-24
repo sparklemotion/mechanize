@@ -24,7 +24,7 @@ The mechanize mailing list is available here:
 
 The bug tracker is available here:
 
-  * http://rubyforge.org/tracker/?atid=5709&group_id=1453
+  * http://github.com/tenderlove/mechanize/issues
 
 == Examples
 

@@ -1,6 +1,16 @@
 require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 class CookieJarTest < Test::Unit::TestCase
+  def cookie_values(options = {})
+    {
+      :name     => 'Foo',
+      :value    => 'Bar',
+      :path     => '/',
+      :expires  => Time.now + (10 * 86400),
+      :domain   => 'rubyforge.org'
+   }.merge(options)
+  end
+  
   def cookie_from_hash(hash)
     c = Mechanize::Cookie.new(hash[:name], hash[:value])
     hash.each { |k,v|
@@ -11,44 +21,30 @@ class CookieJarTest < Test::Unit::TestCase
   end
 
   def test_two_cookies_same_domain_and_name_different_paths
-    values = {  :name     => 'Foo',
-                :value    => 'Bar',
-                :path     => '/',
-                :expires  => Time.now + (10 * 86400),
-                :domain   => 'rubyforge.org'
-             }
-
     url = URI.parse('http://rubyforge.org/')
 
     jar = Mechanize::CookieJar.new
-    cookie = cookie_from_hash(values)
+    cookie = cookie_from_hash(cookie_values)
     jar.add(url, cookie)
-    jar.add(url, cookie_from_hash(values.merge(:path => '/onetwo')))
+    jar.add(url, cookie_from_hash(cookie_values(:path => '/onetwo')))
 
     assert_equal(1, jar.cookies(url).length)
     assert_equal 2, jar.cookies(URI.parse('http://rubyforge.org/onetwo')).length
   end
 
   def test_domain_case
-    values = {  :name     => 'Foo',
-                :value    => 'Bar',
-                :path     => '/',
-                :expires  => Time.now + (10 * 86400),
-                :domain   => 'rubyforge.org'
-             }
     url = URI.parse('http://rubyforge.org/')
 
     jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(values)
+    cookie = cookie_from_hash(cookie_values)
     jar.add(url, cookie)
     assert_equal(1, jar.cookies(url).length)
 
-    jar.add(url, cookie_from_hash( values.merge(  :domain => 'RuByForge.Org',
-                                                  :name   => 'aaron'
-                                               ) ) )
+    jar.add(url, cookie_from_hash(
+        cookie_values(:domain => 'RuByForge.Org', :name   => 'aaron')))
 
     assert_equal(2, jar.cookies(url).length)
 
@@ -57,12 +53,7 @@ class CookieJarTest < Test::Unit::TestCase
   end
 
   def test_empty_value
-    values = {  :name     => 'Foo',
-                :value    => '',
-                :path     => '/',
-                :expires  => Time.now + (10 * 86400),
-                :domain   => 'rubyforge.org'
-             }
+    values = cookie_values(:value => "")
     url = URI.parse('http://rubyforge.org/')
 
     jar = Mechanize::CookieJar.new
@@ -84,24 +75,18 @@ class CookieJarTest < Test::Unit::TestCase
   end
 
   def test_add_future_cookies
-    values = {  :name     => 'Foo',
-                :value    => 'Bar',
-                :path     => '/',
-                :expires  => Time.now + (10 * 86400),
-                :domain   => 'rubyforge.org'
-             }
     url = URI.parse('http://rubyforge.org/')
 
     jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(values)
+    cookie = cookie_from_hash(cookie_values)
     jar.add(url, cookie)
     assert_equal(1, jar.cookies(url).length)
 
     # Add the same cookie, and we should still only have one
-    jar.add(url, cookie_from_hash(values))
+    jar.add(url, cookie_from_hash(cookie_values))
     assert_equal(1, jar.cookies(url).length)
 
     # Make sure we can get the cookie from different paths
@@ -112,24 +97,18 @@ class CookieJarTest < Test::Unit::TestCase
   end
 
   def test_add_multiple_cookies
-    values = {  :name     => 'Foo',
-                :value    => 'Bar',
-                :path     => '/',
-                :expires  => Time.now + (10 * 86400),
-                :domain   => 'rubyforge.org'
-             }
     url = URI.parse('http://rubyforge.org/')
 
     jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(values)
+    cookie = cookie_from_hash(cookie_values)
     jar.add(url, cookie)
     assert_equal(1, jar.cookies(url).length)
 
     # Add the same cookie, and we should still only have one
-    jar.add(url, cookie_from_hash(values.merge( :name => 'Baz' )))
+    jar.add(url, cookie_from_hash(cookie_values(:name => 'Baz')))
     assert_equal(2, jar.cookies(url).length)
 
     # Make sure we can get the cookie from different paths
@@ -140,21 +119,15 @@ class CookieJarTest < Test::Unit::TestCase
   end
 
   def test_clear_cookies
-    values = {  :name     => 'Foo',
-                :value    => 'Bar',
-                :path     => '/',
-                :expires  => Time.now + (10 * 86400),
-                :domain   => 'rubyforge.org'
-             }
     url = URI.parse('http://rubyforge.org/')
 
     jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(values)
+    cookie = cookie_from_hash(cookie_values)
     jar.add(url, cookie)
-    jar.add(url, cookie_from_hash(values.merge( :name => 'Baz' )))
+    jar.add(url, cookie_from_hash(cookie_values(:name => 'Baz')))
     assert_equal(2, jar.cookies(url).length)
 
     jar.clear!
@@ -163,21 +136,15 @@ class CookieJarTest < Test::Unit::TestCase
   end
 
   def test_save_cookies
-    values = {  :name     => 'Foo',
-                :value    => 'Bar',
-                :path     => '/',
-                :expires  => Time.now + (10 * 86400),
-                :domain   => 'rubyforge.org'
-             }
     url = URI.parse('http://rubyforge.org/')
 
     jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(values)
+    cookie = cookie_from_hash(cookie_values)
     jar.add(url, cookie)
-    jar.add(url, cookie_from_hash(values.merge( :name => 'Baz' )))
+    jar.add(url, cookie_from_hash(cookie_values(:name => 'Baz')))
     assert_equal(2, jar.cookies(url).length)
 
     jar.save_as("cookies.yml")
@@ -190,46 +157,36 @@ class CookieJarTest < Test::Unit::TestCase
   end
 
   def test_expire_cookies
-    values = {  :name     => 'Foo',
-                :value    => 'Bar',
-                :path     => '/',
-                :expires  => Time.now + (10 * 86400),
-                :domain   => 'rubyforge.org'
-             }
     url = URI.parse('http://rubyforge.org/')
 
     jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(values)
+    cookie = cookie_from_hash(cookie_values)
     jar.add(url, cookie)
     assert_equal(1, jar.cookies(url).length)
 
     # Add a second cookie
-    jar.add(url, cookie_from_hash(values.merge( :name => 'Baz' )))
+    jar.add(url, cookie_from_hash(cookie_values(:name => 'Baz')))
     assert_equal(2, jar.cookies(url).length)
 
     # Make sure we can get the cookie from different paths
     assert_equal(2, jar.cookies(URI.parse('http://rubyforge.org/login')).length)
 
     # Expire the first cookie
-    jar.add(url, cookie_from_hash(values.merge( :expires => Time.now - (10 * 86400))))
+    jar.add(url, cookie_from_hash(
+        cookie_values(:expires => Time.now - (10 * 86400))))
     assert_equal(1, jar.cookies(url).length)
 
     # Expire the second cookie
-    jar.add(url, cookie_from_hash(values.merge( :name => 'Baz',
-                                          :expires => Time.now - (10 * 86400))))
+    jar.add(url, cookie_from_hash(
+        cookie_values( :name => 'Baz', :expires => Time.now - (10 * 86400))))
     assert_equal(0, jar.cookies(url).length)
   end
 
   def test_session_cookies
-    values = {  :name     => 'Foo',
-                :value    => 'Bar',
-                :path     => '/',
-                :expires  => nil,
-                :domain   => 'rubyforge.org'
-             }
+    values = cookie_values(:expires => nil)
     url = URI.parse('http://rubyforge.org/')
 
     jar = Mechanize::CookieJar.new
@@ -241,19 +198,19 @@ class CookieJarTest < Test::Unit::TestCase
     assert_equal(1, jar.cookies(url).length)
 
     # Add a second cookie
-    jar.add(url, cookie_from_hash(values.merge( :name => 'Baz' )))
+    jar.add(url, cookie_from_hash(values.merge(:name => 'Baz')))
     assert_equal(2, jar.cookies(url).length)
 
     # Make sure we can get the cookie from different paths
     assert_equal(2, jar.cookies(URI.parse('http://rubyforge.org/login')).length)
 
     # Expire the first cookie
-    jar.add(url, cookie_from_hash(values.merge( :expires => Time.now - (10 * 86400))))
+    jar.add(url, cookie_from_hash(values.merge(:expires => Time.now - (10 * 86400))))
     assert_equal(1, jar.cookies(url).length)
 
     # Expire the second cookie
-    jar.add(url, cookie_from_hash(values.merge( :name => 'Baz',
-                                          :expires => Time.now - (10 * 86400))))
+    jar.add(url, cookie_from_hash(
+        values.merge(:name => 'Baz', :expires => Time.now - (10 * 86400))))
     assert_equal(0, jar.cookies(url).length)
 
     # When given a URI with a blank path, CookieJar#cookies should return
@@ -268,12 +225,7 @@ class CookieJarTest < Test::Unit::TestCase
   end
 
   def test_paths
-    values = {  :name     => 'Foo',
-                :value    => 'Bar',
-                :path     => '/login',
-                :expires  => nil,
-                :domain   => 'rubyforge.org'
-             }
+    values = cookie_values(:path => "/login", :expires => nil)
     url = URI.parse('http://rubyforge.org/login')
 
     jar = Mechanize::CookieJar.new
@@ -304,21 +256,15 @@ class CookieJarTest < Test::Unit::TestCase
 
 
   def test_save_and_read_cookiestxt
-    values = {  :name     => 'Foo',
-                :value    => 'Bar',
-                :path     => '/',
-                :expires  => Time.now + (10 * 86400),
-                :domain   => 'rubyforge.org'
-             }
     url = URI.parse('http://rubyforge.org/')
 
     jar = Mechanize::CookieJar.new
     assert_equal(0, jar.cookies(url).length)
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(values)
+    cookie = cookie_from_hash(cookie_values)
     jar.add(url, cookie)
-    jar.add(url, cookie_from_hash(values.merge( :name => 'Baz' )))
+    jar.add(url, cookie_from_hash(cookie_values(:name => 'Baz')))
     assert_equal(2, jar.cookies(url).length)
 
     jar.save_as("cookies.txt", :cookiestxt)
@@ -330,21 +276,11 @@ class CookieJarTest < Test::Unit::TestCase
 
     FileUtils.rm("cookies.txt")
   end
-
+  
   def test_ssl_cookies
     # thanks to michal "ocher" ochman for reporting the bug responsible for this test.
-    values = {  :name     => 'Foo',
-      :value    => 'Bar',
-      :path     => '/login',
-      :expires  => nil,
-      :domain   => 'rubyforge.org'
-    }
-    values_ssl = {  :name     => 'Foo',
-      :value    => 'Bar',
-      :path     => '/login',
-      :expires  => nil,
-      :domain   => 'rubyforge.org:443'
-    }
+    values = cookie_values(:expires => nil)
+    values_ssl = values.merge(:domain => "#{values[:domain]}:443")
     url = URI.parse('https://rubyforge.org/login')
 
     jar = Mechanize::CookieJar.new
@@ -358,5 +294,4 @@ class CookieJarTest < Test::Unit::TestCase
     jar.add(url, cookie)
     assert_equal(2, jar.cookies(url).length, "did not handle SSL cookie with :443")
   end
-
 end

@@ -42,9 +42,7 @@ class Mechanize
         }.map { |_,cookie| cookie.values }
       }.flatten
 
-      cookies.find_all { |cookie|
-        !cookie.expires || Time.now < cookie.expires
-      }
+      cookies.find_all { |cookie| ! cookie.expired? }
     end
 
     def empty?(url)
@@ -102,7 +100,6 @@ class Mechanize
       @jar = {}
     end
 
-
     # Read cookies from Mozilla cookies.txt-style IO stream
     def load_cookiestxt(io)
       now = Time.now
@@ -117,13 +114,13 @@ class Mechanize
 
         expires_seconds = fields[4].to_i
         begin
-          expires = Time.at(expires_seconds)
+          expires = (expires_seconds == 0) ? nil : Time.at(expires_seconds)
         rescue
           next
           # Just in case we ever decide to support DateTime...
           # expires = DateTime.new(1970,1,1) + ((expires_seconds + 1) / (60*60*24.0))
         end
-        next if expires < now
+        next if (expires_seconds != 0) && (expires < now)
 
         c = Mechanize::Cookie.new(fields[5], fields[6])
         c.domain = fields[0]
@@ -173,7 +170,7 @@ class Mechanize
       @jar.each do |domain, paths|
         paths.each do |path, names|
           names.each do |cookie_name, cookie|
-            if cookie.expires && Time.now > cookie.expires
+            if cookie.expired?
               paths[path].delete(cookie_name)
             end
           end

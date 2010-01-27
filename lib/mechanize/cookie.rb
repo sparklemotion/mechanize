@@ -63,6 +63,14 @@ class Mechanize
       }
     end
 
+    def expired?
+      if expires.nil?
+        false
+      else
+        Time.now > expires
+      end
+    end
+
     def to_s
       "#{@name}=#{@value}"
     end

@@ -1,6 +1,11 @@
 = WWW::Mechanize examples
 
+Note: Several examples show methods chained to the end of do/end blocks.
+Do...end is the same as curly braces ({...}). For example, do ... end.submit
+is the same as { ... }.submit.
+
 == Google
+
   require 'rubygems'
   require 'mechanize'
   
@@ -20,10 +25,13 @@
 
 == Rubyforge
 
+  require 'rubygems'
+  require 'mechanize'
+
   a = WWW::Mechanize.new
   a.get('http://rubyforge.org/') do |page|
     # Click the login link
-    login_page = a.click(page.links_with(:text => /Log In/))
+    login_page = a.click(page.link_with(:text => /Log In/))
   
     # Submit the login form
     my_page = login_page.form_with(:action => '/account/login.php') do |f|
@@ -41,25 +49,30 @@
 == File Upload
 Upload a file to flickr.
   
+  require 'rubygems'
+  require 'mechanize'
+
+  abort "#{$0} login passwd filename" if (ARGV.size != 3)
+
   a = WWW::Mechanize.new { |agent|
     # Flickr refreshes after login
     agent.follow_meta_refresh = true
   }
-  
+
   a.get('http://flickr.com/') do |home_page|
-    signin_page = a.click(home_page.links_with(:text => /Sign In/))
-  
+    signin_page = a.click(home_page.link_with(:text => /Sign In/))
+
     my_page = signin_page.form_with(:name => 'login_form') do |form|
       form.login  = ARGV[0]
       form.passwd = ARGV[1]
     end.submit
-  
+
     # Click the upload link
-    upload_page = a.click(my_page.links_with(:text => /Upload/))
-  
+    upload_page = a.click(my_page.link_with(:text => /Upload/))
+
     # We want the basic upload page.
     upload_page = a.click(upload_page.link_with(:text => /basic Uploader/))
-  
+
     # Upload the file
     upload_page.form_with(:method => 'POST') do |upload_form|
       upload_form.file_uploads.first.file_name = ARGV[2]
@@ -108,6 +121,7 @@ possible exceptions).
 
 This example also demonstrates subclassing Mechanize.
 
+  require 'rubygems'
   require 'mechanize'
 
   class TestMech < WWW::Mechanize

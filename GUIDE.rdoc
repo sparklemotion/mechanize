@@ -34,18 +34,18 @@ Now that we've fetched google's homepage, lets try listing all of the links:
 We can list the links, but Mechanize gives a few shortcuts to help us find a
 link to click on.  Lets say we wanted to click the link whose text is 'News'.
 Normally, we would have to do this:
- page = agent.click page.links.find { |l| l.text == 'News' }
+ page = agent.page.links.find { |l| l.text == 'News' }.click
 But Mechanize gives us a shortcut.  Instead we can say this:
- page = agent.click page.link_with(:text => 'News')
+ page = agent.page.link_with(:text => 'News').click
 That shortcut says "find all links with the name 'News'".  You're probably
 thinking "there could be multiple links with that text!", and you would be
 correct!  If you use the plural form, you can access the list.
 If you wanted to click on the second news link, you could do this:
- agent.click page.links_with(:text => 'News')[1]
+ agent.page.links_with(:text => 'News')[1].click
 We can even find a link with a certain href like so:
- page.links_with(:href => '/something')
+ page.link_with(:href => '/something')
 Or chain them together to find a link with certain text and certain href:
- page.links_with(:text => 'News', :href => '/something')
+ page.link_with(:text => 'News', :href => '/something')
 
 These shortcuts that mechanize provides are available on any list that you
 can fetch like frames, iframes, or forms.  Now that we know how to find and
@@ -120,3 +120,4 @@ html.  What does this mean for you?  You can treat a mechanize page like
 an nokogiri object.  After you have used Mechanize to navigate to the page
 that you need to scrape, then scrape it using nokogiri methods:
   agent.get('http://someurl.com/').search(".//p[@class='posted']")
+

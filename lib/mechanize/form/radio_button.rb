@@ -5,11 +5,11 @@ class Mechanize
     class RadioButton < Field
       attr_accessor :checked
 
-      def initialize(name, value, checked, form, node)
-        @checked = checked
+      def initialize node, form
+        @checked = !!node['checked']
         @form    = form
         @node    = node
-        super(name, value)
+        super(node['name'], node['value'])
       end
 
       def check

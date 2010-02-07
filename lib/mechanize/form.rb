@@ -277,9 +277,9 @@ class Mechanize
         next if name.nil? && !(type == 'submit' || type =='button')
         case type
         when 'radio'
-          @radiobuttons << RadioButton.new(node['name'], node['value'], !!node['checked'], self, node)
+          @radiobuttons << RadioButton.new(node, self)
         when 'checkbox'
-          @checkboxes << CheckBox.new(node['name'], node['value'], !!node['checked'], self, node)
+          @checkboxes << CheckBox.new(node, self)
         when 'file'
           @file_uploads << FileUpload.new(node['name'], nil)
         when 'submit'

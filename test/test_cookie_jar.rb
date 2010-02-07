@@ -10,7 +10,7 @@ class CookieJarTest < Test::Unit::TestCase
       :domain   => 'rubyforge.org'
    }.merge(options)
   end
-  
+
   def cookie_from_hash(hash)
     c = Mechanize::Cookie.new(hash[:name], hash[:value])
     hash.each { |k,v|
@@ -276,20 +276,21 @@ class CookieJarTest < Test::Unit::TestCase
 
     FileUtils.rm("cookies.txt")
   end
-  
+
   def test_save_and_read_cookiestxt_with_session_cookies
     url = URI.parse('http://rubyforge.org/')
 
     jar = Mechanize::CookieJar.new
-    
+
     jar.add(url, cookie_from_hash(cookie_values(:expires => nil)))
     jar.save_as("cookies.txt", :cookiestxt)
     jar.clear!
     assert_equal(0, jar.cookies(url).length)
-  
+
     jar.load("cookies.txt", :cookiestxt)
     assert_equal(1, jar.cookies(url).length)
     assert_nil jar.cookies(url).first.expires
+    FileUtils.rm("cookies.txt")
   end
 
   def test_ssl_cookies

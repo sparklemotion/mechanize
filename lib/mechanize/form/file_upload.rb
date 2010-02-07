@@ -12,10 +12,11 @@ class Mechanize
       alias :file_data :value
       alias :file_data= :value=
 
-        def initialize(name, file_name)
+        def initialize node, file_name
           @file_name = Util.html_unescape(file_name)
           @file_data = nil
-          super(name, @file_data)
+          @node      = node
+          super(node['name'], @file_data)
         end
     end
   end

@@ -345,7 +345,7 @@ class Mechanize
     query.each { |k,v|
       if v.is_a?(IO)
         form.enctype = 'multipart/form-data'
-        ul = Form::FileUpload.new(k.to_s,::File.basename(v.path))
+        ul = Form::FileUpload.new({'name' => k.to_s},::File.basename(v.path))
         ul.file_data = v.read
         form.file_uploads << ul
       else

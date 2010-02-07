@@ -16,11 +16,11 @@ class TestCheckBoxes < Test::Unit::TestCase
   end
 
   def test_file_upload
-    f = Mechanize::Form::FileUpload.new('a&amp;b', 'a&amp;b')
+    f = Mechanize::Form::FileUpload.new(fake_node, 'a&amp;b')
     assert_equal('a&b', f.name)
     assert_equal('a&b', f.file_name)
 
-    f = Mechanize::Form::FileUpload.new('a&b', 'a&b')
+    f = Mechanize::Form::FileUpload.new(fake_node, 'a&b')
     assert_equal('a&b', f.name)
     assert_equal('a&b', f.file_name)
   end
@@ -32,12 +32,15 @@ class TestCheckBoxes < Test::Unit::TestCase
   end
 
   def test_radio_button
-    fake_node = {
-      'name'  => 'a&amp;b',
-      'value' => 'a&amp;b'
-    }
     f = Mechanize::Form::RadioButton.new(fake_node, nil)
     assert_equal('a&b', f.name)
     assert_equal('a&b', f.value)
+  end
+
+  def fake_node
+    {
+      'name'  => 'a&amp;b',
+      'value' => 'a&amp;b'
+    }
   end
 end

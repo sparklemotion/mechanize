@@ -281,7 +281,7 @@ class Mechanize
         when 'checkbox'
           @checkboxes << CheckBox.new(node, self)
         when 'file'
-          @file_uploads << FileUpload.new(node['name'], nil)
+          @file_uploads << FileUpload.new(node, nil)
         when 'submit'
           @buttons << Submit.new(node['name'], node['value'])
         when 'button'

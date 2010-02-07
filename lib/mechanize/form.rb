@@ -238,6 +238,87 @@ class Mechanize
       @fields.delete_if{ |f| f.name == field_name}
     end
 
+    ##
+    # :method: field_with(criteria)
+    #
+    # Find one field that matches +criteria+
+    # Example:
+    #   form.field_with(:value => /foo/).value = 'hello'
+
+    ##
+    # :method: fields_with(criteria)
+    #
+    # Find all fields that match +criteria+
+    # Example:
+    #   form.fields_with(:value => /foo/).each do |field|
+    #     field.value = 'hello!'
+    #   end
+
+    ##
+    # :method: button_with(criteria)
+    #
+    # Find one button that matches +criteria+
+    # Example:
+    #   form.button_with(:value => /submit/).value = 'hello'
+
+    ##
+    # :method: buttons_with(criteria)
+    #
+    # Find all buttons that match +criteria+
+    # Example:
+    #   form.buttons_with(:value => /submit/).each do |button|
+    #     button.value = 'hello!'
+    #   end
+
+    ##
+    # :method: file_upload_with(criteria)
+    #
+    # Find one file upload field that matches +criteria+
+    # Example:
+    #   form.file_upload_with(:file_name => /picture/).value = 'foo'
+
+    ##
+    # :method: file_uploads_with(criteria)
+    #
+    # Find all file upload fields that match +criteria+
+    # Example:
+    #   form.file_uploads_with(:file_name => /picutre/).each do |field|
+    #     field.value = 'foo!'
+    #   end
+
+    ##
+    # :method: radiobutton_with(criteria)
+    #
+    # Find one radio button that matches +criteria+
+    # Example:
+    #   form.radiobutton_with(:name => /woo/).check
+
+    ##
+    # :method: radiobuttons_with(criteria)
+    #
+    # Find all radio buttons that match +criteria+
+    # Example:
+    #   form.radiobuttons_with(:name => /woo/).each do |field|
+    #     field.check
+    #   end
+
+    ##
+    # :method: checkbox_with(criteria)
+    #
+    # Find one checkbox that matches +criteria+
+    # Example:
+    #   form.checkbox_with(:name => /woo/).check
+
+    ##
+    # :method: checkboxes_with(criteria)
+    #
+    # Find all checkboxes that match +criteria+
+    # Example:
+    #   form.checkboxes_with(:name => /woo/).each do |field|
+    #     field.check
+    #   end
+
+    # Woo! meta programming time
     { :field        => :fields,
       :button       => :buttons,
       :file_upload  => :file_uploads,

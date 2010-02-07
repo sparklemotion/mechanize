@@ -1,11 +1,12 @@
 = Mechanize CHANGELOG
 
-=== HEAD
+=== 1.0.0
 
 * New Features:
 
   * An optional verb may be passed to Mechanize#get GH #26
-  * The WWW constant is deprecated
+  * The WWW constant is deprecated. Switch to the top level constant Mechanize
+  * SelectList#option_with and options_with for finding options
 
 * Bug Fixes:
 

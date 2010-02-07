@@ -7,6 +7,16 @@ class SelectTest < Test::Unit::TestCase
     @form = @page.forms.first
   end
 
+  def test_option_with
+    o = @form.field_with(:name => 'list').option_with(:value => '1')
+    assert_equal '1', o.value
+  end
+
+  def test_options_with
+    os = @form.field_with(:name => 'list').options_with(:value => /1|2/)
+    assert_equal ['1', '2'].sort, os.map { |x| x.value }.sort
+  end
+
   def test_select_none
     @form.fields_with(:name => 'list').first.select_none
     assert_equal('1', @form.list)

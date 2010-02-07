@@ -38,11 +38,11 @@ class Mechanize
       if disposition = @response['content-disposition']
         disposition.split(/;\s*/).each do |pair|
           k,v = pair.split(/=/, 2)
-            @filename = v if k && k.downcase == 'filename'
-          end
-        else
-          if @uri
-            @filename = @uri.path.split(/\//).last || 'index.html'
+          @filename = v if k && k.downcase == 'filename'
+        end
+      else
+        if @uri
+          @filename = @uri.path.split(/\//).last || 'index.html'
           @filename << ".html" unless @filename =~ /\./
         end
       end

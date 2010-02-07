@@ -37,7 +37,7 @@ require 'mechanize/monkey_patch'
 #  require 'mechanize'
 #  require 'logger'
 #
-#  agent = WWW::Mechanize.new { |a| a.log = Logger.new("mech.log") }
+#  agent = Mechanize.new { |a| a.log = Logger.new("mech.log") }
 #  agent.user_agent_alias = 'Mac Safari'
 #  page = agent.get("http://www.google.com/")
 #  search_form = page.form_with(:name => "f")
@@ -637,6 +637,20 @@ class Mechanize
   end
 end
 
-module WWW; end
-WWW::Mechanize = ::Mechanize
+module WWW
+  def self.const_missing klass
+    warn <<eomsg
+!!!!! DEPRECATION NOTICE !!!!!
+The WWW constant is deprecated, please switch to the new top-level Mechanize
+constant.  WWW will be removed in Mechanize version 2.0
 
+You've referenced the WWW constant from #{caller.first}, please
+switch the "WWW" to "Mechanize".  Thanks!
+
+Sincerely,
+
+  Pew Pew Pew
+eomsg
+    Object.const_get(klass)
+  end
+end

@@ -15,6 +15,7 @@
   * meta redirects outside the head are not followed. GH #13
   * Form submissions work with nil page encodings. GH #25
   * Fixing default values with serialized cookies. GH #3
+  * Checkboxes and fields are sorted by page appearance before submitting. #11
 
 === 0.9.3
 

@@ -22,6 +22,13 @@ class Mechanize
       def query_value
         [[@name, @value || '']]
       end
+
+      def <=> other
+        return 0 if self == other
+        return 1 if Hash === node
+        return -1 if Hash === other.node
+        node <=> other.node
+      end
     end
 
     class Text     < Field; end

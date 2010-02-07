@@ -168,13 +168,14 @@ class Mechanize
     def build_query(buttons = [])
       query = []
 
-      fields.each do |f|
-        qval = proc_query(f)
-        query.push(*qval)
-      end
-
-      checkboxes.each do |f|
-        if f.checked
+      (fields + checkboxes).sort.each do |f|
+        case f
+        when Form::CheckBox
+          if f.checked
+            qval = proc_query(f)
+            query.push(*qval)
+          end
+        when Form::Field
           qval = proc_query(f)
           query.push(*qval)
         end

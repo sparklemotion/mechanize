@@ -8,6 +8,7 @@ class TestHeaderResolver < Test::Unit::TestCase
         300,
         Mechanize::CookieJar.new,
         'foobar',
+        true,
         {
           'hello' => 'world',
           'Content-Type' => 'utf-8'

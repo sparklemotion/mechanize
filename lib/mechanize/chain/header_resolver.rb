@@ -2,7 +2,7 @@ class Mechanize
   class Chain
     class HeaderResolver
       include Mechanize::Handler
-      def initialize(keep_alive, keep_alive_time, cookie_jar, user_agent, 
+      def initialize(keep_alive, keep_alive_time, cookie_jar, user_agent,
                      gzip_enabled, headers)
         @keep_alive = keep_alive
         @keep_alive_time = keep_alive_time

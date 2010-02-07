@@ -64,6 +64,8 @@ class Net::HTTP
     path = '/index.html' if path == '/'
 
     res = Response.new
+    res.query_params = url.query
+
     request.query = WEBrick::HTTPUtils.parse_query(url.query)
     request.cookies = WEBrick::Cookie.parse(request['Cookie'])
     if SERVLETS[path]
@@ -72,6 +74,7 @@ class Net::HTTP
           request.body = data.first
         else
           request.query = WEBrick::HTTPUtils.parse_query(data.first)
+          res.query_params = data.first
         end
       end
       SERVLETS[path].new({}).send("do_#{request.method}", request, res)
@@ -106,7 +109,8 @@ class Response
 
   attr_reader :code
   attr_accessor :body, :query, :cookies
-  
+  attr_accessor :query_params
+
   def code=(c)
     @code = c.to_s
   end

@@ -245,7 +245,7 @@ class FormTest < WEBrick::HTTPServlet::AbstractServlet
         res.body << "<a href=\"#\">#{URI.unescape(k)}:#{URI.unescape(data)}</a><br />"
       }
     }
-    res.body << "</body></HTML>"
+    res.body << "<div id=\"query\">#{res.query}</div></body></HTML>"
     res['Content-Type'] = "text/html"
   end
 
@@ -256,7 +256,7 @@ class FormTest < WEBrick::HTTPServlet::AbstractServlet
         res.body << "<a href=\"#\">#{k}:#{data}</a><br />"
       }
     }
-    res.body << "</body></HTML>"
+    res.body << "<div id=\"query\">#{res.query_params}</div></body></HTML>"
     res['Content-Type'] = "text/html"
   end
 end

@@ -1,4 +1,4 @@
-= WWW::Mechanize examples
+= Mechanize examples
 
 Note: Several examples show methods chained to the end of do/end blocks.
 Do...end is the same as curly braces ({...}). For example, do ... end.submit
@@ -9,7 +9,7 @@ is the same as { ... }.submit.
   require 'rubygems'
   require 'mechanize'
   
-  a = WWW::Mechanize.new { |agent|
+  a = Mechanize.new { |agent|
     agent.user_agent_alias = 'Mac Safari'
   }
   
@@ -28,7 +28,7 @@ is the same as { ... }.submit.
   require 'rubygems'
   require 'mechanize'
 
-  a = WWW::Mechanize.new
+  a = Mechanize.new
   a.get('http://rubyforge.org/') do |page|
     # Click the login link
     login_page = a.click(page.link_with(:text => /Log In/))
@@ -54,7 +54,7 @@ Upload a file to flickr.
 
   abort "#{$0} login passwd filename" if (ARGV.size != 3)
 
-  a = WWW::Mechanize.new { |agent|
+  a = Mechanize.new { |agent|
     # Flickr refreshes after login
     agent.follow_meta_refresh = true
   }
@@ -87,7 +87,7 @@ This example shows you how:
   require 'mechanize'
   require 'rubyful_soup'
 
-  class SoupParser < WWW::Mechanize::Page
+  class SoupParser < Mechanize::Page
     attr_reader :soup
     def initialize(uri = nil, response = nil, body = nil, code = nil)
       @soup = BeautifulSoup.new(body)
@@ -95,7 +95,7 @@ This example shows you how:
     end
   end
 
-  agent = WWW::Mechanize.new
+  agent = Mechanize.new
   agent.pluggable_parser.html = SoupParser
 
 Now all HTML pages will be parsed with the SoupParser class, and automatically
@@ -107,7 +107,7 @@ Beautiful Soup for that page.
   require 'rubygems'
   require 'mechanize'
   
-  agent = WWW::Mechanize.new
+  agent = Mechanize.new
   agent.set_proxy('localhost', '8000')
   page = agent.get(ARGV[0])
   puts page.body
@@ -124,7 +124,7 @@ This example also demonstrates subclassing Mechanize.
   require 'rubygems'
   require 'mechanize'
 
-  class TestMech < WWW::Mechanize
+  class TestMech < Mechanize
     def process
       get 'http://rubyforge.org/'
       search_form = page.forms.first
@@ -168,7 +168,7 @@ openssl.exe pkcs12 -in input_file.p12 -clcerts -out example.cer -nokeys
   require 'mechanize'
 
   # create Mechanize instance
-  agent = WWW::Mechanize.new
+  agent = Mechanize.new
   
   # set the path of the certificate file
   agent.cert = 'example.cer'

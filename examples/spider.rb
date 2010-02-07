@@ -3,7 +3,7 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "lib")
 require 'rubygems'
 require 'mechanize'
 
-agent = WWW::Mechanize.new
+agent = Mechanize.new
 stack = agent.get(ARGV[0]).links
 while l = stack.pop
   next unless l.uri.host == agent.history.first.uri.host

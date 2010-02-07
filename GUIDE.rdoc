@@ -1,4 +1,4 @@
-= Getting Started With WWW::Mechanize
+= Getting Started With Mechanize
 This guide is meant to get you started using Mechanize.  By the end of this
 guide, you should be able to fetch pages, click links, fill out and submit
 forms, scrape data, and many other hopefully useful things.  This guide
@@ -11,7 +11,7 @@ instantiate a new mechanize object:
  require 'rubygems'
  require 'mechanize'
 
- agent = WWW::Mechanize.new
+ agent = Mechanize.new
 Now we'll use the agent we've created to fetch a page.  Let's fetch google
 with our mechanize agent:
  page = agent.get('http://google.com/')
@@ -56,7 +56,7 @@ Lets continue with our google example.  Here's the code we have so far:
  require 'rubygems'
  require 'mechanize'
 
- agent = WWW::Mechanize.new
+ agent = Mechanize.new
  page = agent.get('http://google.com/')
 If we pretty print the page, we can see that there is one form named 'f',
 that has a couple buttons and a few fields:
@@ -69,7 +69,7 @@ object.  So lets set the form field named 'q' on the form to 'ruby mechanize':
  google_form.q = 'ruby mechanize'
 To make sure that we set the value, lets pretty print the form, and you should
 see a line similar to this:
- #<WWW::Mechanize::Field:0x1403488 @name="q", @value="ruby mechanize">
+ #<Mechanize::Field:0x1403488 @name="q", @value="ruby mechanize">
 If you saw that the value of 'q' changed, you're on the right track!  Now we
 can submit the form and 'press' the submit button and print the results:
  page = agent.submit(google_form, google_form.buttons.first)
@@ -83,7 +83,7 @@ Lets take a look at the code all together:
  require 'rubygems'
  require 'mechanize'
 
- agent = WWW::Mechanize.new
+ agent = Mechanize.new
  page = agent.get('http://google.com/')
  google_form = page.form('f')
  google_form.q = 'ruby mechanize'

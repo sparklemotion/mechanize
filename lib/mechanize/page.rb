@@ -98,11 +98,15 @@ class Mechanize
     def_delegator :parser, :/, :/
     def_delegator :parser, :at, :at
 
+    ##
+    # :method: form_with(criteria)
+    #
     # Find a form matching +criteria+.
     # Example:
     #   page.form_with(:action => '/post/login.php') do |f|
     #     ...
     #   end
+
     [:form, :link, :base, :frame, :iframe].each do |type|
       eval(<<-eomethod)
           def #{type}s_with(criteria)

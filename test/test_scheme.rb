@@ -36,7 +36,7 @@ class SchemeTest < Test::Unit::TestCase
     link = page.links.find { |l| l.text =~ /tc_follow_meta/ }
     assert_not_nil(link)
     path = URI.parse(link.href).path
-    
+
     page = link.click
     assert_equal(File.read(path), page.body)
 

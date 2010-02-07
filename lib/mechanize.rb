@@ -10,6 +10,7 @@ require 'nokogiri'
 require 'forwardable'
 require 'iconv'
 require 'nkf'
+require 'mutex_m'
 
 require 'mechanize/util'
 require 'mechanize/content_type_error'
@@ -519,6 +520,7 @@ class Mechanize
       request['If-Modified-Since'] = page.response['Last-Modified']
     end if(@conditional_requests)
 
+    http_obj.mu_lock
     # Specify timeouts if given
     http_obj.open_timeout = @open_timeout if @open_timeout
     http_obj.read_timeout = @read_timeout if @read_timeout
@@ -556,6 +558,7 @@ class Mechanize
                                Chain::ResponseHeaderHandler.new(@cookie_jar, @connection_cache),
                               ])
     after_connect.handle(options)
+    http_obj.mu_unlock
 
     res_klass = options[:res_klass]
     response_body = options[:response_body]

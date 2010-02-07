@@ -68,6 +68,7 @@ class Mechanize
           end
         end
 
+        http_obj.extend(Mutex_m)
         params[:connection] = http_obj
         super
       end

@@ -103,7 +103,7 @@ class Mechanize
   @html_parser = Nokogiri::HTML
   class << self
     attr_accessor :html_parser, :log
-    
+
     def inherited(child)
       child.html_parser ||= html_parser
       child.log ||= log
@@ -216,6 +216,8 @@ class Mechanize
 
   # Fetches the URL passed in and returns a page.
   def get(options, parameters = [], referer = nil)
+    verb = :get
+
     unless options.is_a? Hash
       url = options
       unless parameters.respond_to?(:each) # FIXME: Remove this in 0.8.0
@@ -225,8 +227,9 @@ class Mechanize
     else
       raise ArgumentError.new("url must be specified") unless url = options[:url]
       parameters = options[:params] || []
-      referer = options[:referer]
-      headers = options[:headers]
+      referer    = options[:referer]
+      headers    = options[:headers]
+      verb       = options[:verb] || verb
     end
 
     unless referer
@@ -250,6 +253,7 @@ class Mechanize
     page = fetch_page(  :uri      => url,
                         :referer  => referer,
                         :headers  => headers || {},
+                        :verb     => verb,
                         :params   => parameters
                         )
     add_to_history(page)

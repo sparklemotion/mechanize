@@ -17,6 +17,12 @@ class TestRedirectNotGetOrHead < Test::Unit::TestCase
     assert_equal(page.body, "method: HEAD")
   end
 
+  def test_get_takes_a_verb
+    page = @agent.get(:url => 'http://localhost/redirect', :verb => :head)
+    assert_equal(page.uri.to_s, 'http://localhost/verb')
+    assert_equal(page.body, "method: HEAD")
+  end
+
   def test_get_redirect_results_in_get_request
     page = @agent.get('http://localhost/redirect')
     assert_equal(page.uri.to_s, 'http://localhost/verb')

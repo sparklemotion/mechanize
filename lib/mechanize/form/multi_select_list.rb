@@ -11,7 +11,7 @@ class Mechanize
     class MultiSelectList < Field
       attr_accessor :options
 
-      def initialize(name, node)
+      def initialize node
         value = []
         @options = []
 
@@ -20,7 +20,7 @@ class Mechanize
           option = Option.new(n, self)
           @options << option
         end
-        super(name, value)
+        super(node, value)
       end
 
       def query_value

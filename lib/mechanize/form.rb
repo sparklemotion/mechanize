@@ -74,7 +74,7 @@ class Mechanize
 
     # Add a field with +field_name+ and +value+
     def add_field!(field_name, value = nil)
-      fields << Field.new(field_name, value)
+      fields << Field.new({'name' => field_name}, value)
     end
 
     # This method sets multiple fields on the form.  It takes a list of field
@@ -283,37 +283,37 @@ class Mechanize
         when 'file'
           @file_uploads << FileUpload.new(node, nil)
         when 'submit'
-          @buttons << Submit.new(node['name'], node['value'])
+          @buttons << Submit.new(node)
         when 'button'
-          @buttons << Button.new(node['name'], node['value'])
+          @buttons << Button.new(node)
         when 'reset'
-          @buttons << Reset.new(node['name'], node['value'])
+          @buttons << Reset.new(node)
         when 'image'
-          @buttons << ImageButton.new(node['name'], node['value'])
+          @buttons << ImageButton.new(node)
         when 'hidden'
-          @fields << Hidden.new(node['name'], node['value'] || '')
+          @fields << Hidden.new(node, node['value'] || '')
         when 'text'
-          @fields << Text.new(node['name'], node['value'] || '')
+          @fields << Text.new(node, node['value'] || '')
         when 'textarea'
-          @fields << Textarea.new(node['name'], node['value'] || '')
+          @fields << Textarea.new(node, node['value'] || '')
         else
-          @fields << Field.new(node['name'], node['value'] || '')
+          @fields << Field.new(node, node['value'] || '')
         end
       end
 
       # Find all textarea tags
       form_node.search('textarea').each do |node|
         next if node['name'].nil?
-        @fields << Field.new(node['name'], node.inner_text)
+        @fields << Field.new(node, node.inner_text)
       end
 
       # Find all select tags
       form_node.search('select').each do |node|
         next if node['name'].nil?
         if node.has_attribute? 'multiple'
-          @fields << MultiSelectList.new(node['name'], node)
+          @fields << MultiSelectList.new(node)
         else
-          @fields << SelectList.new(node['name'], node)
+          @fields << SelectList.new(node)
         end
       end
 
@@ -322,7 +322,7 @@ class Mechanize
       form_node.search('button').each do |node|
         type = (node['type'] || 'submit').downcase
         next if type == 'reset'
-        @buttons << Button.new(node['name'], node['value'])
+        @buttons << Button.new(node)
       end
     end
 

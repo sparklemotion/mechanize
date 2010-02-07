@@ -8,8 +8,7 @@ class Mechanize
       def initialize node, form
         @checked = !!node['checked']
         @form    = form
-        @node    = node
-        super(node['name'], node['value'])
+        super(node)
       end
 
       def check

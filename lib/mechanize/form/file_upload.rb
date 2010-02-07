@@ -16,7 +16,7 @@ class Mechanize
           @file_name = Util.html_unescape(file_name)
           @file_data = nil
           @node      = node
-          super(node['name'], @file_data)
+          super(node, @file_data)
         end
     end
   end

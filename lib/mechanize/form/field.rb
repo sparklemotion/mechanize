@@ -7,10 +7,11 @@ class Mechanize
     # To set the value of a field, just use the value method:
     # field.value = "foo"
     class Field
-      attr_accessor :name, :value
+      attr_accessor :name, :value, :node
 
-      def initialize(name, value)
-        @name = Util.html_unescape(name)
+      def initialize node, value = node['value']
+        @node = node
+        @name = Util.html_unescape(node['name'])
         @value = if value.is_a? String
                    Util.html_unescape(value)
                  else

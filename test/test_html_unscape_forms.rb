@@ -2,15 +2,15 @@ require "helper"
 
 class TestCheckBoxes < Test::Unit::TestCase
   def test_field
-    f = Mechanize::Form::Field.new('a&amp;b', 'a&amp;b')
+    f = Mechanize::Form::Field.new({'name' => 'a&amp;b'}, 'a&amp;b')
     assert_equal('a&b', f.name)
     assert_equal('a&b', f.value)
 
-    f = Mechanize::Form::Field.new('a&b', 'a&b')
+    f = Mechanize::Form::Field.new({'name' => 'a&b'}, 'a&b')
     assert_equal('a&b', f.name)
     assert_equal('a&b', f.value)
 
-    f = Mechanize::Form::Field.new('a&#38;b', 'a&#38;b')
+    f = Mechanize::Form::Field.new({'name' => 'a&#38;b'}, 'a&#38;b')
     assert_equal('a&b', f.name)
     assert_equal('a&b', f.value)
   end
@@ -26,7 +26,7 @@ class TestCheckBoxes < Test::Unit::TestCase
   end
 
   def test_image_button
-    f = Mechanize::Form::ImageButton.new('a&amp;b', 'a&amp;b')
+    f = Mechanize::Form::ImageButton.new({'name' => 'a&amp;b'}, 'a&amp;b')
     assert_equal('a&b', f.name)
     assert_equal('a&b', f.value)
   end

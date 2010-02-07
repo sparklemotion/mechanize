@@ -349,7 +349,7 @@ class Mechanize
         ul.file_data = v.read
         form.file_uploads << ul
       else
-        form.fields << Form::Field.new(k.to_s,v)
+        form.fields << Form::Field.new({'name' => k.to_s},v)
       end
     }
     post_form(url, form, headers)

@@ -7,8 +7,8 @@ class Mechanize
     #  selectlist.value = selectlist.options.first.value
     # Options can also be selected by "clicking" or selecting them.  See Option
     class SelectList < MultiSelectList
-      def initialize(name, node)
-        super(name, node)
+      def initialize node
+        super
         if selected_options.length > 1
           selected_options.reverse[1..selected_options.length].each do |o|
             o.unselect

@@ -125,86 +125,86 @@ class Mechanize
           end
           alias :#{type} :#{type}_with
         eomethod
-      end
+    end
 
-      def links
-        @links ||= %w{ a area }.map do |tag|
-          search(tag).map do |node|
-            Link.new(node, @mech, self)
-          end
-        end.flatten
-      end
-
-      def forms
-        @forms ||= search('form').map do |html_form|
-          form = Form.new(html_form, @mech, self)
-          form.action ||= @uri.to_s
-          form
+    def links
+      @links ||= %w{ a area }.map do |tag|
+        search(tag).map do |node|
+          Link.new(node, @mech, self)
         end
-      end
+      end.flatten
+    end
 
-      def meta
-        @meta ||= search('head > meta').map do |node|
-          next unless node['http-equiv'] && node['content']
-          (equiv, content) = node['http-equiv'], node['content']
-          if equiv && equiv.downcase == 'refresh'
-            Meta.parse(content, uri) do |delay, href|
-              node['delay'] = delay
-              node['href'] = href
-              Meta.new(node, @mech, self)
-            end
+    def forms
+      @forms ||= search('form').map do |html_form|
+        form = Form.new(html_form, @mech, self)
+        form.action ||= @uri.to_s
+        form
+      end
+    end
+
+    def meta
+      @meta ||= search('head > meta').map do |node|
+        next unless node['http-equiv'] && node['content']
+        (equiv, content) = node['http-equiv'], node['content']
+        if equiv && equiv.downcase == 'refresh'
+          Meta.parse(content, uri) do |delay, href|
+            node['delay'] = delay
+            node['href'] = href
+            Meta.new(node, @mech, self)
           end
-        end.compact
-      end
-
-      def bases
-        @bases ||=
-          search('base').map { |node| Base.new(node, @mech, self) }
-      end
-
-      def frames
-        @frames ||=
-          search('frame').map { |node| Frame.new(node, @mech, self) }
-      end
-
-      def iframes
-        @iframes ||=
-          search('iframe').map { |node| Frame.new(node, @mech, self) }
-      end
-
-      def images
-        @images ||=
-          search('img').map { |node| Image.new(node, self) }
-      end
-
-      def image_urls
-        @image_urls ||= images.map(&:url).uniq
-      end
-
-      def labels
-        @labels ||=
-          search('label').map { |node| Label.new(node, self) }
-      end
-
-      def labels_hash
-        unless @labels_hash
-          hash = {}
-          labels.each do |label|
-            hash[label.node['for']] = label if label.for
-          end
-          @labels_hash = hash
         end
-        return @labels_hash
-      end
+      end.compact
+    end
 
-      private
+    def bases
+      @bases ||=
+        search('base').map { |node| Base.new(node, @mech, self) }
+    end
 
-      def html_body
-        if body
-          body.length > 0 ? body : '<html></html>'
-        else
-          ''
+    def frames
+      @frames ||=
+        search('frame').map { |node| Frame.new(node, @mech, self) }
+    end
+
+    def iframes
+      @iframes ||=
+        search('iframe').map { |node| Frame.new(node, @mech, self) }
+    end
+
+    def images
+      @images ||=
+        search('img').map { |node| Image.new(node, self) }
+    end
+
+    def image_urls
+      @image_urls ||= images.map(&:url).uniq
+    end
+
+    def labels
+      @labels ||=
+        search('label').map { |node| Label.new(node, self) }
+    end
+
+    def labels_hash
+      unless @labels_hash
+        hash = {}
+        labels.each do |label|
+          hash[label.node['for']] = label if label.for
         end
+        @labels_hash = hash
+      end
+      return @labels_hash
+    end
+
+    private
+
+    def html_body
+      if body
+        body.length > 0 ? body : '<html></html>'
+      else
+        ''
       end
     end
   end
+end

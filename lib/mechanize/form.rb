@@ -157,13 +157,8 @@ class Mechanize
     end
     private :proc_query
 
-    def from_native_charset(str, enc=nil)
-      if page
-        enc ||= page.encoding
-        Util.from_native_charset(str,enc) rescue str
-      else
-        str
-      end
+    def from_native_charset str
+      Util.from_native_charset(str,page && page.encoding)
     end
     private :from_native_charset
 
@@ -173,12 +168,12 @@ class Mechanize
     def build_query(buttons = [])
       query = []
 
-      fields().each do |f|
+      fields.each do |f|
         qval = proc_query(f)
         query.push(*qval)
       end
 
-      checkboxes().each do |f|
+      checkboxes.each do |f|
         if f.checked
           qval = proc_query(f)
           query.push(*qval)
@@ -186,7 +181,7 @@ class Mechanize
       end
 
       radio_groups = {}
-      radiobuttons().each do |f|
+      radiobuttons.each do |f|
         fname = from_native_charset(f.name)
         radio_groups[fname] ||= []
         radio_groups[fname] << f

@@ -8,6 +8,7 @@
   * 7bit content-encoding support.  Thanks sporkmonger! GH #2
   * Fixed a bug with iconv conversion. Thanks awesomeman! GH #9
   * meta redirects outside the head are not followed. GH #13
+  * Form submissions work with nil page encodings. GH #25
 
 === 0.9.3
 

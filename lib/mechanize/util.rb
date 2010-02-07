@@ -28,10 +28,11 @@ class Mechanize
 
       def from_native_charset(s, code)
         return s unless s && code
+        return s unless Mechanize.html_parser == Nokogiri::HTML
 
-        if Mechanize.html_parser == Nokogiri::HTML
+        begin
           Iconv.iconv(code.to_s, "UTF-8", s).join("")
-        else
+        rescue Iconv::InvalidEncoding
           s
         end
       end

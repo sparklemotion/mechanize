@@ -5,6 +5,13 @@ class FormsMechTest < Test::Unit::TestCase
     @agent = Mechanize.new
   end
 
+  def test_post_with_blank_encoding
+    page = @agent.get("http://localhost/form_test.html")
+    form = page.form('post_form1')
+    form.page.encoding = nil
+    form.submit
+  end
+
   def test_no_form_action
     page = @agent.get('http://localhost:2000/form_no_action.html')
     page.forms.first.fields.first.value = 'Aaron'

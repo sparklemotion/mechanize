@@ -20,6 +20,7 @@ class Mechanize
         @jar[normal_domain] = Hash.new { |h,k| h[k] = {} }
       end
 
+      @jar[normal_domain][cookie.path] ||= {}
       @jar[normal_domain][cookie.path][cookie.name] = cookie
       cleanup
       cookie

@@ -293,6 +293,17 @@ class CookieJarTest < Test::Unit::TestCase
     FileUtils.rm("cookies.txt")
   end
 
+  def test_save_and_read_expired_cookies
+    url = URI.parse('http://rubyforge.org/')
+
+    jar = Mechanize::CookieJar.new
+    jar.jar['rubyforge.org'] = {}
+
+    assert_nothing_raised do
+      jar.add(url, cookie_from_hash(cookie_values))
+    end
+  end
+
   def test_ssl_cookies
     # thanks to michal "ocher" ochman for reporting the bug responsible for this test.
     values = cookie_values(:expires => nil)

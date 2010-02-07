@@ -9,6 +9,7 @@
   * Fixed a bug with iconv conversion. Thanks awesomeman! GH #9
   * meta redirects outside the head are not followed. GH #13
   * Form submissions work with nil page encodings. GH #25
+  * Fixing default values with serialized cookies. GH #3
 
 === 0.9.3
 

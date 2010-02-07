@@ -101,12 +101,86 @@ class Mechanize
     ##
     # :method: form_with(criteria)
     #
-    # Find a form matching +criteria+.
+    # Find a single form matching +criteria+.
     # Example:
     #   page.form_with(:action => '/post/login.php') do |f|
     #     ...
     #   end
 
+    ##
+    # :method: forms_with(criteria)
+    #
+    # Find all forms form matching +criteria+.
+    # Example:
+    #   page.forms_with(:action => '/post/login.php').each do |f|
+    #     ...
+    #   end
+
+    ##
+    # :method: link_with(criteria)
+    #
+    # Find a single link matching +criteria+.
+    # Example:
+    #   page.link_with(:href => /foo/).click
+
+    ##
+    # :method: links_with(criteria)
+    #
+    # Find all links matching +criteria+.
+    # Example:
+    #   page.links_with(:href => /foo/).each do |link|
+    #     puts link.href
+    #   end
+
+    ##
+    # :method: base_with(criteria)
+    #
+    # Find a single base tag matching +criteria+.
+    # Example:
+    #   page.base_with(:href => /foo/).click
+
+    ##
+    # :method: bases_with(criteria)
+    #
+    # Find all base tags matching +criteria+.
+    # Example:
+    #   page.bases_with(:href => /foo/).each do |base|
+    #     puts base.href
+    #   end
+
+    ##
+    # :method: frame_with(criteria)
+    #
+    # Find a single frame tag matching +criteria+.
+    # Example:
+    #   page.frame_with(:src => /foo/).click
+
+    ##
+    # :method: frames_with(criteria)
+    #
+    # Find all frame tags matching +criteria+.
+    # Example:
+    #   page.frames_with(:src => /foo/).each do |frame|
+    #     p frame.src
+    #   end
+
+    ##
+    # :method: iframe_with(criteria)
+    #
+    # Find a single iframe tag matching +criteria+.
+    # Example:
+    #   page.iframe_with(:src => /foo/).click
+
+    ##
+    # :method: iframes_with(criteria)
+    #
+    # Find all iframe tags matching +criteria+.
+    # Example:
+    #   page.iframes_with(:src => /foo/).each do |iframe|
+    #     p iframe.src
+    #   end
+
+    # let's meta program!
     [:form, :link, :base, :frame, :iframe].each do |type|
       eval(<<-eomethod)
           def #{type}s_with(criteria)
@@ -127,6 +201,8 @@ class Mechanize
         eomethod
     end
 
+    ##
+    # Return a list of all link and area tags
     def links
       @links ||= %w{ a area }.map do |tag|
         search(tag).map do |node|
@@ -135,6 +211,8 @@ class Mechanize
       end.flatten
     end
 
+    ##
+    # Return a list of all form tags
     def forms
       @forms ||= search('form').map do |html_form|
         form = Form.new(html_form, @mech, self)
@@ -143,6 +221,8 @@ class Mechanize
       end
     end
 
+    ##
+    # Return a list of all meta tags
     def meta
       @meta ||= search('head > meta').map do |node|
         next unless node['http-equiv'] && node['content']
@@ -157,21 +237,29 @@ class Mechanize
       end.compact
     end
 
+    ##
+    # Return a list of all base tags
     def bases
       @bases ||=
         search('base').map { |node| Base.new(node, @mech, self) }
     end
 
+    ##
+    # Return a list of all frame tags
     def frames
       @frames ||=
         search('frame').map { |node| Frame.new(node, @mech, self) }
     end
 
+    ##
+    # Return a list of all iframe tags
     def iframes
       @iframes ||=
         search('iframe').map { |node| Frame.new(node, @mech, self) }
     end
 
+    ##
+    # Return a list of all img tags
     def images
       @images ||=
         search('img').map { |node| Image.new(node, self) }
@@ -181,6 +269,8 @@ class Mechanize
       @image_urls ||= images.map(&:url).uniq
     end
 
+    ##
+    # Return a list of all label tags
     def labels
       @labels ||=
         search('label').map { |node| Label.new(node, self) }

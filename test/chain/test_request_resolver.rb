@@ -1,4 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '..', "helper"))
+require "helper"
 
 class TestRequestResolver < Test::Unit::TestCase
   def test_handle_get

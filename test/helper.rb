@@ -1,9 +1,8 @@
 require 'test/unit'
-$:.unshift(File.expand_path(File.join(File.dirname(__FILE__),'..','lib')))
 require 'rubygems'
 require 'mechanize'
 require 'webrick/httputils'
-require File.join(File.dirname(__FILE__),'servlets')
+require 'servlets'
 
 BASE_DIR = File.dirname(__FILE__)
 

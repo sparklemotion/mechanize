@@ -1,4 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
+require "helper"
 
 class TestUtil < Test::Unit::TestCase
   def test_from_native_charset

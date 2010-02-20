@@ -16,8 +16,15 @@ class Mechanize
   #  agent.get('http://example.com/foo.jpg').class  #=> Mechanize::File
   #
   class File
+    extend Forwardable
+
     attr_accessor :uri, :response, :body, :code, :filename
     alias :header :response
+    def_delegator :header, :[], :[]
+    def_delegator :header, :[]=, :[]=
+    def_delegator :header, :key?, :key?
+    def_delegator :header, :each, :each
+    def_delegator :header, :canonical_each, :canonical_each
 
     alias :content :body
 

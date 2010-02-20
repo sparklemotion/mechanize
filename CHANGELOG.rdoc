@@ -2,6 +2,11 @@
 
 === HEAD
 
+* New Features
+
+  * Add header reference methods to Mechanize::File so that a reponse
+    object gets compatible with Net::HTTPResponse.
+
 * Bug Fixes:
 
   * Fixed a bug where Referer is not sent when accessing a relative

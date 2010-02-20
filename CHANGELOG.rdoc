@@ -1,5 +1,12 @@
 = Mechanize CHANGELOG
 
+=== HEAD
+
+* Bug Fixes:
+
+  * Fixed a bug where Referer is not sent when accessing a relative
+    URI starting with "http".
+
 === 1.0.0
 
 * New Features:

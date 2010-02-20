@@ -235,7 +235,7 @@ class Mechanize
     end
 
     unless referer
-      if url.to_s =~ /^http/
+      if url.to_s =~ %r{\Ahttps?://}
         referer = Page.new(nil, {'content-type'=>'text/html'})
       else
         referer = current_page || Page.new(nil, {'content-type'=>'text/html'})

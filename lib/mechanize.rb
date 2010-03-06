@@ -313,7 +313,8 @@ class Mechanize
   # value of the string and clicks it. Otherwise, clicks the
   # Mechanize::Page::Link object passed in. Returns the page fetched.
   def click(link)
-    if link.is_a? String
+    case link
+    when String, Regexp
       if real_link = page.link_with(:text => link)
         click real_link
       else

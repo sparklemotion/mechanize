@@ -6,6 +6,8 @@
 
   * Add header reference methods to Mechanize::File so that a reponse
     object gets compatible with Net::HTTPResponse.
+  * Mechanize#click accepts a string to click a button/link in the current
+    page. It works as expected when not passed a string.
 
 * Bug Fixes:
 

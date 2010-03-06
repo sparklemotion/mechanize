@@ -306,13 +306,27 @@ class Mechanize
     get(url).body
   end
 
-  # Clicks the Mechanize::Link object passed in and returns the
-  # page fetched.
+  # If the parameter is a string, finds the button or link with the
+  # value of the string and clicks it. Otherwise, clicks the
+  # Mechanize::Page::Link object passed in. Returns the page fetched.
   def click(link)
-    referer = link.page rescue referer = nil
-    href = link.respond_to?(:href) ? link.href :
-      (link['href'] || link['src'])
-    get(:url => href, :referer => (referer || current_page()))
+    if link.is_a? String
+      if real_link = page.link_with(:text => link)
+        click real_link
+      else
+        button = nil
+        form = page.forms.find do |f|
+          button = f.button_with(:value => link)
+          button.is_a? Form::Submit
+        end
+        submit form, button if form
+      end
+    else
+      referer = link.page rescue referer = nil
+      href = link.respond_to?(:href) ? link.href :
+        (link['href'] || link['src'])
+      get(:url => href, :referer => (referer || current_page()))
+    end
   end
 
   # Equivalent to the browser back button.  Returns the most recent page

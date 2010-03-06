@@ -265,4 +265,19 @@ class TestMechMethods < Test::Unit::TestCase
     }
     assert_equal(1, @agent.history.length)
   end
+  
+  def test_click
+    @agent.get 'http://localhost/test_click.html'
+    @agent.click 'A Button'
+    assert_equal 'http://localhost/frame_test.html?words=nil',
+      @agent.page.uri.to_s
+    @agent.back
+    @agent.click 'A Link'
+    assert_equal 'http://localhost/index.html',
+      @agent.page.uri.to_s
+    @agent.back
+    @agent.click @agent.page.link_with(:text => 'A Link')
+    assert_equal 'http://localhost/index.html',
+      @agent.page.uri.to_s
+  end
 end

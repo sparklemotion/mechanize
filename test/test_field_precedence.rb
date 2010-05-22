@@ -10,7 +10,10 @@ class TestFieldPrecedence < Test::Unit::TestCase
     form = @page.forms.first
     assert !form.checkboxes.empty?
     assert_equal "1", form.checkboxes.first.value
-    assert_equal 'ticky=1&ticky=0', form.submit.parser.at('#query').text
+
+    submitted = form.submit
+
+    assert_equal 'ticky=1&ticky=0', submitted.parser.at('#query').text
   end
 
   def test_field_sort

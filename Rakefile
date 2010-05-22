@@ -9,6 +9,7 @@ Hoe.spec 'mechanize' do
   self.history_file     = 'CHANGELOG.rdoc'
   self.extra_rdoc_files += Dir['*.rdoc']
   self.extra_deps       << ['nokogiri', '>= 1.2.1']
+  self.extra_deps       << ['net-http-persistent', '~> 1.1']
 end
 
 desc "Update SSL Certificate"

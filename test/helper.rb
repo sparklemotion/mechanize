@@ -66,17 +66,20 @@ class Net::HTTP
     res = Response.new
     res.query_params = url.query
 
-    request.query = WEBrick::HTTPUtils.parse_query(url.query)
+    request.query = if 'POST' != request.method && url.query then
+                      WEBrick::HTTPUtils.parse_query url.query
+                    elsif request['content-type'] =~ /www-form-urlencoded/ then
+                      WEBrick::HTTPUtils.parse_query request.body
+                    elsif request['content-type'] =~ /boundary=(.+)/ then
+                      boundary = WEBrick::HTTPUtils.dequote $1
+                      WEBrick::HTTPUtils.parse_form_data request.body, boundary
+                    else
+                      {}
+                    end
+
     request.cookies = WEBrick::Cookie.parse(request['Cookie'])
+
     if SERVLETS[path]
-      if request.method == "POST"
-        if request['Content-Type'] =~ /^multipart\/form-data/
-          request.body = data.first
-        else
-          request.query = WEBrick::HTTPUtils.parse_query(data.first)
-          res.query_params = data.first
-        end
-      end
       SERVLETS[path].new({}).send("do_#{request.method}", request, res)
     else
       filename = "htdocs#{path.gsub(/[^\/\\.\w_\s]/, '_')}"
@@ -85,6 +88,7 @@ class Net::HTTP
           PAGE_CACHE[filename] = file.read
         }
       end
+
       res.body = PAGE_CACHE[filename]
     end
 

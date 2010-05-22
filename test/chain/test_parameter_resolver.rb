@@ -14,7 +14,7 @@ class TestParameterResolver < Test::Unit::TestCase
       v.handle(hash)
     }
     assert_equal('q=hello', hash[:uri].query)
-    assert_equal([], hash[:params])
+    assert_nil(hash[:params])
   end
 
   def test_handle_post

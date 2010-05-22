@@ -1,5 +1,5 @@
-require 'net/http'
-require 'net/https'
+require 'openssl'
+require 'net/http/persistent'
 require 'uri'
 require 'webrick/httputils'
 require 'zlib'
@@ -97,6 +97,8 @@ class Mechanize
   # The HTML parser to be used when parsing documents
   attr_accessor :html_parser
 
+  attr_reader :http # :nodoc:
+
   attr_reader :history
   attr_reader :pluggable_parser
 
@@ -145,19 +147,12 @@ class Mechanize
     @auth_hash      = {}  # Keep track of urls for sending auth
     @request_headers= {}  # A hash of request headers to be used
 
-    # Proxy settings
-    @proxy_addr     = nil
-    @proxy_pass     = nil
-    @proxy_port     = nil
-    @proxy_user     = nil
-
     @conditional_requests = true
 
     @follow_meta_refresh  = false
     @redirection_limit    = 20
 
     # Connection Cache & Keep alive
-    @connection_cache = {}
     @keep_alive_time  = 300
     @keep_alive       = true
 
@@ -174,6 +169,7 @@ class Mechanize
     @pre_connect_hook = Chain::PreConnectHook.new
     @post_connect_hook = Chain::PostConnectHook.new
 
+    set_http
     @html_parser = self.class.html_parser
 
     yield self if block_given?
@@ -195,7 +191,14 @@ class Mechanize
   # Sets the proxy address, port, user, and password
   # +addr+ should be a host, with no "http://"
   def set_proxy(addr, port, user = nil, pass = nil)
-    @proxy_addr, @proxy_port, @proxy_user, @proxy_pass = addr, port, user, pass
+    proxy = URI.parse "http://#{addr}"
+    proxy.port = port
+    proxy.user     = user if user
+    proxy.password = pass if pass
+
+    set_http proxy
+
+    nil
   end
 
   # Set the user agent for the Mechanize object.
@@ -459,6 +462,20 @@ class Mechanize
     hash[:uri].to_s
   end
 
+  def set_http proxy = nil
+    @http = Net::HTTP::Persistent.new 'mechanize', proxy
+
+    @http.keep_alive = @keep_alive_time
+
+    @http.ca_file         = @ca_file
+    @http.verify_callback = @verify_callback
+
+    if @cert and @key then
+      @http.certificate = OpenSSL::X509::Certificate.new ::File.read(@cert)
+      @http.private_key = OpenSSL::PKey::RSA.new ::File.read(@key), @pass
+    end
+  end
+
   def post_form(url, form, headers = {})
     cur_page = form.page || current_page ||
       Page.new( nil, {'content-type'=>'text/html'})
@@ -499,19 +516,9 @@ class Mechanize
                                 Chain::URIResolver.new(@scheme_handlers),
                                 Chain::ParameterResolver.new,
                                 Chain::RequestResolver.new,
-                                Chain::ConnectionResolver.new(
-                                                              @connection_cache,
-                                                              @keep_alive,
-                                                              @proxy_addr,
-                                                              @proxy_port,
-                                                              @proxy_user,
-                                                              @proxy_pass
-                                                              ),
-                                Chain::SSLResolver.new(@ca_file, @verify_callback, @cert, @key, @pass),
+                                Chain::ConnectionResolver.new,
                                 Chain::AuthHeaders.new(@auth_hash, @user, @password, @digest),
                                 Chain::HeaderResolver.new(
-                                                          @keep_alive,
-                                                          @keep_alive_time,
                                                           @cookie_jar,
                                                           @user_agent,
                                                           @gzip_enabled,
@@ -519,7 +526,8 @@ class Mechanize
                                                           ),
                                 Chain::CustomHeaders.new,
                                 @pre_connect_hook,
-                               ])
+                               ], @http)
+
     before_connect.handle(options)
 
     uri           = options[:uri]
@@ -534,11 +542,9 @@ class Mechanize
       request['If-Modified-Since'] = page.response['Last-Modified']
     end if(@conditional_requests)
 
-    http_obj.mu_lock
     # Specify timeouts if given
     http_obj.open_timeout = @open_timeout if @open_timeout
     http_obj.read_timeout = @read_timeout if @read_timeout
-    http_obj.start unless http_obj.started?
 
     # Log specified headers for the request
     log.info("#{ request.class }: #{ request.path }") if log
@@ -547,32 +553,20 @@ class Mechanize
     end if log
 
     # Send the request
-    attempts = 0
-    begin
-      response = http_obj.request(request, *request_data) { |r|
-        connection_chain = Chain.new([
-                                      Chain::ResponseReader.new(r),
-                                      Chain::BodyDecodingHandler.new,
-                                     ])
-        connection_chain.handle(options)
-      }
-    rescue EOFError, Errno::ECONNRESET, Errno::EPIPE => x
-      log.error("Rescuing EOF error") if log
-      http_obj.finish
-      raise x if attempts >= 2
-      request.body = nil
-      http_obj.start
-      attempts += 1
-      retry
-    end
+    response = http_obj.request(uri, request) { |r|
+      connection_chain = Chain.new([
+                                    Chain::ResponseReader.new(r),
+                                    Chain::BodyDecodingHandler.new,
+                                   ])
+      connection_chain.handle(options)
+    }
 
     after_connect = Chain.new([
                                @post_connect_hook,
                                Chain::ResponseBodyParser.new(@pluggable_parser, @watch_for_set),
-                               Chain::ResponseHeaderHandler.new(@cookie_jar, @connection_cache),
+                               Chain::ResponseHeaderHandler.new(@cookie_jar),
                               ])
     after_connect.handle(options)
-    http_obj.mu_unlock
 
     res_klass = options[:res_klass]
     response_body = options[:response_body]
@@ -595,6 +589,7 @@ class Mechanize
         end
         sleep delay.to_f
       end
+
       if redirect_uri
         @history.push(page, page.uri)
         return fetch_page(

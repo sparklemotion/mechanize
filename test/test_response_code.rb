@@ -6,7 +6,7 @@ class ResponseCodeMechTest < Test::Unit::TestCase
   end
 
   def test_eof_error_loop
-    assert_raises(EOFError) {
+    assert_raises(Net::HTTP::Persistent::Error) {
       @agent.get("http://localhost/http_headers?Content-Length=300")
     }
   end

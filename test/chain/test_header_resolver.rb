@@ -4,8 +4,6 @@ class TestHeaderResolver < Test::Unit::TestCase
   def setup
     @chain = Mechanize::Chain.new([
       Mechanize::Chain::HeaderResolver.new(
-        true,
-        300,
         Mechanize::CookieJar.new,
         'foobar',
         true,

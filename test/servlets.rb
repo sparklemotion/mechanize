@@ -251,12 +251,14 @@ class FormTest < WEBrick::HTTPServlet::AbstractServlet
 
   def do_POST(req, res)
     res.body = "<HTML><body>"
+
     req.query.each_key { |k|
       req.query[k].each_data { |data|
         res.body << "<a href=\"#\">#{k}:#{data}</a><br />"
       }
     }
-    res.body << "<div id=\"query\">#{res.query_params}</div></body></HTML>"
+
+    res.body << "<div id=\"query\">#{req.body}</div></body></HTML>"
     res['Content-Type'] = "text/html"
   end
 end

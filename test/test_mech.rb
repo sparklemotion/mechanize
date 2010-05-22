@@ -265,8 +265,8 @@ class TestMechMethods < Test::Unit::TestCase
     }
     assert_equal(1, @agent.history.length)
   end
-  
-  def test_click
+
+  def test_click2
     @agent.get 'http://localhost/test_click.html'
     @agent.click 'A Button'
     assert_equal 'http://localhost/frame_test.html?words=nil',

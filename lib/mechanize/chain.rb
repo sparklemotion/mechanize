@@ -15,7 +15,10 @@ require 'mechanize/chain/body_decoding_handler'
 
 class Mechanize
   class Chain
-    def initialize(list)
+    attr_accessor :http
+
+    def initialize(list, http = nil)
+      @http = http
       @list = list
       @list.each { |l| l.chain = self }
     end

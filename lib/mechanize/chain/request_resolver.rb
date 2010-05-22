@@ -8,6 +8,7 @@ class Mechanize
         if %w{ http https }.include?(uri.scheme.downcase)
           klass = Net::HTTP.const_get(params[:verb].to_s.capitalize)
           params[:request] ||= klass.new(uri.request_uri)
+          params[:request].body = params[:params].first if params[:params]
         end
 
         if %w{ file }.include?(uri.scheme.downcase)

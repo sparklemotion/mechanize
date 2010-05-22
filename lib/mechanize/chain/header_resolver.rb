@@ -2,10 +2,7 @@ class Mechanize
   class Chain
     class HeaderResolver
       include Mechanize::Handler
-      def initialize(keep_alive, keep_alive_time, cookie_jar, user_agent,
-                     gzip_enabled, headers)
-        @keep_alive = keep_alive
-        @keep_alive_time = keep_alive_time
+      def initialize(cookie_jar, user_agent, gzip_enabled, headers)
         @cookie_jar = cookie_jar
         @user_agent = user_agent
         @gzip_enabled = gzip_enabled
@@ -17,12 +14,6 @@ class Mechanize
         referer = params[:referer]
         request = params[:request]
 
-        if @keep_alive
-          request['Connection'] = 'keep-alive'
-          request['Keep-Alive'] = @keep_alive_time.to_s
-        else
-          request['Connection'] = 'close'
-        end
         if @gzip_enabled
           request['Accept-Encoding'] = 'gzip,identity'
         else

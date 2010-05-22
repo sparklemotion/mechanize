@@ -3,28 +3,14 @@ class Mechanize
     class ResponseHeaderHandler
       include Mechanize::Handler
 
-      def initialize(cookie_jar, connection_cache)
+      def initialize(cookie_jar)
         @cookie_jar = cookie_jar
-        @connection_cache = connection_cache
       end
 
       def handle(ctx, params)
         response = params[:response]
         uri = params[:uri]
         page = params[:page]
-        cache_obj = (@connection_cache["#{uri.host}:#{uri.port}"] ||= {
-                       :connection         => nil,
-                       :keep_alive_options => {},
-                     })
-
-        # If the server sends back keep alive options, save them
-        if keep_alive_info = response['keep-alive']
-          keep_alive_info.split(/,\s*/).each do |option|
-            k, v = option.split(/\=/)
-            cache_obj[:keep_alive_options] ||= {}
-            cache_obj[:keep_alive_options][k.intern] = v
-          end
-        end
 
         if page.is_a?(Page) && page.body =~ /Set-Cookie/n
           page.search('//head/meta[@http-equiv="Set-Cookie"]').each do |meta|

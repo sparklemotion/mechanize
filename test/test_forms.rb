@@ -410,23 +410,26 @@ class FormsMechTest < Test::Unit::TestCase
     assert_equal(1, post_form.buttons.size)
     assert_equal(2, post_form.radiobuttons.size)
     assert_equal(2, post_form.checkboxes.size)
-    assert_not_nil(post_form.fields.find { |f| f.name == "first_name" },
-      "First name field was nil"
-    )
-    assert_not_nil(
-    post_form.radiobuttons.find { |f| f.name == "gender" && f.value == "male"},
-      "Gender male button was nil"
-    )
 
-    assert_not_nil(
-    post_form.radiobuttons.find {|f| f.name == "gender" && f.value == "female"},
-      "Gender female button was nil"
-    )
+    assert_not_nil(post_form.fields.find { |f| f.name == "first_name" },
+                   "First name field was nil")
+
+    male_button = post_form.radiobuttons.find { |f|
+      f.name == "gender" && f.value == "male"
+    }
+    assert_not_nil(male_button, "Gender male button was nil")
+
+    female_button = post_form.radiobuttons.find { |f|
+      f.name == "gender" && f.value == "female"
+    }
+
+    assert_not_nil(female_button, "Gender female button was nil")
 
     assert_not_nil(post_form.checkbox_with(:name => "cool person"),
-      "couldn't find cool person checkbox")
+                   "couldn't find cool person checkbox")
+
     assert_not_nil(post_form.checkboxes.find { |f| f.name == "likes ham" },
-      "couldn't find likes ham checkbox")
+                   "couldn't find likes ham checkbox")
 
     # Now set all the fields
     post_form.field_with(:name => 'first_name').value = "Aaron"
@@ -434,22 +437,18 @@ class FormsMechTest < Test::Unit::TestCase
       f.name == "gender" && f.value == "male" 
     }.checked = true
     post_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
+
     page = @agent.submit(post_form, post_form.buttons.first)
 
     # Check that the submitted fields exist
     assert_equal(3, page.links.size, "Not enough links")
-    assert_not_nil(
-      page.links.find { |l| l.text == "likes ham:on" },
-      "likes ham check box missing"
-    )
-    assert_not_nil(
-      page.links.find { |l| l.text == "first_name:Aaron" },
-      "first_name field missing"
-    )
-    assert_not_nil(
-      page.links.find { |l| l.text == "gender:male" },
-      "gender field missing"
-    )
+
+    assert_not_nil(page.links.find { |l| l.text == "likes ham:on" },
+                   "likes ham check box missing")
+    assert_not_nil(page.links.find { |l| l.text == "first_name:Aaron" },
+                   "first_name field missing")
+    assert_not_nil(page.links.find { |l| l.text == "gender:male" },
+                   "gender field missing")
   end
 
   def test_get_with_param_in_action

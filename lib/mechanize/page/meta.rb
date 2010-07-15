@@ -32,11 +32,9 @@ class Mechanize
           if content && content =~ CONTENT_REGEXP
             delay, url = $1, $3
 
-            url = case url
-                  when nil, "" then uri.to_s
-                  when /^http/i then url
-                  else "http://#{uri.host}#{url}"
-                  end
+            dest = uri
+            dest += url if url
+            url = dest.to_s
 
             block_given? ? yield(delay, url) : [delay, url]
           else

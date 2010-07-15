@@ -48,11 +48,13 @@ class MetaTest < Test::Unit::TestCase
   #
 
   def test_parse_documentation
-    uri = URI.parse('http://current.com/')
+    uri = URI.parse('http://current.com/here/')
 
     assert_equal ['5', 'http://example.com/'], Meta.parse("5;url=http://example.com/", uri)
-    assert_equal ['5', 'http://current.com/'], Meta.parse("5;url=", uri)
-    assert_equal ['5', 'http://current.com/'], Meta.parse("5", uri)
+    assert_equal ['5', 'http://current.com/here/test'], Meta.parse("5;url=test", uri)
+    assert_equal ['5', 'http://current.com/test'], Meta.parse("5;url=/test", uri)
+    assert_equal ['5', 'http://current.com/here/'], Meta.parse("5;url=", uri) 
+    assert_equal ['5', 'http://current.com/here/'], Meta.parse("5", uri) 
     assert_equal nil, Meta.parse("invalid content", uri)
   end
 

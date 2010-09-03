@@ -5,6 +5,12 @@ class FormsMechTest < Test::Unit::TestCase
     @agent = Mechanize.new
   end
 
+  def test_post_with_rails_3_encoding_hack
+    page = @agent.get("http://localhost/rails_3_encoding_hack_form_test.html")
+    form = page.forms.first
+    form.submit
+  end
+
   def test_post_with_blank_encoding
     page = @agent.get("http://localhost/form_test.html")
     form = page.form('post_form1')

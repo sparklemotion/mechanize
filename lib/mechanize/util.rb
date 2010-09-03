@@ -32,7 +32,7 @@ class Mechanize
 
         begin
           Iconv.iconv(code.to_s, "UTF-8", s).join("")
-        rescue Iconv::InvalidEncoding
+        rescue Iconv::InvalidEncoding, Iconv::IllegalSequence
           s
         end
       end

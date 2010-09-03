@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'hoe'
+Hoe.plugin :gemspec
 
 Hoe.spec 'mechanize' do
   developer 'Aaron Patterson', 'aaronp@rubyforge.org'
@@ -23,12 +24,3 @@ task('ssl_cert') do |p|
   sh "mv server.key server.csr server.crt server.pem test/data/"
   sh "rm server.key.org"
 end
-
-desc 'Generate a gem spec'
-task "gem:spec" do
-  File.open("mechanize.gemspec", 'w') do |f|
-    now = Time.now.strftime("%Y%m%d%H%M%S")
-    f.write `rake debug_gem`.sub(/(s.version = ".*)(")/) { "#{$1}.#{now}#{$2}" }
-  end
-end
-

@@ -226,7 +226,7 @@ class Mechanize
         params = []
         query_params.each { |k,v| params << param_to_multipart(k, v) unless k.nil? }
         @file_uploads.each { |f| params << file_to_multipart(f) }
-        params.collect { |p| "--#{boundary}\r\n#{p.force_encoding('ASCII-8BIT')}" }.join('') +
+        params.collect { |p| "--#{boundary}\r\n#{p.respond_to?(:force_encoding) ? p.force_encoding('ASCII-8BIT') : p}" }.join('') +
           "--#{boundary}--\r\n"
       else
         Mechanize::Util.build_query_string(query_params)

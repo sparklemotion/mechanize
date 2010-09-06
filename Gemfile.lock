@@ -1,0 +1,29 @@
+PATH
+  remote: .
+  specs:
+    mechanize (1.0.0.20100903115223)
+      net-http-persistent (~> 1.1)
+      nokogiri (>= 1.2.1)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    hoe (2.6.2)
+      rake (>= 0.8.7)
+      rubyforge (>= 2.0.4)
+    json_pure (1.4.6)
+    net-http-persistent (1.2.5)
+    nokogiri (1.4.3.1)
+    rake (0.8.7)
+    rubyforge (2.0.4)
+      json_pure (>= 1.1.7)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  hoe (>= 2.6.1)
+  mechanize!
+  net-http-persistent (~> 1.1)
+  nokogiri (>= 1.2.1)
+  rubyforge (>= 2.0.4)

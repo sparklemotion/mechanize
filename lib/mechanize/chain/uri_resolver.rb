@@ -25,14 +25,14 @@ class Mechanize
                                            uri.split(/(?:%[0-9A-Fa-f]{2})+|#/).zip(
                                                                                    uri.scan(/(?:%[0-9A-Fa-f]{2})+|#/)
                                                                                    ).map { |x,y|
-                                             "#{URI.escape(x)}#{y}"
+                                             "#{WEBrick::HTTPUtils.escape(x)}#{y}"
                                            }.join('')
                                            )
 
           begin
             uri = URI.parse(escaped_uri)
           rescue
-            uri = URI.parse(URI.escape(escaped_uri))
+            uri = URI.parse(WEBrick::HTTPUtils.escape(escaped_uri))
           end
 
         end

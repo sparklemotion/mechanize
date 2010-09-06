@@ -59,7 +59,7 @@ class Net::HTTP
 
   def request(request, *data, &block)
     url = URI.parse(request.path)
-    path = URI.unescape(url.path)
+    path = WEBrick::HTTPUtils.unescape(url.path)
 
     path = '/index.html' if path == '/'
 

@@ -242,7 +242,7 @@ class FormTest < WEBrick::HTTPServlet::AbstractServlet
     res.body = "<HTML><body>"
     req.query.each_key { |k|
       req.query[k].each_data { |data|
-        res.body << "<a href=\"#\">#{URI.unescape(k)}:#{URI.unescape(data)}</a><br />"
+        res.body << "<a href=\"#\">#{WEBrick::HTTPUtils.unescape(k)}:#{WEBrick::HTTPUtils.unescape(data)}</a><br />"
       }
     }
     res.body << "<div id=\"query\">#{res.query}</div></body></HTML>"
@@ -359,7 +359,7 @@ class SendCookiesTest < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     res['Content-Type'] = "text/html"
     res.body = "<html><body>"
-    req.cookies.each { |c| 
+    req.cookies.each { |c|
       res.body << "<a href=\"#\">#{c.name}:#{c.value}</a>"
     }
     res.body << "</body></html>"

@@ -21,6 +21,14 @@ class TestFormButtons < Test::Unit::TestCase
     assert_form_contains_button('<button type="button" value="submit"/>')
   end
 
+  def test_image_button_tag
+    assert_form_contains_button('<input type="image" name="submit" src="http://foo.com/image.jpg"/>')
+  end
+  
+  def test_no_name_image_button_tag
+    assert_form_contains_button('<input type="image" src="http://foo.com/image.jpg"/>')
+  end
+  
   def assert_form_contains_button(button)
     page = Mechanize::Page.new(nil, html_response, html(button), 200, @agent)
     assert_equal(1, page.forms.length)

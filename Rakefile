@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'hoe'
+Hoe.plugin :bundler
 Hoe.plugin :gemspec
 
 Hoe.spec 'mechanize' do

@@ -29,6 +29,12 @@ class Mechanize
         return -1 if Hash === other.node
         node <=> other.node
       end
+      
+      # This method is a shortcut to get field's DOM id.
+      # Common usage: form.field_with(:dom_id => "foo")
+      def dom_id
+        node['id']
+      end
     end
 
     class Text     < Field; end

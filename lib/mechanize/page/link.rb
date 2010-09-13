@@ -43,6 +43,12 @@ class Mechanize
       def click
         @mech.click self
       end
+      
+      # This method is a shorthand to get link's DOM id.
+      # Common usage: page.link_with(:dom_id => "links_exact_id")
+      def dom_id
+        node['id']
+      end
     end
   end
 end

@@ -525,6 +525,16 @@ class FormsMechTest < Test::Unit::TestCase
     form.first = 'Aaron'
     assert_equal('Aaron', form.first)
   end
+  
+  def test_form_and_fields_dom_id
+    # blatant copypasta of test above
+    page = @agent.get("http://localhost/form_test.html")
+    form = page.form_with(:dom_id => 'generic_form')
+
+    assert_not_nil(form)
+    assert_equal(1, form.fields_with(:dom_id => 'name_first').length)
+    assert_equal('first_name', form.field_with(:dom_id => 'name_first').name)
+  end
 
   def test_add_field
     page = @agent.get("http://localhost/form_multival.html")

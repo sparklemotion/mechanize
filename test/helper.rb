@@ -113,7 +113,7 @@ class Response
 
   attr_reader :code
   attr_accessor :body, :query, :cookies
-  attr_accessor :query_params
+  attr_accessor :query_params, :http_version
 
   def code=(c)
     @code = c.to_s
@@ -128,6 +128,7 @@ class Response
     @code = nil
     @query = nil
     @cookies = []
+    @http_version = '1.1'
   end
 
   def read_body

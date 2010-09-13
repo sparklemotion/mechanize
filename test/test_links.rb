@@ -125,4 +125,11 @@ class LinksMechTest < Test::Unit::TestCase
     link = page.link_with(:text => 'unusual characters')
     assert_nothing_raised { @agent.click link }
   end
+  
+  def test_links_dom_id
+    page = @agent.get("http://localhost/tc_links.html")
+    link = page.links_with(:dom_id => 'bold_aaron_link')
+    assert_equal(1, link.length)
+    assert_equal('Aaron Patterson', link.first.text)
+  end
 end

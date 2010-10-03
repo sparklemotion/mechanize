@@ -42,6 +42,7 @@ class Net::HTTP
     '/many_cookies'           => ManyCookiesTest,
     '/many_cookies_as_string' => ManyCookiesAsStringTest,
     '/send_cookies'           => SendCookiesTest,
+    '/quoted_value_cookie'    => QuotedValueCookieTest,
     '/if_modified_since'      => ModifiedSinceServlet,
     '/http_headers'           => HeaderServlet,
     '/infinite_redirect'      => InfiniteRedirectTest,

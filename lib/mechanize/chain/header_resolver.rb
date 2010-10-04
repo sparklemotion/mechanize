@@ -30,8 +30,8 @@ class Mechanize
           request.add_field('Cookie', cookie)
         end
 
-        # Add Referer header to request
-        if referer && referer.uri
+        # Add Referer header to request except https => http
+        if referer && referer.uri && (!(URI::HTTPS === referer.uri) or URI::HTTPS === uri)
           request['Referer'] = referer.uri.to_s
         end
 

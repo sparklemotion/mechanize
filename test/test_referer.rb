@@ -36,4 +36,22 @@ class RefererTest < Test::Unit::TestCase
     page = @agent.submit page1.forms.first
     assert_equal("http://localhost/tc_referer.html", page.body)
   end
+
+  def test_http_to_https
+    page = @agent.get("http://localhost/tc_referer.html")
+    page = @agent.click page.links.last
+    assert_equal("http://localhost/tc_referer.html", page.body)
+  end
+
+  def test_https_to_https
+    page = @agent.get("https://localhost/tc_referer.html")
+    page = @agent.click page.links.last
+    assert_equal("https://localhost/tc_referer.html", page.body)
+  end
+
+  def test_https_to_http
+    page = @agent.get("https://localhost/tc_referer.html")
+    page = @agent.click page.links[1]
+    assert_equal("", page.body)
+  end
 end

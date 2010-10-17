@@ -65,7 +65,7 @@ class Mechanize
     'iPhone' => 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1C28 Safari/419.3',
     'Mechanize' => "WWW-Mechanize/#{VERSION} (http://rubyforge.org/projects/mechanize/)"
   }
-  #A cookie_jar keeps track of cookies received
+  #A Mechanize::CookieJar, which is used to keep track of cookies received
   attr_accessor :cookie_jar
   #Length of time to wait until a connection is opened in seconds
   attr_accessor :open_timeout
@@ -75,11 +75,11 @@ class Mechanize
   attr_accessor :user_agent
   #? seems to be something to do with page parsing
   attr_accessor :watch_for_set
-  #OpenSSL server certificate file (path to?)
+  #Path to an OpenSSL server certificate file
   attr_accessor :ca_file
-  #OpenSSL Private Key (path to?)
+  #Path to an OpenSSL Private Key
   attr_accessor :key
-  #OpenSSL client certificate file (path to?)
+  #Path to an OpenSSL client certificate file
   attr_accessor :cert
   #OpenSSL password
   attr_accessor :pass

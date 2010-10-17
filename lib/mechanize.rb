@@ -65,11 +65,17 @@ class Mechanize
     'iPhone' => 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1C28 Safari/419.3',
     'Mechanize' => "WWW-Mechanize/#{VERSION} (http://rubyforge.org/projects/mechanize/)"
   }
-
+  # A cookiejar (mechanize/cookie_jar) keeps track of cookies received
   attr_accessor :cookie_jar
-  attr_accessor :open_timeout, :read_timeout
+  # Time to wait until a connection is opened (seconds? tenths of seconds? minutes?)
+  attr_accessor :open_timeout
+  #?
+  attr_accessor  :read_timeout
+  #The identification string for the client initiating a web request
   attr_accessor :user_agent
+  #?
   attr_accessor :watch_for_set
+  #OpenSSL server certificate file
   attr_accessor :ca_file
   attr_accessor :key
   attr_accessor :cert

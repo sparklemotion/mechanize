@@ -3,3 +3,4 @@ tags
 test/digest.htpasswd
 Gemfile
 Gemfile.lock
+doc

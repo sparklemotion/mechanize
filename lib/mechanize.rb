@@ -83,18 +83,21 @@ class Mechanize
   attr_accessor :cert
   #OpenSSL password
   attr_accessor :pass
-  #Boolean: true to allow redirects, false to disallow
+  #Boolean: True to allow redirects, False to disallow
   attr_accessor :redirect_ok
-  #Boolean: true to enabled gzip (compression and decompression?) of (retrieved?) page
+  #Boolean: True to enable gzip (compression and decompression?) of (retrieved?) page
   attr_accessor :gzip_enabled
   #Time to keep alive the connection (seconds?)
   attr_accessor :keep_alive_time
-  #Boolean: true to keep alive the connection to the server
+  #Boolean: True to keep alive the connection to the server
   attr_accessor :keep_alive
-  #
+  #Boolean: True to allow conditional gets -- see RFC2616 for details
   attr_accessor :conditional_requests
+  #Boolean: --what does this do relative to meta refreshing? Beyond, keep note of http://www.w3.org/TR/WCAG10-CORE-TECHS/#auto-page-refresh
   attr_accessor :follow_meta_refresh
+  #what type? Specifies the mode and function for ssl verification.
   attr_accessor :verify_callback
+  
   attr_accessor :history_added
   attr_accessor :scheme_handlers
   attr_accessor :redirection_limit
@@ -143,6 +146,7 @@ class Mechanize
     # callback for OpenSSL errors while verifying the server certificate
     # chain, can be used for debugging or to ignore errors by always
     # returning _true_
+    # specifying nil uses the default method that was valid when the SSL was created
     @verify_callback = nil
     @cert           = nil # OpenSSL Certificate
     @key            = nil # OpenSSL Private Key

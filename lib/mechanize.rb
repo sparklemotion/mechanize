@@ -65,25 +65,33 @@ class Mechanize
     'iPhone' => 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1C28 Safari/419.3',
     'Mechanize' => "WWW-Mechanize/#{VERSION} (http://rubyforge.org/projects/mechanize/)"
   }
-  # A cookiejar (mechanize/cookie_jar) keeps track of cookies received
+  #A cookie_jar keeps track of cookies received
   attr_accessor :cookie_jar
-  # Time to wait until a connection is opened (seconds? tenths of seconds? minutes?)
+  #Length of time to wait until a connection is opened in seconds
   attr_accessor :open_timeout
-  #?
+  #Length of time to attempt to read data from the server
   attr_accessor  :read_timeout
   #The identification string for the client initiating a web request
   attr_accessor :user_agent
-  #?
+  #? seems to be something to do with page parsing
   attr_accessor :watch_for_set
-  #OpenSSL server certificate file
+  #OpenSSL server certificate file (path to?)
   attr_accessor :ca_file
+  #OpenSSL Private Key (path to?)
   attr_accessor :key
+  #OpenSSL client certificate file (path to?)
   attr_accessor :cert
+  #OpenSSL password
   attr_accessor :pass
+  #Boolean: true to allow redirects, false to disallow
   attr_accessor :redirect_ok
+  #Boolean: true to enabled gzip (compression and decompression?) of (retrieved?) page
   attr_accessor :gzip_enabled
+  #Time to keep alive the connection (seconds?)
   attr_accessor :keep_alive_time
+  #Boolean: true to keep alive the connection to the server
   attr_accessor :keep_alive
+  #
   attr_accessor :conditional_requests
   attr_accessor :follow_meta_refresh
   attr_accessor :verify_callback

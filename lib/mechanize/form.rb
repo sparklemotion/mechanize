@@ -359,7 +359,7 @@ class Mechanize
       @checkboxes   = []
 
       # Find all input tags
-      form_node.search('input').each do |node|
+      form_node.search('.//input').each do |node|
         type = (node['type'] || 'text').downcase
         name = node['name']
         next if name.nil? && !(type == 'submit' || type =='button' || type == 'image')

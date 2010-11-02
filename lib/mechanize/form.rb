@@ -71,11 +71,14 @@ class Mechanize
     def text_field?(field_name)     !!    texts.find{|f| f.name == field_name}; end
     def hidden_field?(field_name)   !!  hiddens.find{|f| f.name == field_name}; end
     def textarea_field?(field_name) !!textareas.find{|f| f.name == field_name}; end
-      
+
     # This method is a shortcut to get form's DOM id.
-    # Common usage: page.form_with(:dom_id => "foorm")
+    # Common usage:
+    #   page.form_with(:dom_id => "foorm")
+    # Note that you can also use +:id+ to get to this method:
+    #   page.form_with(:id => "foorm")
     def dom_id
-      form_node['id']  
+      form_node['id']
     end
 
     # Add a field with +field_name+ and +value+
@@ -249,8 +252,7 @@ class Mechanize
     #
     # Find one field that matches +criteria+
     # Example:
-    #   form.field_with(:dom_id => "exact_field_id").value = 'hello'
-    #   form.field_with(:id => "exact_field_id").value = 'hello' # :id works too!
+    #   form.field_with(:id => "exact_field_id").value = 'hello'
 
     ##
     # :method: fields_with(criteria)
@@ -336,8 +338,7 @@ class Mechanize
           def #{plural}_with criteria = {}
             criteria = {:name => criteria} if String === criteria
             f = #{plural}.find_all do |thing|
-              # criteria.all? { |k,v| v === thing.send(k) }
-              criteria.all? do |k,v| 
+              criteria.all? do |k,v|
                 k = :dom_id if(k.to_s == "id")
                 v === thing.send(k)
               end

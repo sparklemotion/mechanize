@@ -149,8 +149,8 @@ class FormsMechTest < Test::Unit::TestCase
 
     # Now set all the fields
     post_form.fields.find { |f| f.name == "first_name" }.value = "Aaron"
-    post_form.radiobuttons.find { |f| 
-      f.name == "gender" && f.value == "male" 
+    post_form.radiobuttons.find { |f|
+      f.name == "gender" && f.value == "male"
     }.checked = true
     post_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
     post_form.checkboxes.find { |f| f.name == "green[eggs]" }.checked = true
@@ -186,12 +186,12 @@ class FormsMechTest < Test::Unit::TestCase
     assert_not_nil(post_form, "Post form is null")
     assert_equal("post", post_form.method.downcase)
     assert_equal("/form_post", post_form.action)
-    
+
     assert_equal(1, post_form.fields.size)
     assert_equal(1, post_form.buttons.size)
-    
+
     page = @agent.submit(post_form, post_form.buttons.first)
-    
+
     assert_not_nil(page)
   end
 
@@ -263,8 +263,8 @@ class FormsMechTest < Test::Unit::TestCase
     img.y = "10"
     # Now set all the fields
     get_form.fields.find { |f| f.name == "first_name" }.value = "Aaron"
-    get_form.radiobuttons.find { |f| 
-      f.name == "gender" && f.value == "male" 
+    get_form.radiobuttons.find { |f|
+      f.name == "gender" && f.value == "male"
     }.checked = true
     get_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
     get_form.checkboxes.find { |f| f.name == "green[eggs]" }.checked = true
@@ -332,8 +332,8 @@ class FormsMechTest < Test::Unit::TestCase
 
     # Now set all the fields
     post_form.fields.find { |f| f.name == "first_name" }.value = "Aaron"
-    post_form.radiobuttons.find { |f| 
-      f.name == "gender" && f.value == "male" 
+    post_form.radiobuttons.find { |f|
+      f.name == "gender" && f.value == "male"
     }.checked = true
     post_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
     page = @agent.submit(post_form, post_form.buttons.first)
@@ -384,8 +384,8 @@ class FormsMechTest < Test::Unit::TestCase
 
     # Now set all the fields
     get_form.fields.find { |f| f.name == "first_name" }.value = "Aaron"
-    get_form.radiobuttons.find { |f| 
-      f.name == "gender" && f.value == "male" 
+    get_form.radiobuttons.find { |f|
+      f.name == "gender" && f.value == "male"
     }.checked = true
     get_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
     page = @agent.submit(get_form, get_form.buttons.first)
@@ -439,8 +439,8 @@ class FormsMechTest < Test::Unit::TestCase
 
     # Now set all the fields
     post_form.field_with(:name => 'first_name').value = "Aaron"
-    post_form.radiobuttons.find { |f| 
-      f.name == "gender" && f.value == "male" 
+    post_form.radiobuttons.find { |f|
+      f.name == "gender" && f.value == "male"
     }.checked = true
     post_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
 
@@ -487,8 +487,8 @@ class FormsMechTest < Test::Unit::TestCase
 
     # Now set all the fields
     get_form.fields.find { |f| f.name == "first_name" }.value = "Aaron"
-    get_form.radiobuttons.find { |f| 
-      f.name == "gender" && f.value == "male" 
+    get_form.radiobuttons.find { |f|
+      f.name == "gender" && f.value == "male"
     }.checked = true
     get_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
     page = @agent.submit(get_form, get_form.buttons.first)
@@ -512,7 +512,7 @@ class FormsMechTest < Test::Unit::TestCase
     page = @agent.get("http://localhost/form_test.html")
     get_form = page.forms.find { |f| f.name == "get_form1" }
     get_form.field("first_name").value = "Gregory"
-    assert_equal( "Gregory", get_form.field("first_name").value ) 
+    assert_equal( "Gregory", get_form.field("first_name").value )
   end
 
   def test_fields_as_accessors
@@ -525,18 +525,18 @@ class FormsMechTest < Test::Unit::TestCase
     form.first = 'Aaron'
     assert_equal('Aaron', form.first)
   end
-  
+
   def test_form_and_fields_dom_id
     # blatant copypasta of test above
     page = @agent.get("http://localhost/form_test.html")
     form = page.form_with(:dom_id => 'generic_form')
     form_by_id = page.form_with(:id => 'generic_form')
-    
+
 
     assert_not_nil(form)
     assert_equal(1, form.fields_with(:dom_id => 'name_first').length)
     assert_equal('first_name', form.field_with(:dom_id => 'name_first').name)
-    
+
     #  *_with(:id => blah) should work exactly like (:dom_id => blah)
     assert_equal(form, form_by_id)
     assert_equal(form.fields_with(:dom_id => 'name_first'), form.fields_with(:id => 'name_first'))
@@ -553,7 +553,7 @@ class FormsMechTest < Test::Unit::TestCase
     assert_not_nil(f)
     assert_equal(number_of_fields + 1, form.fields.length)
   end
-  
+
   def test_delete_field
     page = @agent.get("http://localhost/form_multival.html")
     form = page.form_with(:name => 'post_form')
@@ -564,7 +564,7 @@ class FormsMechTest < Test::Unit::TestCase
 
     form.delete_field!('first')
     assert_nil(form['first'])
-    assert_equal(number_of_fields - 2, form.fields.length)    
+    assert_equal(number_of_fields - 2, form.fields.length)
   end
 
   def test_has_field

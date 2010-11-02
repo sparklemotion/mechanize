@@ -186,8 +186,7 @@ class Mechanize
           def #{type}s_with(criteria)
             criteria = {:name => criteria} if String === criteria
             f = #{type}s.find_all do |thing|
-              # criteria.all? { |k,v| v === thing.send(k) }
-              criteria.all? do |k,v| 
+              criteria.all? do |k,v|
                 k = :dom_id if(k.to_s == "id")
                 v === thing.send(k)
               end

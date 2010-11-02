@@ -362,7 +362,7 @@ class Mechanize
       form_node.search('input').each do |node|
         type = (node['type'] || 'text').downcase
         name = node['name']
-        next if name.nil? && !(type == 'submit' || type =='button')
+        next if name.nil? && !(type == 'submit' || type =='button' || type == 'image')
         case type
         when 'radio'
           @radiobuttons << RadioButton.new(node, self)

@@ -35,6 +35,8 @@ class Mechanize
               body.read
             when '7bit'
               body.read
+            when 'none'
+              body.read
             else
               raise 'Unsupported content encoding'
             end

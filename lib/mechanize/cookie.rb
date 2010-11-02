@@ -13,7 +13,7 @@ class Mechanize
 
         cookie = nil
         begin
-          cookie = new(key, WEBrick::HTTPUtils.dequote(value))
+          cookie = new(key, value.dup)
         rescue
           log.warn("Couldn't parse key/value: #{first_elem}") if log
         end

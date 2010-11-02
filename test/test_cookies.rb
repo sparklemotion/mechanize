@@ -5,6 +5,12 @@ class CookiesMechTest < Test::Unit::TestCase
     @agent = Mechanize.new
   end
 
+  def test_quoted_value_cookie
+    page = @agent.get("http://localhost/quoted_value_cookie")
+    quoted_cookie = @agent.cookies.find { |k| k.name == 'quoted' }
+    assert_equal("\"value\"", quoted_cookie.value)
+  end
+
   def test_meta_tag_cookies
     cookies = @agent.cookies.length
     page = @agent.get("http://localhost/meta_cookie.html")

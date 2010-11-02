@@ -530,10 +530,16 @@ class FormsMechTest < Test::Unit::TestCase
     # blatant copypasta of test above
     page = @agent.get("http://localhost/form_test.html")
     form = page.form_with(:dom_id => 'generic_form')
+    form_by_id = page.form_with(:id => 'generic_form')
+    
 
     assert_not_nil(form)
     assert_equal(1, form.fields_with(:dom_id => 'name_first').length)
     assert_equal('first_name', form.field_with(:dom_id => 'name_first').name)
+    
+    #  *_with(:id => blah) should work exactly like (:dom_id => blah)
+    assert_equal(form, form_by_id)
+    assert_equal(form.fields_with(:dom_id => 'name_first'), form.fields_with(:id => 'name_first'))
   end
 
   def test_add_field

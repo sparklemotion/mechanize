@@ -129,7 +129,9 @@ class LinksMechTest < Test::Unit::TestCase
   def test_links_dom_id
     page = @agent.get("http://localhost/tc_links.html")
     link = page.links_with(:dom_id => 'bold_aaron_link')
+    link_by_id = page.links_with(:id => 'bold_aaron_link')
     assert_equal(1, link.length)
     assert_equal('Aaron Patterson', link.first.text)
+    assert_equal(link, link_by_id)
   end
 end

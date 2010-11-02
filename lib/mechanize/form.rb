@@ -250,6 +250,7 @@ class Mechanize
     # Find one field that matches +criteria+
     # Example:
     #   form.field_with(:dom_id => "exact_field_id").value = 'hello'
+    #   form.field_with(:id => "exact_field_id").value = 'hello' # :id works too!
 
     ##
     # :method: fields_with(criteria)
@@ -335,7 +336,11 @@ class Mechanize
           def #{plural}_with criteria = {}
             criteria = {:name => criteria} if String === criteria
             f = #{plural}.find_all do |thing|
-              criteria.all? { |k,v| v === thing.send(k) }
+              # criteria.all? { |k,v| v === thing.send(k) }
+              criteria.all? do |k,v| 
+                k = :dom_id if(k.to_s == "id")
+                v === thing.send(k)
+              end
             end
             yield f if block_given?
             f

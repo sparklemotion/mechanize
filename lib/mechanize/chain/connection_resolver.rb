@@ -14,7 +14,7 @@ class Mechanize
           http_obj = Object.new
           class << http_obj
             def request(uri, request)
-              yield FileResponse.new(uri.path)
+              yield FileResponse.new(CGI.unescape(uri.path))
             end
           end
         end

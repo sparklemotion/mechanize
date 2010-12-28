@@ -47,6 +47,7 @@ class Net::HTTP
     '/http_headers'           => HeaderServlet,
     '/infinite_redirect'      => InfiniteRedirectTest,
     '/infinite_refresh'       => InfiniteRefreshTest,
+    '/redirect_ok'            => RedirectOkTest,
     '/redirect'               => RedirectTest,
     '/refresh_without_url'    => RefreshWithoutUrl,
     '/refresh_with_empty_url' => RefreshWithEmptyUrl,

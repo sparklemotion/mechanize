@@ -10,6 +10,9 @@
     in the current page. It works as expected when not passed a
     string or regexp.
 
+  * Provide a way to only follow permanent redirects (301)
+    automatically: agent.redirect_ok = :permanent   GH #73
+
 * Bug Fixes:
 
   * Fixed a bug where Referer is not sent when accessing a relative

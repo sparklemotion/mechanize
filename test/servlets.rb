@@ -200,6 +200,29 @@ class InfiniteRedirectTest < WEBrick::HTTPServlet::AbstractServlet
   alias :do_POST :do_GET
 end
 
+class RedirectOkTest < WEBrick::HTTPServlet::AbstractServlet
+  def do_GET(req, res)
+    res['Content-Type'] = "text/plain"
+    case q = req.query['q']
+    when '1'..'2'
+      res.status = '301'
+      q.succ!
+    when '3'..'4'
+      res.status = '302'
+      q.succ!
+    when '5'
+      res.status = '200'
+      res.body = 'Finally OK.'
+      return
+    else
+      res.status = '301'
+      q = '1'
+    end
+    res['Location'] = "/redirect_ok?q=#{q}"
+  end
+  alias :do_POST :do_GET
+end
+
 class RedirectTest < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     res['Content-Type'] = req.query['ct'] || "text/html"

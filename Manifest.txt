@@ -145,7 +145,6 @@ test/test_history.rb
 test/test_history_added.rb
 test/test_html_unscape_forms.rb
 test/test_if_modified_since.rb
-test/test_keep_alive.rb
 test/test_links.rb
 test/test_mech.rb
 test/test_mech_proxy.rb

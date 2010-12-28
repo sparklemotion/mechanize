@@ -8,16 +8,16 @@ is the same as { ... }.submit.
 
   require 'rubygems'
   require 'mechanize'
-  
+
   a = Mechanize.new { |agent|
     agent.user_agent_alias = 'Mac Safari'
   }
-  
+
   a.get('http://google.com/') do |page|
     search_result = page.form_with(:name => 'f') do |search|
       search.q = 'Hello world'
     end.submit
-  
+
     search_result.links.each do |link|
       puts link.text
     end
@@ -32,13 +32,13 @@ is the same as { ... }.submit.
   a.get('http://rubyforge.org/') do |page|
     # Click the login link
     login_page = a.click(page.link_with(:text => /Log In/))
-  
+
     # Submit the login form
     my_page = login_page.form_with(:action => '/account/login.php') do |f|
       f.form_loginname  = ARGV[0]
       f.form_pw         = ARGV[1]
     end.click_button
-  
+
     my_page.links.each do |link|
       text = link.text.strip
       next unless text.length > 0
@@ -48,7 +48,7 @@ is the same as { ... }.submit.
 
 == File Upload
 Upload a file to flickr.
-  
+
   require 'rubygems'
   require 'mechanize'
 
@@ -106,7 +106,7 @@ Beautiful Soup for that page.
 
   require 'rubygems'
   require 'mechanize'
-  
+
   agent = Mechanize.new
   agent.set_proxy('localhost', '8000')
   page = agent.get(ARGV[0])
@@ -155,8 +155,8 @@ This example also demonstrates subclassing Mechanize.
 
 In most cases a client certificate is created as an additional layer of security
 for certain websites.  The specific case that this was initially tested on was
-for automating the download of archived images from a banks (Wachovia) lockbox 
-system.  Once the certificate is installed into your browser you will have to 
+for automating the download of archived images from a banks (Wachovia) lockbox
+system.  Once the certificate is installed into your browser you will have to
 export it and split the certificate and private key into separate files. Exported
 files are usually in .p12 format (IE 7 & Firefox 2.0) which stands for PKCS #12.
 You can convert them from p12 to pem format by using the following commands:
@@ -169,17 +169,17 @@ openssl.exe pkcs12 -in input_file.p12 -clcerts -out example.cer -nokeys
 
   # create Mechanize instance
   agent = Mechanize.new
-  
+
   # set the path of the certificate file
   agent.cert = 'example.cer'
-  
+
   # set the path of the private key file
   agent.key = 'example.key'
 
   # get the login form & fill it out with the username/password
-  login_form = @agent.get("http://example.com/login_page").form('Login')
+  login_form = agent.get("http://example.com/login_page").form('Login')
   login_form.Userid = 'TestUser'
   login_form.Password = 'TestPassword'
-  
+
   # submit login form
   agent.submit(login_form, login_form.buttons.first)

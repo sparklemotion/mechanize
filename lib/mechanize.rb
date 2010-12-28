@@ -74,7 +74,14 @@ class Mechanize
   attr_accessor :key
   attr_accessor :cert
   attr_accessor :pass
+
+  # Controls how this agent deals with redirects.  If it is set to
+  # true or :all, all 3xx redirects are automatically followed.  This
+  # is the default behavior.  If it is :permanent, only 301 (Moved
+  # Permanently) redirects are followed.  If it is a false value, no
+  # redirects are followed.
   attr_accessor :redirect_ok
+
   attr_accessor :gzip_enabled
   attr_accessor :keep_alive_time
   attr_accessor :keep_alive
@@ -133,7 +140,7 @@ class Mechanize
     @cert           = nil # OpenSSL Certificate
     @key            = nil # OpenSSL Private Key
     @pass           = nil # OpenSSL Password
-    @redirect_ok    = true # Should we follow redirects?
+    @redirect_ok    = true
     @gzip_enabled   = true
 
     # attr_readers
@@ -609,7 +616,14 @@ class Mechanize
       log.debug("Got cached page") if log
       return visited_page(uri) || page
     elsif res_klass <= Net::HTTPRedirection
-      return page unless follow_redirect?
+      case redirect_ok
+      when true, :all
+        # shortcut
+      when false, nil
+        return page
+      when :permanent
+        return page if res_klass != Net::HTTPMovedPermanently
+      end
       log.info("follow redirect to: #{ response['Location'] }") if log
       from_uri  = page.uri
       raise RedirectLimitReachedError.new(page, redirects) if redirects + 1 > redirection_limit

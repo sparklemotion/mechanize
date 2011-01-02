@@ -53,6 +53,9 @@ class Net::HTTP
     '/refresh_with_empty_url' => RefreshWithEmptyUrl,
     '/digest_auth'            => DigestAuthServlet,
     '/verb'                   => VerbServlet,
+    '/robots.txt'             => RobotsTxtTest,
+    '/robots'                 => RobotsTest,
+    '/norobots'               => NoRobotsTest,
   }
 
   PAGE_CACHE = {}

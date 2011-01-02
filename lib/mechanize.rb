@@ -1,5 +1,6 @@
 require 'openssl'
 require 'net/http/persistent'
+require 'webrobots'
 require 'uri'
 require 'webrick/httputils'
 require 'zlib'
@@ -18,6 +19,7 @@ require 'mechanize/response_code_error'
 require 'mechanize/unsupported_scheme_error'
 require 'mechanize/redirect_limit_reached_error'
 require 'mechanize/redirect_not_get_or_head_error'
+require 'mechanize/robots_disallowed_error.rb'
 require 'mechanize/cookie'
 require 'mechanize/cookie_jar'
 require 'mechanize/history'
@@ -68,7 +70,13 @@ class Mechanize
 
   attr_accessor :cookie_jar
   attr_accessor :open_timeout, :read_timeout
-  attr_accessor :user_agent
+
+  attr_reader :user_agent
+  def user_agent=(value)
+    @webrobots = nil if value != @user_agent
+    @user_agent = value
+  end
+
   attr_accessor :watch_for_set
   attr_accessor :ca_file
   attr_accessor :key
@@ -81,6 +89,13 @@ class Mechanize
   # Permanently) redirects are followed.  If it is a false value, no
   # redirects are followed.
   attr_accessor :redirect_ok
+
+  # Says this agent should consult the site's robots.txt for each access.
+  attr_reader :robots
+  def robots=(value)
+    @webrobots = nil if value != @robots
+    @robots = value
+  end
 
   attr_accessor :gzip_enabled
   attr_accessor :keep_alive_time
@@ -158,6 +173,9 @@ class Mechanize
 
     @follow_meta_refresh  = false
     @redirection_limit    = 20
+
+    @robots         = false
+    @webrobots      = nil
 
     # Connection Cache & Keep alive
     @keep_alive_time  = 300
@@ -544,6 +562,12 @@ class Mechanize
     request_data  = options[:params]
     redirects     = options[:redirects]
     http_obj      = options[:connection]
+
+    # Consult robots.txt
+    if @robots && uri.is_a?(URI::HTTP)
+      @webrobots ||= WebRobots.new(@user_agent, :http_get => method(:get_file))
+      @webrobots.allowed?(uri) or raise RobotsDisallowedError.new(uri)
+    end
 
     # Add If-Modified-Since if page is in history
     if( (page = visited_page(uri)) && page.response['Last-Modified'] )

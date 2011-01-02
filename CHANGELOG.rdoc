@@ -13,6 +13,9 @@
   * Provide a way to only follow permanent redirects (301)
     automatically: agent.redirect_ok = :permanent   GH #73
 
+  * Add support for robots.txt, Robots Exclusion Protocol.  Turn on
+    the option by setting agent.robots = true
+
 * Bug Fixes:
 
   * Fixed a bug where Referer is not sent when accessing a relative

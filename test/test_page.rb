@@ -93,6 +93,14 @@ class TestPage < Test::Unit::TestCase
     assert_equal(nil, page.title)
   end
 
+  def test_canonical_uri
+    page = @agent.get("http://localhost/canonical_uri.html")
+    assert_equal(URI("http://localhost/canonical_uri"), page.canonical_uri)
+
+    page = @agent.get("http://localhost/file_upload.html")
+    assert_equal(nil, page.canonical_uri)
+  end
+
   def test_page_decoded_with_charset
     page = Mechanize::Page.new(
       URI.parse('http://tenderlovemaking.com/'),

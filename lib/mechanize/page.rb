@@ -73,6 +73,12 @@ class Mechanize
       parser.respond_to?(:encoding) ? parser.encoding : nil
     end
 
+    # Return the canonical URI for the page if there is a link tag
+    # with href="canonical".
+    def canonical_uri
+      link = at('link[@rel="canonical"][@href]') and URI(link['href'])
+    end
+
     def parser
       return @parser if @parser
 

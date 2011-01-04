@@ -11,6 +11,8 @@
     string or regexp.
   * Add Mechanize::Page::Link#rel and #rel?(kind) to read and test the
     rel attribute.
+  * Add Mechanize::Page#canonical_uri to read a <link rel="canonical">
+    tag.
   * Provide a way to only follow permanent redirects (301)
     automatically: agent.redirect_ok = :permanent   GH #73
 

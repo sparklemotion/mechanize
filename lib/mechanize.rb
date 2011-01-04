@@ -1,6 +1,5 @@
 require 'openssl'
 require 'net/http/persistent'
-require 'webrobots'
 require 'uri'
 require 'webrick/httputils'
 require 'zlib'
@@ -93,6 +92,7 @@ class Mechanize
   # Says this agent should consult the site's robots.txt for each access.
   attr_reader :robots
   def robots=(value)
+    require 'webrobots' if value
     @webrobots = nil if value != @robots
     @robots = value
   end

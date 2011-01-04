@@ -476,9 +476,24 @@ class Mechanize
     end
   end
 
+  # Tests if this agent is allowed to access +url+, consulting the
+  # site's robots.txt.
+  def robots_allowed?(url)
+    webrobots.allowed?(url)
+  end
+
+  # Equivalent to !robots_allowed?(url).
+  def robots_disallowed?(url)
+    !webrobots.allowed?(url)
+  end
+
   alias :page :current_page
 
   private
+
+  def webrobots
+    @webrobots ||= WebRobots.new(@user_agent, :http_get => method(:get_file))
+  end
 
   def resolve(url, referer = current_page())
     hash = { :uri => url, :referer => referer }
@@ -565,8 +580,7 @@ class Mechanize
 
     # Consult robots.txt
     if @robots && uri.is_a?(URI::HTTP)
-      @webrobots ||= WebRobots.new(@user_agent, :http_get => method(:get_file))
-      @webrobots.allowed?(uri) or raise RobotsDisallowedError.new(uri)
+      robots_allowed?(uri) or raise RobotsDisallowedError.new(uri)
     end
 
     # Add If-Modified-Since if page is in history

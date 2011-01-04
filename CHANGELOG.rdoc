@@ -16,8 +16,10 @@
   * Provide a way to only follow permanent redirects (301)
     automatically: agent.redirect_ok = :permanent   GH #73
 
-  * Add support for robots.txt, Robots Exclusion Protocol.  Turn on
-    the option by setting agent.robots = true
+  * Add support for Robots Exclusion Protocol (i.e. robots.txt).  New
+    methods are: Mechanize#robots_allowed? and #robots_disallowed?.
+    Automatic exclusion can be turned on by setting:
+      agent.robots = true
 
 * Bug Fixes:
 

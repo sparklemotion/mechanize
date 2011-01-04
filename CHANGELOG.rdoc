@@ -9,7 +9,8 @@
   * Mechanize#click accepts a regexp or string to click a button/link
     in the current page. It works as expected when not passed a
     string or regexp.
-
+  * Add Mechanize::Page::Link#rel and #rel?(kind) to read and test the
+    rel attribute.
   * Provide a way to only follow permanent redirects (301)
     automatically: agent.redirect_ok = :permanent   GH #73
 

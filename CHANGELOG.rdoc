@@ -15,11 +15,12 @@
     tag.
   * Provide a way to only follow permanent redirects (301)
     automatically: agent.redirect_ok = :permanent   GH #73
-
-  * Add support for Robots Exclusion Protocol (i.e. robots.txt).  New
-    methods are: Mechanize#robots_allowed? and #robots_disallowed?.
-    Automatic exclusion can be turned on by setting:
+  * Add support for Robots Exclusion Protocol (i.e. robots.txt) and
+    nofollow/noindex in meta tags and the rel attribute.  Automatic
+    exclusion can be turned on by setting:
       agent.robots = true
+  * Manual robots.txt test can be performed with
+    Mechanize#robots_allowed? and #robots_disallowed?.
 
 * Bug Fixes:
 

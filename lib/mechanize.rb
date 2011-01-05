@@ -339,6 +339,14 @@ class Mechanize
   # Mechanize::Page::Link object passed in. Returns the page fetched.
   def click(link)
     case link
+    when Page::Link
+      referer = link.page || current_page()
+      if robots
+        if (referer.is_a?(Page) && referer.parser.nofollow?) || link.rel?('nofollow')
+          raise RobotsDisallowedError.new(link.href)
+        end
+      end
+      get(:url => link.href, :referer => referer)
     when String, Regexp
       if real_link = page.link_with(:text => link)
         click real_link
@@ -351,10 +359,10 @@ class Mechanize
         submit form, button if form
       end
     else
-      referer = link.page rescue referer = nil
+      referer = current_page()
       href = link.respond_to?(:href) ? link.href :
         (link['href'] || link['src'])
-      get(:url => href, :referer => (referer || current_page()))
+      get(:url => href, :referer => referer)
     end
   end
 
@@ -579,7 +587,7 @@ class Mechanize
     http_obj      = options[:connection]
 
     # Consult robots.txt
-    if @robots && uri.is_a?(URI::HTTP)
+    if robots && uri.is_a?(URI::HTTP)
       robots_allowed?(uri) or raise RobotsDisallowedError.new(uri)
     end
 
@@ -648,7 +656,13 @@ class Mechanize
       end
     end
 
-    return page if res_klass <= Net::HTTPSuccess
+    if res_klass <= Net::HTTPSuccess
+      if robots && page.is_a?(Page)
+        page.parser.noindex? and raise RobotsDisallowedError.new(uri)
+      end
+
+      return page
+    end
 
     if res_klass == Net::HTTPNotModified
       log.debug("Got cached page") if log

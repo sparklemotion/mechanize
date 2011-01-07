@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mechanize}
-  s.version = "1.0.1.beta.20110107104129"
+  s.version = "1.0.1.beta.20110107104205"
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Aaron Patterson", "Mike Dalessio"]

@@ -84,7 +84,7 @@ class Net::HTTP
     if SERVLETS[path]
       SERVLETS[path].new({}).send("do_#{request.method}", request, res)
     else
-      filename = "htdocs#{path.gsub(/[^\/\\.\w_\s]/, '_')}"
+      filename = "htdocs#{path.gsub(/[^\/\\.\w\s]/, '_')}"
       unless PAGE_CACHE[filename]
         File.open("#{BASE_DIR}/#{filename}", 'rb') { |file|
           PAGE_CACHE[filename] = file.read

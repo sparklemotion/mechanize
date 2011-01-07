@@ -30,10 +30,14 @@ class Mechanize
         return s unless s && code
         return s unless Mechanize.html_parser == Nokogiri::HTML
 
-        begin
-          Iconv.iconv(code.to_s, "UTF-8", s).join("")
-        rescue Iconv::InvalidEncoding, Iconv::IllegalSequence
-          s
+        if RUBY_VERSION < '1.9.2'
+          begin
+            Iconv.iconv(code.to_s, "UTF-8", s).join("")
+          rescue Iconv::InvalidEncoding, Iconv::IllegalSequence
+            s
+          end
+        else
+          s.encode("UTF-8") rescue s
         end
       end
 

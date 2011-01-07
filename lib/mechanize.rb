@@ -8,7 +8,9 @@ require 'digest/md5'
 require 'fileutils'
 require 'nokogiri'
 require 'forwardable'
-require 'iconv'
+
+require 'iconv' if RUBY_VERSION < '1.9.2'
+
 require 'nkf'
 require 'mutex_m'
 

@@ -50,7 +50,7 @@ require 'mechanize/monkey_patch'
 class Mechanize
   ##
   # The version of Mechanize you are using.
-  VERSION = '1.0.0'
+  VERSION = '1.0.1.beta'
 
   ##
   # User Agent aliases

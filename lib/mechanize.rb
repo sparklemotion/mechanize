@@ -464,7 +464,7 @@ class Mechanize
 
   def resolve(url, referer = current_page())
     hash = { :uri => url, :referer => referer }
-    chain = Chain.new([
+    Chain.new([
                        Chain::URIResolver.new(@scheme_handlers)
                       ]).handle(hash)
     hash[:uri].to_s

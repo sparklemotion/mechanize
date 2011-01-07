@@ -107,7 +107,7 @@ class TestHistory < Test::Unit::TestCase
   end
 
   def test_no_slash
-    page = @agent.get('http://localhost')
+    @agent.get('http://localhost')
 
     node = Struct.new(:href, :inner_text).new('http://localhost/', 'blah')
     link = Mechanize::Page::Link.new(node, nil, nil)
@@ -119,7 +119,7 @@ class TestHistory < Test::Unit::TestCase
   end
 
   def test_with_slash
-    page = @agent.get('http://localhost/')
+    @agent.get('http://localhost/')
 
     node = Struct.new(:href, :inner_text).new('http://localhost/', 'blah')
     link = Mechanize::Page::Link.new(node, nil, nil)

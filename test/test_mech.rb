@@ -111,7 +111,7 @@ class TestMechMethods < Test::Unit::TestCase
   def test_history
     0.upto(25) do |i|
       assert_equal(i, @agent.history.size)
-      page = @agent.get("http://localhost/")
+      @agent.get("http://localhost/")
     end
     page = @agent.get("http://localhost/form_test.html")
 
@@ -151,12 +151,12 @@ class TestMechMethods < Test::Unit::TestCase
     @agent.max_history = 10
     0.upto(10) do |i|
       assert_equal(i, @agent.history.size)
-      page = @agent.get("http://localhost/")
+      @agent.get("http://localhost/")
     end
-    
+
     0.upto(10) do |i|
       assert_equal(10, @agent.history.size)
-      page = @agent.get("http://localhost/")
+      @agent.get("http://localhost/")
     end
   end
 
@@ -180,9 +180,9 @@ class TestMechMethods < Test::Unit::TestCase
   def test_back_button
     0.upto(5) do |i|
       assert_equal(i, @agent.history.size)
-      page = @agent.get("http://localhost/")
+      @agent.get("http://localhost/")
     end
-    page = @agent.get("http://localhost/form_test.html")
+    @agent.get("http://localhost/form_test.html")
 
     assert_equal("http://localhost/form_test.html",
       @agent.history.last.uri.to_s)
@@ -255,7 +255,7 @@ class TestMechMethods < Test::Unit::TestCase
   end
 
   def test_transact
-    page = @agent.get("http://localhost/frame_test.html")
+    @agent.get("http://localhost/frame_test.html")
     assert_equal(1, @agent.history.length)
     @agent.transact { |a|
       5.times {

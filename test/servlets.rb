@@ -28,7 +28,7 @@ class BasicAuthServlet < WEBrick::HTTPServlet::AbstractServlet
     begin
       authenticator.authenticate(req,res)
       res.body = 'You are authenticated'
-    rescue WEBrick::HTTPStatus::Unauthorized => ex
+    rescue WEBrick::HTTPStatus::Unauthorized
       res.status = 401
     end
     FileUtils.rm('dot.htpasswd')
@@ -54,7 +54,7 @@ class DigestAuthServlet < WEBrick::HTTPServlet::AbstractServlet
     begin
       @@authenticator.authenticate(req,res)
       res.body = 'You are authenticated'
-    rescue WEBrick::HTTPStatus::Unauthorized => ex
+    rescue WEBrick::HTTPStatus::Unauthorized
       res.status = 401
     end
     FileUtils.rm('digest.htpasswd') if File.exists?('digest.htpasswd')

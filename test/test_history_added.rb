@@ -10,7 +10,7 @@ class HistoryAddedTest < Test::Unit::TestCase
     @agent.history_added = lambda { |page|
       onload += 1
     }
-    page = @agent.get('http://localhost/tc_blank_form.html')
+    @agent.get('http://localhost/tc_blank_form.html')
     assert_equal(1, onload)
   end
 end

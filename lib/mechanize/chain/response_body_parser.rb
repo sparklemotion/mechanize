@@ -20,8 +20,8 @@ class Mechanize
         end
 
         # Find our pluggable parser
-        parser = @pluggable_parser.parser(content_type)
-        params[:page] = parser.new(uri, response, response_body,
+        parser_klass = @pluggable_parser.parser(content_type)
+        params[:page] = parser_klass.new(uri, response, response_body,
                                    response.code) { |parser|
           parser.mech = params[:agent] if parser.respond_to? :mech=
           if parser.respond_to?(:watch_for_set=) && @watch_for_set

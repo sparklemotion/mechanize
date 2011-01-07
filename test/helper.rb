@@ -15,7 +15,7 @@ module MechTestHelper
     </body></html>
     END
     html_response = { 'content-type' => 'text/html' }
-    page = Mechanize::Page.new(  nil, html_response, html, 200, agent )
+    Mechanize::Page.new(  nil, html_response, html, 200, agent )
   end
 end
 

@@ -7,7 +7,7 @@ class TestGzip < Test::Unit::TestCase
 
   def test_request_empty_gzip
     assert_nothing_raised do
-      page = @agent.get("http://localhost/gzip")
+      @agent.get("http://localhost/gzip")
     end
   end
 

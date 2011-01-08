@@ -488,6 +488,9 @@ class Mechanize
   # site's robots.txt.
   def robots_allowed?(url)
     webrobots.allowed?(url)
+  rescue WebRobots::ParseError => e
+    log.info("error in parsing robots.txt for #{url}: #{e.message}") if log
+    return true
   end
 
   # Equivalent to !robots_allowed?(url).

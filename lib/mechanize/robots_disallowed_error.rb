@@ -22,7 +22,7 @@ class Mechanize
     end
 
     def to_s
-      "Access disallowed by robots.txt: #{url}"
+      "Robots access is disallowed for URL: #{url}"
     end
     alias :inspect :to_s
   end

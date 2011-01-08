@@ -12,7 +12,7 @@ Hoe.spec 'mechanize' do
   self.extra_rdoc_files += Dir['*.rdoc']
   self.extra_deps       << ['nokogiri', '>= 1.2.1']
   self.extra_deps       << ['net-http-persistent', '~> 1.1']
-  self.extra_deps       << ['webrobots', '>= 0.0.5']
+  self.extra_deps       << ['webrobots', '>= 0.0.6']
 end
 
 desc "Update SSL Certificate"

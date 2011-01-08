@@ -488,9 +488,6 @@ class Mechanize
   # site's robots.txt.
   def robots_allowed?(url)
     webrobots.allowed?(url)
-  rescue WebRobots::ParseError => e
-    log.info("error in parsing robots.txt for #{url}: #{e.message}") if log
-    return true
   end
 
   # Equivalent to !robots_allowed?(url).
@@ -498,12 +495,40 @@ class Mechanize
     !webrobots.allowed?(url)
   end
 
+  # Returns an error object if there is an error in fetching or
+  # parsing robots.txt of the site +url+.
+  def robots_error(url)
+    webrobots.error(url)
+  end
+
+  # Raises the error if there is an error in fetching or parsing
+  # robots.txt of the site +url+.
+  def robots_error!(url)
+    webrobots.error!(url)
+  end
+
+  # Removes robots.txt cache for the site +url+.
+  def robots_reset(url)
+    webrobots.reset(url)
+  end
+
   alias :page :current_page
 
   private
 
+  def webrobots_http_get(uri)
+    get_file(uri)
+  rescue Net::HTTPExceptions => e
+    case e.response
+    when Net::HTTPNotFound
+      ''
+    else
+      raise e
+    end
+  end
+
   def webrobots
-    @webrobots ||= WebRobots.new(@user_agent, :http_get => method(:get_file))
+    @webrobots ||= WebRobots.new(@user_agent, :http_get => method(:webrobots_http_get))
   end
 
   def resolve(url, referer = current_page())

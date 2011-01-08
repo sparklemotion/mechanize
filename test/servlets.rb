@@ -399,31 +399,3 @@ class QuotedValueCookieTest < WEBrick::HTTPServlet::AbstractServlet
     res.body = "<html><body>hello</body></html>"
   end
 end
-
-class RobotsTxtTest < WEBrick::HTTPServlet::AbstractServlet
-  def do_GET(req, res)
-    res['Content-Type'] = "text/plain"
-    res.body = <<-EOS
-User-Agent: *
-Disallow: /norobots
-    EOS
-  end
-end
-
-class RobotsTest < WEBrick::HTTPServlet::AbstractServlet
-  def do_GET(req, res)
-    res['Content-Type'] = "text/plain"
-    res.body = <<-EOS
-OK
-    EOS
-  end
-end
-
-class NoRobotsTest < WEBrick::HTTPServlet::AbstractServlet
-  def do_GET(req, res)
-    res['Content-Type'] = "text/plain"
-    res.body = <<-EOS
-You are not supposed to be here.
-    EOS
-  end
-end

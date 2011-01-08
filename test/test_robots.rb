@@ -9,18 +9,20 @@ class TestRobots < Test::Unit::TestCase
   end
 
   def test_robots
-    assert_equal "OK\n", @robot.get_file("http://localhost/robots")
+    assert_nothing_raised {
+      assert_equal "Welcome!", @robot.get("http://localhost/robots.html").title
+    }
     assert_raise(Mechanize::RobotsDisallowedError) {
-      @robot.get_file("http://localhost/norobots")
+      @robot.get("http://localhost/norobots.html")
     }
   end
 
   def test_robots_allowed?
-    assert  @agent.robots_allowed?("http://localhost/robots")
-    assert !@agent.robots_allowed?("http://localhost/norobots")
+    assert  @agent.robots_allowed?("http://localhost/robots.html")
+    assert !@agent.robots_allowed?("http://localhost/norobots.html")
 
-    assert !@agent.robots_disallowed?("http://localhost/robots")
-    assert  @agent.robots_disallowed?("http://localhost/norobots")
+    assert !@agent.robots_disallowed?("http://localhost/robots.html")
+    assert  @agent.robots_disallowed?("http://localhost/norobots.html")
   end
 
   def test_noindex

@@ -53,9 +53,6 @@ class Net::HTTP
     '/refresh_with_empty_url' => RefreshWithEmptyUrl,
     '/digest_auth'            => DigestAuthServlet,
     '/verb'                   => VerbServlet,
-    '/robots.txt'             => RobotsTxtTest,
-    '/robots'                 => RobotsTest,
-    '/norobots'               => NoRobotsTest,
   }
 
   PAGE_CACHE = {}
@@ -95,6 +92,12 @@ class Net::HTTP
       end
 
       res.body = PAGE_CACHE[filename]
+      case filename
+      when /\.txt$/
+        res['Content-Type'] = 'text/plain'
+      when /\.jpg$/
+        res['Content-Type'] = 'image/jpeg'
+      end
     end
 
     res['Content-Type'] ||= 'text/html'

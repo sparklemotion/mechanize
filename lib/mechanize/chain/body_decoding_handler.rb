@@ -10,6 +10,8 @@ class Mechanize
         options[:response_body] =
           if encoding = response['Content-Encoding']
             case encoding.downcase
+            when "utf-8"
+              body.read
             when 'gzip'
               Mechanize.log.debug('gunzip body') if Mechanize.log
               if response['Content-Length'].to_i > 0 || body.length > 0

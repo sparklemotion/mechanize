@@ -27,7 +27,7 @@ class BasicAuthTest < Test::Unit::TestCase
       end
     }
     @agent.basic_auth('user', 'pass')
-    page = @agent.get("http://localhost/digest_auth")
+    @agent.get("http://localhost/digest_auth")
     assert block_called
   end
 
@@ -54,7 +54,7 @@ class BasicAuthTest < Test::Unit::TestCase
   def test_auth_bad_user_pass
     @agent.basic_auth('aaron', 'aaron')
     begin
-      page = @agent.get("http://localhost/basic_auth")
+      @agent.get("http://localhost/basic_auth")
     rescue Mechanize::ResponseCodeError => e
       assert_equal("401", e.response_code)
     end
@@ -62,7 +62,7 @@ class BasicAuthTest < Test::Unit::TestCase
 
   def test_auth_failure
     begin
-      page = @agent.get("http://localhost/basic_auth")
+      @agent.get("http://localhost/basic_auth")
     rescue Mechanize::ResponseCodeError => e
       assert_equal("401", e.response_code)
     end

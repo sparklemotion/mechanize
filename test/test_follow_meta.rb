@@ -12,7 +12,7 @@ class FollowMetaTest < Test::Unit::TestCase
       requests << params[:request]
     }
 
-    page = @agent.get('http://localhost/tc_meta_in_body.html')
+    @agent.get('http://localhost/tc_meta_in_body.html')
     assert_equal 1, requests.length
   end
 
@@ -29,7 +29,7 @@ class FollowMetaTest < Test::Unit::TestCase
       requests << params[:request]
     }
 
-    page = @agent.get('http://localhost/tc_follow_meta.html')
+    @agent.get('http://localhost/tc_follow_meta.html')
     assert_nil requests[1]['referer']
   end
 
@@ -112,7 +112,7 @@ class FollowMetaTest < Test::Unit::TestCase
       end
     end
 
-    page = @agent.get('http://localhost/http_refresh?refresh_time=1')
+    @agent.get('http://localhost/http_refresh?refresh_time=1')
     assert_equal [1], @agent.slept
   end
 

@@ -18,21 +18,21 @@ class RefererTest < Test::Unit::TestCase
 
   def test_fetch_two
     page1 = @agent.get("http://localhost/tc_referer.html")
-    page2 = @agent.get("http://localhost/tc_pretty_print.html")
+    @agent.get("http://localhost/tc_pretty_print.html")
     page = @agent.click page1.links.first
     assert_equal("http://localhost/tc_referer.html", page.body)
   end
 
   def test_fetch_two_first
     page1 = @agent.get("http://localhost/tc_referer.html")
-    page2 = @agent.get("http://localhost/tc_pretty_print.html")
+    @agent.get("http://localhost/tc_pretty_print.html")
     page = @agent.click page1.links.first
     assert_equal("http://localhost/tc_referer.html", page.body)
   end
 
   def test_post_form
     page1 = @agent.get("http://localhost/tc_referer.html")
-    page2 = @agent.get("http://localhost/tc_pretty_print.html")
+    @agent.get("http://localhost/tc_pretty_print.html")
     page = @agent.submit page1.forms.first
     assert_equal("http://localhost/tc_referer.html", page.body)
   end

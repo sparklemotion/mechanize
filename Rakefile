@@ -2,6 +2,7 @@ require 'rubygems'
 require 'hoe'
 Hoe.plugin :bundler
 Hoe.plugin :gemspec
+Hoe.plugin :git
 
 Hoe.spec 'mechanize' do
   developer 'Aaron Patterson', 'aaronp@rubyforge.org'

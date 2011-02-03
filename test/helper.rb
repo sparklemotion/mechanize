@@ -15,7 +15,7 @@ module MechTestHelper
     </body></html>
     END
     html_response = { 'content-type' => 'text/html' }
-    page = Mechanize::Page.new(  nil, html_response, html, 200, agent )
+    Mechanize::Page.new(  nil, html_response, html, 200, agent )
   end
 end
 
@@ -47,6 +47,7 @@ class Net::HTTP
     '/http_headers'           => HeaderServlet,
     '/infinite_redirect'      => InfiniteRedirectTest,
     '/infinite_refresh'       => InfiniteRefreshTest,
+    '/redirect_ok'            => RedirectOkTest,
     '/redirect'               => RedirectTest,
     '/refresh_without_url'    => RefreshWithoutUrl,
     '/refresh_with_empty_url' => RefreshWithEmptyUrl,
@@ -83,7 +84,7 @@ class Net::HTTP
     if SERVLETS[path]
       SERVLETS[path].new({}).send("do_#{request.method}", request, res)
     else
-      filename = "htdocs#{path.gsub(/[^\/\\.\w_\s]/, '_')}"
+      filename = "htdocs#{path.gsub(/[^\/\\.\w\s]/, '_')}"
       unless PAGE_CACHE[filename]
         File.open("#{BASE_DIR}/#{filename}", 'rb') { |file|
           PAGE_CACHE[filename] = file.read

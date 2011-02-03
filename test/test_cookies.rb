@@ -6,14 +6,14 @@ class CookiesMechTest < Test::Unit::TestCase
   end
 
   def test_quoted_value_cookie
-    page = @agent.get("http://localhost/quoted_value_cookie")
+    @agent.get("http://localhost/quoted_value_cookie")
     quoted_cookie = @agent.cookies.find { |k| k.name == 'quoted' }
     assert_equal("\"value\"", quoted_cookie.value)
   end
 
   def test_meta_tag_cookies
     cookies = @agent.cookies.length
-    page = @agent.get("http://localhost/meta_cookie.html")
+    @agent.get("http://localhost/meta_cookie.html")
     assert_equal(cookies + 1, @agent.cookies.length)
   end
 
@@ -26,7 +26,7 @@ class CookiesMechTest < Test::Unit::TestCase
   end
 
   def test_no_space_cookies
-    page = @agent.get("http://localhost/one_cookie_no_space")
+    @agent.get("http://localhost/one_cookie_no_space")
     assert_equal(1, @agent.cookies.length)
     foo_cookie = @agent.cookies.find { |k| k.name == 'foo' }
     assert_not_nil(foo_cookie, 'Foo cookie was nil')
@@ -36,7 +36,7 @@ class CookiesMechTest < Test::Unit::TestCase
   end
 
   def test_many_cookies_as_string
-    page = @agent.get("http://localhost/many_cookies_as_string")
+    @agent.get("http://localhost/many_cookies_as_string")
     assert_equal(4, @agent.cookies.length)
 
     name_cookie = @agent.cookies.find { |k| k.name == "name" }
@@ -67,7 +67,7 @@ class CookiesMechTest < Test::Unit::TestCase
   end
 
   def test_many_cookies
-    page = @agent.get("http://localhost/many_cookies")
+    @agent.get("http://localhost/many_cookies")
     assert_equal(4, @agent.cookies.length)
 
     name_cookie = @agent.cookies.find { |k| k.name == "name" }

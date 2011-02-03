@@ -14,7 +14,7 @@ class MechErrorsTest < Test::Unit::TestCase
 
   def test_non_exist
     begin
-      page = @agent.get("http://localhost/bad_form_test.html")
+      @agent.get("http://localhost/bad_form_test.html")
     rescue RuntimeError => ex
       assert_equal("404", ex.inspect)
     end

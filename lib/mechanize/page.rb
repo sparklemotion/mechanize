@@ -50,9 +50,19 @@ class Mechanize
     end
 
     def title
-      @title ||= if parser && search('title').inner_text.length > 0
-                   search('title').inner_text
-                 end
+      @title ||=
+        if doc = parser
+          title = if doc.respond_to?(:title)
+                    doc.title
+                  else
+                    doc.search('title').inner_text
+                  end
+          if title && !title.empty?
+            title
+          else
+            nil
+          end
+        end
     end
 
     def encoding=(encoding)

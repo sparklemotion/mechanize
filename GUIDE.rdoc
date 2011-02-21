@@ -115,7 +115,7 @@ tell it what file name you want to upload:
   form.file_uploads.first.file_name = "somefile.jpg"
 
 == Scraping Data
-Mechanize uses nokogiri[http://nokogiri.rubyforge.org/] to parse
+Mechanize uses nokogiri[http://nokogiri.org/] to parse
 html.  What does this mean for you?  You can treat a mechanize page like
 an nokogiri object.  After you have used Mechanize to navigate to the page
 that you need to scrape, then scrape it using nokogiri methods:

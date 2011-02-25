@@ -12,7 +12,7 @@ class Mechanize
         body = StringIO.new
         total = 0
         @response.read_body { |part|
-          total += part.length
+          total += (part.respond_to?(:bytesize) ? part.bytesize : part.length)
           body.write(part)
           Mechanize.log.debug("Read #{total} bytes") if Mechanize.log
         }

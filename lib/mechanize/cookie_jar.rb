@@ -32,7 +32,12 @@ class Mechanize
       url.path = '/' if url.path.empty?
 
       domains = @jar.find_all { |domain, _|
-        url.host =~ /#{CookieJar.strip_port(domain)}$/i
+        cookie_domain = CookieJar.strip_port(domain)
+        if cookie_domain.start_with?('.')
+          url.host =~ /#{cookie_domain}$/i
+        else
+          url.host =~ /^#{cookie_domain}$/i
+        end
       }
 
       return [] unless domains.length > 0

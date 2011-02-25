@@ -118,6 +118,28 @@ class CookieJarTest < Test::Unit::TestCase
     assert_equal(0, jar.cookies(URI.parse('http://google.com/')).length)
   end
 
+  def test_domain_mimics_browser_behavior_for_subdomains
+    url = URI.parse('http://admin.rubyforge.org/')
+
+    jar = Mechanize::CookieJar.new
+    cookie = cookie_from_hash(cookie_values)
+    jar.add(url, cookie)
+
+    assert_equal(0, jar.cookies(url).length)
+  end
+
+  def test_domain_mimics_browser_behavior_for_leading_dot
+    url = URI.parse('http://admin.rubyforge.org/')
+
+    jar = Mechanize::CookieJar.new
+    assert_equal(0, jar.cookies(url).length)
+
+    cookie = cookie_from_hash(cookie_values)
+    jar.add(url, cookie_from_hash(cookie_values(:domain => '.rubyforge.org')))
+
+    assert_equal(1, jar.cookies(url).length)
+  end
+
   def test_clear_cookies
     url = URI.parse('http://rubyforge.org/')
 

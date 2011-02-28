@@ -118,6 +118,20 @@ class CookieJarTest < Test::Unit::TestCase
     assert_equal(0, jar.cookies(URI.parse('http://google.com/')).length)
   end
 
+  def test_add_rejects_cookies_for_TLDs
+    url = URI.parse('http://rubyforge.org/')
+
+    jar = Mechanize::CookieJar.new
+    assert_equal(0, jar.cookies(url).length)
+
+    tld_cookie = cookie_from_hash(cookie_values(:domain => '.org'))
+    jar.add(url, tld_cookie)
+    single_dot_cookie = cookie_from_hash(cookie_values(:domain => '.'))
+    jar.add(url, single_dot_cookie)
+
+    assert_equal(0, jar.cookies(url).length)
+  end
+
   def test_domain_mimics_browser_behavior_for_subdomains
     url = URI.parse('http://admin.rubyforge.org/')
 

@@ -13,6 +13,7 @@ class Mechanize
     # Add a cookie to the Jar.
     def add(uri, cookie)
       return unless uri.host =~ /#{CookieJar.strip_port(cookie.domain)}$/i
+      return if cookie.domain =~ /^\.\w*$/    # reject cookies for TLDs
 
       normal_domain = cookie.domain.downcase
 

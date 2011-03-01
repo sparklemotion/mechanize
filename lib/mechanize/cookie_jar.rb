@@ -12,8 +12,7 @@ class Mechanize
 
     # Add a cookie to the Jar.
     def add(uri, cookie)
-      return unless uri.host =~ /#{CookieJar.strip_port(cookie.domain)}$/i
-      return if cookie.domain =~ /^\.\w*$/    # reject cookies for TLDs
+      return unless valid_cookie_for_uri?(uri, cookie)
 
       normal_domain = cookie.domain.downcase
 
@@ -172,6 +171,24 @@ class Mechanize
     end
 
     private
+    # Determine if the cookie's domain and path are valid for
+    # the uri.host based on the rules in RFC 2965
+    def valid_cookie_for_uri?(uri, cookie)
+      cookie_domain = CookieJar.strip_port(cookie.domain)
+
+      # reject cookies whose domains do not contain an embedded dot
+      # cookies for localhost and .local. are exempt from this rule
+      return false if cookie_domain !~ /.\../ && cookie_domain !~ /(localhost|\.?local)\.?$/
+
+      # Permitted:     A Set-Cookie from request-host x.foo.com for Domain=.foo.com
+      # Not Permitted: A Set-Cookie from request-host y.x.foo.com for Domain=.foo.com because y.x contains a dot
+      # Not Permitted: A Set-Cookie from request-host foo.com for Domain=.bar.com
+      match = uri.host.match(/#{cookie_domain}/i)
+      return false if match.nil? || match.pre_match =~ /.\../
+
+      true
+    end
+
     # Remove expired cookies
     def cleanup
       @jar.each do |domain, paths|

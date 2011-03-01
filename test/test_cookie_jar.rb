@@ -118,7 +118,7 @@ class CookieJarTest < Test::Unit::TestCase
     assert_equal(0, jar.cookies(URI.parse('http://google.com/')).length)
   end
 
-  def test_add_rejects_cookies_for_TLDs
+  def test_add_rejects_cookies_that_do_not_contain_an_embedded_dot
     url = URI.parse('http://rubyforge.org/')
 
     jar = Mechanize::CookieJar.new
@@ -132,17 +132,57 @@ class CookieJarTest < Test::Unit::TestCase
     assert_equal(0, jar.cookies(url).length)
   end
 
-  def test_domain_mimics_browser_behavior_for_subdomains
-    url = URI.parse('http://admin.rubyforge.org/')
+  def test_add_makes_exception_for_local_tld
+    url = URI.parse('http://example.local')
 
     jar = Mechanize::CookieJar.new
-    cookie = cookie_from_hash(cookie_values)
+    tld_cookie = cookie_from_hash(cookie_values(:domain => '.local'))
+    jar.add(url, tld_cookie)
+
+    assert_equal(1, jar.cookies(url).length)
+  end
+
+  def test_add_makes_exception_for_localhost
+    url = URI.parse('http://localhost')
+
+    jar = Mechanize::CookieJar.new
+    tld_cookie = cookie_from_hash(cookie_values(:domain => 'localhost'))
+    jar.add(url, tld_cookie)
+
+    assert_equal(1, jar.cookies(url).length)
+  end
+
+  def test_add_cookie_for_the_parent_domain
+    url = URI.parse('http://x.foo.com')
+
+    jar = Mechanize::CookieJar.new
+    cookie = cookie_from_hash(cookie_values(:domain => '.foo.com'))
+    jar.add(url, cookie)
+
+    assert_equal(1, jar.cookies(url).length)
+  end
+
+  def test_add_rejects_cookies_from_a_nested_subdomain
+    url = URI.parse('http://y.x.foo.com')
+
+    jar = Mechanize::CookieJar.new
+    cookie = cookie_from_hash(cookie_values(:domain => '.foo.com'))
     jar.add(url, cookie)
 
     assert_equal(0, jar.cookies(url).length)
   end
 
-  def test_domain_mimics_browser_behavior_for_leading_dot
+  def test_cookie_without_leading_dot_does_not_match_subdomains
+    url = URI.parse('http://admin.rubyforge.org/')
+
+    jar = Mechanize::CookieJar.new
+    cookie = cookie_from_hash(cookie_values(:domain => 'rubyforge.org'))
+    jar.add(url, cookie)
+
+    assert_equal(0, jar.cookies(url).length)
+  end
+
+  def test_cookies_with_leading_dot_match_subdomains
     url = URI.parse('http://admin.rubyforge.org/')
 
     jar = Mechanize::CookieJar.new

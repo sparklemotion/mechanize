@@ -1,5 +1,6 @@
-.*.swp
-tags
-test/digest.htpasswd
-Gemfile
-Gemfile.lock
+*.swp
+/Gemfile
+/Gemfile.lock
+/TAGS
+/tags
+/test/digest.htpasswd

@@ -18,6 +18,7 @@
   * Fixed a bug where Referer is not sent when accessing a relative
     URI starting with "http".
   * Fix handling of Meta Refresh with relative paths.  GH #39
+  * Mechanize::CookieJar now supports RFC 2109 correctly.  GH#85
 
 === 1.0.0
 

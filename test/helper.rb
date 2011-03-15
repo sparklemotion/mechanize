@@ -65,7 +65,7 @@ class Net::HTTP
 
     path = '/index.html' if path == '/'
 
-    res = Response.new
+    res = ::Response.new
     res.query_params = url.query
 
     request.query = if 'POST' != request.method && url.query then

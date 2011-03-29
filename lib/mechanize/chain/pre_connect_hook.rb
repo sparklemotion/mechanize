@@ -1,20 +1,18 @@
-class Mechanize
-  class Chain
-    class PreConnectHook
-      include Mechanize::Handler
+class Mechanize::Chain::PreConnectHook
+  include Mechanize::Handler
 
-      attr_accessor :hooks
-      def initialize
-        @hooks = []
-      end
+  attr_accessor :hooks
 
-      def handle(ctx, params)
-        @hooks.each { |hook| hook.call(params) }
-        super
-      end
-    end
+  def initialize
+    @hooks = []
+  end
 
-    class PostConnectHook < PreConnectHook
-    end
+  def handle(ctx, params)
+    @hooks.each { |hook| hook.call(params) }
+    super
   end
 end
+
+class Mechanize::Chain::PostConnectHook < Mechanize::Chain::PreConnectHook
+end
+

@@ -1,21 +1,19 @@
-class Mechanize
-  class Chain
-    attr_accessor :http
+class Mechanize::Chain
+  attr_accessor :http
 
-    def initialize(list, http = nil)
-      @http = http
-      @list = list
-      @list.each { |l| l.chain = self }
-    end
+  def initialize(list, http = nil)
+    @http = http
+    @list = list
+    @list.each { |l| l.chain = self }
+  end
 
-    def handle(request)
-      @list.first.handle(self, request)
-    end
+  def handle(request)
+    @list.first.handle(self, request)
+  end
 
-    def pass(obj, request)
-      next_link = @list[@list.index(obj) + 1]
-      next_link.handle(self, request) if next_link
-    end
+  def pass(obj, request)
+    next_link = @list[@list.index(obj) + 1]
+    next_link.handle(self, request) if next_link
   end
 end
 

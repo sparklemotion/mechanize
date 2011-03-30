@@ -1,5 +1,6 @@
 require 'openssl'
 require 'net/http/persistent'
+require 'net/http/digest_auth'
 require 'uri'
 require 'webrick/httputils'
 require 'zlib'
@@ -154,6 +155,7 @@ class Mechanize
     @user           = nil # Auth User
     @password       = nil # Auth Password
     @digest         = nil # DigestAuth Digest
+    @digest_auth    = Net::HTTP::DigestAuth.new
     @auth_hash      = {}  # Keep track of urls for sending auth
     @request_headers= {}  # A hash of request headers to be used
 
@@ -456,6 +458,26 @@ class Mechanize
 
   alias :page :current_page
 
+  def auth_headers uri, request
+    auth_type = @auth_hash[uri.host]
+
+    return unless auth_type
+
+    case auth_type
+    when :basic
+      request.basic_auth @user, @password
+    when :digest, :iis_digest
+      uri.user = @user
+      uri.password = @password
+
+      iis = auth_type == :iis_digest
+
+      auth = @digest_auth.auth_header uri, @digest, request.method, iis
+
+      request['Authorization'] = auth
+    end
+  end
+
   def connection_for uri
     case uri.scheme.downcase
     when 'http', 'https' then
@@ -579,12 +601,15 @@ class Mechanize
     options[:uri], params = resolve_parameters uri, method, params
     options[:params] = params
 
-    options[:request] = http_request uri, method, params
+    request = http_request uri, method, params
 
     options[:connection] = connection_for uri
 
-    Chain.handle([Chain::AuthHeaders.new(@auth_hash, @user, @password, @digest),
-                  Chain::HeaderResolver.new(@cookie_jar,
+    auth_headers uri, request
+
+    options[:request] = request
+
+    Chain.handle([Chain::HeaderResolver.new(@cookie_jar,
                                             @user_agent,
                                             @gzip_enabled,
                                             @request_headers),

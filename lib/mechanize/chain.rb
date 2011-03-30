@@ -22,7 +22,6 @@ class Mechanize::Chain
 end
 
 require 'mechanize/chain/handler'
-require 'mechanize/chain/auth_headers'
 require 'mechanize/chain/body_decoding_handler'
 require 'mechanize/chain/custom_headers'
 require 'mechanize/chain/header_resolver'

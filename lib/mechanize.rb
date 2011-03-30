@@ -456,6 +456,33 @@ class Mechanize
 
   alias :page :current_page
 
+  def http_request uri, method, params = nil
+    scheme = uri.scheme.downcase
+
+    case uri.scheme.downcase
+    when 'http', 'https' then
+      klass = Net::HTTP.const_get(method.to_s.capitalize)
+
+      request ||= klass.new(uri.request_uri)
+      request.body = params.first if params
+
+      request
+    when 'file' then
+      request = Struct.new(:uri).new(uri)
+
+      class << request
+        def add_field(*args); end
+        alias :[]= :add_field
+        def path
+          uri.path
+        end
+        def each_header; end
+      end
+
+      request
+    end
+  end
+
   def resolve_parameters uri, method, parameters
     case method
     when :head, :get, :delete, :trace then
@@ -527,13 +554,17 @@ class Mechanize
       :headers    => {},
     }.merge(params)
 
+    method = options[:verb]
+    params = options[:params]
+
     uri = @resolver.resolve options[:uri], options[:referer]
 
-    options[:uri], options[:params] =
-      resolve_parameters uri, options[:verb], options[:params]
+    options[:uri], params = resolve_parameters uri, method, params
+    options[:params] = params
 
-    Chain.handle([Chain::RequestResolver.new,
-                  Chain::ConnectionResolver.new,
+    options[:request] = http_request uri, method, params
+
+    Chain.handle([Chain::ConnectionResolver.new,
                   Chain::AuthHeaders.new(@auth_hash, @user, @password, @digest),
                   Chain::HeaderResolver.new(@cookie_jar,
                                             @user_agent,

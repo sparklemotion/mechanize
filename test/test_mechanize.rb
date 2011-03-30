@@ -7,6 +7,20 @@ class TestMechanize < Test::Unit::TestCase
     @uri = URI.parse 'http://example/'
   end
 
+  def test_http_request_get
+    request = @agent.http_request @uri, :get
+    
+    assert_kind_of Net::HTTP::Get, request
+    assert_equal '/', request.path
+  end
+
+  def test_http_request_post
+    request = @agent.http_request @uri, :post
+    
+    assert_kind_of Net::HTTP::Post, request
+    assert_equal '/', request.path
+  end
+
   def test_resolve_parameters_body
     input_params = { :q => 'hello' }
 

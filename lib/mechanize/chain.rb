@@ -1,6 +1,10 @@
 class Mechanize::Chain
   attr_accessor :http
 
+  def self.handle list, request, http = nil
+    new(list, http).handle request
+  end
+
   def initialize(list, http = nil)
     @http = http
     @list = list

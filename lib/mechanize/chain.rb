@@ -24,7 +24,6 @@ end
 require 'mechanize/chain/handler'
 require 'mechanize/chain/auth_headers'
 require 'mechanize/chain/body_decoding_handler'
-require 'mechanize/chain/connection_resolver'
 require 'mechanize/chain/custom_headers'
 require 'mechanize/chain/header_resolver'
 require 'mechanize/chain/pre_connect_hook'

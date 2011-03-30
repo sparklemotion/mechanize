@@ -459,11 +459,7 @@ class Mechanize
   private
 
   def resolve(url, referer = current_page())
-    hash = { :uri => url, :referer => referer }
-    Chain.new([
-                       Chain::URIResolver.new(@resolver)
-                      ]).handle(hash)
-    hash[:uri].to_s
+    @resolver.resolve(url, referer).to_s
   end
 
   def set_http proxy = nil

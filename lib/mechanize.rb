@@ -456,6 +456,23 @@ class Mechanize
 
   alias :page :current_page
 
+  def connection_for uri
+    case uri.scheme.downcase
+    when 'http', 'https' then
+      return @http
+    when 'file' then
+      file_connection = Object.new # HACK make a class
+
+      class << file_connection
+        def request(uri, request)
+          yield Mechanize::FileResponse.new(CGI.unescape(uri.path))
+        end
+      end
+
+      return file_connection
+    end
+  end
+
   def http_request uri, method, params = nil
     scheme = uri.scheme.downcase
 
@@ -468,7 +485,7 @@ class Mechanize
 
       request
     when 'file' then
-      request = Struct.new(:uri).new(uri)
+      request = Struct.new(:uri).new(uri) # HACK make a class
 
       class << request
         def add_field(*args); end
@@ -564,8 +581,9 @@ class Mechanize
 
     options[:request] = http_request uri, method, params
 
-    Chain.handle([Chain::ConnectionResolver.new,
-                  Chain::AuthHeaders.new(@auth_hash, @user, @password, @digest),
+    options[:connection] = connection_for uri
+
+    Chain.handle([Chain::AuthHeaders.new(@auth_hash, @user, @password, @digest),
                   Chain::HeaderResolver.new(@cookie_jar,
                                             @user_agent,
                                             @gzip_enabled,

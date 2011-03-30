@@ -7,6 +7,20 @@ class TestMechanize < Test::Unit::TestCase
     @uri = URI.parse 'http://example/'
   end
 
+  def test_connection_for_file
+    uri = URI.parse 'file:///nonexistent'
+    conn = @agent.connection_for uri
+
+    assert_instance_of Object, conn
+    assert_respond_to conn, :request
+  end
+
+  def test_connection_for_http
+    conn = @agent.connection_for @uri
+
+    assert_equal @agent.http, conn
+  end
+
   def test_http_request_get
     request = @agent.http_request @uri, :get
     

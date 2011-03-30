@@ -512,23 +512,18 @@ class Mechanize
       :headers    => {},
     }.merge(params)
 
-    before_connect = Chain.new([
-                                Chain::URIResolver.new(@resolver),
-                                Chain::ParameterResolver.new,
-                                Chain::RequestResolver.new,
-                                Chain::ConnectionResolver.new,
-                                Chain::AuthHeaders.new(@auth_hash, @user, @password, @digest),
-                                Chain::HeaderResolver.new(
-                                                          @cookie_jar,
-                                                          @user_agent,
-                                                          @gzip_enabled,
-                                                          @request_headers
-                                                          ),
-                                Chain::CustomHeaders.new,
-                                @pre_connect_hook,
-                               ], @http)
-
-    before_connect.handle(options)
+    Chain.handle([Chain::URIResolver.new(@resolver),
+                  Chain::ParameterResolver.new,
+                  Chain::RequestResolver.new,
+                  Chain::ConnectionResolver.new,
+                  Chain::AuthHeaders.new(@auth_hash, @user, @password, @digest),
+                  Chain::HeaderResolver.new(@cookie_jar,
+                                            @user_agent,
+                                            @gzip_enabled,
+                                            @request_headers),
+                  Chain::CustomHeaders.new,
+                  @pre_connect_hook],
+                 options, @http)
 
     uri           = options[:uri]
     request       = options[:request]
@@ -554,19 +549,16 @@ class Mechanize
 
     # Send the request
     response = http_obj.request(uri, request) { |r|
-      connection_chain = Chain.new([
-                                    Chain::ResponseReader.new(r),
-                                    Chain::BodyDecodingHandler.new,
-                                   ])
-      connection_chain.handle(options)
+      Chain.handle([Chain::ResponseReader.new(r),
+                    Chain::BodyDecodingHandler.new],
+                   options)
     }
 
-    after_connect = Chain.new([
-                               @post_connect_hook,
-                               Chain::ResponseBodyParser.new(@pluggable_parser, @watch_for_set),
-                               Chain::ResponseHeaderHandler.new(@cookie_jar),
-                              ])
-    after_connect.handle(options)
+    Chain.handle([@post_connect_hook,
+                  Chain::ResponseBodyParser.new(@pluggable_parser,
+                                                @watch_for_set),
+                  Chain::ResponseHeaderHandler.new(@cookie_jar)],
+                 options)
 
     res_klass = options[:res_klass]
     response_body = options[:response_body]

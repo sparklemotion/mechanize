@@ -456,6 +456,21 @@ class Mechanize
 
   alias :page :current_page
 
+  def resolve_parameters uri, method, parameters
+    case method
+    when :head, :get, :delete, :trace then
+      if parameters and parameters.length > 0
+        uri.query ||= ''
+        uri.query << '&' if uri.query.length > 0
+        uri.query << Mechanize::Util.build_query_string(parameters)
+      end
+      
+      return uri, nil
+    end
+
+    return uri, parameters
+  end
+
   private
 
   def resolve(url, referer = current_page())
@@ -512,10 +527,12 @@ class Mechanize
       :headers    => {},
     }.merge(params)
 
-    options[:uri] = @resolver.resolve options[:uri], options[:referer]
+    uri = @resolver.resolve options[:uri], options[:referer]
 
-    Chain.handle([Chain::ParameterResolver.new,
-                  Chain::RequestResolver.new,
+    options[:uri], options[:params] =
+      resolve_parameters uri, options[:verb], options[:params]
+
+    Chain.handle([Chain::RequestResolver.new,
                   Chain::ConnectionResolver.new,
                   Chain::AuthHeaders.new(@auth_hash, @user, @password, @digest),
                   Chain::HeaderResolver.new(@cookie_jar,

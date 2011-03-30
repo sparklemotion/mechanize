@@ -3,16 +3,14 @@ require 'helper'
 class TestMechanizeChain < Test::Unit::TestCase
 
   def test_self_handle
-    r = Mechanize::URIResolver.new
+    options = {
+      :headers => { :etag => '0' },
+      :request => Net::HTTP::Get.new('/'),
+    }
 
-    ref = Object.new
-    def ref.uri() URI.parse 'http://example/' end
+    Mechanize::Chain.handle [Mechanize::Chain::CustomHeaders.new], options
 
-    options = { :uri => '/foo', :referer => ref }
-
-    Mechanize::Chain.handle [Mechanize::Chain::URIResolver.new(r)], options
-
-    assert_equal 'http://example/foo', options[:uri].to_s
+    assert_equal %w[0], options[:request].to_hash['etag']
   end
 
 end

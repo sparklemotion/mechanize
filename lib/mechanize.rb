@@ -512,8 +512,9 @@ class Mechanize
       :headers    => {},
     }.merge(params)
 
-    Chain.handle([Chain::URIResolver.new(@resolver),
-                  Chain::ParameterResolver.new,
+    options[:uri] = @resolver.resolve options[:uri], options[:referer]
+
+    Chain.handle([Chain::ParameterResolver.new,
                   Chain::RequestResolver.new,
                   Chain::ConnectionResolver.new,
                   Chain::AuthHeaders.new(@auth_hash, @user, @password, @digest),

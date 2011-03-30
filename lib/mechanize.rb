@@ -29,6 +29,7 @@ require 'mechanize/file_response'
 require 'mechanize/inspect'
 require 'mechanize/chain'
 require 'mechanize/monkey_patch'
+require 'mechanize/uri_resolver'
 
 # = Synopsis
 # The Mechanize library is used for automating interaction with a website.  It
@@ -165,15 +166,8 @@ class Mechanize
     @keep_alive_time  = 300
     @keep_alive       = true
 
-    @scheme_handlers  = Hash.new { |h,k|
-      h[k] = lambda { |link, page|
-        raise UnsupportedSchemeError.new(k)
-      }
-    }
-    @scheme_handlers['http']      = lambda { |link, page| link }
-    @scheme_handlers['https']     = @scheme_handlers['http']
-    @scheme_handlers['relative']  = @scheme_handlers['http']
-    @scheme_handlers['file']      = @scheme_handlers['http']
+    @resolver = Mechanize::URIResolver.new
+    @scheme_handlers = @resolver.scheme_handlers
 
     @pre_connect_hook = Chain::PreConnectHook.new
     @post_connect_hook = Chain::PostConnectHook.new
@@ -467,7 +461,7 @@ class Mechanize
   def resolve(url, referer = current_page())
     hash = { :uri => url, :referer => referer }
     Chain.new([
-                       Chain::URIResolver.new(@scheme_handlers)
+                       Chain::URIResolver.new(@resolver)
                       ]).handle(hash)
     hash[:uri].to_s
   end
@@ -523,7 +517,7 @@ class Mechanize
     }.merge(params)
 
     before_connect = Chain.new([
-                                Chain::URIResolver.new(@scheme_handlers),
+                                Chain::URIResolver.new(@resolver),
                                 Chain::ParameterResolver.new,
                                 Chain::RequestResolver.new,
                                 Chain::ConnectionResolver.new,

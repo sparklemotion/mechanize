@@ -2,13 +2,15 @@ require "helper"
 
 class TestURIResolver < Test::Unit::TestCase
   def test_handle
+    r = Mechanize::URIResolver.new
     v = Mechanize::Chain.new([
-      Mechanize::Chain::URIResolver.new(Hash.new { |h,k|
-        h[k] = lambda { |u,r| u }
-      })
+      Mechanize::Chain::URIResolver.new(r)
     ])
-    assert_raises(ArgumentError) { v.handle({}) }
-    assert_nothing_raised { v.handle({:uri => 'http://google.com/'}) }
-    assert_raises(RuntimeError) { v.handle({:uri => 'google'}) }
+
+    e = assert_raises ArgumentError do
+      v.handle({})
+    end
+
+    assert_equal 'uri must be specified', e.message
   end
 end

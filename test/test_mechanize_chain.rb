@@ -2,13 +2,17 @@ require 'helper'
 
 class TestMechanizeChain < Test::Unit::TestCase
 
-  def  est_self_handle
+  def test_self_handle
     r = Mechanize::URIResolver.new
 
-    uri = Mechanize::Chain.handle([Mechanize::Chain::URIResolver.new(r)],
-                                  :uri => 'foo', :referer => 'http://example/')
+    ref = Object.new
+    def ref.uri() URI.parse 'http://example/' end
 
-    assert_equal 'http://example/foo', uri.to_s
+    options = { :uri => '/foo', :referer => ref }
+
+    Mechanize::Chain.handle [Mechanize::Chain::URIResolver.new(r)], options
+
+    assert_equal 'http://example/foo', options[:uri].to_s
   end
 
 end

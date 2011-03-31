@@ -6,7 +6,10 @@ class TestMechanize < Test::Unit::TestCase
     @agent = Mechanize.new
     @uri = URI.parse 'http://example/'
     @req = Net::HTTP::Get.new '/'
+
     @res = Net::HTTPResponse.allocate
+    def @res.code() 200 end
+    @res.instance_variable_set :@header, {}
   end
 
   def test_connection_for_file
@@ -138,32 +141,6 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal 'ISO-8859-1,utf-8;q=0.7,*;q=0.7', @req['accept-charset']
   end
 
-  def test_resolve_parameters_body
-    input_params = { :q => 'hello' }
-
-    uri, params = @agent.resolve_parameters @uri, :post, input_params
-
-    assert_equal 'http://example/', uri.to_s
-    assert_equal input_params, params
-  end
-
-  def test_resolve_parameters_query
-    uri, params = @agent.resolve_parameters @uri, :get, :q => 'hello'
-
-    assert_equal 'http://example/?q=hello', uri.to_s
-    assert_nil params
-  end
-
-  def test_resolve_parameters_query_append
-    input_params = { :q => 'hello' }
-    @uri.query = 'a=b'
-
-    uri, params = @agent.resolve_parameters @uri, :get, input_params
-
-    assert_equal 'http://example/?a=b&q=hello', uri.to_s
-    assert_nil params
-  end
-
   def test_request_add_headers
     @agent.request_add_headers @req, 'Content-Length' => 300
 
@@ -239,6 +216,155 @@ class TestMechanize < Test::Unit::TestCase
     @agent.request_user_agent @req
 
     assert_match %r%^WWW-Mechanize%, @req['user-agent']
+  end
+
+  def test_resolve_parameters_body
+    input_params = { :q => 'hello' }
+
+    uri, params = @agent.resolve_parameters @uri, :post, input_params
+
+    assert_equal 'http://example/', uri.to_s
+    assert_equal input_params, params
+  end
+
+  def test_resolve_parameters_query
+    uri, params = @agent.resolve_parameters @uri, :get, :q => 'hello'
+
+    assert_equal 'http://example/?q=hello', uri.to_s
+    assert_nil params
+  end
+
+  def test_resolve_parameters_query_append
+    input_params = { :q => 'hello' }
+    @uri.query = 'a=b'
+
+    uri, params = @agent.resolve_parameters @uri, :get, input_params
+
+    assert_equal 'http://example/?a=b&q=hello', uri.to_s
+    assert_nil params
+  end
+
+  def test_response_read
+    def @res.read_body() yield 'part' end
+    def @res.content_length() 4 end
+
+    body = @agent.response_read @res, @req
+
+    assert_equal 'part', body
+  end
+
+  def test_response_read_content_length_head
+    req = Net::HTTP::Head.new '/'
+
+    def @res.content_length() end
+    def @res.read_body() end
+
+    body = @agent.response_read @res, req
+
+    assert_equal '', body
+  end
+
+  def test_response_read_content_length_mismatch
+    def @res.content_length() 5 end
+    def @res.read_body() yield 'part' end
+
+    e = assert_raises EOFError do
+      @agent.response_read @res, @req
+    end
+
+    assert_equal 'Content-Length (5) does not match response body length (4)',
+                 e.message
+  end
+
+  def test_response_read_content_length_redirect
+    res = Net::HTTPFound.allocate
+    def res.content_length() 5 end
+    def res.code() 302 end
+    def res.read_body() yield 'part' end
+    res.instance_variable_set :@header, {}
+
+    body = @agent.response_read res, @req
+
+    assert_equal 'part', body
+  end
+
+  def test_response_read_encoding_7_bit
+    def @res.read_body() yield 'part' end
+    def @res.content_length() 4 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[7bit]
+
+    body = @agent.response_read @res, @req
+
+    assert_equal 'part', body
+  end
+
+  def test_response_read_encoding_none
+    def @res.read_body() yield 'part' end
+    def @res.content_length() 4 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[none]
+
+    body = @agent.response_read @res, @req
+
+    assert_equal 'part', body
+  end
+
+  def test_response_read_encoding_gzip
+    def @res.read_body()
+      yield "\037\213\b\0002\002\225M\000\003"
+      yield "+H,*\001\000\306p\017I\004\000\000\000"
+    end
+    def @res.content_length() 24 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[gzip]
+
+    body = @agent.response_read @res, @req
+
+    assert_equal 'part', body
+  end
+
+  def test_response_read_encoding_x_gzip
+    def @res.read_body()
+      yield 'x-gzip'
+    end
+    def @res.content_length() 6 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[x-gzip]
+
+    body = @agent.response_read @res, @req
+
+    assert_equal 'x-gzip', body
+  end
+
+  def test_response_read_encoding_unknown
+    def @res.read_body() yield 'part' end
+    def @res.content_length() 4 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[unknown]
+
+    e = assert_raises RuntimeError do
+      @agent.response_read @res, @req
+    end
+
+    assert_equal 'Unsupported Content-Encoding: unknown', e.message
+  end
+
+  def test_response_read_no_body
+    req = Net::HTTP::Options.new '/'
+
+    def @res.content_length() end
+    def @res.read_body() end
+
+    body = @agent.response_read @res, req
+
+    assert_equal '', body
+  end
+
+  def test_response_read_unknown_code
+    def @res.read_body() yield 'part' end
+    def @res.code() 999 end
+
+    e = assert_raises Mechanize::ResponseCodeError do
+      @agent.response_read @res, @req
+    end
+
+    assert_equal @res, e.page
   end
 
 end

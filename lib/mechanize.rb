@@ -574,21 +574,6 @@ class Mechanize
     request['accept-language'] = 'en-us,en;q=0.5'
   end
 
-  def resolve_parameters uri, method, parameters
-    case method
-    when :head, :get, :delete, :trace then
-      if parameters and parameters.length > 0
-        uri.query ||= ''
-        uri.query << '&' if uri.query.length > 0
-        uri.query << Mechanize::Util.build_query_string(parameters)
-      end
-      
-      return uri, nil
-    end
-
-    return uri, parameters
-  end
-
   def request_add_headers request, headers = {}
     @request_headers.each do |k,v|
       request[k] = v
@@ -615,6 +600,72 @@ class Mechanize
 
   def request_user_agent request
     request['User-Agent'] = @user_agent if @user_agent
+  end
+
+  def resolve_parameters uri, method, parameters
+    case method
+    when :head, :get, :delete, :trace then
+      if parameters and parameters.length > 0
+        uri.query ||= ''
+        uri.query << '&' if uri.query.length > 0
+        uri.query << Mechanize::Util.build_query_string(parameters)
+      end
+      
+      return uri, nil
+    end
+
+    return uri, parameters
+  end
+
+  def response_read response, request
+    body = StringIO.new
+    total = 0
+
+    response.read_body { |part|
+      total += part.length
+      body.write(part)
+      Mechanize.log.debug("Read #{total} bytes") if Mechanize.log
+    }
+
+    body.rewind
+
+    raise Mechanize::ResponseCodeError.new(response) unless
+      Net::HTTPResponse::CODE_TO_OBJ[response.code.to_s]
+
+    content_length = response.content_length
+
+    unless Net::HTTP::Head === request or Net::HTTPRedirection === response then
+      raise EOFError, "Content-Length (#{content_length}) does not match " \
+                      "response body length (#{body.length})" if
+        content_length and content_length != body.length
+    end
+
+    case response['Content-Encoding']
+    when 'gzip' then
+      Mechanize.log.debug('gunzip body') if Mechanize.log
+
+      if content_length > 0 or body.length > 0 then
+        begin
+          zio = Zlib::GzipReader.new body
+          zio.read
+        rescue Zlib::BufError, Zlib::GzipFile::Error
+          Mechanize.log.error('Caught a Zlib::BufError') if Mechanize.log
+          body.rewind
+          body.read 10
+          Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body.read)
+        rescue Zlib::DataError
+          Mechanize.log.error("Caught a Zlib::DataError, " \
+                              "unable to decode page: #{$!}") if Mechanize.log
+          ''
+        ensure
+          zio.close if zio and not zio.closed?
+        end
+      end
+    when nil, 'none', '7bit', 'x-gzip' then
+      body.read
+    else
+      raise "Unsupported Content-Encoding: #{response['Content-Encoding']}"
+    end
   end
 
   private
@@ -724,11 +775,16 @@ class Mechanize
       log.debug("request-header: #{ k } => #{ v }")
     end if log
 
+    response_body = nil
+
     # Send the request
-    response = http_obj.request(uri, request) { |r|
-      Chain.handle([Chain::ResponseReader.new(r),
-                    Chain::BodyDecodingHandler.new],
-                   options)
+    response = http_obj.request(uri, request) { |res|
+      response_body = response_read res, request
+
+      options[:response]      = res
+      options[:response_body] = response_body
+
+      res
     }
 
     post_connect response
@@ -738,8 +794,7 @@ class Mechanize
                   Chain::ResponseHeaderHandler.new(@cookie_jar)],
                  options)
 
-    res_klass = options[:res_klass]
-    response_body = options[:response_body]
+    res_klass = Net::HTTPResponse::CODE_TO_OBJ[response.code.to_s]
     page = options[:page]
 
     log.info("status: #{ page.code }") if log

@@ -22,9 +22,7 @@ class Mechanize::Chain
 end
 
 require 'mechanize/chain/handler'
-require 'mechanize/chain/body_decoding_handler'
 require 'mechanize/chain/response_body_parser'
 require 'mechanize/chain/response_header_handler'
-require 'mechanize/chain/response_reader'
 require 'mechanize/chain/ssl_resolver'
 

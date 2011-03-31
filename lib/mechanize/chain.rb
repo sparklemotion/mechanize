@@ -23,7 +23,6 @@ end
 
 require 'mechanize/chain/handler'
 require 'mechanize/chain/body_decoding_handler'
-require 'mechanize/chain/custom_headers'
 require 'mechanize/chain/pre_connect_hook'
 require 'mechanize/chain/response_body_parser'
 require 'mechanize/chain/response_header_handler'

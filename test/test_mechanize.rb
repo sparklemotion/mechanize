@@ -139,18 +139,44 @@ class TestMechanize < Test::Unit::TestCase
     assert_nil params
   end
 
-  def test_request_custom_headers
+  def test_request_add_headers
+    @agent.request_add_headers @req, 'Content-Length' => 300
+
+    assert_equal '300', @req['content-length']
+  end
+
+  def test_request_add_headers_etag
+    @agent.request_add_headers @req, :etag => '300'
+
+    assert_equal '300', @req['etag']
+  end
+
+  def test_request_add_headers_if_modified_since
+    @agent.request_add_headers @req, :if_modified_since => 'some_date'
+
+    assert_equal 'some_date', @req['if-modified-since']
+  end
+
+  def test_request_add_headers_none
+    @agent.request_add_headers @req
+
+    assert_equal %w[accept user-agent], @req.to_hash.keys.sort
+  end
+
+  def test_request_add_headers_request_headers
     @agent.request_headers['X-Foo'] = 'bar'
 
-    @agent.request_custom_headers @req
+    @agent.request_add_headers @req
 
     assert_equal %w[accept user-agent x-foo], @req.to_hash.keys.sort
   end
 
-  def test_request_custom_headers_none
-    @agent.request_custom_headers @req
+  def test_request_add_headers_symbol
+    e = assert_raises ArgumentError do
+      @agent.request_add_headers @req, :content_length => 300
+    end
 
-    assert_equal %w[accept user-agent], @req.to_hash.keys.sort
+    assert_equal 'unknown header symbol content_length', e.message
   end
 
   def test_request_referer

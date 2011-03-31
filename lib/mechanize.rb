@@ -567,9 +567,20 @@ class Mechanize
     return uri, parameters
   end
 
-  def request_custom_headers request
+  def request_add_headers request, headers = {}
     @request_headers.each do |k,v|
       request[k] = v
+    end
+
+    headers.each do |field, value|
+      case field
+      when :etag              then request["ETag"] = value
+      when :if_modified_since then request["If-Modified-Since"] = value
+      when Symbol then
+        raise ArgumentError, "unknown header symbol #{field}"
+      else
+        request[field] = value
+      end
     end
   end
 
@@ -663,12 +674,11 @@ class Mechanize
     request_host uri, request
     request_referer request, uri, referer
     request_user_agent request
-    request_custom_headers request
+    request_add_headers request, options[:headers]
 
     options[:request] = request
 
-    Chain.handle([Chain::CustomHeaders.new,
-                  @pre_connect_hook],
+    Chain.handle([@pre_connect_hook],
                  options, @http)
 
     uri           = options[:uri]

@@ -8,8 +8,8 @@ class FollowMetaTest < Test::Unit::TestCase
   def test_dont_follow_meta_in_body
     @agent.follow_meta_refresh = true
     requests = []
-    @agent.pre_connect_hooks << lambda { |params|
-      requests << params[:request]
+    @agent.pre_connect_hooks << lambda { |_, request|
+      requests << request
     }
 
     @agent.get('http://localhost/tc_meta_in_body.html')
@@ -25,8 +25,8 @@ class FollowMetaTest < Test::Unit::TestCase
   def test_meta_refresh_does_not_send_referer
     @agent.follow_meta_refresh = true
     requests = []
-    @agent.pre_connect_hooks << lambda { |params|
-      requests << params[:request]
+    @agent.pre_connect_hooks << lambda { |_, request|
+      requests << request
     }
 
     @agent.get('http://localhost/tc_follow_meta.html')

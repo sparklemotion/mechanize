@@ -2,6 +2,12 @@
 
 === HEAD
 
+* API changes
+  * Pre connect hooks are now called with the agent and the request.  See
+    Mechanize#pre_connect_hooks.
+  * Post connect hooks are now called with the agent and the response.  See
+    Mechanize#post_connect_hooks.
+
 * New Features
 
   * Add header reference methods to Mechanize::File so that a reponse

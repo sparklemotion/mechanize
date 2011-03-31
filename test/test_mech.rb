@@ -40,8 +40,8 @@ class TestMechMethods < Test::Unit::TestCase
 
   def test_get_no_referer
     requests = []
-    @agent.pre_connect_hooks << lambda { |params|
-      requests << params[:request]
+    @agent.pre_connect_hooks << lambda { |_, request|
+      requests << request
     }
 
     @agent.get('http://localhost/')
@@ -59,8 +59,8 @@ class TestMechMethods < Test::Unit::TestCase
 
   def test_post_connect_hook_gets_called
     response = nil
-    @agent.post_connect_hooks << lambda { |params|
-      response = params[:response]
+    @agent.post_connect_hooks << lambda { |_, res|
+      response = res
     }
 
     @agent.get('http://localhost/')
@@ -69,8 +69,8 @@ class TestMechMethods < Test::Unit::TestCase
 
   def test_get_with_referer
     request = nil
-    @agent.pre_connect_hooks << lambda { |params|
-      request = params[:request]
+    @agent.pre_connect_hooks << lambda { |_, req|
+      request = req
     }
 
     @agent.get('http://localhost/', URI.parse('http://google.com/'))

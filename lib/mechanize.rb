@@ -113,6 +113,16 @@ class Mechanize
   attr_reader :history
   attr_reader :pluggable_parser
 
+  # A list of hooks to call after retrieving a response.  Hooks are called with
+  # the agent and the response returned.
+
+  attr_reader :post_connect_hooks
+
+  # A list of hooks to call before making a request.  Hooks are called with
+  # the agent and the request to be performed.
+
+  attr_reader :pre_connect_hooks
+
   alias :follow_redirect? :redirect_ok
 
   @html_parser = Nokogiri::HTML
@@ -171,8 +181,8 @@ class Mechanize
     @resolver = Mechanize::URIResolver.new
     @scheme_handlers = @resolver.scheme_handlers
 
-    @pre_connect_hook = Chain::PreConnectHook.new
-    @post_connect_hook = Chain::PostConnectHook.new
+    @pre_connect_hooks = []
+    @post_connect_hooks = []
 
     set_http
     @html_parser = self.class.html_parser
@@ -184,14 +194,6 @@ class Mechanize
   def max_history; @history.max_size end
   def log=(l); self.class.log = l end
   def log; self.class.log end
-
-  def pre_connect_hooks
-    @pre_connect_hook.hooks
-  end
-
-  def post_connect_hooks
-    @post_connect_hook.hooks
-  end
 
   # Sets the proxy address, port, user, and password
   # +addr+ should be a host, with no "http://"
@@ -530,6 +532,26 @@ class Mechanize
     end
   end
 
+  ##
+  # Invokes hooks added to post_connect_hooks after a +response+ is returned.
+  # Yields the +agent+ and the +response+ returned to each hook.
+
+  def post_connect response # :yields: agent, response
+    @post_connect_hooks.each do |hook|
+      hook.call self, response
+    end
+  end
+
+  ##
+  # Invokes hooks added to pre_connect_hooks before a +request+ is made.
+  # Yields the +agent+ and the +request+ that will be performed to each hook.
+
+  def pre_connect request # :yields: agent, request
+    @pre_connect_hooks.each do |hook|
+      hook.call self, request
+    end
+  end
+
   def request_cookies request, uri
     return if @cookie_jar.empty? uri
 
@@ -678,8 +700,7 @@ class Mechanize
 
     options[:request] = request
 
-    Chain.handle([@pre_connect_hook],
-                 options, @http)
+    pre_connect request
 
     uri           = options[:uri]
     request       = options[:request]
@@ -710,8 +731,9 @@ class Mechanize
                    options)
     }
 
-    Chain.handle([@post_connect_hook,
-                  Chain::ResponseBodyParser.new(@pluggable_parser,
+    post_connect response
+
+    Chain.handle([Chain::ResponseBodyParser.new(@pluggable_parser,
                                                 @watch_for_set),
                   Chain::ResponseHeaderHandler.new(@cookie_jar)],
                  options)

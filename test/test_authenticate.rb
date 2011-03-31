@@ -20,9 +20,9 @@ class BasicAuthTest < Test::Unit::TestCase
 
   def test_no_duplicate_headers
     block_called = false
-    @agent.pre_connect_hooks << lambda { |params|
+    @agent.pre_connect_hooks << lambda { |_, request|
       block_called = true
-      params[:request].to_hash.each do |k,v|
+      request.to_hash.each do |k,v|
         assert_equal(1, v.length)
       end
     }

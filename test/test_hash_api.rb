@@ -26,8 +26,8 @@ class TestHashApi < Test::Unit::TestCase
 
   def test_get_with_referer
     request = nil
-    @agent.pre_connect_hooks << lambda { |params|
-      request = params[:request]
+    @agent.pre_connect_hooks << lambda { |_, req|
+      request = req
     }
 
     @agent.get( :url => 'http://localhost/',

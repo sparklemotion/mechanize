@@ -6,6 +6,7 @@ class TestMechanize < Test::Unit::TestCase
     @agent = Mechanize.new
     @uri = URI.parse 'http://example/'
     @req = Net::HTTP::Get.new '/'
+    @res = Net::HTTPResponse.allocate
   end
 
   def test_connection_for_file
@@ -48,6 +49,30 @@ class TestMechanize < Test::Unit::TestCase
     
     assert_kind_of Net::HTTP::Post, request
     assert_equal '/', request.path
+  end
+
+  def test_post_connect
+    @agent.post_connect_hooks << proc { |agent, response|
+      assert_equal @agent, agent
+      assert_kind_of Net::HTTPResponse, response
+      throw :called
+    }
+
+    assert_throws :called do
+      @agent.post_connect @res
+    end
+  end
+
+  def test_pre_connect
+    @agent.pre_connect_hooks << proc { |agent, request|
+      assert_equal @agent, agent
+      assert_kind_of Net::HTTPRequest, request
+      throw :called
+    }
+
+    assert_throws :called do
+      @agent.pre_connect @req
+    end
   end
 
   def test_request_cookies

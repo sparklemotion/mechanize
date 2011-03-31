@@ -495,6 +495,14 @@ class Mechanize
     end
   end
 
+  def enable_gzip request
+    request['accept-encoding'] = if @gzip_enabled
+                                   'gzip,identity'
+                                 else
+                                   'identity'
+                                 end
+  end
+
   def http_request uri, method, params = nil
     scheme = uri.scheme.downcase
 
@@ -522,6 +530,28 @@ class Mechanize
     end
   end
 
+  def request_cookies uri, request
+    return if @cookie_jar.empty? uri
+
+    cookies = @cookie_jar.cookies uri
+
+    return if cookies.empty?
+
+    request.add_field 'Cookie', cookies.join('; ')
+  end
+
+  def request_host uri, request
+    port = [80, 443].include?(uri.port.to_i) ? nil : uri.port
+    host = uri.host
+
+    request['Host'] = [host, port].compact.join ':'
+  end
+
+  def request_language_charset request
+    request['accept-charset']  = 'ISO-8859-1,utf-8;q=0.7,*;q=0.7'
+    request['accept-language'] = 'en-us,en;q=0.5'
+  end
+
   def resolve_parameters uri, method, parameters
     case method
     when :head, :get, :delete, :trace then
@@ -535,6 +565,23 @@ class Mechanize
     end
 
     return uri, parameters
+  end
+
+  def request_custom_headers request
+    @request_headers.each do |k,v|
+      request[k] = v
+    end
+  end
+
+  def request_referer request, uri, referer
+    return unless referer
+    return if 'https' == referer.scheme and 'https' != uri.scheme
+
+    request['Referer'] = referer
+  end
+
+  def request_user_agent request
+    request['User-Agent'] = @user_agent if @user_agent
   end
 
   private
@@ -595,6 +642,8 @@ class Mechanize
 
     method = options[:verb]
     params = options[:params]
+    referer = options[:referer]
+    referer = referer ? referer.uri : nil
 
     uri = @resolver.resolve options[:uri], options[:referer]
 
@@ -607,13 +656,18 @@ class Mechanize
 
     auth_headers uri, request
 
+    enable_gzip request
+
+    request_language_charset request
+    request_cookies uri, request
+    request_host uri, request
+    request_referer request, uri, referer
+    request_user_agent request
+    request_custom_headers request
+
     options[:request] = request
 
-    Chain.handle([Chain::HeaderResolver.new(@cookie_jar,
-                                            @user_agent,
-                                            @gzip_enabled,
-                                            @request_headers),
-                  Chain::CustomHeaders.new,
+    Chain.handle([Chain::CustomHeaders.new,
                   @pre_connect_hook],
                  options, @http)
 

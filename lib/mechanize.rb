@@ -530,7 +530,7 @@ class Mechanize
     end
   end
 
-  def request_cookies uri, request
+  def request_cookies request, uri
     return if @cookie_jar.empty? uri
 
     cookies = @cookie_jar.cookies uri
@@ -540,7 +540,7 @@ class Mechanize
     request.add_field 'Cookie', cookies.join('; ')
   end
 
-  def request_host uri, request
+  def request_host request, uri
     port = [80, 443].include?(uri.port.to_i) ? nil : uri.port
     host = uri.host
 
@@ -670,8 +670,8 @@ class Mechanize
     enable_gzip request
 
     request_language_charset request
-    request_cookies uri, request
-    request_host uri, request
+    request_cookies request, uri
+    request_host request, uri
     request_referer request, uri, referer
     request_user_agent request
     request_add_headers request, options[:headers]

@@ -56,13 +56,13 @@ class TestMechanize < Test::Unit::TestCase
       @agent.cookie_jar.add uri, cookie
     end
 
-    @agent.request_cookies uri, @req
+    @agent.request_cookies @req, uri
 
     assert_equal 'hello=world domain=.example.com', @req['Cookie']
   end
 
   def test_request_cookies_none
-    @agent.request_cookies @uri, @req
+    @agent.request_cookies @req, @uri
 
     assert_nil @req['Cookie']
   end
@@ -74,7 +74,7 @@ class TestMechanize < Test::Unit::TestCase
       @agent.cookie_jar.add uri, cookie
     end
 
-    @agent.request_cookies uri, @req
+    @agent.request_cookies @req, uri
 
     expected = cookie_str.sub ', ', '; '
 
@@ -87,13 +87,13 @@ class TestMechanize < Test::Unit::TestCase
       @agent.cookie_jar.add uri, cookie
     end
 
-    @agent.request_cookies @uri, @req
+    @agent.request_cookies @req, @uri
 
     assert_nil @req['Cookie']
   end
 
   def test_request_host
-    @agent.request_host @uri, @req
+    @agent.request_host @req, @uri
 
     assert_equal 'example', @req['host']
   end
@@ -101,7 +101,7 @@ class TestMechanize < Test::Unit::TestCase
   def test_request_host_nonstandard
     @uri.port = 81
 
-    @agent.request_host @uri, @req
+    @agent.request_host @req, @uri
 
     assert_equal 'example:81', @req['host']
   end

@@ -28,7 +28,6 @@ require 'mechanize/form'
 require 'mechanize/pluggable_parsers'
 require 'mechanize/file_response'
 require 'mechanize/inspect'
-require 'mechanize/chain'
 require 'mechanize/monkey_patch'
 require 'mechanize/uri_resolver'
 

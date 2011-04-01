@@ -617,6 +617,25 @@ class Mechanize
     return uri, parameters
   end
 
+  def response_parse response, body, uri
+    content_type = nil
+
+    unless response['Content-Type'].nil?
+      data, = response['Content-Type'].split ';', 2
+      content_type, = data.downcase.split ',', 2 unless data.nil?
+    end
+
+    # Find our pluggable parser
+    parser_klass = @pluggable_parser.parser(content_type)
+
+    parser_klass.new(uri, response, body, response.code) { |parser|
+      parser.mech = self if parser.respond_to? :mech=
+      if @watch_for_set and parser.respond_to?(:watch_for_set=)
+        parser.watch_for_set = @watch_for_set
+      end
+    }
+  end
+
   def response_read response, request
     body = StringIO.new
     total = 0
@@ -789,13 +808,14 @@ class Mechanize
 
     post_connect response
 
-    Chain.handle([Chain::ResponseBodyParser.new(@pluggable_parser,
-                                                @watch_for_set),
-                  Chain::ResponseHeaderHandler.new(@cookie_jar)],
+    page = response_parse response, response_body, uri
+
+    options[:page] = page
+
+    Chain.handle([Chain::ResponseHeaderHandler.new(@cookie_jar)],
                  options)
 
     res_klass = Net::HTTPResponse::CODE_TO_OBJ[response.code.to_s]
-    page = options[:page]
 
     log.info("status: #{ page.code }") if log
 

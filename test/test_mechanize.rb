@@ -298,16 +298,6 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal 'part', body
   end
 
-  def test_response_read_encoding_none
-    def @res.read_body() yield 'part' end
-    def @res.content_length() 4 end
-    @res.instance_variable_set :@header, 'content-encoding' => %w[none]
-
-    body = @agent.response_read @res, @req
-
-    assert_equal 'part', body
-  end
-
   def test_response_read_encoding_gzip
     def @res.read_body()
       yield "\037\213\b\0002\002\225M\000\003"
@@ -315,6 +305,16 @@ class TestMechanize < Test::Unit::TestCase
     end
     def @res.content_length() 24 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[gzip]
+
+    body = @agent.response_read @res, @req
+
+    assert_equal 'part', body
+  end
+
+  def test_response_read_encoding_none
+    def @res.read_body() yield 'part' end
+    def @res.content_length() 4 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[none]
 
     body = @agent.response_read @res, @req
 
@@ -365,6 +365,28 @@ class TestMechanize < Test::Unit::TestCase
     end
 
     assert_equal @res, e.page
+  end
+
+  def test_response_parse
+    body = '<title>hi</title>'
+    @res.instance_variable_set :@header, 'content-type' => %w[text/html]
+
+    page = @agent.response_parse @res, body, @uri
+
+    assert_instance_of Mechanize::Page, page
+    assert_equal @agent, page.mech
+  end
+
+  def test_response_parse_content_type_encoding
+    body = '<title>hi</title>'
+    @res.instance_variable_set(:@header,
+                               'content-type' =>
+                                 %w[text/html;charset=ISO-8859-1])
+
+    page = @agent.response_parse @res, body, @uri
+
+    assert_instance_of Mechanize::Page, page
+    assert_equal @agent, page.mech
   end
 
 end

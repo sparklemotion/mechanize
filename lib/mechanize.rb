@@ -617,6 +617,28 @@ class Mechanize
     return uri, parameters
   end
 
+  def response_cookies response, uri, page
+    if page.is_a?(Mechanize::Page) && page.body =~ /Set-Cookie/n
+      page.search('//head/meta[@http-equiv="Set-Cookie"]').each do |meta|
+        Mechanize::Cookie::parse(uri, meta['content']) { |c|
+          Mechanize.log.debug("saved cookie: #{c}") if Mechanize.log
+          @cookie_jar.add(uri, c)
+        }
+      end
+    end
+
+    header_cookies = response.get_fields 'Set-Cookie'
+
+    return unless header_cookies
+
+    header_cookies.each do |cookie|
+      Mechanize::Cookie.parse(uri, cookie) { |c|
+        Mechanize.log.debug("saved cookie: #{c}") if Mechanize.log
+        @cookie_jar.add(uri, c)
+      }
+    end
+  end
+
   def response_parse response, body, uri
     content_type = nil
 
@@ -810,10 +832,7 @@ class Mechanize
 
     page = response_parse response, response_body, uri
 
-    options[:page] = page
-
-    Chain.handle([Chain::ResponseHeaderHandler.new(@cookie_jar)],
-                 options)
+    response_cookies response, uri, page
 
     res_klass = Net::HTTPResponse::CODE_TO_OBJ[response.code.to_s]
 

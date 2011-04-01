@@ -244,6 +244,40 @@ class TestMechanize < Test::Unit::TestCase
     assert_nil params
   end
 
+  def test_response_cookies
+    uri = URI.parse 'http://host.example.com'
+    cookie_str = 'a=b domain=.example.com'
+    @res.instance_variable_set(:@header,
+                               'set-cookie' => [cookie_str],
+                               'content-type' => %w[text/html])
+    page = Mechanize::Page.new uri, @res, '', 200, @agent
+
+    @agent.response_cookies @res, uri, page
+
+    assert_equal ['a=b domain=.example.com'],
+                 @agent.cookie_jar.cookies(uri).map { |c| c.to_s }
+  end
+
+  def test_response_cookies_meta
+    uri = URI.parse 'http://host.example.com'
+    cookie_str = 'a=b domain=.example.com'
+
+    body = <<-BODY
+<head>
+  <meta http-equiv="Set-Cookie" content="#{cookie_str}">
+</head>"
+    BODY
+
+    @res.instance_variable_set(:@header,
+                               'content-type' => %w[text/html])
+    page = Mechanize::Page.new uri, @res, body, 200, @agent
+
+    @agent.response_cookies @res, uri, page
+
+    assert_equal ['a=b domain=.example.com'],
+                 @agent.cookie_jar.cookies(uri).map { |c| c.to_s }
+  end
+
   def test_response_read
     def @res.read_body() yield 'part' end
     def @res.content_length() 4 end

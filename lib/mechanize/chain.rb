@@ -22,6 +22,5 @@ class Mechanize::Chain
 end
 
 require 'mechanize/chain/handler'
-require 'mechanize/chain/response_header_handler'
 require 'mechanize/chain/ssl_resolver'
 

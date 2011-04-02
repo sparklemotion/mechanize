@@ -5,7 +5,7 @@
 
 == DESCRIPTION
 
-The Mechanize library is used for automating interaction with websites. 
+The Mechanize library is used for automating interaction with websites.
 Mechanize automatically stores and sends cookies, follows redirects,
 can follow links, and submit forms.  Form fields can be populated and
 submitted.  Mechanize also keeps track of the sites that you have visited as
@@ -28,12 +28,12 @@ The bug tracker is available here:
 
 == Examples
 
-If you are just starting, check out the GUIDE.  
+If you are just starting, check out the GUIDE.
 Also, check out the EXAMPLES file.
 
 == Authors
 
-Copyright (c) 2005 by Michael Neumann (mneumann@ntecs.de) 
+Copyright (c) 2005 by Michael Neumann (mneumann@ntecs.de)
 
 Copyright (c) 2006-2010:
 
@@ -53,7 +53,7 @@ perl Mechanize which is available here[http://search.cpan.org/~petdance/WWW-Mech
 Thank you to Michael Neumann for starting the Ruby version.  Thanks to everyone
 who's helped out in various ways.  Finally, thank you to the people using this
 library!
-  
+
 == License
 
 This library is distributed under the GPL.  Please see the LICENSE file.

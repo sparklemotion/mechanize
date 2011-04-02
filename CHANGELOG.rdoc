@@ -13,6 +13,8 @@
     argument
   * Mechanize#delete now accepts headers instead of an options Hash as the
     last argument
+  * Mechanize#request_with_entity now accepts headers instead of an options
+    Hash as the last argument
 
 * New Features
 
@@ -21,7 +23,6 @@
   * Mechanize#click accepts a regexp or string to click a button/link
     in the current page. It works as expected when not passed a
     string or regexp.
-
   * Provide a way to only follow permanent redirects (301)
     automatically: agent.redirect_ok = :permanent   GH #73
 

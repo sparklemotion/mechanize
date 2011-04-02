@@ -586,7 +586,7 @@ class Mechanize
         uri.query << '&' if uri.query.length > 0
         uri.query << Mechanize::Util.build_query_string(parameters)
       end
-      
+
       return uri, nil
     end
 
@@ -594,9 +594,9 @@ class Mechanize
   end
 
   def response_cookies response, uri, page
-    if page.is_a?(Mechanize::Page) && page.body =~ /Set-Cookie/n
+    if Mechanize::Page === page and page.body =~ /Set-Cookie/n
       page.search('//head/meta[@http-equiv="Set-Cookie"]').each do |meta|
-        Mechanize::Cookie::parse(uri, meta['content']) { |c|
+        Mechanize::Cookie.parse(uri, meta['content']) { |c|
           Mechanize.log.debug("saved cookie: #{c}") if Mechanize.log
           @cookie_jar.add(uri, c)
         }
@@ -751,7 +751,7 @@ class Mechanize
     pre_connect request
 
     # Add If-Modified-Since if page is in history
-    if (page = visited_page(uri)) && page.response['Last-Modified']
+    if (page = visited_page(uri)) and page.response['Last-Modified']
       request['If-Modified-Since'] = page.response['Last-Modified']
     end if(@conditional_requests)
 
@@ -788,7 +788,7 @@ class Mechanize
       redirect_uri  = nil
       referer       = page
 
-      if (page.respond_to?(:meta) && (redirect = page.meta.first))
+      if page.respond_to?(:meta) and (redirect = page.meta.first)
         redirect_uri = redirect.uri.to_s
         sleep redirect.node['delay'].to_f
         referer = Page.new(nil, {'content-type'=>'text/html'})

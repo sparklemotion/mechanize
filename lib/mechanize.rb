@@ -50,7 +50,7 @@ require 'mechanize/uri_resolver'
 class Mechanize
   ##
   # The version of Mechanize you are using.
-  VERSION = '1.0.1.beta'
+  VERSION = '2.0.pre.1'
 
   ##
   # User Agent aliases

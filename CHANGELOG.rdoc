@@ -8,6 +8,11 @@
   * Post connect hooks are now called with the agent and the response.  See
     Mechanize#post_connect_hooks.
   * Mechanize::Chain is gone, as an internal API this should cause no problems.
+  * Mechanize#fetch_page no longer accepts an options Hash.
+  * Mechanize#put now accepts headers instead of an options Hash as the last
+    argument
+  * Mechanize#delete now accepts headers instead of an options Hash as the
+    last argument
 
 * New Features
 

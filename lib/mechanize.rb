@@ -260,51 +260,41 @@ class Mechanize
     end
 
     # fetch the page
-    page = fetch_page(  :uri      => url,
-                        :referer  => referer,
-                        :headers  => headers || {},
-                        :verb     => verb,
-                        :params   => parameters
-                        )
+    headers ||= {}
+    page = fetch_page url, verb, headers, parameters, referer
     add_to_history(page)
     yield page if block_given?
     page
   end
 
   ####
-  # PUT to +url+ with +entity+, and setting +options+:
+  # PUT to +url+ with +entity+, and setting +headers+:
   #
-  #   put('http://tenderlovemaking.com/', 'new content', :headers => {'Content-Type' => 'text/plain'})
+  #   put('http://example/', 'new content', {'Content-Type' => 'text/plain'})
   #
-  def put(url, entity, options = {})
-    request_with_entity(:put, url, entity, options)
+  def put(url, entity, headers = {})
+    request_with_entity(:put, url, entity, headers)
   end
 
   ####
-  # DELETE to +url+ with +query_params+, and setting +options+:
+  # DELETE to +url+ with +query_params+, and setting +headers+:
   #
-  #   delete('http://tenderlovemaking.com/', {'q' => 'foo'}, :headers => {})
+  #   delete('http://example/', {'q' => 'foo'}, {})
   #
-  def delete(url, query_params = {}, options = {})
-    page = head(url, query_params, options.merge({:verb => :delete}))
+  def delete(uri, query_params = {}, headers = {})
+    page = fetch_page(uri, :delete, headers, query_params)
     add_to_history(page)
     page
   end
 
   ####
-  # HEAD to +url+ with +query_params+, and setting +options+:
+  # HEAD to +url+ with +query_params+, and setting +headers+:
   #
-  #   head('http://tenderlovemaking.com/', {'q' => 'foo'}, :headers => {})
+  #   head('http://example/', {'q' => 'foo'}, {})
   #
-  def head(url, query_params = {}, options = {})
-    options = {
-      :uri      => url,
-      :headers  => {},
-      :params   => query_params,
-      :verb     => :head
-    }.merge(options)
+  def head(uri, query_params = {}, headers = {})
     # fetch the page
-    page = fetch_page(options)
+    page = fetch_page(uri, :head, headers, query_params)
     yield page if block_given?
     page
   end
@@ -356,7 +346,7 @@ class Mechanize
   #  agent.post('http://example.com/', "<message>hello</message>", 'Content-Type' => 'application/xml')
   def post(url, query={}, headers={})
     if query.is_a?(String)
-      return request_with_entity(:post, url, query, :headers => headers)
+      return request_with_entity(:post, url, query, headers)
     end
     node = {}
     # Create a fake form
@@ -402,27 +392,15 @@ class Mechanize
     end
   end
 
-  def request_with_entity(verb, url, entity, options={})
-    cur_page = current_page || Page.new( nil, {'content-type'=>'text/html'})
-
-    options = {
-      :uri      => url,
-      :referer  => cur_page,
-      :headers  => {},
-    }.update(options)
+  def request_with_entity(verb, uri, entity, headers = {})
+    cur_page = current_page || Page.new(nil, {'content-type'=>'text/html'})
 
     headers = {
       'Content-Type' => 'application/octet-stream',
       'Content-Length' => entity.size.to_s,
-    }.update(options[:headers])
+    }.update headers
 
-    options.update({
-                     :verb => verb,
-                     :params => [entity],
-                     :headers => headers,
-                   })
-
-    page = fetch_page(options)
+    page = fetch_page uri, verb, headers, [entity], cur_page
     add_to_history(page)
     page
   end
@@ -727,55 +705,37 @@ class Mechanize
     end
   end
 
-  def post_form(url, form, headers = {})
+  def post_form(uri, form, headers = {})
     cur_page = form.page || current_page ||
-      Page.new( nil, {'content-type'=>'text/html'})
+      Page.new(nil, {'content-type'=>'text/html'})
 
     request_data = form.request_data
 
     log.debug("query: #{ request_data.inspect }") if log
 
+    headers = {
+      'Content-Type'    => form.enctype,
+      'Content-Length'  => request_data.size.to_s,
+    }.merge headers
+
     # fetch the page
-    page = fetch_page(  :uri      => url,
-                        :referer  => cur_page,
-                        :verb     => :post,
-                        :params   => [request_data],
-                        :headers  => {
-                          'Content-Type'    => form.enctype,
-                          'Content-Length'  => request_data.size.to_s,
-                        }.merge(headers))
+    page = fetch_page uri, :post, headers, [request_data], cur_page
     add_to_history(page)
     page
   end
 
   # uri is an absolute URI
-  def fetch_page(params)
-    options = {
-      :request    => nil,
-      :response   => nil,
-      :connection => nil,
-      :referer    => current_page(),
-      :uri        => nil,
-      :verb       => :get,
-      :agent      => self,
-      :redirects  => 0,
-      :params     => [],
-      :headers    => {},
-    }.merge(params)
+  def fetch_page uri, method = :get, headers = {}, params = [],
+                 referer = current_page, redirects = 0
+    referer_uri = referer ? referer.uri : nil
 
-    method = options[:verb]
-    params = options[:params]
-    referer = options[:referer]
-    referer = referer ? referer.uri : nil
+    uri = @resolver.resolve uri, referer
 
-    uri = @resolver.resolve options[:uri], options[:referer]
-
-    options[:uri], params = resolve_parameters uri, method, params
-    options[:params] = params
+    uri, params = resolve_parameters uri, method, params
 
     request = http_request uri, method, params
 
-    options[:connection] = connection_for uri
+    connection = connection_for uri
 
     auth_headers uri, request
 
@@ -784,29 +744,20 @@ class Mechanize
     request_language_charset request
     request_cookies request, uri
     request_host request, uri
-    request_referer request, uri, referer
+    request_referer request, uri, referer_uri
     request_user_agent request
-    request_add_headers request, options[:headers]
-
-    options[:request] = request
+    request_add_headers request, headers
 
     pre_connect request
 
-    uri           = options[:uri]
-    request       = options[:request]
-    cur_page      = options[:referer]
-    request_data  = options[:params]
-    redirects     = options[:redirects]
-    http_obj      = options[:connection]
-
     # Add If-Modified-Since if page is in history
-    if( (page = visited_page(uri)) && page.response['Last-Modified'] )
+    if (page = visited_page(uri)) && page.response['Last-Modified']
       request['If-Modified-Since'] = page.response['Last-Modified']
     end if(@conditional_requests)
 
     # Specify timeouts if given
-    http_obj.open_timeout = @open_timeout if @open_timeout
-    http_obj.read_timeout = @read_timeout if @read_timeout
+    connection.open_timeout = @open_timeout if @open_timeout
+    connection.read_timeout = @read_timeout if @read_timeout
 
     # Log specified headers for the request
     log.info("#{ request.class }: #{ request.path }") if log
@@ -817,11 +768,8 @@ class Mechanize
     response_body = nil
 
     # Send the request
-    response = http_obj.request(uri, request) { |res|
+    response = connection.request(uri, request) { |res|
       response_body = response_read res, request
-
-      options[:response]      = res
-      options[:response_body] = response_body
 
       res
     }
@@ -839,6 +787,7 @@ class Mechanize
     if follow_meta_refresh
       redirect_uri  = nil
       referer       = page
+
       if (page.respond_to?(:meta) && (redirect = page.meta.first))
         redirect_uri = redirect.uri.to_s
         sleep redirect.node['delay'].to_f
@@ -854,13 +803,7 @@ class Mechanize
 
       if redirect_uri
         @history.push(page, page.uri)
-        return fetch_page(
-                          :uri        => redirect_uri,
-                          :referer    => referer,
-                          :params     => [],
-                          :verb       => :get,
-                          :redirects  => redirects + 1
-                          )
+        return fetch_page(redirect_uri, :get, {}, [], referer, redirects + 1)
       end
     end
 
@@ -881,13 +824,10 @@ class Mechanize
       log.info("follow redirect to: #{ response['Location'] }") if log
       from_uri  = page.uri
       raise RedirectLimitReachedError.new(page, redirects) if redirects + 1 > redirection_limit
-      redirect_verb = options[:verb] == :head ? :head : :get
-      page = fetch_page(  :uri => response['Location'].to_s,
-                          :referer => page,
-                          :params  => [],
-                          :verb => redirect_verb,
-                          :redirects => redirects + 1
-                          )
+      redirect_method = method == :head ? :head : :get
+      page = fetch_page(response['Location'].to_s, redirect_method, {}, [],
+                        page, redirects + 1)
+
       @history.push(page, from_uri)
       return page
     elsif res_klass <= Net::HTTPUnauthorized
@@ -902,12 +842,9 @@ class Mechanize
       else
         @auth_hash[uri.host] = :basic
       end
-      return fetch_page(  :uri      => uri,
-                          :referer  => cur_page,
-                          :verb     => request.method.downcase.to_sym,
-                          :params   => request_data,
-                          :headers  => options[:headers]
-                          )
+
+      return fetch_page(uri, request.method.downcase.to_sym, headers, params,
+                        referer)
     end
 
     raise ResponseCodeError.new(page), "Unhandled response", caller

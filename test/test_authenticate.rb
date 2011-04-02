@@ -35,10 +35,10 @@ class BasicAuthTest < Test::Unit::TestCase
     class << @agent
       alias :old_fetch_page :fetch_page
       attr_accessor :requests
-      def fetch_page(args)
+      def fetch_page(uri, method, *args)
         @requests ||= []
-        x = old_fetch_page(args)
-        @requests << args[:verb]
+        x = old_fetch_page(uri, method, *args)
+        @requests << method
         x
       end
     end

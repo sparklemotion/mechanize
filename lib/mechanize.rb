@@ -436,26 +436,6 @@ class Mechanize
 
   alias :page :current_page
 
-  def auth_headers uri, request
-    auth_type = @auth_hash[uri.host]
-
-    return unless auth_type
-
-    case auth_type
-    when :basic
-      request.basic_auth @user, @password
-    when :digest, :iis_digest
-      uri.user = @user
-      uri.password = @password
-
-      iis = auth_type == :iis_digest
-
-      auth = @digest_auth.auth_header uri, @digest, request.method, iis
-
-      request['Authorization'] = auth
-    end
-  end
-
   def connection_for uri
     case uri.scheme.downcase
     when 'http', 'https' then
@@ -525,6 +505,26 @@ class Mechanize
   def pre_connect request # :yields: agent, request
     @pre_connect_hooks.each do |hook|
       hook.call self, request
+    end
+  end
+
+  def request_auth request, uri
+    auth_type = @auth_hash[uri.host]
+
+    return unless auth_type
+
+    case auth_type
+    when :basic
+      request.basic_auth @user, @password
+    when :digest, :iis_digest
+      uri.user = @user
+      uri.password = @password
+
+      iis = auth_type == :iis_digest
+
+      auth = @digest_auth.auth_header uri, @digest, request.method, iis
+
+      request['Authorization'] = auth
     end
   end
 
@@ -737,7 +737,7 @@ class Mechanize
 
     connection = connection_for uri
 
-    auth_headers uri, request
+    request_auth request, uri
 
     enable_gzip request
 

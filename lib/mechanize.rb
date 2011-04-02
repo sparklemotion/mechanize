@@ -863,20 +863,3 @@ require 'mechanize/unsupported_scheme_error'
 require 'mechanize/redirect_limit_reached_error'
 require 'mechanize/redirect_not_get_or_head_error'
 
-module WWW
-  def self.const_missing klass
-    warn <<eomsg
-!!!!! DEPRECATION NOTICE !!!!!
-The WWW constant is deprecated, please switch to the new top-level Mechanize
-constant.  WWW will be removed in Mechanize version 2.0
-
-You've referenced the WWW constant from #{caller.first}, please
-switch the "WWW" to "Mechanize".  Thanks!
-
-Sincerely,
-
-  Pew Pew Pew
-eomsg
-    Object.const_get(klass)
-  end
-end

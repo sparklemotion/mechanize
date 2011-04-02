@@ -17,6 +17,7 @@
     Hash as the last argument
   * Mechanize no longer raises RuntimeError directly, Mechanize::Error or
     ArgumentError are raised instead.
+  * WWW::Mechanize has been removed.
 
 * New Features
 

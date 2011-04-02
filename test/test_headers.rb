@@ -25,7 +25,7 @@ class TestHeaders < Test::Unit::TestCase
       when *all_keys
         # ok
       else
-        raise "unexpected key: #{key}"
+        flunk "unexpected key: #{key}"
       end
     }
     assert_equal([], keys)

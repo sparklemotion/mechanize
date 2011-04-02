@@ -8,7 +8,7 @@ class TestMechanizeURIResolver < Test::Unit::TestCase
   end
 
   def test_resolve_bad_uri
-    e = assert_raises RuntimeError do
+    e = assert_raises ArgumentError do
       @r.resolve 'google'
     end
 

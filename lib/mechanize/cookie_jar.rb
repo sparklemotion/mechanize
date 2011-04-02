@@ -78,7 +78,7 @@ class Mechanize
         when :cookiestxt then
           dump_cookiestxt(f)
         else
-          raise "Unknown cookie jar file format"
+          raise ArgumentError, "Unknown cookie jar file format"
         end
       }
     end
@@ -96,7 +96,7 @@ class Mechanize
         when :cookiestxt then
           load_cookiestxt(f)
         else
-          raise "Unknown cookie jar file format"
+          raise ArgumentError, "Unknown cookie jar file format"
         end
       }
     end

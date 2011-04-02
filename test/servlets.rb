@@ -129,7 +129,8 @@ class GzipServlet < WEBrick::HTTPServlet::AbstractServlet
       res['Content-Encoding'] = 'gzip'
       res['Content-Type'] = "text/html"
     else
-      raise 'no gzip'
+      res.code = 400
+      res.body = 'no gzip'
     end
   end
 end

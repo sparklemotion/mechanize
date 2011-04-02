@@ -1,6 +1,6 @@
 class Mechanize
   # Thrown when too many redirects are sent
-  class RedirectLimitReachedError < RuntimeError
+  class RedirectLimitReachedError < Mechanize::Error
     attr_reader :page, :response_code, :redirects
     def initialize(page, redirects)
       @page           = page

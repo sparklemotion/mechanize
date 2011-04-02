@@ -15,11 +15,6 @@ require 'nkf'
 require 'mutex_m'
 
 require 'mechanize/util'
-require 'mechanize/content_type_error'
-require 'mechanize/response_code_error'
-require 'mechanize/unsupported_scheme_error'
-require 'mechanize/redirect_limit_reached_error'
-require 'mechanize/redirect_not_get_or_head_error'
 require 'mechanize/cookie'
 require 'mechanize/cookie_jar'
 require 'mechanize/history'
@@ -51,6 +46,9 @@ class Mechanize
   ##
   # The version of Mechanize you are using.
   VERSION = '2.0.pre.1'
+
+  class Error < RuntimeError
+  end
 
   ##
   # User Agent aliases
@@ -209,7 +207,8 @@ class Mechanize
   # Set the user agent for the Mechanize object.
   # See AGENT_ALIASES
   def user_agent_alias=(al)
-    self.user_agent = AGENT_ALIASES[al] || raise("unknown agent alias")
+    self.user_agent = AGENT_ALIASES[al] ||
+      raise(ArgumentError, "unknown agent alias")
   end
 
   # Returns a list of cookies stored in the cookie jar.
@@ -388,7 +387,7 @@ class Mechanize
             :referer  => form.page
             )
     else
-      raise "unsupported method: #{form.method.upcase}"
+      raise ArgumentError, "unsupported method: #{form.method.upcase}"
     end
   end
 
@@ -681,7 +680,8 @@ class Mechanize
     when nil, 'none', '7bit', 'x-gzip' then
       body.read
     else
-      raise "Unsupported Content-Encoding: #{response['Content-Encoding']}"
+      raise Mechanize::Error,
+            "Unsupported Content-Encoding: #{response['Content-Encoding']}"
     end
   end
 
@@ -856,6 +856,12 @@ class Mechanize
     history_added.call(page) if history_added
   end
 end
+
+require 'mechanize/content_type_error'
+require 'mechanize/response_code_error'
+require 'mechanize/unsupported_scheme_error'
+require 'mechanize/redirect_limit_reached_error'
+require 'mechanize/redirect_not_get_or_head_error'
 
 module WWW
   def self.const_missing klass

@@ -55,7 +55,7 @@ class Mechanize::URIResolver
     uri.path = '/' if uri.path.length == 0
 
     if uri.relative?
-      raise "absolute URL needed (not #{uri})" unless
+      raise ArgumentError, "absolute URL needed (not #{uri})" unless
         referer && referer.uri
 
       base = nil
@@ -72,7 +72,7 @@ class Mechanize::URIResolver
     end
 
     unless ['http', 'https', 'file'].include?(uri.scheme.downcase)
-      raise "unsupported scheme: #{uri.scheme}"
+      raise ArgumentError, "unsupported scheme: #{uri.scheme}"
     end
 
     uri

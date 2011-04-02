@@ -372,7 +372,7 @@ class TestMechanize < Test::Unit::TestCase
     def @res.content_length() 4 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[unknown]
 
-    e = assert_raises RuntimeError do
+    e = assert_raises Mechanize::Error do
       @agent.response_read @res, @req
     end
 

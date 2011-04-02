@@ -206,7 +206,8 @@ class Mechanize
           qval = proc_query(f)
           query.push(*qval)
         elsif checked.size > 1
-          raise "multiple radiobuttons are checked in the same group!"
+          raise Mechanize::Error,
+                "multiple radiobuttons are checked in the same group!"
         end
       end
 

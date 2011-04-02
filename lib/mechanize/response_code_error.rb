@@ -4,7 +4,7 @@ class Mechanize
   # not know how to handle.  Currently, this exception will be thrown
   # if Mechanize encounters response codes other than 200, 301, or 302.
   # Any other response code is up to the user to handle.
-  class ResponseCodeError < RuntimeError
+  class ResponseCodeError < Mechanize::Error
     attr_reader :response_code
     attr_reader :page
 

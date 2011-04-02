@@ -44,8 +44,9 @@ class Mechanize
 
       @encoding = nil if html_body =~ /<meta[^>]*charset[^>]*>/i
 
-      raise Mechanize::ContentTypeError.new(response['content-type']) unless
+      raise Mechanize::ContentTypeError, response['content-type'] unless
         response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/i
+
       @parser = @links = @forms = @meta = @bases = @frames = @iframes = nil
     end
 

@@ -235,7 +235,7 @@ class Mechanize
         parameters = []
       end
     else
-      raise ArgumentError.new("url must be specified") unless url = options[:url]
+      raise ArgumentError, "url must be specified" unless url = options[:url]
       parameters = options[:params] || []
       referer    = options[:referer]
       headers    = options[:headers]
@@ -646,7 +646,7 @@ class Mechanize
 
     body.rewind
 
-    raise Mechanize::ResponseCodeError.new(response) unless
+    raise Mechanize::ResponseCodeError, response unless
       Net::HTTPResponse::CODE_TO_OBJ[response.code.to_s]
 
     content_length = response.content_length
@@ -823,7 +823,8 @@ class Mechanize
       end
       log.info("follow redirect to: #{ response['Location'] }") if log
       from_uri  = page.uri
-      raise RedirectLimitReachedError.new(page, redirects) if redirects + 1 > redirection_limit
+      raise RedirectLimitReachedError.new(page, redirects) if
+        redirects + 1 > redirection_limit
       redirect_method = method == :head ? :head : :get
       page = fetch_page(response['Location'].to_s, redirect_method, {}, [],
                         page, redirects + 1)
@@ -831,8 +832,8 @@ class Mechanize
       @history.push(page, from_uri)
       return page
     elsif res_klass <= Net::HTTPUnauthorized
-      raise ResponseCodeError.new(page) unless @user || @password
-      raise ResponseCodeError.new(page) if @auth_hash.has_key?(uri.host)
+      raise ResponseCodeError, page unless @user || @password
+      raise ResponseCodeError, page if @auth_hash.has_key?(uri.host)
       if response['www-authenticate'] =~ /Digest/i
         @auth_hash[uri.host] = :digest
         if response['server'] =~ /Microsoft-IIS/
@@ -847,7 +848,7 @@ class Mechanize
                         referer)
     end
 
-    raise ResponseCodeError.new(page), "Unhandled response", caller
+    raise ResponseCodeError.new(page), "Unhandled response"
   end
 
   def add_to_history(page)

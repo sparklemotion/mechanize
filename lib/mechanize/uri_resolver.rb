@@ -5,7 +5,7 @@ class Mechanize::URIResolver
   def initialize
     @scheme_handlers = Hash.new { |h, scheme|
       h[scheme] = lambda { |link, page|
-        raise Mechanize::UnsupportedSchemeError.new(scheme)
+        raise Mechanize::UnsupportedSchemeError, scheme
       }
     }
 

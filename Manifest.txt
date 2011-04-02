@@ -12,22 +12,6 @@ examples/proxy_req.rb
 examples/rubyforge.rb
 examples/spider.rb
 lib/mechanize.rb
-lib/mechanize/chain.rb
-lib/mechanize/chain/auth_headers.rb
-lib/mechanize/chain/body_decoding_handler.rb
-lib/mechanize/chain/connection_resolver.rb
-lib/mechanize/chain/custom_headers.rb
-lib/mechanize/chain/handler.rb
-lib/mechanize/chain/header_resolver.rb
-lib/mechanize/chain/parameter_resolver.rb
-lib/mechanize/chain/post_connect_hook.rb
-lib/mechanize/chain/pre_connect_hook.rb
-lib/mechanize/chain/request_resolver.rb
-lib/mechanize/chain/response_body_parser.rb
-lib/mechanize/chain/response_header_handler.rb
-lib/mechanize/chain/response_reader.rb
-lib/mechanize/chain/ssl_resolver.rb
-lib/mechanize/chain/uri_resolver.rb
 lib/mechanize/content_type_error.rb
 lib/mechanize/cookie.rb
 lib/mechanize/cookie_jar.rb
@@ -60,14 +44,8 @@ lib/mechanize/redirect_limit_reached_error.rb
 lib/mechanize/redirect_not_get_or_head_error.rb
 lib/mechanize/response_code_error.rb
 lib/mechanize/unsupported_scheme_error.rb
+lib/mechanize/uri_resolver.rb
 lib/mechanize/util.rb
-test/chain/test_argument_validator.rb
-test/chain/test_auth_headers.rb
-test/chain/test_custom_headers.rb
-test/chain/test_header_resolver.rb
-test/chain/test_parameter_resolver.rb
-test/chain/test_request_resolver.rb
-test/chain/test_response_reader.rb
 test/data/htpasswd
 test/data/server.crt
 test/data/server.csr
@@ -77,6 +55,7 @@ test/helper.rb
 test/htdocs/alt_text.html
 test/htdocs/bad_form_test.html
 test/htdocs/button.jpg
+test/htdocs/dir with spaces/foo.html
 test/htdocs/empty_form.html
 test/htdocs/file_upload.html
 test/htdocs/find_link.html
@@ -97,6 +76,7 @@ test/htdocs/index.html
 test/htdocs/link with space.html
 test/htdocs/meta_cookie.html
 test/htdocs/no_title_test.html
+test/htdocs/rails_3_encoding_hack_form_test.html
 test/htdocs/relative/tc_relative_links.html
 test/htdocs/tc_bad_charset.html
 test/htdocs/tc_bad_links.html
@@ -117,6 +97,7 @@ test/htdocs/tc_referer.html
 test/htdocs/tc_relative_links.html
 test/htdocs/tc_textarea.html
 test/htdocs/test_bad_encoding.html
+test/htdocs/test_click.html
 test/htdocs/unusual______.html
 test/servlets.rb
 test/ssl_server.rb
@@ -141,6 +122,7 @@ test/test_frames.rb
 test/test_get_headers.rb
 test/test_gzipping.rb
 test/test_hash_api.rb
+test/test_headers.rb
 test/test_history.rb
 test/test_history_added.rb
 test/test_html_unscape_forms.rb
@@ -148,7 +130,9 @@ test/test_if_modified_since.rb
 test/test_links.rb
 test/test_mech.rb
 test/test_mech_proxy.rb
+test/test_mechanize.rb
 test/test_mechanize_file.rb
+test/test_mechanize_uri_resolver.rb
 test/test_meta.rb
 test/test_multi_select.rb
 test/test_no_attributes.rb

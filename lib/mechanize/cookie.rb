@@ -64,11 +64,8 @@ class Mechanize
     end
 
     def expired?
-      if expires.nil?
-        false
-      else
-        Time.now > expires
-      end
+      return false unless expires
+      Time.now > expires
     end
 
     def to_s

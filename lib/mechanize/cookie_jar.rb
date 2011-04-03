@@ -28,7 +28,7 @@ class Mechanize::CookieJar
 
     @jar[normal_domain][cookie.path] ||= {}
     @jar[normal_domain][cookie.path][cookie.name] = cookie
-    cleanup
+
     cookie
   end
 
@@ -95,7 +95,7 @@ class Mechanize::CookieJar
   # :yaml  <- YAML structure.
   # :cookiestxt  <- Mozilla's cookies.txt format
   def load(file, format = :yaml)
-    @jar = ::File.open(file) { |f|
+    @jar = open(file) { |f|
       case format
       when :yaml then
         YAML::load(f)
@@ -105,6 +105,10 @@ class Mechanize::CookieJar
         raise ArgumentError, "Unknown cookie jar file format"
       end
     }
+
+    cleanup
+
+    self
   end
 
   # Clear the cookie jar
@@ -124,19 +128,14 @@ class Mechanize::CookieJar
       next if fields.length != 7
 
       expires_seconds = fields[4].to_i
-      begin
-        expires = (expires_seconds == 0) ? nil : Time.at(expires_seconds)
-      rescue
-        next
-        # Just in case we ever decide to support DateTime...
-        # expires = DateTime.new(1970,1,1) + ((expires_seconds + 1) / (60*60*24.0))
-      end
-      next if (expires_seconds != 0) && (expires < now)
+      expires = (expires_seconds == 0) ? nil : Time.at(expires_seconds)
+      next if expires and (expires < now)
 
       c = Mechanize::Cookie.new(fields[5], fields[6])
       c.domain = fields[0]
-      # Field 1 indicates whether the cookie can be read by other machines at the same domain.
-      # This is computed by the cookie implementation, based on the domain value.
+      # Field 1 indicates whether the cookie can be read by other machines at
+      # the same domain.  This is computed by the cookie implementation, based
+      # on the domain value.
       c.path = fields[2]               # Path for which the cookie is relevant
       c.secure = (fields[3] == "TRUE") # Requires a secure connection
       c.expires = expires             # Time the cookie expires.
@@ -144,6 +143,7 @@ class Mechanize::CookieJar
 
       add(FakeURI.new(c.domain), c)
     end
+
     @jar
   end
 

@@ -28,6 +28,7 @@
     string or regexp.
   * Provide a way to only follow permanent redirects (301)
     automatically: agent.redirect_ok = :permanent   GH #73
+  * Documented various Mechanize accessors.  GH #66
 
 * Bug Fixes:
 

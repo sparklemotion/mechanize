@@ -80,6 +80,7 @@ test/htdocs/rails_3_encoding_hack_form_test.html
 test/htdocs/relative/tc_relative_links.html
 test/htdocs/tc_bad_charset.html
 test/htdocs/tc_bad_links.html
+test/htdocs/tc_base_images.html
 test/htdocs/tc_base_link.html
 test/htdocs/tc_blank_form.html
 test/htdocs/tc_charset.html
@@ -88,6 +89,7 @@ test/htdocs/tc_encoded_links.html
 test/htdocs/tc_field_precedence.html
 test/htdocs/tc_follow_meta.html
 test/htdocs/tc_form_action.html
+test/htdocs/tc_images.html
 test/htdocs/tc_links.html
 test/htdocs/tc_meta_in_body.html
 test/htdocs/tc_no_attributes.html
@@ -127,6 +129,7 @@ test/test_history.rb
 test/test_history_added.rb
 test/test_html_unscape_forms.rb
 test/test_if_modified_since.rb
+test/test_images.rb
 test/test_links.rb
 test/test_mech.rb
 test/test_mech_proxy.rb

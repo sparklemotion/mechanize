@@ -43,6 +43,7 @@ require 'mechanize/uri_resolver'
 #  search_results = agent.submit(search_form)
 #  puts search_results.body
 class Mechanize
+
   ##
   # The version of Mechanize you are using.
   VERSION = '2.0.pre.1'
@@ -65,23 +66,33 @@ class Mechanize
     'iPhone' => 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1C28 Safari/419.3',
     'Mechanize' => "WWW-Mechanize/#{VERSION} (http://rubyforge.org/projects/mechanize/)"
   }
-  #A Mechanize::CookieJar, which is used to keep track of cookies received
+
+  # A Mechanize::CookieJar which stores cookies
   attr_accessor :cookie_jar
-  #Length of time to wait until a connection is opened in seconds
+
+  # Length of time to wait until a connection is opened in seconds
   attr_accessor :open_timeout
-  #Length of time to attempt to read data from the server
+
+  # Length of time to attempt to read data from the server
   attr_accessor  :read_timeout
-  #The identification string for the client initiating a web request
+
+  # The identification string for the client initiating a web request
   attr_accessor :user_agent
-  #? seems to be something to do with page parsing
+
+  # The value of watch_for_set is passed to pluggable parsers for retrieved
+  # content
   attr_accessor :watch_for_set
-  #Path to an OpenSSL server certificate file
+
+  # Path to an OpenSSL server certificate file
   attr_accessor :ca_file
-  #Path to an OpenSSL Private Key
+
+  # Path to an OpenSSL Private Key
   attr_accessor :key
-  #Path to an OpenSSL client certificate file
+
+  # Path to an OpenSSL client certificate file
   attr_accessor :cert
-  #OpenSSL password
+
+  # OpenSSL key password
   attr_accessor :pass
 
   # Controls how this agent deals with redirects.  If it is set to
@@ -91,19 +102,25 @@ class Mechanize
   # redirects are followed.
   attr_accessor :redirect_ok
 
-  #Boolean: True to enable gzip (compression and decompression?) of (retrieved?) page
+  # Disables HTTP/1.1 gzip compression (enabled by default)
   attr_accessor :gzip_enabled
-  #Time to keep alive the connection (seconds?)
+
+  # HTTP/1.0 keep-alive time
   attr_accessor :keep_alive_time
-  #Boolean: True to keep alive the connection to the server
+
+  # HTTP/1.1 keep-alives are always active.  This does nothing.
   attr_accessor :keep_alive
-  #Boolean: True to allow conditional gets -- see RFC2616 for details
+
+  # Disables If-Modified-Since conditional requests (enabled by default)
   attr_accessor :conditional_requests
-  #Boolean: --what does this do relative to meta refreshing? Beyond, keep note of http://www.w3.org/TR/WCAG10-CORE-TECHS/#auto-page-refresh
+
+  # Follow HTML meta refresh
   attr_accessor :follow_meta_refresh
-  #what type? Specifies the mode and function for ssl verification.
+
+  # A callback for additional certificate verification.  See
+  # OpenSSL::SSL::SSLContext#verify_callback
   attr_accessor :verify_callback
-  
+
   attr_accessor :history_added
   attr_accessor :scheme_handlers
   attr_accessor :redirection_limit
@@ -283,7 +300,7 @@ class Mechanize
     page
   end
 
-  ####
+  ##
   # PUT to +url+ with +entity+, and setting +headers+:
   #
   #   put('http://example/', 'new content', {'Content-Type' => 'text/plain'})
@@ -292,7 +309,7 @@ class Mechanize
     request_with_entity(:put, url, entity, headers)
   end
 
-  ####
+  ##
   # DELETE to +url+ with +query_params+, and setting +headers+:
   #
   #   delete('http://example/', {'q' => 'foo'}, {})
@@ -303,7 +320,7 @@ class Mechanize
     page
   end
 
-  ####
+  ##
   # HEAD to +url+ with +query_params+, and setting +headers+:
   #
   #   head('http://example/', {'q' => 'foo'}, {})

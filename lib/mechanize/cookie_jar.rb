@@ -5,6 +5,11 @@ require 'yaml'
 # any particular website.
 
 class Mechanize::CookieJar
+
+  # add_cookie wants something resembling a URI.
+
+  FakeURI = Struct.new(:host) # :nodoc:
+
   attr_reader :jar
 
   def initialize
@@ -110,7 +115,6 @@ class Mechanize::CookieJar
   # Read cookies from Mozilla cookies.txt-style IO stream
   def load_cookiestxt(io)
     now = Time.now
-    fakeuri = Struct.new(:host)    # add_cookie wants something resembling a URI.
 
     io.each_line do |line|
       line.chomp!
@@ -138,7 +142,7 @@ class Mechanize::CookieJar
       c.expires = expires             # Time the cookie expires.
       c.version = 0                   # Conforms to Netscape cookie spec.
 
-      add(fakeuri.new(c.domain), c)
+      add(FakeURI.new(c.domain), c)
     end
     @jar
   end

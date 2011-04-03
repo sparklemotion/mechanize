@@ -110,6 +110,16 @@ class CookieClassTest < Test::Unit::TestCase
     end
   end
 
+  def test_parse_expires_session
+    cookie = 'PRETANET=TGIAqbFXtt; Name=/PRETANET; Path=/; Max-Age=1.2; Content-type=text/html; Domain=192.168.6.196; expires=;'
+
+    url = URI.parse('http://localhost/')
+
+    cookie = Mechanize::Cookie.parse(url, cookie).first
+
+    assert cookie.session
+  end
+
   def test_parse_valid_cookie
     url = URI.parse('http://rubyforge.org/')
     cookie_params = {}

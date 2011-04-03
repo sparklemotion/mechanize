@@ -16,15 +16,17 @@ class Mechanize::CookieJar
     @jar = {}
   end
 
+  def initialize_copy other # :nodoc:
+    @jar = Marshal.load Marshal.dump other.jar
+  end
+
   # Add a cookie to the Jar.
   def add(uri, cookie)
     return unless valid_cookie_for_uri?(uri, cookie)
 
     normal_domain = cookie.domain.downcase
 
-    unless @jar.has_key?(normal_domain)
-      @jar[normal_domain] = Hash.new { |h,k| h[k] = {} }
-    end
+    @jar[normal_domain] ||= {} unless @jar.has_key?(normal_domain)
 
     @jar[normal_domain][cookie.path] ||= {}
     @jar[normal_domain][cookie.path][cookie.name] = cookie
@@ -77,16 +79,21 @@ class Mechanize::CookieJar
   # :yaml  <- YAML structure
   # :cookiestxt  <- Mozilla's cookies.txt format
   def save_as(file, format = :yaml)
-    ::File.open(file, "w") { |f|
+    jar = dup
+    jar.cleanup true
+
+    open(file, 'w') { |f|
       case format
       when :yaml then
-        YAML::dump(@jar, f)
+        YAML.dump(jar.jar, f)
       when :cookiestxt then
-        dump_cookiestxt(f)
+        jar.dump_cookiestxt(f)
       else
         raise ArgumentError, "Unknown cookie jar file format"
       end
     }
+
+    self
   end
 
   # Load cookie jar from a file in the format specified.
@@ -194,14 +201,15 @@ class Mechanize::CookieJar
     true
   end
 
+  protected
+
   # Remove expired cookies
-  def cleanup
+  def cleanup session = false
     @jar.each do |domain, paths|
       paths.each do |path, names|
         names.each do |cookie_name, cookie|
-          if cookie.expired?
-            paths[path].delete(cookie_name)
-          end
+          paths[path].delete(cookie_name) if
+            cookie.expired? or (session and cookie.session)
         end
       end
     end

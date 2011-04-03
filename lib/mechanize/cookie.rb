@@ -4,6 +4,9 @@ require 'webrick/cookie'
 class Mechanize
   # This class is used to represent an HTTP Cookie.
   class Cookie < WEBrick::Cookie
+
+    attr_accessor :session
+
     def self.parse(uri, str, log = Mechanize.log)
       return str.split(/,(?=[^;,]*=)|,$/).map { |c|
         cookie_elem = c.split(/;+/)
@@ -29,12 +32,15 @@ class Mechanize
           when "domain"  then cookie.domain  = value.sub(/^\./, '')
           when "path"    then cookie.path    = value
           when 'expires'
+            if value.empty? then
+              cookie.session = true
+              next
+            end
+
             begin
               cookie.expires = Time::parse(value)
             rescue
-              if log
-                log.warn("Couldn't parse expires: #{value}")
-              end
+              log.warn("Couldn't parse expires: #{value}") if log
             end
           when "max-age" then
             begin

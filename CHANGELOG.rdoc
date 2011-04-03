@@ -38,6 +38,8 @@
   * Mechanize::CookieJar now supports RFC 2109 correctly.  GH #85
   * Fixed typo in EXAMPLES.rdoc.  GH #74
   * The base element is now handled correctly for images.  GH #72
+  * Image buttons with no name attribute are now included in the form's button
+    list.  GH#56
 
 === 1.0.0
 

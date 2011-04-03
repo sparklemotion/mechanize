@@ -212,6 +212,15 @@ class TestMechanize < Test::Unit::TestCase
     assert_nil @req['referer']
   end
 
+  def test_request_referer_https_downgrade_case
+    uri = URI.parse 'http://example'
+    referer = URI.parse 'httpS://old.example'
+
+    @agent.request_referer @req, uri, referer
+
+    assert_nil @req['referer']
+  end
+
   def test_request_referer_none
     @agent.request_referer @req, @uri, nil
 

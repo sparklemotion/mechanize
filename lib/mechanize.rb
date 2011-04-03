@@ -602,7 +602,8 @@ class Mechanize
 
   def request_referer request, uri, referer
     return unless referer
-    return if 'https' == referer.scheme and 'https' != uri.scheme
+    return if 'https' == referer.scheme.downcase and
+              'https' != uri.scheme.downcase
 
     request['Referer'] = referer
   end

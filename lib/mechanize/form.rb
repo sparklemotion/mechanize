@@ -229,14 +229,22 @@ class Mechanize
     # multi-part post,
     def request_data
       query_params = build_query()
+
       case @enctype.downcase
       when /^multipart\/form-data/
         boundary = rand_string(20)
         @enctype = "multipart/form-data; boundary=#{boundary}"
         params = []
-        query_params.each { |k,v| params << param_to_multipart(k, v) unless k.nil? }
+        query_params.each do |k,v|
+          params << param_to_multipart(k, v) unless k.nil?
+        end
+
         @file_uploads.each { |f| params << file_to_multipart(f) }
-        params.collect { |p| "--#{boundary}\r\n#{p.respond_to?(:force_encoding) ? p.force_encoding('ASCII-8BIT') : p}" }.join('') +
+
+        params.map do |part|
+          part.force_encoding('ASCII-8BIT') if part.respond_to? :force_encoding
+          "--#{boundary}\r\n#{part}"
+        end.join('') +
           "--#{boundary}--\r\n"
       else
         Mechanize::Util.build_query_string(query_params)

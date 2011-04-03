@@ -135,6 +135,7 @@ test/test_mech.rb
 test/test_mech_proxy.rb
 test/test_mechanize.rb
 test/test_mechanize_file.rb
+test/test_mechanize_form_image_button.rb
 test/test_mechanize_uri_resolver.rb
 test/test_meta.rb
 test/test_multi_select.rb

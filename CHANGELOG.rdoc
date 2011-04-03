@@ -42,7 +42,7 @@
   * Image buttons with no name attribute are now included in the form's button
     list.  GH#56
   * Improved handling of non ASCII-7bit compatible characters in links (only
-    an issue on ruby 1.8).  GH #36
+    an issue on ruby 1.8).  GH #36, GH #75
   * Loading cookies.txt is faster.  GH #38
   * Mechanize no longer sends cookies for a.b.example to axb.example.  GH #41
   * Mechanize no longer sends the button name as a form field for image

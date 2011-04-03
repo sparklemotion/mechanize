@@ -47,13 +47,13 @@ class Mechanize
 
     # Returns whether or not the form contains a field with +field_name+
     def has_field?(field_name)
-      ! fields.find { |f| f.name.eql? field_name }.nil?
+      fields.find { |f| f.name == field_name }
     end
 
     alias :has_key? :has_field?
 
     def has_value?(value)
-      ! fields.find { |f| f.value.eql? value }.nil?
+      fields.find { |f| f.value == value }
     end
 
     def keys; fields.map { |f| f.name }; end
@@ -66,11 +66,11 @@ class Mechanize
     def hiddens  ; @hiddens   ||=  fields.select { |f| f.class == Hidden   }; end
     def textareas; @textareas ||=  fields.select { |f| f.class == Textarea }; end
 
-    def submit_button?(button_name) !!  submits.find{|f| f.name == button_name}; end
-    def reset_button?(button_name)  !!   resets.find{|f| f.name == button_name}; end
-    def text_field?(field_name)     !!    texts.find{|f| f.name == field_name}; end
-    def hidden_field?(field_name)   !!  hiddens.find{|f| f.name == field_name}; end
-    def textarea_field?(field_name) !!textareas.find{|f| f.name == field_name}; end
+    def submit_button?(button_name)   submits.find{|f| f.name == button_name}; end
+    def reset_button?(button_name)     resets.find{|f| f.name == button_name}; end
+    def text_field?(field_name)         texts.find{|f| f.name == field_name}; end
+    def hidden_field?(field_name)     hiddens.find{|f| f.name == field_name}; end
+    def textarea_field?(field_name) textareas.find{|f| f.name == field_name}; end
 
     # This method is a shortcut to get form's DOM id.
     # Common usage:
@@ -105,8 +105,8 @@ class Mechanize
           value = nil
           index = 0
           [v].flatten.each do |val|
-            index = val.to_i unless value.nil?
-            value = val if value.nil?
+            index = val.to_i if value
+            value = val unless value
           end
           self.fields_with(:name => k.to_s).[](index).value = value
         end
@@ -128,10 +128,10 @@ class Mechanize
     #  form['name'] = 'Aaron'
     def []=(field_name, value)
       f = field(field_name)
-      if f.nil?
-        add_field!(field_name, value)
-      else
+      if f
         f.value = value
+      else
+        add_field!(field_name, value)
       end
     end
 
@@ -234,12 +234,12 @@ class Mechanize
       when /^multipart\/form-data/
         boundary = rand_string(20)
         @enctype = "multipart/form-data; boundary=#{boundary}"
-        params = []
-        query_params.each do |k,v|
-          params << param_to_multipart(k, v) unless k.nil?
-        end
 
-        @file_uploads.each { |f| params << file_to_multipart(f) }
+        params = query_params.map do |k,v|
+          param_to_multipart(k, v) if k
+        end.compact
+
+        params.concat @file_uploads.map { |f| file_to_multipart(f) }
 
         params.map do |part|
           part.force_encoding('ASCII-8BIT') if part.respond_to? :force_encoding
@@ -377,7 +377,7 @@ class Mechanize
       form_node.search('input').each do |node|
         type = (node['type'] || 'text').downcase
         name = node['name']
-        next if name.nil? && !(type == 'submit' || type =='button' || type == 'image')
+        next if name.nil? && !%w[submit button image].include?(type)
         case type
         when 'radio'
           @radiobuttons << RadioButton.new(node, self)
@@ -406,13 +406,13 @@ class Mechanize
 
       # Find all textarea tags
       form_node.search('textarea').each do |node|
-        next if node['name'].nil?
+        next unless node['name']
         @fields << Field.new(node, node.inner_text)
       end
 
       # Find all select tags
       form_node.search('select').each do |node|
-        next if node['name'].nil?
+        next unless node['name']
         if node.has_attribute? 'multiple'
           @fields << MultiSelectList.new(node)
         else
@@ -453,13 +453,14 @@ class Mechanize
         "filename=\"#{mime_value_quote(file_name)}\"\r\n" +
         "Content-Transfer-Encoding: binary\r\n"
 
-      if file.file_data.nil? and ! file.file_name.nil?
-        file.file_data = ::File.open(file.file_name, "rb") { |f| f.read }
-        file.mime_type = WEBrick::HTTPUtils.mime_type(file.file_name,
-                                                      WEBrick::HTTPUtils::DefaultMimeTypes)
+      if file.file_data.nil? and file.file_name
+        file.file_data = open(file.file_name, "rb") { |f| f.read }
+        file.mime_type =
+          WEBrick::HTTPUtils.mime_type(file.file_name,
+                                       WEBrick::HTTPUtils::DefaultMimeTypes)
       end
 
-      if file.mime_type != nil
+      if file.mime_type
         body << "Content-Type: #{file.mime_type}\r\n"
       end
 

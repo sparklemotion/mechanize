@@ -572,10 +572,10 @@ class FormsMechTest < Test::Unit::TestCase
     form = page.form_with(:name => 'post_form')
 
     assert_not_nil(form)
-    assert_equal(false, form.has_field?('intarweb'))
+    assert(!form.has_field?('intarweb'))
     f = form.add_field!('intarweb')
     assert_not_nil(f)
-    assert_equal(true, form.has_field?('intarweb'))
+    assert(form.has_field?('intarweb'))
   end
 
   def test_field_error

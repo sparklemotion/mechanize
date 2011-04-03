@@ -46,13 +46,13 @@ class TestFormHash < Test::Unit::TestCase
     form = @page.forms.first
 
     assert_not_nil(form)
-    assert_equal(false, form.has_field?('name'))
-    assert_equal(false, form.has_value?('Aaron'))
+    assert(!form.has_field?('name'))
+    assert(!form.has_value?('Aaron'))
     assert_equal(0, form.keys.length)
     assert_equal(0, form.values.length)
     form['name'] = 'Aaron'
-    assert_equal(true, form.has_field?('name'))
-    assert_equal(true, form.has_value?('Aaron'))
+    assert(form.has_field?('name'))
+    assert(form.has_value?('Aaron'))
     assert_equal(1, form.keys.length)
     assert_equal(['name'], form.keys)
     assert_equal(1, form.values.length)

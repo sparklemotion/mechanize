@@ -5,7 +5,7 @@ class Mechanize
   # This class is used to represent an HTTP Cookie.
   class Cookie < WEBrick::Cookie
     def self.parse(uri, str, log = Mechanize.log)
-      return str.split(/,(?=[^;,]*=)|,$/).collect { |c|
+      return str.split(/,(?=[^;,]*=)|,$/).map { |c|
         cookie_elem = c.split(/;+/)
         first_elem = cookie_elem.shift
         first_elem.strip!
@@ -60,6 +60,8 @@ class Mechanize
         cookie.domain  ||= uri.host
         # Move this in to the cookie jar
         yield cookie if block_given?
+
+        cookie
       }
     end
 

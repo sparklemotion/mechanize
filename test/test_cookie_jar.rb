@@ -176,6 +176,14 @@ class CookieJarTest < Test::Unit::TestCase
   end
 
   def test_cookies_dot
+    url = URI.parse('http://www.host.example/')
+
+    cookie = cookie_from_hash(cookie_values)
+    @jar.add(url,
+             cookie_from_hash(cookie_values(:domain => 'www.host.example')))
+
+    url = URI.parse('http://wwwxhost.example/')
+    assert_equal(0, @jar.cookies(url).length)
   end
 
   def test_clear_bang

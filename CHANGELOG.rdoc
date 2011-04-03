@@ -44,6 +44,7 @@
   * Improved handling of non ASCII-7bit compatible characters in links (only
     an issue on ruby 1.8).  GH #36
   * Loading cookies.txt is faster.  GH #38
+  * Mechanize no longer sends cookies for a.b.example to axb.example.  GH #41
 
 === 1.0.0
 

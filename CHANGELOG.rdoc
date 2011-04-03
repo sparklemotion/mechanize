@@ -45,6 +45,8 @@
     an issue on ruby 1.8).  GH #36
   * Loading cookies.txt is faster.  GH #38
   * Mechanize no longer sends cookies for a.b.example to axb.example.  GH #41
+  * Mechanize no longer sends the button name as a form field for image
+    buttons.  GH #45
 
 === 1.0.0
 

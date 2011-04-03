@@ -271,7 +271,7 @@ class FormsMechTest < Test::Unit::TestCase
     page = @agent.submit(get_form, get_form.buttons.first)
 
     # Check that the submitted fields exist
-    assert_equal(7, page.links.size, "Not enough links")
+    assert_equal(6, page.links.size, "Not enough links")
     assert_not_nil(
       page.links.find { |l| l.text == "likes ham:on" },
       "likes ham check box missing"
@@ -294,10 +294,6 @@ class FormsMechTest < Test::Unit::TestCase
     )
     assert_not_nil(
       page.links.find { |l| l.text == "button.x:9" },
-      "Image button missing"
-    )
-    assert_not_nil(
-      page.links.find { |l| l.text == "button:button" },
       "Image button missing"
     )
   end

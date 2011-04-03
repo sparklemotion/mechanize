@@ -12,9 +12,8 @@ class Mechanize
       end
 
       def query_value
-        super <<
-          [@name + ".x", (@x || 0).to_s] <<
-          [@name + ".y", (@y || 0).to_s]
+        [["#{@name}.x", (@x || 0).to_s],
+         ["#{@name}.y", (@y || 0).to_s]]
       end
     end
   end

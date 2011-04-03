@@ -62,13 +62,13 @@ class Mechanize::CookieJar
   end
 
   def to_a
-    cookies = []
-    @jar.each do |domain, paths|
-      paths.each do |path, names|
-        cookies << names.values
+    cleanup
+
+    @jar.map do |domain, paths|
+      paths.map do |path, names|
+        names.values
       end
-    end
-    cookies.flatten
+    end.flatten
   end
 
   # Save the cookie jar to a file in the format specified.

@@ -36,6 +36,7 @@
   * Fix handling of Meta Refresh with relative paths.  GH #39
   * Mechanize::CookieJar now supports RFC 2109 correctly.  GH #85
   * Fixed typo in EXAMPLES.rdoc.  GH #74
+  * The base element is now handled correctly for images.  GH #72
 
 === 1.0.0
 

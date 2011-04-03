@@ -15,6 +15,13 @@ class PostForm < Test::Unit::TestCase
     )
   end
 
+  def test_post_form_json
+    page = @agent.post "http://localhost/form_post",
+                       'json' => '["&quot;"]'
+
+    assert page.links.find { |l| l.text == 'json:["""]' }
+  end
+
   def test_post_form_multival
     page = @agent.post("http://localhost/form_post",
                        [ ['gender', 'female'],

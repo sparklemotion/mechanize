@@ -390,7 +390,8 @@ class Mechanize
     node['enctype'] = 'application/x-www-form-urlencoded'
 
     form = Form.new(node)
-    query.each { |k,v|
+
+    query.each { |k, v|
       if v.is_a?(IO)
         form.enctype = 'multipart/form-data'
         ul = Form::FileUpload.new({'name' => k.to_s},::File.basename(v.path))

@@ -65,14 +65,23 @@ class Mechanize
     'iPhone' => 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1C28 Safari/419.3',
     'Mechanize' => "WWW-Mechanize/#{VERSION} (http://rubyforge.org/projects/mechanize/)"
   }
-
+  #A Mechanize::CookieJar, which is used to keep track of cookies received
   attr_accessor :cookie_jar
-  attr_accessor :open_timeout, :read_timeout
+  #Length of time to wait until a connection is opened in seconds
+  attr_accessor :open_timeout
+  #Length of time to attempt to read data from the server
+  attr_accessor  :read_timeout
+  #The identification string for the client initiating a web request
   attr_accessor :user_agent
+  #? seems to be something to do with page parsing
   attr_accessor :watch_for_set
+  #Path to an OpenSSL server certificate file
   attr_accessor :ca_file
+  #Path to an OpenSSL Private Key
   attr_accessor :key
+  #Path to an OpenSSL client certificate file
   attr_accessor :cert
+  #OpenSSL password
   attr_accessor :pass
 
   # Controls how this agent deals with redirects.  If it is set to
@@ -82,12 +91,19 @@ class Mechanize
   # redirects are followed.
   attr_accessor :redirect_ok
 
+  #Boolean: True to enable gzip (compression and decompression?) of (retrieved?) page
   attr_accessor :gzip_enabled
+  #Time to keep alive the connection (seconds?)
   attr_accessor :keep_alive_time
+  #Boolean: True to keep alive the connection to the server
   attr_accessor :keep_alive
+  #Boolean: True to allow conditional gets -- see RFC2616 for details
   attr_accessor :conditional_requests
+  #Boolean: --what does this do relative to meta refreshing? Beyond, keep note of http://www.w3.org/TR/WCAG10-CORE-TECHS/#auto-page-refresh
   attr_accessor :follow_meta_refresh
+  #what type? Specifies the mode and function for ssl verification.
   attr_accessor :verify_callback
+  
   attr_accessor :history_added
   attr_accessor :scheme_handlers
   attr_accessor :redirection_limit
@@ -146,6 +162,7 @@ class Mechanize
     # callback for OpenSSL errors while verifying the server certificate
     # chain, can be used for debugging or to ignore errors by always
     # returning _true_
+    # specifying nil uses the default method that was valid when the SSL was created
     @verify_callback = nil
     @cert           = nil # OpenSSL Certificate
     @key            = nil # OpenSSL Private Key

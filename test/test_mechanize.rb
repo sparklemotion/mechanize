@@ -10,6 +10,12 @@ class TestMechanize < Test::Unit::TestCase
     @res = Net::HTTPResponse.allocate
     def @res.code() 200 end
     @res.instance_variable_set :@header, {}
+
+    @headers = if RUBY_VERSION > '1.9' then
+                 %w[accept user-agent]
+               else
+                 %w[accept]
+               end
   end
 
   def test_connection_for_file
@@ -162,7 +168,7 @@ class TestMechanize < Test::Unit::TestCase
   def test_request_add_headers_none
     @agent.request_add_headers @req
 
-    assert_equal %w[accept user-agent], @req.to_hash.keys.sort
+    assert_equal @headers, @req.to_hash.keys.sort
   end
 
   def test_request_add_headers_request_headers
@@ -170,7 +176,7 @@ class TestMechanize < Test::Unit::TestCase
 
     @agent.request_add_headers @req
 
-    assert_equal %w[accept user-agent x-foo], @req.to_hash.keys.sort
+    assert_equal @headers + %w[x-foo], @req.to_hash.keys.sort
   end
 
   def test_request_add_headers_symbol

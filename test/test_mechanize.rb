@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'helper'
 
 class TestMechanize < Test::Unit::TestCase
@@ -399,6 +401,26 @@ class TestMechanize < Test::Unit::TestCase
     end
 
     assert_equal 'Unsupported Content-Encoding: unknown', e.message
+  end
+
+  def test_response_read_file
+    Tempfile.open 'pi.txt' do |tempfile|
+      tempfile.write "π\n"
+      tempfile.flush
+      tempfile.rewind
+
+      uri = URI.parse "file://#{tempfile.path}"
+      req = Mechanize::FileRequest.new uri
+      res = Mechanize::FileResponse.new tempfile.path
+
+      body = @agent.response_read res, req
+
+      expected = "π\n"
+      expected.force_encoding Encoding::BINARY if expected.respond_to? :encoding
+
+      assert_equal expected, body
+      assert_equal Encoding::BINARY, body.encoding if body.respond_to? :encoding
+    end
   end
 
   def test_response_read_no_body

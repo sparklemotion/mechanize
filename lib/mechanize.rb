@@ -652,6 +652,8 @@ class Mechanize
 
   def response_read response, request
     body = StringIO.new
+    body.set_encoding Encoding::BINARY, Encoding::BINARY if
+      body.respond_to? :set_encoding
     total = 0
 
     response.read_body { |part|
@@ -674,6 +676,8 @@ class Mechanize
     end
 
     case response['Content-Encoding']
+    when nil, 'none', '7bit', 'x-gzip' then
+      body.string
     when 'gzip' then
       Mechanize.log.debug('gunzip body') if Mechanize.log
 
@@ -694,8 +698,6 @@ class Mechanize
           zio.close if zio and not zio.closed?
         end
       end
-    when nil, 'none', '7bit', 'x-gzip' then
-      body.read
     else
       raise Mechanize::Error,
             "Unsupported Content-Encoding: #{response['Content-Encoding']}"

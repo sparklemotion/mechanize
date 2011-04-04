@@ -11,7 +11,9 @@ class Mechanize::FileResponse
       if directory?
         yield dir_body
       else
-        yield File.read(@file_path)
+        open @file_path, 'rb' do |io|
+          yield io.read
+        end
       end
     else
       yield ''
@@ -46,15 +48,21 @@ class Mechanize::FileResponse
   end
 
   private
+
   def dir_body
-    '<html><body>' +
-      Dir[::File.join(@file_path, '*')].map { |f|
-      "<a href=\"file://#{f}\">#{::File.basename(f)}</a>"
-    }.join("\n") + '</body></html>'
+    body = %w[<html><body>]
+    body.concat Dir[File.join(@file_path, '*')].map { |f|
+      "<a href=\"file://#{f}\">#{File.basename(f)}</a>"
+    }
+    body << %w[</body></html>]
+
+    body = body.join "\n"
+    body.force_encoding Encoding::BINARY if body.respond_to? :force_encoding
+    body
   end
 
   def directory?
-    ::File.directory?(@file_path)
+    File.directory?(@file_path)
   end
 end
 

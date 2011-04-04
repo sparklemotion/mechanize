@@ -3,6 +3,8 @@ require 'rubygems'
 require 'mechanize'
 require 'webrick/httputils'
 require 'servlets'
+require 'tmpdir'
+require 'tempfile'
 
 BASE_DIR = File.dirname(__FILE__)
 

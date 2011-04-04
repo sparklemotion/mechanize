@@ -51,6 +51,7 @@
   * Blank cookie values are now skipped.  GH #80
   * Mechanize now adds a '.' to cookie domains if no '.' was sent.  This is
     not allowed by RFC 2109 but does appear in RFC 2965.  GH #86
+  * file URIs are now read in binary mode.  GH #83
 
 === 1.0.0
 

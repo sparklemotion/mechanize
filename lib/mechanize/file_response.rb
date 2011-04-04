@@ -7,11 +7,11 @@ class Mechanize::FileResponse
   end
 
   def read_body
-    if ::File.exists?(@file_path)
+    if File.exist?(@file_path)
       if directory?
         yield dir_body
       else
-        yield ::File.read(@file_path)
+        yield File.read(@file_path)
       end
     else
       yield ''
@@ -19,12 +19,12 @@ class Mechanize::FileResponse
   end
 
   def code
-    ::File.exists?(@file_path) ? 200 : 400
+    File.exist?(@file_path) ? 200 : 400
   end
 
   def content_length
     return dir_body.length if directory?
-    ::File.exists?(@file_path) ? ::File.stat(@file_path).size : 0
+    File.exist?(@file_path) ? File.stat(@file_path).size : 0
   end
 
   def each_header; end

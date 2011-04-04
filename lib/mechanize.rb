@@ -499,18 +499,7 @@ class Mechanize
 
       request
     when 'file' then
-      request = Struct.new(:uri).new(uri) # HACK make a class
-
-      class << request
-        def add_field(*args); end
-        alias :[]= :add_field
-        def path
-          uri.path
-        end
-        def each_header; end
-      end
-
-      request
+      Mechanize::FileRequest.new uri
     end
   end
 
@@ -891,4 +880,5 @@ require 'mechanize/unsupported_scheme_error'
 require 'mechanize/redirect_limit_reached_error'
 require 'mechanize/redirect_not_get_or_head_error'
 require 'mechanize/file_connection'
+require 'mechanize/file_request'
 

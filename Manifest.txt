@@ -108,8 +108,6 @@ test/test_bad_links.rb
 test/test_blank_form.rb
 test/test_checkboxes.rb
 test/test_content_type.rb
-test/test_cookie_class.rb
-test/test_cookie_jar.rb
 test/test_cookies.rb
 test/test_encoded_links.rb
 test/test_errors.rb
@@ -134,14 +132,16 @@ test/test_links.rb
 test/test_mech.rb
 test/test_mech_proxy.rb
 test/test_mechanize.rb
+test/test_mechanize_cookie.rb
+test/test_mechanize_cookie_jar.rb
 test/test_mechanize_file.rb
 test/test_mechanize_form_image_button.rb
+test/test_mechanize_page.rb
 test/test_mechanize_uri_resolver.rb
 test/test_meta.rb
 test/test_multi_select.rb
 test/test_no_attributes.rb
 test/test_option.rb
-test/test_page.rb
 test/test_pluggable_parser.rb
 test/test_post_form.rb
 test/test_pretty_print.rb

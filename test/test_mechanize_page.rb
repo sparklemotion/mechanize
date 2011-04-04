@@ -2,7 +2,7 @@ require "helper"
 
 require 'cgi'
 
-class TestPage < Test::Unit::TestCase
+class TestMechanizePage < Test::Unit::TestCase
   def setup
     @agent = Mechanize.new
   end

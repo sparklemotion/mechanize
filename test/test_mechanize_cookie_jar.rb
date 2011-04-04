@@ -1,7 +1,7 @@
 require 'helper'
 require 'tmpdir'
 
-class CookieJarTest < Test::Unit::TestCase
+class TestMechanizeCookieJar < Test::Unit::TestCase
 
   def setup
     @jar = Mechanize::CookieJar.new

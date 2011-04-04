@@ -17,7 +17,7 @@ module Enumerable
   end
 end
 
-class CookieClassTest < Test::Unit::TestCase
+class TestMechanizeCookie < Test::Unit::TestCase
   def silently
     warn_level = $VERBOSE
     $VERBOSE = false

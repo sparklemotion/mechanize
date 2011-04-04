@@ -10,8 +10,8 @@ class TestMechanizeFileRequest < Test::Unit::TestCase
     assert_equal uri, r.uri
     assert_equal '/', r.path
 
-    assert_respond_to r, :add_field
     assert_respond_to r, :[]=
+    assert_respond_to r, :add_field
     assert_respond_to r, :each_header
   end
 

@@ -45,16 +45,24 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal 'identity', @req['accept-encoding']
   end
 
+  def test_http_request_file
+    uri = URI.parse 'file:///nonexistent'
+    request = @agent.http_request uri, :get
+
+    assert_kind_of Mechanize::FileRequest, request
+    assert_equal '/nonexistent', request.path
+  end
+
   def test_http_request_get
     request = @agent.http_request @uri, :get
-    
+
     assert_kind_of Net::HTTP::Get, request
     assert_equal '/', request.path
   end
 
   def test_http_request_post
     request = @agent.http_request @uri, :post
-    
+
     assert_kind_of Net::HTTP::Post, request
     assert_equal '/', request.path
   end

@@ -121,6 +121,36 @@ class TestMechanizeCookie < Test::Unit::TestCase
     end
   end
 
+  def test_parse_domain_dot
+    url = URI.parse('http://host.example.com/')
+
+    cookie_str = 'a=b; domain=.example.com'
+
+    cookie = Mechanize::Cookie.parse(url, cookie_str).first
+
+    assert_equal '.example.com', cookie.domain
+  end
+
+  def test_parse_domain_no_dot
+    url = URI.parse('http://host.example.com/')
+
+    cookie_str = 'a=b; domain=example.com'
+
+    cookie = Mechanize::Cookie.parse(url, cookie_str).first
+
+    assert_equal '.example.com', cookie.domain
+  end
+
+  def test_parse_domain_none
+    url = URI.parse('http://example.com/')
+
+    cookie_str = 'a=b;'
+
+    cookie = Mechanize::Cookie.parse(url, cookie_str).first
+
+    assert_equal 'example.com', cookie.domain
+  end
+
   def test_parse_expires_session
     cookie = 'PRETANET=TGIAqbFXtt; Name=/PRETANET; Path=/; Max-Age=1.2; Content-type=text/html; Domain=192.168.6.196; expires=;'
 
@@ -156,7 +186,6 @@ class TestMechanizeCookie < Test::Unit::TestCase
       assert_not_nil(cookie)
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('/', cookie.path)
-      assert_equal('rubyforge.org', cookie.domain)
 
       # if expires was set, make sure we parsed it
       if c.find { |k| k == 'expires' }
@@ -193,7 +222,6 @@ class TestMechanizeCookie < Test::Unit::TestCase
       assert_equal('12345%7D=', cookie.to_s)
       assert_equal('', cookie.value)
       assert_equal('/', cookie.path)
-      assert_equal('rubyforge.org', cookie.domain)
 
       # if expires was set, make sure we parsed it
       if c.find { |k| k == 'expires' }
@@ -230,7 +258,6 @@ class TestMechanizeCookie < Test::Unit::TestCase
       Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
       assert_not_nil(cookie)
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
-      assert_equal('rubyforge.org', cookie.domain)
       assert_equal('/', cookie.path)
 
       # if expires was set, make sure we parsed it
@@ -268,48 +295,8 @@ class TestMechanizeCookie < Test::Unit::TestCase
       Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
       assert_not_nil(cookie)
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
-      assert_equal('rubyforge.org', cookie.domain)
       assert_equal('/', cookie.path)
       assert_equal(true, cookie.secure)
-
-      # if expires was set, make sure we parsed it
-      if c.find { |k| k == 'expires' }
-        assert_equal(expires, cookie.expires)
-      else
-        assert_nil(cookie.expires)
-      end
-    end
-  end
-
-  # If no domain was given, we must use the one from the URL
-  def test_cookie_with_url_domain
-    url = URI.parse('http://login.rubyforge.org/')
-    cookie_params = {}
-    cookie_params['expires']   = 'expires=Sun, 27-Sep-2037 00:00:00 GMT'
-    cookie_params['path']      = 'path=/'
-    cookie_params['domain']    = 'domain=.rubyforge.org'
-    cookie_params['httponly']  = 'HttpOnly'
-    cookie_value = '12345%7D=ASDFWEE345%3DASda'
-
-    expires = Time.parse('Sun, 27-Sep-2037 00:00:00 GMT')
-    
-    cookie_params.keys.combine.each do |c|
-      next if c.find { |k| k == 'domain' }
-      cookie_text = "#{cookie_value}; "
-      c.each_with_index do |key, idx|
-        if idx == (c.length - 1)
-          cookie_text << "#{cookie_params[key]}"
-        else
-          cookie_text << "#{cookie_params[key]}; "
-        end
-      end
-      cookie = nil
-      Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
-      assert_not_nil(cookie)
-      assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
-      assert_equal('/', cookie.path)
-
-      assert_equal('login.rubyforge.org', cookie.domain)
 
       # if expires was set, make sure we parsed it
       if c.find { |k| k == 'expires' }
@@ -345,7 +332,6 @@ class TestMechanizeCookie < Test::Unit::TestCase
       assert_not_nil(cookie)
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('/', cookie.path)
-      assert_equal('rubyforge.org', cookie.domain)
 
       # if expires was set, make sure we parsed it
       if c.find { |k| k == 'expires' }

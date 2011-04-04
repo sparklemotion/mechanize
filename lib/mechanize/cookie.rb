@@ -29,8 +29,11 @@ class Mechanize::Cookie < WEBrick::Cookie
         value = WEBrick::HTTPUtils.dequote(value.strip) if value
 
         case key.downcase
-        when "domain"  then cookie.domain  = value.sub(/^\./, '')
-        when "path"    then cookie.path    = value
+        when "domain" then
+          value = ".#{value}" unless value =~ /^\./
+          cookie.domain = value
+        when "path" then
+          cookie.path = value
         when 'expires'
           if value.empty? then
             cookie.session = true

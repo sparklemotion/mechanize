@@ -49,6 +49,8 @@
   * Mechanize no longer sends the button name as a form field for image
     buttons.  GH #45
   * Blank cookie values are now skipped.  GH #80
+  * Mechanize now adds a '.' to cookie domains if no '.' was sent.  This is
+    not allowed by RFC 2109 but does appear in RFC 2965.  GH #86
 
 === 1.0.0
 

@@ -190,11 +190,19 @@ class Mechanize::CookieJar
 
     # reject cookies whose domains do not contain an embedded dot
     # cookies for localhost and .local. are exempt from this rule
-    return false if cookie_domain !~ /.\../ && cookie_domain !~ /(localhost|\.?local)\.?$/
+    return false if
+      cookie_domain !~ /.\../ && cookie_domain !~ /(localhost|\.?local)\.?$/
 
-    # Permitted:     A Set-Cookie from request-host x.foo.com for Domain=.foo.com
-    # Not Permitted: A Set-Cookie from request-host y.x.foo.com for Domain=.foo.com because y.x contains a dot
-    # Not Permitted: A Set-Cookie from request-host foo.com for Domain=.bar.com
+    cookie_domain = if cookie_domain.start_with? '.' then
+                      ".?#{Regexp.escape cookie_domain[1..-1]}"
+                    else
+                      Regexp.escape cookie_domain
+                    end
+
+    # Permitted:     A Set-Cookie for x.foo.com for Domain=.foo.com
+    # Not Permitted: A Set-Cookie for y.x.foo.com for Domain=.foo.com because
+    #                y.x contains a dot
+    # Not Permitted: A Set-Cookie for foo.com for Domain=.bar.com
     match = uri.host.match(/#{cookie_domain}/i)
     return false if match.nil? || match.pre_match =~ /.\../
 

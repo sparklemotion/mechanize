@@ -22,8 +22,7 @@ class TestMechanize < Test::Unit::TestCase
     uri = URI.parse 'file:///nonexistent'
     conn = @agent.connection_for uri
 
-    assert_instance_of Object, conn
-    assert_respond_to conn, :request
+    assert_equal Mechanize::FileConnection.new, conn
   end
 
   def test_connection_for_http

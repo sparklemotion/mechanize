@@ -16,6 +16,7 @@ lib/mechanize/content_type_error.rb
 lib/mechanize/cookie.rb
 lib/mechanize/cookie_jar.rb
 lib/mechanize/file.rb
+lib/mechanize/file_connection.rb
 lib/mechanize/file_response.rb
 lib/mechanize/file_saver.rb
 lib/mechanize/form.rb
@@ -135,6 +136,7 @@ test/test_mechanize.rb
 test/test_mechanize_cookie.rb
 test/test_mechanize_cookie_jar.rb
 test/test_mechanize_file.rb
+test/test_mechanize_file_response.rb
 test/test_mechanize_form_image_button.rb
 test/test_mechanize_page.rb
 test/test_mechanize_uri_resolver.rb

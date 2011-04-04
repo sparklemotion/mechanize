@@ -20,14 +20,15 @@ class Mechanize
         rescue
           log.warn("Couldn't parse key/value: #{first_elem}") if log
         end
+
         next unless cookie
 
         cookie_elem.each do |pair|
           pair.strip!
           key, value = pair.split(/\=/, 2)
-          if value
-            value = WEBrick::HTTPUtils.dequote(value.strip)
-          end
+          next unless key
+          value = WEBrick::HTTPUtils.dequote(value.strip) if value
+
           case key.downcase
           when "domain"  then cookie.domain  = value.sub(/^\./, '')
           when "path"    then cookie.path    = value

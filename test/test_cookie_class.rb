@@ -59,6 +59,17 @@ class CookieClassTest < Test::Unit::TestCase
     end
   end
 
+  def test_parse_empty
+    cookie_str = 'a=b; ; c=d'
+
+    uri = URI.parse 'http://example'
+
+    Mechanize::Cookie.parse uri, cookie_str do |cookie|
+      assert_equal 'a', cookie.name
+      assert_equal 'b', cookie.value
+    end
+  end
+
   def test_parse_weird_cookie
     cookie = 'n/a, ASPSESSIONIDCSRRQDQR=FBLDGHPBNDJCPCGNCPAENELB; path=/'
     url = URI.parse('http://www.searchinnovation.com/')

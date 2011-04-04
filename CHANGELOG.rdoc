@@ -48,6 +48,7 @@
   * Mechanize no longer sends cookies for a.b.example to axb.example.  GH #41
   * Mechanize no longer sends the button name as a form field for image
     buttons.  GH #45
+  * Blank cookie values are now skipped.  GH #80
 
 === 1.0.0
 

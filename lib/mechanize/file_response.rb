@@ -47,6 +47,14 @@ class Mechanize::FileResponse
     []
   end
 
+  def http_version
+    '0'
+  end
+
+  def message
+    File.exist?(@file_path) ? 'OK' : 'Bad Request'
+  end
+
   private
 
   def dir_body

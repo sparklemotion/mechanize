@@ -138,4 +138,8 @@ class Response
   def read_body
     yield body
   end
+
+  def message
+    ''
+  end
 end

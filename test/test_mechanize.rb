@@ -36,7 +36,7 @@ class TestMechanize < Test::Unit::TestCase
   def test_enable_gzip
     @agent.enable_gzip @req
 
-    assert_equal 'gzip,identity', @req['accept-encoding']
+    assert_equal 'gzip,deflate,identity', @req['accept-encoding']
   end
 
   def test_enable_gzip_no
@@ -350,6 +350,31 @@ class TestMechanize < Test::Unit::TestCase
     def @res.read_body() yield 'part' end
     def @res.content_length() 4 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[7bit]
+
+    body = @agent.response_read @res, @req
+
+    assert_equal 'part', body
+  end
+
+  def test_response_read_encoding_deflate
+    def @res.read_body()
+      yield "x\x9C+H,*\x01\x00\x04?\x01\xB8"
+    end
+    def @res.content_length() 12 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
+
+    body = @agent.response_read @res, @req
+
+    assert_equal 'part', body
+  end
+
+  # IIS/6.0 ASP.NET/2.0.50727 does not wrap deflate with zlib, WTF?
+  def test_response_read_encoding_deflate_no_zlib
+    def @res.read_body()
+      yield "+H,*\001\000"
+    end
+    def @res.content_length() 6 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
 
     body = @agent.response_read @res, @req
 

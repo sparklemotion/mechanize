@@ -481,7 +481,7 @@ class Mechanize
 
   def enable_gzip request
     request['accept-encoding'] = if @gzip_enabled
-                                   'gzip,identity'
+                                   'gzip,deflate,identity'
                                  else
                                    'identity'
                                  end
@@ -613,7 +613,7 @@ class Mechanize
     if Mechanize::Page === page and page.body =~ /Set-Cookie/n
       page.search('//head/meta[@http-equiv="Set-Cookie"]').each do |meta|
         Mechanize::Cookie.parse(uri, meta['content']) { |c|
-          Mechanize.log.debug("saved cookie: #{c}") if Mechanize.log
+          log.debug("saved cookie: #{c}") if log
           @cookie_jar.add(uri, c)
         }
       end
@@ -625,7 +625,7 @@ class Mechanize
 
     header_cookies.each do |cookie|
       Mechanize::Cookie.parse(uri, cookie) { |c|
-        Mechanize.log.debug("saved cookie: #{c}") if Mechanize.log
+        log.debug("saved cookie: #{c}") if log
         @cookie_jar.add(uri, c)
       }
     end
@@ -659,7 +659,7 @@ class Mechanize
     response.read_body { |part|
       total += part.length
       body.write(part)
-      Mechanize.log.debug("Read #{total} bytes") if Mechanize.log
+      log.debug("Read #{total} bytes") if log
     }
 
     body.rewind
@@ -678,21 +678,36 @@ class Mechanize
     case response['Content-Encoding']
     when nil, 'none', '7bit' then
       body.string
+    when 'deflate' then
+      log.debug('deflate body') if log
+
+      if content_length > 0 or body.length > 0 then
+        begin
+            Zlib::Inflate.inflate body.string
+        rescue Zlib::BufError, Zlib::DataError
+          log.error('Unable to inflate page, retrying with raw deflate') if log
+          begin
+            Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body.string)
+          rescue Zlib::BufError, Zlib::DataError
+            log.error("unable to inflate page: #{$!}") if log
+            ''
+          end
+        end
+      end
     when 'gzip', 'x-gzip' then
-      Mechanize.log.debug('gunzip body') if Mechanize.log
+      log.debug('gzip body') if log
 
       if content_length > 0 or body.length > 0 then
         begin
           zio = Zlib::GzipReader.new body
           zio.read
         rescue Zlib::BufError, Zlib::GzipFile::Error
-          Mechanize.log.error('Caught a Zlib::BufError') if Mechanize.log
+          log.error('Unable to gunzip body, trying raw inflate') if log
           body.rewind
           body.read 10
           Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body.read)
         rescue Zlib::DataError
-          Mechanize.log.error("Caught a Zlib::DataError, " \
-                              "unable to decode page: #{$!}") if Mechanize.log
+          log.error("unable to gunzip page: #{$!}") if log
           ''
         ensure
           zio.close if zio and not zio.closed?
@@ -779,7 +794,7 @@ class Mechanize
     connection.read_timeout = @read_timeout if @read_timeout
 
     # Log specified headers for the request
-    log.info("#{ request.class }: #{ request.path }") if log
+    log.info("#{request.class}: #{request.path}") if log
     request.each_header do |k, v|
       log.debug("request-header: #{ k } => #{ v }")
     end if log
@@ -788,6 +803,13 @@ class Mechanize
 
     # Send the request
     response = connection.request(uri, request) { |res|
+      log.info("status: #{res.class} #{res.http_version} #{res.code} " \
+               "#{res.message}") if log
+
+      res.each_header do |k, v|
+        log.debug("response-header: #{ k } => #{ v }")
+      end if log
+
       response_body = response_read res, request
 
       res
@@ -800,8 +822,6 @@ class Mechanize
     response_cookies response, uri, page
 
     res_klass = Net::HTTPResponse::CODE_TO_OBJ[response.code.to_s]
-
-    log.info("status: #{ page.code }") if log
 
     if follow_meta_refresh
       redirect_uri  = nil

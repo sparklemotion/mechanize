@@ -302,6 +302,24 @@ class TestMechanize < Test::Unit::TestCase
                  @agent.cookie_jar.cookies(uri).map { |c| c.to_s }
   end
 
+  def test_response_follow_meta_refresh
+    uri = URI.parse 'http://example/#id'
+
+    body = <<-BODY
+<title></title>
+<meta http-equiv="refresh" content="0">
+    BODY
+
+    page = Mechanize::Page.new(uri, {'content-type' => 'text/html'}, body,
+                               200, @agent)
+
+    @agent.follow_meta_refresh = true
+
+    page = @agent.response_follow_meta_refresh @res, uri, page, 0
+
+    assert_equal uri, page.uri
+  end
+
   def test_response_read
     def @res.read_body() yield 'part' end
     def @res.content_length() 4 end

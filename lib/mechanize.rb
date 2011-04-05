@@ -631,6 +631,30 @@ class Mechanize
     end
   end
 
+  def response_follow_meta_refresh response, uri, page, redirects
+    return unless @follow_meta_refresh
+
+    redirect_uri  = nil
+    referer       = page
+
+    if page.respond_to?(:meta) and (redirect = page.meta.first)
+      redirect_uri = redirect.uri.to_s
+      sleep redirect.node['delay'].to_f
+      referer = Page.new(nil, {'content-type'=>'text/html'})
+    elsif refresh = response['refresh']
+      delay, redirect_uri = Page::Meta.parse(refresh, uri)
+      raise Mechanize::Error, 'Invalid refresh http header' unless delay
+      raise RedirectLimitReachedError.new(page, redirects) if
+        redirects + 1 > redirection_limit
+      sleep delay.to_f
+    end
+
+    if redirect_uri
+      @history.push(page, page.uri)
+      fetch_page(redirect_uri, :get, {}, [], referer, redirects + 1)
+    end
+  end
+
   def response_parse response, body, uri
     content_type = nil
 
@@ -823,28 +847,8 @@ class Mechanize
 
     res_klass = Net::HTTPResponse::CODE_TO_OBJ[response.code.to_s]
 
-    if follow_meta_refresh
-      redirect_uri  = nil
-      referer       = page
-
-      if page.respond_to?(:meta) and (redirect = page.meta.first)
-        redirect_uri = redirect.uri.to_s
-        sleep redirect.node['delay'].to_f
-        referer = Page.new(nil, {'content-type'=>'text/html'})
-      elsif refresh = response['refresh']
-        delay, redirect_uri = Page::Meta.parse(refresh, uri)
-        raise StandardError, "Invalid refresh http header" unless delay
-        if redirects + 1 > redirection_limit
-          raise RedirectLimitReachedError.new(page, redirects)
-        end
-        sleep delay.to_f
-      end
-
-      if redirect_uri
-        @history.push(page, page.uri)
-        return fetch_page(redirect_uri, :get, {}, [], referer, redirects + 1)
-      end
-    end
+    meta = response_follow_meta_refresh response, uri, page, redirects
+    return meta if meta
 
     return page if res_klass <= Net::HTTPSuccess
 

@@ -381,14 +381,15 @@ class TestMechanize < Test::Unit::TestCase
 
   def test_response_read_encoding_x_gzip
     def @res.read_body()
-      yield 'x-gzip'
+      yield "\037\213\b\0002\002\225M\000\003"
+      yield "+H,*\001\000\306p\017I\004\000\000\000"
     end
-    def @res.content_length() 6 end
+    def @res.content_length() 24 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[x-gzip]
 
     body = @agent.response_read @res, @req
 
-    assert_equal 'x-gzip', body
+    assert_equal 'part', body
   end
 
   def test_response_read_encoding_unknown

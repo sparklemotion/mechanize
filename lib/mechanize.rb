@@ -676,9 +676,9 @@ class Mechanize
     end
 
     case response['Content-Encoding']
-    when nil, 'none', '7bit', 'x-gzip' then
+    when nil, 'none', '7bit' then
       body.string
-    when 'gzip' then
+    when 'gzip', 'x-gzip' then
       Mechanize.log.debug('gunzip body') if Mechanize.log
 
       if content_length > 0 or body.length > 0 then

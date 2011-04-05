@@ -52,6 +52,7 @@
   * Mechanize now adds a '.' to cookie domains if no '.' was sent.  This is
     not allowed by RFC 2109 but does appear in RFC 2965.  GH #86
   * file URIs are now read in binary mode.  GH #83
+  * Content-Encoding: x-gzip is now treated like gzip per RFC 2616.
 
 === 1.0.0
 

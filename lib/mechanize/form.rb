@@ -346,9 +346,14 @@ class Mechanize
       eval(<<-eomethod)
           def #{plural}_with criteria = {}
             criteria = {:name => criteria} if String === criteria
+
+            criteria = criteria.map do |k, v|
+              k = :dom_id if k.to_sym == :id
+              [k, v]
+            end
+
             f = #{plural}.find_all do |thing|
               criteria.all? do |k,v|
-                k = :dom_id if(k.to_s == "id")
                 v === thing.send(k)
               end
             end

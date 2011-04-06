@@ -243,7 +243,7 @@ class Mechanize
   # Set the user agent for the Mechanize object.
   # See AGENT_ALIASES
   def user_agent_alias=(al)
-    self.user_agent = AGENT_ALIASES[al] ||
+    @user_agent = AGENT_ALIASES[al] ||
       raise(ArgumentError, "unknown agent alias")
   end
 

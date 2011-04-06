@@ -303,7 +303,7 @@ class TestMechanize < Test::Unit::TestCase
   end
 
   def test_response_follow_meta_refresh
-    uri = URI.parse 'http://example/#id'
+    uri = URI.parse 'http://example/#id+1'
 
     body = <<-BODY
 <title></title>

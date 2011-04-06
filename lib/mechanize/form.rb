@@ -7,6 +7,7 @@ require 'mechanize/form/check_box'
 require 'mechanize/form/multi_select_list'
 require 'mechanize/form/select_list'
 require 'mechanize/form/option'
+require 'mechanize/element_matcher'
 
 class Mechanize
   # =Synopsis
@@ -22,6 +23,9 @@ class Mechanize
   #  form['name'] = 'Aaron'
   #  puts form['name']
   class Form
+
+    extend Mechanize::ElementMatcher
+
     attr_accessor :method, :action, :name
 
     attr_reader :fields, :buttons, :file_uploads, :radiobuttons, :checkboxes
@@ -136,12 +140,14 @@ class Mechanize
     end
 
     # Treat form fields like accessors.
-    def method_missing(id,*args)
-      method = id.to_s.gsub(/=$/, '')
+    def method_missing(meth, *args)
+      method = meth.to_s.gsub(/=$/, '')
+
       if field(method)
         return field(method).value if args.empty?
         return field(method).value = args[0]
       end
+
       super
     end
 
@@ -272,6 +278,8 @@ class Mechanize
     #     field.value = 'hello!'
     #   end
 
+    elements_with :field
+
     ##
     # :method: button_with(criteria)
     #
@@ -287,6 +295,8 @@ class Mechanize
     #   form.buttons_with(:value => /submit/).each do |button|
     #     button.value = 'hello!'
     #   end
+
+    elements_with :button
 
     ##
     # :method: file_upload_with(criteria)
@@ -304,6 +314,8 @@ class Mechanize
     #     field.value = 'foo!'
     #   end
 
+    elements_with :file_upload
+
     ##
     # :method: radiobutton_with(criteria)
     #
@@ -319,6 +331,8 @@ class Mechanize
     #   form.radiobuttons_with(:name => /woo/).each do |field|
     #     field.check
     #   end
+
+    elements_with :radiobutton
 
     ##
     # :method: checkbox_with(criteria)
@@ -336,41 +350,10 @@ class Mechanize
     #     field.check
     #   end
 
-    # Woo! meta programming time
-    { :field        => :fields,
-      :button       => :buttons,
-      :file_upload  => :file_uploads,
-      :radiobutton  => :radiobuttons,
-      :checkbox     => :checkboxes,
-    }.each do |singular,plural|
-      eval(<<-eomethod)
-          def #{plural}_with criteria = {}
-            criteria = {:name => criteria} if String === criteria
-
-            criteria = criteria.map do |k, v|
-              k = :dom_id if k.to_sym == :id
-              [k, v]
-            end
-
-            f = #{plural}.find_all do |thing|
-              criteria.all? do |k,v|
-                v === thing.send(k)
-              end
-            end
-            yield f if block_given?
-            f
-          end
-
-          def #{singular}_with criteria = {}
-            f = #{plural}_with(criteria).first
-            yield f if block_given?
-            f
-          end
-          alias :#{singular} :#{singular}_with
-        eomethod
-    end
+    elements_with :checkbox,   :checkboxes
 
     private
+
     def parse
       @fields       = []
       @buttons      = []
@@ -478,5 +461,6 @@ class Mechanize
 
       body
     end
+
   end
 end

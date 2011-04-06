@@ -20,6 +20,7 @@ class Mechanize
   #
   class Page < Mechanize::File
     extend Forwardable
+    extend Mechanize::ElementMatcher
 
     attr_accessor :mech
 
@@ -127,6 +128,8 @@ class Mechanize
     #     ...
     #   end
 
+    elements_with :form
+
     ##
     # :method: link_with(criteria)
     #
@@ -142,6 +145,8 @@ class Mechanize
     #   page.links_with(:href => /foo/).each do |link|
     #     puts link.href
     #   end
+
+    elements_with :link
 
     ##
     # :method: base_with(criteria)
@@ -159,6 +164,8 @@ class Mechanize
     #     puts base.href
     #   end
 
+    elements_with :base
+
     ##
     # :method: frame_with(criteria)
     #
@@ -174,6 +181,8 @@ class Mechanize
     #   page.frames_with(:src => /foo/).each do |frame|
     #     p frame.src
     #   end
+
+    elements_with :frame
 
     ##
     # :method: iframe_with(criteria)
@@ -191,34 +200,7 @@ class Mechanize
     #     p iframe.src
     #   end
 
-    # let's meta program!
-    [:form, :link, :base, :frame, :iframe].each do |type|
-      eval(<<-eomethod)
-          def #{type}s_with(criteria)
-            criteria = {:name => criteria} if String === criteria
-
-            criteria = criteria.map do |k, v|
-              k = :dom_id if k.to_sym == :id
-              [k, v]
-            end
-
-            f = #{type}s.find_all do |thing|
-              criteria.all? do |k,v|
-                v === thing.send(k)
-              end
-            end
-            yield f if block_given?
-            f
-          end
-
-          def #{type}_with(criteria)
-            f = #{type}s_with(criteria).first
-            yield f if block_given?
-            f
-          end
-          alias :#{type} :#{type}_with
-        eomethod
-    end
+    elements_with :iframe
 
     ##
     # Return a list of all link and area tags

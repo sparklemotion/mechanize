@@ -15,6 +15,7 @@ lib/mechanize.rb
 lib/mechanize/content_type_error.rb
 lib/mechanize/cookie.rb
 lib/mechanize/cookie_jar.rb
+lib/mechanize/element_matcher.rb
 lib/mechanize/file.rb
 lib/mechanize/file_connection.rb
 lib/mechanize/file_request.rb
@@ -142,6 +143,7 @@ test/test_mechanize_file_response.rb
 test/test_mechanize_form_image_button.rb
 test/test_mechanize_page.rb
 test/test_mechanize_uri_resolver.rb
+test/test_mechanize_util.rb
 test/test_meta.rb
 test/test_multi_select.rb
 test/test_no_attributes.rb
@@ -167,5 +169,4 @@ test/test_ssl_server.rb
 test/test_subclass.rb
 test/test_textarea.rb
 test/test_upload.rb
-test/test_util.rb
 test/test_verbs.rb

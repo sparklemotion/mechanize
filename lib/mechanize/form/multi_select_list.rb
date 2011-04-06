@@ -10,6 +10,8 @@
 #  list.value = ['one']
 #  list.value = 'one'
 class Mechanize::Form::MultiSelectList < Mechanize::Form::Field
+  extend Mechanize::ElementMatcher
+
   attr_accessor :options
 
   def initialize node
@@ -18,11 +20,25 @@ class Mechanize::Form::MultiSelectList < Mechanize::Form::Field
 
     # parse
     node.search('option').each do |n|
-      option = Option.new(n, self)
+      option = Mechanize::Form::Option.new(n, self)
       @options << option
     end
     super(node, value)
   end
+
+  ##
+  # Find one option on this select list with +criteria+
+  # Example:
+  #   select_list.option_with(:value => '1').value = 'foo'
+
+  ##
+  # Find all options on this select list with +criteria+
+  # Example:
+  #   select_list.options_with(:value => /1|2/).each do |field|
+  #     field.value = '20'
+  #   end
+
+  elements_with :option
 
   def query_value
     value ? value.collect { |v| [name, v] } : ''

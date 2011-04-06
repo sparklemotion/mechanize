@@ -14,31 +14,6 @@ class Mechanize::Form::SelectList < Mechanize::Form::MultiSelectList
     end
   end
 
-  ##
-  # Find all options on this select list with +criteria+
-  # Example:
-  #   select_list.options_with(:value => /1|2/).each do |field|
-  #     field.value = '20'
-  #   end
-  def options_with criteria
-    criteria = {:name => criteria} if String === criteria
-    f = @options.find_all do |thing|
-      criteria.all? { |k,v| v === thing.send(k) }
-    end
-    yield f if block_given?
-    f
-  end
-
-  ##
-  # Find one option on this select list with +criteria+
-  # Example:
-  #   select_list.option_with(:value => '1').value = 'foo'
-  def option_with criteria
-    f = options_with(criteria).first
-      yield f if block_given?
-    f
-  end
-
   def value
     value = super
     if value.length > 0

@@ -1,13 +1,13 @@
+require 'mechanize/element_matcher'
 require 'mechanize/form/field'
-require 'mechanize/form/file_upload'
 require 'mechanize/form/button'
+require 'mechanize/form/file_upload'
 require 'mechanize/form/image_button'
+require 'mechanize/form/multi_select_list'
+require 'mechanize/form/option'
 require 'mechanize/form/radio_button'
 require 'mechanize/form/check_box'
-require 'mechanize/form/multi_select_list'
 require 'mechanize/form/select_list'
-require 'mechanize/form/option'
-require 'mechanize/element_matcher'
 
 class Mechanize
   # =Synopsis

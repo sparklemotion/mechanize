@@ -83,10 +83,10 @@ class Mechanize
   # Path to an OpenSSL server certificate file
   attr_accessor :ca_file
 
-  # Path to an OpenSSL Private Key
+  # An OpenSSL private key or the path to a private key
   attr_accessor :key
 
-  # Path to an OpenSSL client certificate file
+  # An OpenSSL client certificate or the path to a certificate file.
   attr_accessor :cert
 
   # OpenSSL key password
@@ -215,7 +215,11 @@ class Mechanize
 
     yield self if block_given?
 
-    set_http
+    if @proxy_addr and @proxy_pass then
+      set_proxy @proxy_addr, @proxy_port, @proxy_user, @proxy_pass
+    else
+      set_http
+    end
   end
 
   def max_history=(length); @history.max_size = length end

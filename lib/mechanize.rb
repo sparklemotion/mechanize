@@ -211,10 +211,11 @@ class Mechanize
     @pre_connect_hooks = []
     @post_connect_hooks = []
 
-    set_http
     @html_parser = self.class.html_parser
 
     yield self if block_given?
+
+    set_http
   end
 
   def max_history=(length); @history.max_size = length end
@@ -755,8 +756,20 @@ class Mechanize
     @http.verify_callback = @verify_callback
 
     if @cert and @key then
-      @http.certificate = OpenSSL::X509::Certificate.new ::File.read(@cert)
-      @http.private_key = OpenSSL::PKey::RSA.new ::File.read(@key), @pass
+      cert = if OpenSSL::X509::Certificate === @cert then
+               @cert
+             else
+               OpenSSL::X509::Certificate.new ::File.read @cert
+             end
+
+      key = if OpenSSL::PKey::PKey === @key then
+              @key
+            else
+              OpenSSL::PKey::RSA.new ::File.read(@key), @pass
+            end
+
+      @http.certificate = cert
+      @http.private_key = key
     end
   end
 

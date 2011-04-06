@@ -4,6 +4,18 @@ require 'helper'
 
 class TestMechanize < Test::Unit::TestCase
 
+  KEY = OpenSSL::PKey::RSA.new 512
+  name = OpenSSL::X509::Name.parse 'CN=nobody/DC=example'
+  CERT = OpenSSL::X509::Certificate.new
+  CERT.version = 2
+  CERT.serial = 0
+  CERT.not_before = Time.now
+  CERT.not_after = Time.now + 60
+  CERT.public_key = KEY.public_key
+  CERT.subject = name
+  CERT.issuer = name
+  CERT.sign KEY, OpenSSL::Digest::SHA1.new
+
   def setup
     @agent = Mechanize.new
     @uri = URI.parse 'http://example/'
@@ -18,6 +30,35 @@ class TestMechanize < Test::Unit::TestCase
                else
                  %w[accept]
                end
+  end
+
+  def test_cert_key_file
+    Tempfile.open 'key' do |key|
+      Tempfile.open 'cert' do |cert|
+        key.write KEY.to_pem
+        key.rewind
+
+        cert.write CERT.to_pem
+        cert.rewind
+
+        agent = Mechanize.new do |agent|
+          agent.cert = cert.path
+          agent.key  = key.path
+        end
+
+        # Certificate#== seems broken
+        assert_equal CERT.to_pem, agent.http.certificate.to_pem
+      end
+    end
+  end
+
+  def test_cert_key_object
+    agent = Mechanize.new do |agent|
+      agent.cert = CERT
+      agent.key  = KEY
+    end
+
+    assert_equal CERT, agent.http.certificate
   end
 
   def test_connection_for_file

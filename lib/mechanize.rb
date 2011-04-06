@@ -48,8 +48,14 @@ class Mechanize
   class Error < RuntimeError
   end
 
+  ruby_version = if RUBY_PATCHLEVEL >= 0 then
+                   "#{RUBY_VERSION}p#{RUBY_PATCHLEVEL}"
+                 else
+                   "#{RUBY_VERSION}dev#{RUBY_REVISION}"
+                 end
   ##
   # User Agent aliases
+
   AGENT_ALIASES = {
     'Windows IE 6' => 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)',
     'Windows IE 7' => 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
@@ -61,7 +67,7 @@ class Mechanize
     'Linux Firefox' => 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.1) Gecko/20100122 firefox/3.6.1',
     'Linux Konqueror' => 'Mozilla/5.0 (compatible; Konqueror/3; Linux)',
     'iPhone' => 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1C28 Safari/419.3',
-    'Mechanize' => "WWW-Mechanize/#{VERSION} (http://rubyforge.org/projects/mechanize/)"
+    'Mechanize' => "Mechanize/#{VERSION} Ruby/#{ruby_version} (http://github.com/tenderlove/mechanize/)"
   }
 
   # A Mechanize::CookieJar which stores cookies

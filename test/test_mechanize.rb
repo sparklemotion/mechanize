@@ -280,7 +280,15 @@ class TestMechanize < Test::Unit::TestCase
   def test_request_user_agent
     @agent.request_user_agent @req
 
-    assert_match %r%^WWW-Mechanize%, @req['user-agent']
+    assert_match %r%^Mechanize/#{Mechanize::VERSION}%, @req['user-agent']
+
+    ruby_version = if RUBY_PATCHLEVEL >= 0 then
+                     "#{RUBY_VERSION}p#{RUBY_PATCHLEVEL}"
+                   else
+                     "#{RUBY_VERSION}dev#{RUBY_REVISION}"
+                   end
+
+    assert_match %r%Ruby/#{ruby_version}%, @req['user-agent']
   end
 
   def test_resolve_parameters_body

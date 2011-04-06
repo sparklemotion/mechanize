@@ -18,6 +18,8 @@
   * Mechanize no longer raises RuntimeError directly, Mechanize::Error or
     ArgumentError are raised instead.
   * WWW::Mechanize has been removed.
+  * The User-Agent header has changed.  It no longer includes the WWW- prefix
+    and now includes the ruby version.  The URL has been updated as well.
 
 * New Features
 

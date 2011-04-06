@@ -635,7 +635,7 @@ class Mechanize
     referer       = page
 
     if page.respond_to?(:meta) and (redirect = page.meta.first)
-      redirect_uri = CGI.unescape redirect.uri.to_s
+      redirect_uri = Mechanize::Util.uri_unescape redirect.uri.to_s
       sleep redirect.node['delay'].to_f
       referer = Page.new(nil, {'content-type'=>'text/html'})
     elsif refresh = response['refresh']

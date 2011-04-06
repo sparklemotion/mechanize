@@ -14,9 +14,6 @@ require 'iconv' if RUBY_VERSION < '1.9.2'
 require 'nkf'
 require 'mutex_m'
 
-require 'mechanize/util'
-require 'mechanize/cookie'
-require 'mechanize/cookie_jar'
 require 'mechanize/history'
 require 'mechanize/form'
 require 'mechanize/pluggable_parsers'
@@ -901,10 +898,13 @@ class Mechanize
 end
 
 require 'mechanize/content_type_error'
-require 'mechanize/response_code_error'
-require 'mechanize/unsupported_scheme_error'
-require 'mechanize/redirect_limit_reached_error'
-require 'mechanize/redirect_not_get_or_head_error'
+require 'mechanize/cookie'
+require 'mechanize/cookie_jar'
 require 'mechanize/file_connection'
 require 'mechanize/file_request'
+require 'mechanize/redirect_limit_reached_error'
+require 'mechanize/redirect_not_get_or_head_error'
+require 'mechanize/response_code_error'
+require 'mechanize/unsupported_scheme_error'
+require 'mechanize/util'
 

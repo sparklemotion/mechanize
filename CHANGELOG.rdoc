@@ -33,6 +33,8 @@
   * Mechanize now implements session cookies.  GH #78
   * Mechanize now implements deflate decoding.  GH #40
   * Mechanize now allows a certificate and key to be passed directly.  GH #71
+  * Mechanize::Form::MultiSelectList now implements #option_with and
+    #options_with.  GH #42
 
 * Bug Fixes:
 

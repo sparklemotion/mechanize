@@ -179,7 +179,6 @@ class TestMechanizeCookieJar < Test::Unit::TestCase
   def test_cookies_with_leading_dot_match_subdomains
     url = URI.parse('http://admin.rubyforge.org/')
 
-    cookie = cookie_from_hash(cookie_values)
     @jar.add(url, cookie_from_hash(cookie_values(:domain => '.rubyforge.org')))
 
     assert_equal(1, @jar.cookies(url).length)
@@ -188,7 +187,6 @@ class TestMechanizeCookieJar < Test::Unit::TestCase
   def test_cookies_dot
     url = URI.parse('http://www.host.example/')
 
-    cookie = cookie_from_hash(cookie_values)
     @jar.add(url,
              cookie_from_hash(cookie_values(:domain => 'www.host.example')))
 

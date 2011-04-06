@@ -22,7 +22,7 @@ class TestMechanize < Test::Unit::TestCase
     @req = Net::HTTP::Get.new '/'
 
     @res = Net::HTTPResponse.allocate
-    def @res.code() 200 end
+    @res.instance_variable_set :@code, 200
     @res.instance_variable_set :@header, {}
 
     @headers = if RUBY_VERSION > '1.9' then
@@ -41,9 +41,9 @@ class TestMechanize < Test::Unit::TestCase
         cert.write CERT.to_pem
         cert.rewind
 
-        agent = Mechanize.new do |agent|
-          agent.cert = cert.path
-          agent.key  = key.path
+        agent = Mechanize.new do |a|
+          a.cert = cert.path
+          a.key  = key.path
         end
 
         # Certificate#== seems broken
@@ -53,9 +53,9 @@ class TestMechanize < Test::Unit::TestCase
   end
 
   def test_cert_key_object
-    agent = Mechanize.new do |agent|
-      agent.cert = CERT
-      agent.key  = KEY
+    agent = Mechanize.new do |a|
+      a.cert = CERT
+      a.key  = KEY
     end
 
     assert_equal CERT, agent.http.certificate
@@ -151,7 +151,7 @@ class TestMechanize < Test::Unit::TestCase
     assert_nil @req['Cookie']
   end
 
-  def test_request_cookies
+  def test_request_cookies_many
     uri = URI.parse 'http://host.example.com'
     cookie_str = 'a=b domain=.example.com, c=d domain=.example.com'
     Mechanize::Cookie.parse uri, cookie_str do |cookie|
@@ -529,7 +529,7 @@ class TestMechanize < Test::Unit::TestCase
 
   def test_response_read_unknown_code
     def @res.read_body() yield 'part' end
-    def @res.code() 999 end
+    @res.instance_variable_set :@code, 9999
 
     e = assert_raises Mechanize::ResponseCodeError do
       @agent.response_read @res, @req

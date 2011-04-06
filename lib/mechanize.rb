@@ -202,6 +202,12 @@ class Mechanize
     @keep_alive_time  = 300
     @keep_alive       = true
 
+    # Proxy
+    @proxy_addr = nil
+    @proxy_port = nil
+    @proxy_user = nil
+    @proxy_pass = nil
+
     @resolver = Mechanize::URIResolver.new
     @scheme_handlers = @resolver.scheme_handlers
 
@@ -487,8 +493,6 @@ class Mechanize
   end
 
   def http_request uri, method, params = nil
-    scheme = uri.scheme.downcase
-
     case uri.scheme.downcase
     when 'http', 'https' then
       klass = Net::HTTP.const_get(method.to_s.capitalize)
@@ -675,8 +679,7 @@ class Mechanize
 
   def response_read response, request
     body = StringIO.new
-    body.set_encoding Encoding::BINARY, Encoding::BINARY if
-      body.respond_to? :set_encoding
+    body.set_encoding Encoding::BINARY if body.respond_to? :set_encoding
     total = 0
 
     response.read_body { |part|

@@ -568,6 +568,17 @@ class Mechanize
     request['accept-language'] = 'en-us,en;q=0.5'
   end
 
+  # Log specified headers for the request
+  def request_log request
+    return unless log
+
+    log.info("#{request.class}: #{request.path}")
+
+    request.each_header do |k, v|
+      log.debug("request-header: #{k} => #{v}")
+    end
+  end
+
   def request_add_headers request, headers = {}
     @request_headers.each do |k,v|
       request[k] = v
@@ -655,6 +666,17 @@ class Mechanize
     if redirect_uri
       @history.push(page, page.uri)
       fetch_page(redirect_uri, :get, {}, [], referer, redirects + 1)
+    end
+  end
+
+  def response_log response
+    return unless log
+
+    log.info("status: #{res.class} #{res.http_version} #{res.code} " \
+             "#{res.message}")
+
+    res.each_header do |k, v|
+      log.debug("response-header: #{k} => #{v}")
     end
   end
 
@@ -831,22 +853,13 @@ class Mechanize
     connection.open_timeout = @open_timeout if @open_timeout
     connection.read_timeout = @read_timeout if @read_timeout
 
-    # Log specified headers for the request
-    log.info("#{request.class}: #{request.path}") if log
-    request.each_header do |k, v|
-      log.debug("request-header: #{ k } => #{ v }")
-    end if log
+    request_log request
 
     response_body = nil
 
     # Send the request
     response = connection.request(uri, request) { |res|
-      log.info("status: #{res.class} #{res.http_version} #{res.code} " \
-               "#{res.message}") if log
-
-      res.each_header do |k, v|
-        log.debug("response-header: #{ k } => #{ v }")
-      end if log
+      response_log res
 
       response_body = response_read res, request
 

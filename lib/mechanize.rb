@@ -672,10 +672,10 @@ class Mechanize
   def response_log response
     return unless log
 
-    log.info("status: #{res.class} #{res.http_version} #{res.code} " \
-             "#{res.message}")
+    log.info("status: #{response.class} #{response.http_version} " \
+             "#{response.code} #{response.message}")
 
-    res.each_header do |k, v|
+    response.each_header do |k, v|
       log.debug("response-header: #{k} => #{v}")
     end
   end

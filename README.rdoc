@@ -35,14 +35,17 @@ Also, check out the EXAMPLES file.
 
 Copyright (c) 2005 by Michael Neumann (mneumann@ntecs.de)
 
-Copyright (c) 2006-2010:
+Copyright (c) 2006-2011:
 
 * {Aaron Patterson}[http://tenderlovemaking.com] (aaronp@rubyforge.org)
 * {Mike Dalessio}[http://mike.daless.io] (mike@csa.net)
 
+Copyright (c) 2011:
+
+* {Eric Hodel}[http://blog.segment7.net] (drbrain@segment7.net)
+
 This library comes with a shameless plug for employing me
-(Aaron[http://tenderlovemaking.com/]) programming
-Ruby, my favorite language!
+(Aaron[http://tenderlovemaking.com/]) programming Ruby, my favorite language!
 
 == Acknowledgments
 
@@ -56,5 +59,5 @@ library!
 
 == License
 
-This library is distributed under the GPL.  Please see the LICENSE file.
+This library is distributed under the MIT license.  Please see the LICENSE file.
 

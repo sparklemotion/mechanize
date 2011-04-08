@@ -2,6 +2,8 @@
 
 === HEAD
 
+Mechanize is now under the MIT license
+
 * API changes
   * Pre connect hooks are now called with the agent and the request.  See
     Mechanize#pre_connect_hooks.

@@ -30,13 +30,6 @@ class SchemeTest < Test::Unit::TestCase
     assert_kind_of(Mechanize::Page, page)
   end
 
-  def test_file_scheme_with_embedded_spaces
-    f = File.expand_path(File.join(File.dirname(__FILE__), "htdocs/dir with spaces/foo.html"))
-    page = @agent.get("file://#{f}")
-    assert_equal(File.read(f), page.body)
-    assert_kind_of(Mechanize::Page, page)
-  end
-
   def test_click_file_link
     f = File.expand_path(File.join(File.dirname(__FILE__), "htdocs"))
     page = @agent.get("file://#{f}")

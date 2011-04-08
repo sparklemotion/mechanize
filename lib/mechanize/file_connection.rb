@@ -10,7 +10,7 @@ class Mechanize::FileConnection
   end
 
   def request uri, request
-    yield Mechanize::FileResponse.new CGI.unescape uri.path
+    yield Mechanize::FileResponse.new Mechanize::Util.uri_unescape uri.path
   end
 
 end

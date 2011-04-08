@@ -21,7 +21,7 @@ class Mechanize::URIResolver
     unless uri.is_a?(URI)
       uri = uri.to_s.strip.gsub(/[^#{0.chr}-#{126.chr}]/o) { |match|
         if RUBY_VERSION >= "1.9.0"
-          CGI.escape(match)
+          Mechanize::Util.uri_escape(match)
         else
           sprintf('%%%X', match.unpack($KCODE == 'UTF8' ? 'U' : 'C')[0])
         end

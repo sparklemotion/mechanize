@@ -99,6 +99,32 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal 'identity', @req['accept-encoding']
   end
 
+  def test_fetch_page_file_plus
+    Tempfile.open '++plus++' do |io|
+      content = 'plusses +++'
+      io.write content
+      io.rewind
+
+      uri = URI.parse "file://#{Mechanize::Util.uri_escape io.path}"
+
+      page = @agent.send :fetch_page, uri
+
+      assert_equal content, page.body
+      assert_kind_of Mechanize::File, page
+    end
+  end
+
+  def test_fetch_page_file_space
+    foo = File.expand_path("../htdocs/dir with spaces/foo.html", __FILE__)
+
+    uri = URI.parse "file://#{Mechanize::Util.uri_escape foo}"
+
+    page = @agent.send :fetch_page, uri
+
+    assert_equal File.read(foo), page.body
+    assert_kind_of Mechanize::Page, page
+  end
+
   def test_http_request_file
     uri = URI.parse 'file:///nonexistent'
     request = @agent.http_request uri, :get

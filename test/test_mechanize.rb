@@ -74,6 +74,17 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal @agent.http, conn
   end
 
+  #def test_download
+  #  Dir.mktmpdir do |dir|
+  #    file = "#{dir}/download"
+  #    open file, 'w' do |io|
+  #      @agent.download 'http://example', io
+  #    end
+
+  #    assert_equal 1, File.stat(file).size
+  #  end
+  #end
+
   def test_enable_gzip
     @agent.enable_gzip @req
 

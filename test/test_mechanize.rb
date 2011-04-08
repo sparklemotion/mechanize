@@ -21,7 +21,7 @@ class TestMechanize < Test::Unit::TestCase
     @uri = URI.parse 'http://example/'
     @req = Net::HTTP::Get.new '/'
 
-    @res = Net::HTTPResponse.allocate
+    @res = Net::HTTPOK.allocate
     @res.instance_variable_set :@code, 200
     @res.instance_variable_set :@header, {}
 
@@ -539,14 +539,15 @@ class TestMechanize < Test::Unit::TestCase
   end
 
   def test_response_read_unknown_code
-    def @res.read_body() yield 'part' end
-    @res.instance_variable_set :@code, 9999
+    res = Net::HTTPUnknownResponse.allocate
+    res.instance_variable_set :@code, 9999
+    def res.read_body() yield 'part' end
 
     e = assert_raises Mechanize::ResponseCodeError do
-      @agent.response_read @res, @req
+      @agent.response_read res, @req
     end
 
-    assert_equal @res, e.page
+    assert_equal res, e.page
   end
 
   def test_response_parse

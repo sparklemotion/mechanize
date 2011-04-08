@@ -264,7 +264,7 @@ class Mechanize
 
   # Fetches the URL passed in and returns a page.
   def get(options, parameters = [], referer = nil)
-    verb = :get
+    method = :get
 
     unless options.is_a? Hash
       url = options
@@ -277,7 +277,7 @@ class Mechanize
       parameters = options[:params] || []
       referer    = options[:referer]
       headers    = options[:headers]
-      verb       = options[:verb] || verb
+      method     = options[:verb] || method
     end
 
     unless referer
@@ -299,7 +299,7 @@ class Mechanize
 
     # fetch the page
     headers ||= {}
-    page = fetch_page url, verb, headers, parameters, referer
+    page = fetch_page url, method, headers, parameters, referer
     add_to_history(page)
     yield page if block_given?
     page
@@ -712,8 +712,8 @@ class Mechanize
 
     body.rewind
 
-    raise Mechanize::ResponseCodeError, response unless
-      Net::HTTPResponse::CODE_TO_OBJ[response.code.to_s]
+    raise Mechanize::ResponseCodeError, response if
+      Net::HTTPUnknownResponse === response
 
     content_length = response.content_length
 
@@ -765,6 +765,51 @@ class Mechanize
       raise Mechanize::Error,
             "Unsupported Content-Encoding: #{response['Content-Encoding']}"
     end
+  end
+
+  def response_redirect response, method, page, redirects
+    case @redirect_ok
+    when true, :all
+      # shortcut
+    when false, nil
+      return page
+    when :permanent
+      return page if response_class != Net::HTTPMovedPermanently
+    end
+
+    log.info("follow redirect to: #{response['Location']}") if log
+
+    from_uri = page.uri
+
+    raise RedirectLimitReachedError.new(page, redirects) if
+      redirects + 1 > redirection_limit
+
+    redirect_method = method == :head ? :head : :get
+
+    page = fetch_page(response['Location'].to_s, redirect_method, {}, [],
+                      page, redirects + 1)
+
+    @history.push(page, from_uri)
+
+    return page
+  end
+
+  def response_authenticate(response, page, uri, request, headers, params,
+                            referer)
+    raise ResponseCodeError, page unless @user || @password
+    raise ResponseCodeError, page if @auth_hash.has_key?(uri.host)
+
+    if response['www-authenticate'] =~ /Digest/i
+      @auth_hash[uri.host] = :digest
+      if response['server'] =~ /Microsoft-IIS/
+        @auth_hash[uri.host] = :iis_digest
+      end
+      @digest = response['www-authenticate']
+    else
+      @auth_hash[uri.host] = :basic
+    end
+
+    fetch_page(uri, request.method.downcase.to_sym, headers, params, referer)
   end
 
   private
@@ -872,53 +917,23 @@ class Mechanize
 
     response_cookies response, uri, page
 
-    res_klass = Net::HTTPResponse::CODE_TO_OBJ[response.code.to_s]
-
     meta = response_follow_meta_refresh response, uri, page, redirects
     return meta if meta
 
-    return page if res_klass <= Net::HTTPSuccess
-
-    if res_klass == Net::HTTPNotModified
+    case response
+    when Net::HTTPSuccess, Mechanize::FileResponse
+      page
+    when Net::HTTPNotModified
       log.debug("Got cached page") if log
-      return visited_page(uri) || page
-    elsif res_klass <= Net::HTTPRedirection
-      case redirect_ok
-      when true, :all
-        # shortcut
-      when false, nil
-        return page
-      when :permanent
-        return page if res_klass != Net::HTTPMovedPermanently
-      end
-      log.info("follow redirect to: #{ response['Location'] }") if log
-      from_uri  = page.uri
-      raise RedirectLimitReachedError.new(page, redirects) if
-        redirects + 1 > redirection_limit
-      redirect_method = method == :head ? :head : :get
-      page = fetch_page(response['Location'].to_s, redirect_method, {}, [],
-                        page, redirects + 1)
-
-      @history.push(page, from_uri)
-      return page
-    elsif res_klass <= Net::HTTPUnauthorized
-      raise ResponseCodeError, page unless @user || @password
-      raise ResponseCodeError, page if @auth_hash.has_key?(uri.host)
-      if response['www-authenticate'] =~ /Digest/i
-        @auth_hash[uri.host] = :digest
-        if response['server'] =~ /Microsoft-IIS/
-          @auth_hash[uri.host] = :iis_digest
-        end
-        @digest = response['www-authenticate']
-      else
-        @auth_hash[uri.host] = :basic
-      end
-
-      return fetch_page(uri, request.method.downcase.to_sym, headers, params,
-                        referer)
+      visited_page(uri) || page
+    when Net::HTTPRedirection
+      response_redirect response, method, page, redirects
+    when Net::HTTPUnauthorized
+      response_authenticate(response, page, uri, request, headers, params,
+                            referer)
+    else
+      raise ResponseCodeError.new(page), "Unhandled response"
     end
-
-    raise ResponseCodeError.new(page), "Unhandled response"
   end
 
   def add_to_history(page)

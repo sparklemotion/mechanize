@@ -9,7 +9,7 @@ class VerbServlet < WEBrick::HTTPServlet::AbstractServlet
   %w(HEAD GET POST PUT DELETE).each do |verb|
     eval(<<-eomethod)
       def do_#{verb}(req, res)
-        res.body = "method: #{verb}"
+        res.header['X-Request-Method'] = #{verb.dump}
       end
     eomethod
   end

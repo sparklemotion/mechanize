@@ -97,14 +97,37 @@ class Net::HTTP
     end
 
     res['Content-Type'] ||= 'text/html'
-    res['Content-Length'] ||= res.body.length.to_s
     res.code ||= "200"
 
-    res.cookies.each do |cookie|
-      res.add_field('Set-Cookie', cookie.to_s)
+    response_klass = Net::HTTPResponse::CODE_TO_OBJ[res.code.to_s]
+    response = response_klass.new res.http_version, res.code, res.message
+
+    res.header.each do |k,v|
+      v = v.first if v.length == 1
+      response[k] = v
     end
-    yield res if block_given?
-    res
+
+    res.cookies.each do |cookie|
+      response.add_field 'Set-Cookie', cookie.to_s
+    end
+
+    response['Content-Type'] ||= 'text/html'
+    response['Content-Length'] = res['Content-Length'] || res.body.length.to_s
+
+    io = StringIO.new(res.body)
+    response.instance_variable_set :@socket, io
+    def io.read clen, dest, _
+      dest << string[0, clen]
+    end
+
+    body_exist = request.response_body_permitted? &&
+                 response_klass.body_permitted?
+
+    response.instance_variable_set :@body_exist, body_exist
+
+    yield response if block_given?
+
+    response
   end
 end
 
@@ -118,6 +141,7 @@ class Response
   attr_reader :code
   attr_accessor :body, :query, :cookies
   attr_accessor :query_params, :http_version
+  attr_accessor :header
 
   def code=(c)
     @code = c.to_s

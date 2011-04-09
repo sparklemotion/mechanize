@@ -25,10 +25,7 @@ class Mechanize::Page < Mechanize::File
     @meta = nil
     @parser = nil
 
-    # FIXME why?  1.8 vs 1.9?
-    method = response.respond_to?(:each_header) ? :each_header : :each
-
-    response.send(method) do |header,v|
+    response.each do |header,v|
       next unless v =~ /charset/i
       encoding = v[/charset=([^; ]+)/i, 1]
       @encoding = encoding unless encoding == 'none'

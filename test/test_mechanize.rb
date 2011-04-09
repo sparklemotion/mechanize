@@ -125,6 +125,16 @@ class TestMechanize < Test::Unit::TestCase
     assert_kind_of Mechanize::Page, page
   end
 
+  def test_fetch_page_file_nonexistent
+    uri = URI.parse 'file:///nonexistent'
+
+    e = assert_raises Mechanize::ResponseCodeError do
+      page = @agent.send :fetch_page, uri
+    end
+
+    assert_equal '404 => Net::HTTPNotFound', e.message
+  end
+
   def test_http_request_file
     uri = URI.parse 'file:///nonexistent'
     request = @agent.http_request uri, :get

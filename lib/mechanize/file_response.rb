@@ -7,21 +7,19 @@ class Mechanize::FileResponse
   end
 
   def read_body
-    if File.exist?(@file_path)
-      if directory?
-        yield dir_body
-      else
-        open @file_path, 'rb' do |io|
-          yield io.read
-        end
-      end
+    raise Mechanize::ResponseCodeError, self unless File.exist? @file_path
+
+    if directory?
+      yield dir_body
     else
-      yield ''
+      open @file_path, 'rb' do |io|
+        yield io.read
+      end
     end
   end
 
   def code
-    File.exist?(@file_path) ? 200 : 400
+    File.exist?(@file_path) ? 200 : 404
   end
 
   def content_length
@@ -52,7 +50,7 @@ class Mechanize::FileResponse
   end
 
   def message
-    File.exist?(@file_path) ? 'OK' : 'Bad Request'
+    File.exist?(@file_path) ? 'OK' : 'Not Found'
   end
 
   private

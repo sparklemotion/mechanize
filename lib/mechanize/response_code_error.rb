@@ -10,11 +10,11 @@ class Mechanize
 
     def initialize(page)
       @page          = page
-      @response_code = page.code
+      @response_code = page.code.to_s
     end
 
     def to_s
-      "#{response_code} => #{Net::HTTPResponse::CODE_TO_OBJ[response_code]}"
+      "#{@response_code} => #{Net::HTTPResponse::CODE_TO_OBJ[@response_code]}"
     end
 
     def inspect; to_s; end

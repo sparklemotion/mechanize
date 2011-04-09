@@ -135,6 +135,17 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal '404 => Net::HTTPNotFound', e.message
   end
 
+  def test_get_yield
+    pages = nil
+
+    @agent.get("http://localhost/file_upload.html") { |page|
+      pages = page
+    }
+
+    assert pages
+    assert_equal('File Upload Form', pages.title)
+  end
+
   def test_http_request_file
     uri = URI.parse 'file:///nonexistent'
     request = @agent.http_request uri, :get
@@ -596,6 +607,17 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal @agent, page.mech
   end
 
+  def test_response_parse_content_type_case
+    body = '<title>hi</title>'
+    @res.instance_variable_set(:@header, 'content-type' => %w[text/HTML])
+
+    page = @agent.response_parse @res, body, @uri
+
+    assert_instance_of Mechanize::Page, page
+
+    assert_equal 'text/HTML', page.content_type
+  end
+
   def test_response_parse_content_type_encoding
     body = '<title>hi</title>'
     @res.instance_variable_set(:@header,
@@ -606,6 +628,59 @@ class TestMechanize < Test::Unit::TestCase
 
     assert_instance_of Mechanize::Page, page
     assert_equal @agent, page.mech
+
+    assert_equal 'ISO-8859-1', page.encoding
+    assert_equal 'ISO-8859-1', page.parser.encoding
+  end
+
+  def test_response_parse_content_type_encoding_garbage
+    body = '<title>hi</title>'
+    @res.instance_variable_set(:@header,
+                               'content-type' =>
+                                 %w[text/html; charset=garbage_charset])
+
+    page = @agent.response_parse @res, body, @uri
+
+    assert_instance_of Mechanize::Page, page
+    assert_equal @agent, page.mech
+  end
+
+  def test_response_parse_content_type_encoding_broken_iso_8859_1
+    body = '<title>hi</title>'
+    @res.instance_variable_set(:@header,
+                               'content-type' =>
+                                 %w[text/html; charset=ISO_8859-1])
+
+    page = @agent.response_parse @res, body, @uri
+
+    assert_instance_of Mechanize::Page, page
+    assert_equal 'ISO_8859-1', page.encoding
+  end
+
+  def test_response_parse_content_type_encoding_broken_utf_8
+    body = '<title>hi</title>'
+    @res.instance_variable_set(:@header,
+                               'content-type' =>
+                                 %w[text/html; charset=UTF8])
+
+    page = @agent.response_parse @res, body, @uri
+
+    assert_instance_of Mechanize::Page, page
+    assert_equal 'UTF8', page.encoding
+    assert_equal 'UTF8', page.parser.encoding
+  end
+
+  def test_response_parse_content_type_encoding_semicolon
+    body = '<title>hi</title>'
+    @res.instance_variable_set(:@header,
+                               'content-type' =>
+                                 %w[text/html;charset=UTF-8;])
+
+    page = @agent.response_parse @res, body, @uri
+
+    assert_instance_of Mechanize::Page, page
+
+    assert_equal 'UTF-8', page.encoding
   end
 
 end

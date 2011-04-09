@@ -16,9 +16,18 @@ class Mechanize::Page < Mechanize::File
   attr_accessor :mech
 
   def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
+    @bases = nil
     @encoding = nil
+    @forms = nil
+    @frames = nil
+    @iframes = nil
+    @links = nil
+    @meta = nil
+    @parser = nil
 
+    # FIXME why?  1.8 vs 1.9?
     method = response.respond_to?(:each_header) ? :each_header : :each
+
     response.send(method) do |header,v|
       next unless v =~ /charset/i
       encoding = v[/charset=([^; ]+)/i, 1]
@@ -27,19 +36,19 @@ class Mechanize::Page < Mechanize::File
 
     # Force the encoding to be 8BIT so we can perform regular expressions.
     # We'll set it to the detected encoding later
-    body.force_encoding('ASCII-8BIT') if body && body.respond_to?(:force_encoding)
+    body.force_encoding('ASCII-8BIT') if
+      body && body.respond_to?(:force_encoding)
 
     @encoding ||= Mechanize::Util.detect_charset(body)
 
     super(uri, response, body, code)
+
     @mech           ||= mech
 
     @encoding = nil if html_body =~ /<meta[^>]*charset[^>]*>/i
 
     raise Mechanize::ContentTypeError, response['content-type'] unless
       response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/i
-
-    @parser = @links = @forms = @meta = @bases = @frames = @iframes = nil
   end
 
   def title
@@ -89,6 +98,7 @@ class Mechanize::Page < Mechanize::File
 
     @parser
   end
+
   alias :root :parser
 
   # Get the content type

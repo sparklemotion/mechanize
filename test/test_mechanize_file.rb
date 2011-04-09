@@ -1,6 +1,6 @@
 require "helper"
 
-class MechanizeFileTest < Test::Unit::TestCase
+class TestMechanizeFile < Test::Unit::TestCase
   def test_content_disposition
     file = Mechanize::File.new(
                                     URI.parse('http://localhost/foo'),
@@ -19,6 +19,12 @@ class MechanizeFileTest < Test::Unit::TestCase
            { 'content-disposition' => 'filename=genome.jpeg', }
            )
     assert_equal('genome.jpeg', file.filename)
+  end
+
+  def test_content_disposition_double_semicolon
+    agent = Mechanize.new
+    page = agent.get("http://localhost/http_headers?content-disposition=#{CGI.escape('attachment;; filename=fooooo')}")
+    assert page.parser
   end
 
   def test_from_uri

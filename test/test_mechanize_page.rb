@@ -7,36 +7,9 @@ class TestMechanizePage < Test::Unit::TestCase
     @agent = Mechanize.new
   end
 
-  def test_page_gets_charset_from_page
+  def test_encoding_from_page
     page = @agent.get("http://localhost/tc_charset.html")
     assert_equal 'windows-1255', page.encoding
-  end
-
-  def test_double_semicolon
-    page = @agent.get("http://localhost/http_headers?content-disposition=#{CGI.escape('attachment;; filename=fooooo')}")
-    assert page.parser
-  end
-
-  def test_broken_charset
-    page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/html; charset=akldsjfhaldjfksh')}")
-    assert page.parser
-  end
-
-  def test_mostly_broken_charset
-    page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/html; charset=ISO_8859-1')}")
-    assert_equal 'ISO_8859-1', page.encoding
-  end
-
-  def test_another_mostly_broken_charset
-    page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/html; charset=UTF8')}")
-    assert_equal 'UTF8', page.parser.encoding
-    assert_equal 'UTF8', page.encoding
-  end
-
-  def test_upper_case_content_type
-    page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/HTML')}")
-    assert_instance_of Mechanize::Page, page
-    assert_equal 'text/HTML', page.content_type
   end
 
   def test_encoding_override_before_parser_initialized
@@ -58,29 +31,10 @@ class TestMechanizePage < Test::Unit::TestCase
     assert_equal 'ISO-8859-2', page.encoding
   end
 
-  def test_page_gets_charset_sent_by_server
-    page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/html; charset=UTF-8')}")
-    assert_equal 'UTF-8', page.encoding
-  end
-
-  def test_page_gets_charset_sent_by_server_with_trailing_semicolon
-    page = @agent.get("http://localhost/http_headers?content-type=#{CGI.escape('text/html; charset=UTF-8;')}")
-    assert_equal 'UTF-8', page.encoding
-  end
-
   def test_set_encoding
     page = @agent.get("http://localhost/file_upload.html")
     page.encoding = 'UTF-8'
     assert_equal 'UTF-8', page.parser.encoding
-  end
-
-  def test_page_gets_yielded
-    pages = nil
-    @agent.get("http://localhost/file_upload.html") { |page|
-      pages = page
-    }
-    assert pages
-    assert_equal('File Upload Form', pages.title)
   end
 
   def test_title
@@ -109,11 +63,13 @@ class TestMechanizePage < Test::Unit::TestCase
     form = page.form(:name => 'post_form1')
     assert form
     yielded = false
+
     form = page.form(:name => 'post_form1') { |f|
       yielded = true
       assert f
       assert_equal(form, f)
     }
+
     assert yielded
 
     form_by_action = page.form(:action => '/form_post?a=b&b=c')

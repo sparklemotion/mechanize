@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'helper'
 require 'cgi'
 
@@ -12,6 +14,22 @@ class TestMechanizePage < Test::Unit::TestCase
 <meta http-equiv="content-type" content="text/html; charset=windows-1255">
 <title>Bia\xB3ystok</title>
   HTML
+  BAD.force_encoding Encoding::BINARY if defined? Encoding
+
+  SJIS_TITLE = '\x83\x65\x83\x58\x83\x67'
+
+  SJIS_AFTER_TITLE = <<-HTML
+<title>#{SJIS_TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  HTML
+
+  SJIS_AFTER_TITLE.force_encoding Encoding::BINARY if defined? Encoding
+
+  UTF8_TITLE = 'テスト'
+  UTF8 = <<-HTML
+<title>#{UTF8_TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  HTML
 
   def setup
     @agent = Mechanize.new
@@ -24,10 +42,32 @@ class TestMechanizePage < Test::Unit::TestCase
     Mechanize::Page.new @uri, res, body, 200, @agent
   end
 
+  def test_charset
+    charset = util_page.charset 'text/html;charset=UTF-8'
+
+    assert_equal 'UTF-8', charset
+  end
+
   def test_encoding
     page = util_page WINDOWS_1255
 
     assert_equal 'windows-1255', page.encoding
+  end
+
+  def test_encoding_charset_after_title
+    page = util_page SJIS_AFTER_TITLE
+
+    assert_equal [], page.parser.errors
+
+    assert_equal 'Shift_JIS', page.encoding
+  end
+
+  def test_encoding_charset_after_title_bad
+    page = util_page UTF8
+
+    assert_equal [], page.parser.errors
+
+    assert_equal 'Shift_JIS', page.encoding
   end
 
   def test_encoding_equals
@@ -46,6 +86,7 @@ class TestMechanizePage < Test::Unit::TestCase
     # encoding is wrong, so user wants to force ISO-8859-2
     page.encoding = 'ISO-8859-2'
 
+    assert_equal [], page.parser.errors
     assert_equal 'ISO-8859-2', page.encoding
     assert_equal 'ISO-8859-2', page.parser.encoding
   end
@@ -61,6 +102,7 @@ class TestMechanizePage < Test::Unit::TestCase
     # encoding is wrong, so user wants to force ISO-8859-2
     page.encoding = 'ISO-8859-2'
 
+    assert_equal [], page.parser.errors
     assert_equal 'ISO-8859-2', page.encoding
     assert_equal 'ISO-8859-2', page.parser.encoding
   end

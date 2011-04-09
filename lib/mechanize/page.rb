@@ -16,19 +16,22 @@ class Mechanize::Page < Mechanize::File
   attr_accessor :mech
 
   def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
+    raise Mechanize::ContentTypeError, response['content-type'] unless
+      response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/i
+
     @bases = nil
     @encoding = nil
     @forms = nil
     @frames = nil
     @iframes = nil
     @links = nil
+    @mech = mech
     @meta = nil
     @parser = nil
 
-    response.each do |header,v|
-      next unless v =~ /charset/i
-      encoding = v[/charset=([^; ]+)/i, 1]
-      @encoding = encoding unless encoding == 'none'
+    response.each do |header, value|
+      next unless value =~ /charset/i
+      @encoding = charset value
     end
 
     # Force the encoding to be 8BIT so we can perform regular expressions.
@@ -36,16 +39,19 @@ class Mechanize::Page < Mechanize::File
     body.force_encoding('ASCII-8BIT') if
       body && body.respond_to?(:force_encoding)
 
+    body.scan /<meta .*?>/i do |meta|
+      next unless meta =~ /http-equiv=(["'])?content-type\1/i
+
+      meta =~ /content=(["'])?(.*?)\1/i
+
+      encoding = charset $2
+
+      @encoding = encoding if encoding
+    end if body
+
     @encoding ||= Mechanize::Util.detect_charset(body)
 
     super(uri, response, body, code)
-
-    @mech           ||= mech
-
-    @encoding = nil if html_body =~ /<meta[^>]*charset[^>]*>/i
-
-    raise Mechanize::ContentTypeError, response['content-type'] unless
-      response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/i
   end
 
   def title
@@ -62,6 +68,12 @@ class Mechanize::Page < Mechanize::File
           nil
         end
       end
+  end
+
+  def charset content_type
+    charset = content_type[/charset=([^; ]+)/i, 1]
+    return nil if encoding == 'none'
+    charset
   end
 
   def encoding=(encoding)
@@ -84,13 +96,12 @@ class Mechanize::Page < Mechanize::File
 
   def parser
     return @parser if @parser
+    return nil unless @body
 
-    if body && response
-      if mech.html_parser == Nokogiri::HTML
-        @parser = mech.html_parser.parse(html_body, nil, @encoding)
-      else
-        @parser = mech.html_parser.parse(html_body)
-      end
+    @parser = mech.html_parser.parse(html_body, nil, @encoding)
+
+    unless @parser.errors.empty? then
+      @parser = mech.html_parser.parse html_body, nil, nil
     end
 
     @parser
@@ -289,8 +300,8 @@ class Mechanize::Page < Mechanize::File
   private
 
   def html_body
-    if body
-      body.length > 0 ? body : '<html></html>'
+    if @body
+      @body.empty? ? '<html></html>' : @body
     else
       ''
     end

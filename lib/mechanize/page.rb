@@ -21,6 +21,7 @@ class Mechanize::Page < Mechanize::File
 
     @bases = nil
     @encoding = nil
+    @encodings = [nil]
     @forms = nil
     @frames = nil
     @iframes = nil
@@ -29,9 +30,11 @@ class Mechanize::Page < Mechanize::File
     @meta = nil
     @parser = nil
 
+    @encodings << Mechanize::Util.detect_charset(body) if body
+
     response.each do |header, value|
       next unless value =~ /charset/i
-      @encoding = charset value
+      @encodings << charset(value)
     end
 
     if body
@@ -46,10 +49,8 @@ class Mechanize::Page < Mechanize::File
 
         encoding = charset $2
 
-        @encoding = encoding if encoding
+        @encodings << encoding if encoding
       end
-
-      @encoding ||= Mechanize::Util.detect_charset(body)
     end
 
     super(uri, response, body, code)
@@ -58,16 +59,8 @@ class Mechanize::Page < Mechanize::File
   def title
     @title ||=
       if doc = parser
-        title = if doc.respond_to?(:title)
-                  doc.title
-                else
-                  doc.search('title').inner_text
-                end
-        if title && !title.empty?
-          title
-        else
-          nil
-        end
+        title = doc.search('title').inner_text
+        title.empty? ? nil : title
       end
   end
 
@@ -99,10 +92,14 @@ class Mechanize::Page < Mechanize::File
     return @parser if @parser
     return nil unless @body
 
-    @parser = mech.html_parser.parse(html_body, nil, @encoding)
+    if @encoding then
+      @parser = mech.html_parser.parse(html_body, nil, @encoding)
+    else
+      @encodings.reverse_each do |encoding|
+        @parser = mech.html_parser.parse(html_body, nil, encoding)
 
-    unless @parser.errors.empty? then
-      @parser = mech.html_parser.parse html_body, nil, nil
+        break if @parser.errors.empty?
+      end
     end
 
     @parser

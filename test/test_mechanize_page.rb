@@ -16,7 +16,7 @@ class TestMechanizePage < Test::Unit::TestCase
   HTML
   BAD.force_encoding Encoding::BINARY if defined? Encoding
 
-  SJIS_TITLE = '\x83\x65\x83\x58\x83\x67'
+  SJIS_TITLE = "\x83\x65\x83\x58\x83\x67"
 
   SJIS_AFTER_TITLE = <<-HTML
 <title>#{SJIS_TITLE}</title>
@@ -24,6 +24,13 @@ class TestMechanizePage < Test::Unit::TestCase
   HTML
 
   SJIS_AFTER_TITLE.force_encoding Encoding::BINARY if defined? Encoding
+
+  SJIS_BAD_AFTER_TITLE = <<-HTML
+<title>#{SJIS_TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  HTML
+
+  SJIS_BAD_AFTER_TITLE.force_encoding Encoding::BINARY if defined? Encoding
 
   UTF8_TITLE = 'テスト'
   UTF8 = <<-HTML
@@ -67,7 +74,15 @@ class TestMechanizePage < Test::Unit::TestCase
 
     assert_equal [], page.parser.errors
 
-    assert_equal 'Shift_JIS', page.encoding
+    assert_equal 'UTF-8', page.encoding
+  end
+
+  def test_encoding_charset_after_title_double_bad
+    page = util_page SJIS_BAD_AFTER_TITLE
+
+    assert_equal [], page.parser.errors
+
+    assert_equal 'SHIFT_JIS', page.encoding
   end
 
   def test_encoding_equals

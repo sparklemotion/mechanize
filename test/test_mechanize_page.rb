@@ -7,34 +7,43 @@ class TestMechanizePage < Test::Unit::TestCase
     @agent = Mechanize.new
   end
 
-  def test_encoding_from_page
+  def test_encoding
     page = @agent.get("http://localhost/tc_charset.html")
     assert_equal 'windows-1255', page.encoding
   end
 
-  def test_encoding_override_before_parser_initialized
-    # document has a bad encoding information - windows-1255
-    page = @agent.get("http://localhost/tc_bad_charset.html")
-    # encoding is wrong, so user wants to force ISO-8859-2
-    page.encoding = 'ISO-8859-2'
-    assert_equal 'ISO-8859-2', page.encoding
+  def test_encoding_equals
+    page = @agent.get("http://localhost/file_upload.html")
+
+    page.encoding = 'UTF-8'
+
+    assert_equal 'UTF-8', page.parser.encoding
   end
 
-  def test_encoding_override_after_parser_was_initialized
+  def test_encoding_equals_before_parser
+    # document has a bad encoding information - windows-1255
+    page = @agent.get("http://localhost/tc_bad_charset.html")
+
+    # encoding is wrong, so user wants to force ISO-8859-2
+    page.encoding = 'ISO-8859-2'
+
+    assert_equal 'ISO-8859-2', page.encoding
+    assert_equal 'ISO-8859-2', page.parser.encoding
+  end
+
+  def test_encoding_equals_after_parser
     # document has a bad encoding information - windows-1255
     page = @agent.get("http://localhost/tc_bad_charset.html")
     page.parser
+
     # autodetection sets encoding to windows-1255
     assert_equal 'windows-1255', page.encoding
+
     # encoding is wrong, so user wants to force ISO-8859-2
     page.encoding = 'ISO-8859-2'
-    assert_equal 'ISO-8859-2', page.encoding
-  end
 
-  def test_set_encoding
-    page = @agent.get("http://localhost/file_upload.html")
-    page.encoding = 'UTF-8'
-    assert_equal 'UTF-8', page.parser.encoding
+    assert_equal 'ISO-8859-2', page.encoding
+    assert_equal 'ISO-8859-2', page.parser.encoding
   end
 
   def test_title
@@ -42,7 +51,7 @@ class TestMechanizePage < Test::Unit::TestCase
     assert_equal('File Upload Form', page.title)
   end
 
-  def test_no_title
+  def test_title_none
     page = @agent.get("http://localhost/no_title_test.html")
     assert_equal(nil, page.title)
   end
@@ -58,7 +67,7 @@ class TestMechanizePage < Test::Unit::TestCase
     assert_equal 'EUC-JP', page.parser.encoding
   end
 
-  def test_find_form_with_hash
+  def test_form
     page  = @agent.get("http://localhost/tc_form_action.html")
     form = page.form(:name => 'post_form1')
     assert form

@@ -29,7 +29,9 @@ class Mechanize
     alias :content :body
 
     def initialize(uri=nil, response=nil, body=nil, code=nil)
-      @uri, @body, @code = uri, body, code
+      @uri = uri
+      @body = body
+      @code = code
       @response = Headers.new
 
       # Copy the headers in to a hash to prevent memory leaks

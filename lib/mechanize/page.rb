@@ -34,22 +34,23 @@ class Mechanize::Page < Mechanize::File
       @encoding = charset value
     end
 
-    # Force the encoding to be 8BIT so we can perform regular expressions.
-    # We'll set it to the detected encoding later
-    body.force_encoding('ASCII-8BIT') if
-      body && body.respond_to?(:force_encoding)
+    if body
+      # Force the encoding to be 8BIT so we can perform regular expressions.
+      # We'll set it to the detected encoding later
+      body.force_encoding('ASCII-8BIT') if body.respond_to?(:force_encoding)
 
-    body.scan /<meta .*?>/i do |meta|
-      next unless meta =~ /http-equiv=(["'])?content-type\1/i
+      body.scan(/<meta .*?>/i) do |meta|
+        next unless meta =~ /http-equiv=(["'])?content-type\1/i
 
-      meta =~ /content=(["'])?(.*?)\1/i
+        meta =~ /content=(["'])?(.*?)\1/i
 
-      encoding = charset $2
+        encoding = charset $2
 
-      @encoding = encoding if encoding
-    end if body
+        @encoding = encoding if encoding
+      end
 
-    @encoding ||= Mechanize::Util.detect_charset(body)
+      @encoding ||= Mechanize::Util.detect_charset(body)
+    end
 
     super(uri, response, body, code)
   end
@@ -72,7 +73,7 @@ class Mechanize::Page < Mechanize::File
 
   def charset content_type
     charset = content_type[/charset=([^; ]+)/i, 1]
-    return nil if encoding == 'none'
+    return nil if charset == 'none'
     charset
   end
 

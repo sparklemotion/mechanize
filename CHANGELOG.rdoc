@@ -62,6 +62,7 @@ Mechanize is now under the MIT license
   * file URIs are now read in binary mode.  GH #83
   * Content-Encoding: x-gzip is now treated like gzip per RFC 2616.
   * Mechanize now unescapes URIs for meta refresh.  GH #68
+  * Mechanize now has more robust HTML charset detection.  GH #43
 
 === 1.0.0
 

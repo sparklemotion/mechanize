@@ -43,7 +43,7 @@ class Mechanize::Page < Mechanize::File
       body.force_encoding('ASCII-8BIT') if body.respond_to?(:force_encoding)
 
       body.scan(/<meta .*?>/i) do |meta|
-        next unless meta =~ /http-equiv=(["'])?content-type\1/i
+        next unless meta =~ /http-equiv\s*=\s*(["'])?content-type\1/i
 
         meta =~ /content=(["'])?(.*?)\1/i
 

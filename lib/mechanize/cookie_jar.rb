@@ -1,5 +1,3 @@
-require 'yaml'
-
 ##
 # This class is used to manage the Cookies that have been returned from
 # any particular website.
@@ -85,6 +83,13 @@ class Mechanize::CookieJar
     open(file, 'w') { |f|
       case format
       when :yaml then
+        begin
+          require 'psych'
+        rescue LoadError
+        end
+
+        require 'yaml'
+
         YAML.dump(jar.jar, f)
       when :cookiestxt then
         jar.dump_cookiestxt(f)

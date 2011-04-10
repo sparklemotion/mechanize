@@ -95,8 +95,12 @@ class TestMechanizePage < Test::Unit::TestCase
 
   def test_encoding_equals
     page = util_page
+    page.meta
+    assert page.instance_variable_get(:@meta)
 
     page.encoding = 'UTF-8'
+
+    assert_nil page.instance_variable_get(:@meta)
 
     assert_equal 'UTF-8', page.encoding
     assert_equal 'UTF-8', page.parser.encoding

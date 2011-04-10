@@ -19,16 +19,11 @@ class Mechanize::Page < Mechanize::File
     raise Mechanize::ContentTypeError, response['content-type'] unless
       response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/i
 
-    @bases = nil
     @encoding = nil
     @encodings = [nil]
-    @forms = nil
-    @frames = nil
-    @iframes = nil
-    @links = nil
     @mech = mech
-    @meta = nil
-    @parser = nil
+
+    reset
 
     @encodings << Mechanize::Util.detect_charset(body) if body
 
@@ -71,6 +66,8 @@ class Mechanize::Page < Mechanize::File
   end
 
   def encoding=(encoding)
+    reset
+
     @encoding = encoding
 
     if @parser
@@ -111,13 +108,26 @@ class Mechanize::Page < Mechanize::File
 
   alias :root :parser
 
+  def reset
+    @bases = nil
+    @forms = nil
+    @frames = nil
+    @iframes = nil
+    @links = nil
+    @labels = nil
+    @labels_hash = nil
+    @meta = nil
+    @parser = nil
+    @title = nil
+  end
+
   # Return the canonical URI for the page if there is a link tag
   # with href="canonical".
   def canonical_uri
     link = at('link[@rel="canonical"][@href]') and URI(link['href'])
   end
 
-# Get the content type
+  # Get the content type
   def content_type
     response['content-type']
   end

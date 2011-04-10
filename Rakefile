@@ -11,9 +11,9 @@ Hoe.spec 'mechanize' do
   self.readme_file      = 'README.rdoc'
   self.history_file     = 'CHANGELOG.rdoc'
   self.extra_rdoc_files += Dir['*.rdoc']
-  self.extra_deps       << ['nokogiri', '>= 1.2.1']
-  self.extra_deps       << ['net-http-persistent', '~> 1.1']
-  self.extra_deps       << ['net-http-digest_auth', '~> 1.1']
+  self.extra_deps       << ['nokogiri', '~> 1.4']
+  self.extra_deps       << ['net-http-persistent', '~> 1.6']
+  self.extra_deps       << ['net-http-digest_auth', '~> 1.1', '>= 1.1.1']
   self.spec_extras[:required_ruby_version] = '>= 1.8.7'
 end
 

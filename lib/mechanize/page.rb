@@ -99,6 +99,10 @@ class Mechanize::Page < Mechanize::File
         @parser = mech.html_parser.parse(html_body, nil, encoding)
 
         break if @parser.errors.empty?
+
+        break unless @parser.errors.any? do |error|
+          error.message =~ /(indicate encoding)|(Invalid char)/
+        end
       end
     end
 

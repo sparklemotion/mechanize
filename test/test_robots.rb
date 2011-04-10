@@ -9,20 +9,21 @@ class TestRobots < Test::Unit::TestCase
   end
 
   def test_robots
-    assert_nothing_raised {
-      assert_equal "Welcome!", @robot.get("http://localhost/robots.html").title
-    }
+    assert_equal "Welcome!", @robot.get("http://localhost/robots.html").title
+
     assert_raise(Mechanize::RobotsDisallowedError) {
       @robot.get("http://localhost/norobots.html")
     }
   end
 
-  def test_robots_allowed?
-    assert  @agent.robots_allowed?("http://localhost/robots.html")
-    assert !@agent.robots_allowed?("http://localhost/norobots.html")
+  def test_robots_allowed_eh
+    allowed    = URI.parse 'http://localhost/robots.html'
+    disallowed = URI.parse 'http://localhost/norobots.html'
+    assert  @agent.robots_allowed?(allowed)
+    assert !@agent.robots_allowed?(disallowed)
 
-    assert !@agent.robots_disallowed?("http://localhost/robots.html")
-    assert  @agent.robots_disallowed?("http://localhost/norobots.html")
+    assert !@agent.robots_disallowed?(allowed)
+    assert  @agent.robots_disallowed?(disallowed)
   end
 
   def test_noindex
@@ -30,7 +31,7 @@ class TestRobots < Test::Unit::TestCase
       @agent.get("http://localhost/noindex.html")
     }
 
-    assert @robot.robots_allowed?("http://localhost/noindex.html")
+    assert @robot.robots_allowed?(URI.parse("http://localhost/noindex.html"))
     assert_raise(Mechanize::RobotsDisallowedError) {
       @robot.get("http://localhost/noindex.html")
     }

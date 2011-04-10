@@ -499,8 +499,10 @@ class Mechanize
 
   # Tests if this agent is allowed to access +url+, consulting the
   # site's robots.txt.
-  def robots_allowed?(url)
-    webrobots.allowed?(url)
+  def robots_allowed?(uri)
+    return true if uri.request_uri == '/robots.txt'
+
+    webrobots.allowed?(uri)
   end
 
   # Equivalent to !robots_allowed?(url).
@@ -1036,7 +1038,7 @@ require 'mechanize/pluggable_parsers'
 require 'mechanize/redirect_limit_reached_error'
 require 'mechanize/redirect_not_get_or_head_error'
 require 'mechanize/response_code_error'
-require 'mechanize/robots_disallowed_error.rb'
+require 'mechanize/robots_disallowed_error'
 require 'mechanize/unsupported_scheme_error'
 require 'mechanize/uri_resolver'
 require 'mechanize/util'

@@ -215,7 +215,7 @@ class TestMechMethods < Test::Unit::TestCase
       @agent.history.last.uri.to_s)
   end
 
-  def test_click_hpricot
+  def test_click_hpricot_style
     page = @agent.get("http://localhost/frame_test.html")
 
     link = (page/"//a[@class='bar']").first
@@ -225,7 +225,7 @@ class TestMechMethods < Test::Unit::TestCase
       @agent.history.last.uri.to_s)
   end
 
-  def test_click_hpricot_frame
+  def test_click_frame_hpricot_style
     page = @agent.get("http://localhost/frame_test.html")
 
     link = (page/"//frame[@name='frame2']").first

@@ -23,6 +23,7 @@ Mechanize is now under the MIT license
   * The User-Agent header has changed.  It no longer includes the WWW- prefix
     and now includes the ruby version.  The URL has been updated as well.
   * Mechanize now requires ruby 1.8.7 or newer.
+  * Hpricot support has been removed as webrobots requires nokogiri.
 
 * New Features
 

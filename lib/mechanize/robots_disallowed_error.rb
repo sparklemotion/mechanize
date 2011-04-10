@@ -1,7 +1,7 @@
 class Mechanize
   # Exception that is raised when an access to a resource is
   # disallowed by robots.txt or by HTML document itself.
-  class RobotsDisallowedError < RuntimeError
+  class RobotsDisallowedError < Mechanize::Error
     def initialize(url)
       if url.is_a?(URI)
         @url = url.to_s

@@ -34,7 +34,7 @@ class Mechanize
 
   ##
   # The version of Mechanize you are using.
-  VERSION = '2.0.pre.1'
+  VERSION = '2.0'
 
   class Error < RuntimeError
   end

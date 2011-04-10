@@ -5,6 +5,7 @@ Hoe.plugin :gemspec
 Hoe.plugin :git
 
 Hoe.spec 'mechanize' do
+  developer 'Eric Hodel',      'drbrain@segment7.net'
   developer 'Aaron Patterson', 'aaronp@rubyforge.org'
   developer 'Mike Dalessio',   'mike.dalessio@gmail.com'
 

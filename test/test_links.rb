@@ -94,14 +94,23 @@ class LinksMechTest < Test::Unit::TestCase
     link = page.links_with(:text => /Bold Dude/)
     assert_equal(1, link.length)
     assert_equal('Bold Dude', link.first.text)
+    assert_equal [], link.first.rel
+    assert !link.first.rel?('me')
+    assert !link.first.rel?('nofollow')
 
     link = page.links_with(:text => 'Aaron James Patterson')
     assert_equal(1, link.length)
     assert_equal('Aaron James Patterson', link.first.text)
+    assert_equal ['me'], link.first.rel
+    assert link.first.rel?('me')
+    assert !link.first.rel?('nofollow')
 
     link = page.links_with(:text => 'Aaron Patterson')
     assert_equal(1, link.length)
     assert_equal('Aaron Patterson', link.first.text)
+    assert_equal ['me', 'nofollow'], link.first.rel
+    assert link.first.rel?('me')
+    assert link.first.rel?('nofollow')
 
     link = page.links_with(:text => 'Ruby Rocks!')
     assert_equal(1, link.length)

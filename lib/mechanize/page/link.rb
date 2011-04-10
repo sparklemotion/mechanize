@@ -39,6 +39,16 @@ class Mechanize
         @href && URI.parse(WEBrick::HTTPUtils.escape(@href))
       end
 
+      # A list of words in the rel attribute, all lower-cased.
+      def rel
+        @rel ||= (val = attributes['rel']) ? val.downcase.split(' ') : []
+      end
+
+      # Test if the rel attribute includes +kind+.
+      def rel?(kind)
+        rel.include?(kind)
+      end
+
       # Click on this link
       def click
         @mech.click self

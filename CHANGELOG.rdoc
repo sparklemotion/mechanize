@@ -39,6 +39,16 @@ Mechanize is now under the MIT license
   * Mechanize now allows a certificate and key to be passed directly.  GH #71
   * Mechanize::Form::MultiSelectList now implements #option_with and
     #options_with.  GH #42
+  * Add Mechanize::Page::Link#rel and #rel?(kind) to read and test the rel
+    attribute.
+  * Add Mechanize::Page#canonical_uri to read a </tt><link
+    rel="canonical"></tt> tag.
+  * Add support for Robots Exclusion Protocol (i.e. robots.txt) and
+    nofollow/noindex in meta tags and the rel attribute.  Automatic
+    exclusion can be turned on by setting:
+      agent.robots = true
+  * Manual robots.txt test can be performed with
+    Mechanize#robots_allowed? and #robots_disallowed?.
 
 * Bug Fixes:
 

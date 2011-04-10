@@ -111,7 +111,13 @@ class Mechanize::Page < Mechanize::File
 
   alias :root :parser
 
-  # Get the content type
+  # Return the canonical URI for the page if there is a link tag
+  # with href="canonical".
+  def canonical_uri
+    link = at('link[@rel="canonical"][@href]') and URI(link['href'])
+  end
+
+# Get the content type
   def content_type
     response['content-type']
   end

@@ -12,7 +12,6 @@ require 'uri'
 require 'webrick/httputils'
 require 'zlib'
 
-
 # = Synopsis
 # The Mechanize library is used for automating interaction with a website.  It
 # can follow links, and submit forms.  Form fields can be populated and
@@ -71,7 +70,7 @@ class Mechanize
   attr_accessor  :read_timeout
 
   # The identification string for the client initiating a web request
-  attr_accessor :user_agent
+  attr_reader :user_agent
 
   # The value of watch_for_set is passed to pluggable parsers for retrieved
   # content
@@ -95,6 +94,15 @@ class Mechanize
   # Permanently) redirects are followed.  If it is a false value, no
   # redirects are followed.
   attr_accessor :redirect_ok
+
+  # Says this agent should consult the site's robots.txt for each access.
+  attr_reader :robots
+
+  def robots=(value)
+    require 'webrobots' if value
+    @webrobots = nil if value != @robots
+    @robots = value
+  end
 
   # Disables HTTP/1.1 gzip compression (enabled by default)
   attr_accessor :gzip_enabled
@@ -198,6 +206,9 @@ class Mechanize
     @follow_meta_refresh  = false
     @redirection_limit    = 20
 
+    @robots         = false
+    @webrobots      = nil
+
     # Connection Cache & Keep alive
     @keep_alive_time  = 300
     @keep_alive       = true
@@ -241,6 +252,11 @@ class Mechanize
     set_http proxy
 
     nil
+  end
+
+  def user_agent=(value)
+    @webrobots = nil if value != @user_agent
+    @user_agent = value
   end
 
   # Set the user agent for the Mechanize object.
@@ -347,6 +363,14 @@ class Mechanize
   # Mechanize::Page::Link object passed in. Returns the page fetched.
   def click(link)
     case link
+    when Page::Link
+      referer = link.page || current_page()
+      if robots
+        if (referer.is_a?(Page) && referer.parser.nofollow?) || link.rel?('nofollow')
+          raise RobotsDisallowedError.new(link.href)
+        end
+      end
+      get(:url => link.href, :referer => referer)
     when String, Regexp
       if real_link = page.link_with(:text => link)
         click real_link
@@ -359,10 +383,10 @@ class Mechanize
         submit form, button if form
       end
     else
-      referer = link.page rescue referer = nil
+      referer = current_page()
       href = link.respond_to?(:href) ? link.href :
         (link['href'] || link['src'])
-      get(:url => href, :referer => (referer || current_page()))
+      get(:url => href, :referer => referer)
     end
   end
 
@@ -471,6 +495,34 @@ class Mechanize
     ensure
       @history = history_backup
     end
+  end
+
+  # Tests if this agent is allowed to access +url+, consulting the
+  # site's robots.txt.
+  def robots_allowed?(url)
+    webrobots.allowed?(url)
+  end
+
+  # Equivalent to !robots_allowed?(url).
+  def robots_disallowed?(url)
+    !webrobots.allowed?(url)
+  end
+
+  # Returns an error object if there is an error in fetching or
+  # parsing robots.txt of the site +url+.
+  def robots_error(url)
+    webrobots.error(url)
+  end
+
+  # Raises the error if there is an error in fetching or parsing
+  # robots.txt of the site +url+.
+  def robots_error!(url)
+    webrobots.error!(url)
+  end
+
+  # Removes robots.txt cache for the site +url+.
+  def robots_reset(url)
+    webrobots.reset(url)
   end
 
   alias :page :current_page
@@ -814,6 +866,21 @@ class Mechanize
 
   private
 
+  def webrobots_http_get(uri)
+    get_file(uri)
+  rescue Net::HTTPExceptions => e
+    case e.response
+    when Net::HTTPNotFound
+      ''
+    else
+      raise e
+    end
+  end
+
+  def webrobots
+    @webrobots ||= WebRobots.new(@user_agent, :http_get => method(:webrobots_http_get))
+  end
+
   def resolve(url, referer = current_page())
     @resolver.resolve(url, referer).to_s
   end
@@ -889,6 +956,11 @@ class Mechanize
 
     pre_connect request
 
+    # Consult robots.txt
+    if robots && uri.is_a?(URI::HTTP)
+      robots_allowed?(uri) or raise RobotsDisallowedError.new(uri)
+    end
+
     # Add If-Modified-Since if page is in history
     if (page = visited_page(uri)) and page.response['Last-Modified']
       request['If-Modified-Since'] = page.response['Last-Modified']
@@ -921,7 +993,13 @@ class Mechanize
     return meta if meta
 
     case response
-    when Net::HTTPSuccess, Mechanize::FileResponse
+    when Net::HTTPSuccess
+      if robots && page.is_a?(Page)
+        page.parser.noindex? and raise RobotsDisallowedError.new(uri)
+      end
+
+      page
+    when Mechanize::FileResponse
       page
     when Net::HTTPNotModified
       log.debug("Got cached page") if log
@@ -958,6 +1036,7 @@ require 'mechanize/pluggable_parsers'
 require 'mechanize/redirect_limit_reached_error'
 require 'mechanize/redirect_not_get_or_head_error'
 require 'mechanize/response_code_error'
+require 'mechanize/robots_disallowed_error.rb'
 require 'mechanize/unsupported_scheme_error'
 require 'mechanize/uri_resolver'
 require 'mechanize/util'

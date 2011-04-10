@@ -2,6 +2,7 @@
 /Gemfile
 /Gemfile.lock
 /TAGS
+/pkg
 /tags
 digest.htpasswd
 doc

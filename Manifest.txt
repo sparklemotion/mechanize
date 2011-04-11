@@ -6,6 +6,7 @@ LICENSE.rdoc
 Manifest.txt
 README.rdoc
 Rakefile
+digest.htpasswd
 examples/flickr_upload.rb
 examples/mech-dump.rb
 examples/proxy_req.rb
@@ -113,7 +114,6 @@ test/htdocs/test_click.html
 test/htdocs/unusual______.html
 test/servlets.rb
 test/ssl_server.rb
-test/test_blank_form.rb
 test/test_checkboxes.rb
 test/test_content_type.rb
 test/test_cookies.rb

@@ -6,6 +6,14 @@ class TestMechanizeForm < Test::Unit::TestCase
     @agent = Mechanize.new
   end
 
+  def test_build_query_blank_form
+    page = @agent.get('http://localhost/tc_blank_form.html')
+    form = page.forms.first
+    query = form.build_query
+    assert(query.length > 0)
+    assert query.all? { |x| x[1] == '' }
+  end
+
   def test_field_with
     page = @agent.get("http://localhost/google.html")
     search = page.forms.find { |f| f.name == "f" }

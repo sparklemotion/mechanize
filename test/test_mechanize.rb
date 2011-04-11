@@ -106,14 +106,34 @@ class TestMechanize < Test::Unit::TestCase
       @agent.history.last.uri.to_s)
   end
 
-  def test_click_hpricot_style
+  def test_click_hpricot_style # HACK move to test_divide in Page
     page = @agent.get("http://localhost/frame_test.html")
 
     link = (page/"//a[@class='bar']").first
     assert_not_nil(link)
+
     page = @agent.click(link)
+
     assert_equal("http://localhost/form_test.html",
       @agent.history.last.uri.to_s)
+  end
+
+  def test_click_link_hpricot_style # HACK move to test_search in Page
+    page = @agent.get("http://localhost/tc_encoded_links.html")
+
+    page = @agent.click(page.search('a').first)
+
+    assert_equal("http://localhost/form_post?a=b&b=c", page.uri.to_s)
+  end
+
+  def test_click_link_query
+    page = @agent.get("http://localhost/tc_encoded_links.html")
+    link = page.links.first
+    assert_equal('/form_post?a=b&b=c', link.href)
+
+    page = @agent.click(link)
+
+    assert_equal("http://localhost/form_post?a=b&b=c", page.uri.to_s)
   end
 
   def test_click_link_space

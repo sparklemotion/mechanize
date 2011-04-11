@@ -114,7 +114,6 @@ test/htdocs/unusual______.html
 test/servlets.rb
 test/ssl_server.rb
 test/test_cookies.rb
-test/test_encoded_links.rb
 test/test_errors.rb
 test/test_field_precedence.rb
 test/test_follow_meta.rb

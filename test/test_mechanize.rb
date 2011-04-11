@@ -1046,6 +1046,30 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal(@agent.http.proxy_uri.password, 'lol')
   end
 
+  def test_submit_check_one
+    page = @agent.get('http://localhost/tc_checkboxes.html')
+    form = page.forms.first
+    form.checkboxes_with(:name => 'green')[1].check
+
+    page = @agent.submit(form)
+
+    assert_equal(1, page.links.length)
+    assert_equal('green:on', page.links.first.text)
+  end
+
+  def test_submit_check_two
+    page = @agent.get('http://localhost/tc_checkboxes.html')
+    form = page.forms.first
+    form.checkboxes_with(:name => 'green')[0].check
+    form.checkboxes_with(:name => 'green')[1].check
+
+    page = @agent.submit(form)
+
+    assert_equal(2, page.links.length)
+    assert_equal('green:on', page.links[0].text)
+    assert_equal('green:on', page.links[1].text)
+  end
+
   def test_submit_headers
     page = @agent.get('http://localhost:2000/form_no_action.html')
     assert form = page.forms.first

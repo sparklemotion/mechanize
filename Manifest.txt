@@ -6,7 +6,6 @@ LICENSE.rdoc
 Manifest.txt
 README.rdoc
 Rakefile
-digest.htpasswd
 examples/flickr_upload.rb
 examples/mech-dump.rb
 examples/proxy_req.rb
@@ -114,7 +113,6 @@ test/htdocs/test_click.html
 test/htdocs/unusual______.html
 test/servlets.rb
 test/ssl_server.rb
-test/test_checkboxes.rb
 test/test_content_type.rb
 test/test_cookies.rb
 test/test_encoded_links.rb
@@ -141,6 +139,7 @@ test/test_mechanize_file.rb
 test/test_mechanize_file_request.rb
 test/test_mechanize_file_response.rb
 test/test_mechanize_form.rb
+test/test_mechanize_form_check_box.rb
 test/test_mechanize_form_image_button.rb
 test/test_mechanize_page.rb
 test/test_mechanize_redirect_not_get_or_head_error.rb

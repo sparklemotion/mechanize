@@ -114,7 +114,6 @@ test/htdocs/unusual______.html
 test/servlets.rb
 test/ssl_server.rb
 test/test_cookies.rb
-test/test_field_precedence.rb
 test/test_follow_meta.rb
 test/test_form_action.rb
 test/test_form_as_hash.rb
@@ -136,6 +135,7 @@ test/test_mechanize_file_request.rb
 test/test_mechanize_file_response.rb
 test/test_mechanize_form.rb
 test/test_mechanize_form_check_box.rb
+test/test_mechanize_form_field.rb
 test/test_mechanize_form_image_button.rb
 test/test_mechanize_page.rb
 test/test_mechanize_redirect_not_get_or_head_error.rb

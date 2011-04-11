@@ -1104,6 +1104,5 @@ require 'mechanize/redirect_not_get_or_head_error'
 require 'mechanize/response_code_error'
 require 'mechanize/robots_disallowed_error'
 require 'mechanize/unsupported_scheme_error'
-require 'mechanize/uri_resolver'
 require 'mechanize/util'
 

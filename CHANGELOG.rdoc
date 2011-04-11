@@ -24,6 +24,7 @@ Mechanize is now under the MIT license
     and now includes the ruby version.  The URL has been updated as well.
   * Mechanize now requires ruby 1.8.7 or newer.
   * Hpricot support has been removed as webrobots requires nokogiri.
+  * Mechanize#get no longer accepts the referer as the second argument.
 
 * New Features
 

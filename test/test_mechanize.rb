@@ -215,6 +215,13 @@ class TestMechanize < Test::Unit::TestCase
     assert(response)
   end
 
+  def test_get
+    page = @agent.get('http://localhost', { :q => 'h' }, 'http://example',
+                      { 'X-H' => 'v' })
+
+    assert_equal 'http://localhost/?q=h', page.uri.to_s
+  end
+
   def test_get_HTTP
     page = @agent.get('HTTP://localhost/', { :q => 'hello' })
     assert_equal('HTTP://localhost/?q=hello', page.uri.to_s)
@@ -285,9 +292,6 @@ class TestMechanize < Test::Unit::TestCase
     @agent.pre_connect_hooks << lambda { |_, req|
       request = req
     }
-
-    @agent.get('http://localhost/', URI.parse('http://google.com/'))
-    assert_equal 'http://google.com/', request['Referer']
 
     @agent.get('http://localhost/', [], 'http://tenderlovemaking.com/')
     assert_equal 'http://tenderlovemaking.com/', request['Referer']

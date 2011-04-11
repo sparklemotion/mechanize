@@ -279,17 +279,15 @@ class Mechanize
   alias :basic_auth :auth
 
   # Fetches the URL passed in and returns a page.
-  def get(options, parameters = [], referer = nil)
+  def get(uri, parameters = [], referer = nil, headers = {})
     method = :get
 
-    unless options.is_a? Hash
-      url = options
-      unless parameters.respond_to?(:each) # FIXME: Remove this in 0.8.0
-        referer = parameters
-        parameters = []
-      end
-    else
-      raise ArgumentError, "url must be specified" unless url = options[:url]
+    if Hash === uri then
+      options = uri
+      location = Gem.location_of_caller.join ':'
+      warn "#{location}: Mechanize#get with options hash is deprecated and will be removed October 2011"
+
+      raise ArgumentError, "url must be specified" unless uri = options[:url]
       parameters = options[:params] || []
       referer    = options[:referer]
       headers    = options[:headers]
@@ -297,7 +295,7 @@ class Mechanize
     end
 
     unless referer
-      if url.to_s =~ %r{\Ahttps?://}
+      if uri.to_s =~ %r{\Ahttps?://}
         referer = Page.new(nil, {'content-type'=>'text/html'})
       else
         referer = current_page || Page.new(nil, {'content-type'=>'text/html'})
@@ -315,7 +313,7 @@ class Mechanize
 
     # fetch the page
     headers ||= {}
-    page = fetch_page url, method, headers, parameters, referer
+    page = fetch_page uri, method, headers, parameters, referer
     add_to_history(page)
     yield page if block_given?
     page
@@ -370,7 +368,7 @@ class Mechanize
           raise RobotsDisallowedError.new(link.href)
         end
       end
-      get(:url => link.href, :referer => referer)
+      get link.href, [], referer
     when String, Regexp
       if real_link = page.link_with(:text => link)
         click real_link
@@ -386,7 +384,7 @@ class Mechanize
       referer = current_page()
       href = link.respond_to?(:href) ? link.href :
         (link['href'] || link['src'])
-      get(:url => href, :referer => referer)
+      get href, [], referer
     end
   end
 
@@ -445,11 +443,10 @@ class Mechanize
     when 'POST'
       post_form(form.action, form, headers)
     when 'GET'
-      get(  :url      => form.action.gsub(/\?[^\?]*$/, ''),
-            :params   => form.build_query,
-            :headers  => headers,
-            :referer  => form.page
-            )
+      get(form.action.gsub(/\?[^\?]*$/, ''),
+          form.build_query,
+          form.page,
+          headers)
     else
       raise ArgumentError, "unsupported method: #{form.method.upcase}"
     end

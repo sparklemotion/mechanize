@@ -96,6 +96,35 @@ class TestMechanize < Test::Unit::TestCase
       @agent.history.last.uri.to_s)
   end
 
+  def test_click_frame_hpricot_style
+    page = @agent.get("http://localhost/frame_test.html")
+
+    link = (page/"//frame[@name='frame2']").first
+    assert_not_nil(link)
+    page = @agent.click(link)
+    assert_equal("http://localhost/form_test.html",
+      @agent.history.last.uri.to_s)
+  end
+
+  def test_click_hpricot_style
+    page = @agent.get("http://localhost/frame_test.html")
+
+    link = (page/"//a[@class='bar']").first
+    assert_not_nil(link)
+    page = @agent.click(link)
+    assert_equal("http://localhost/form_test.html",
+      @agent.history.last.uri.to_s)
+  end
+
+  def test_click_link_space
+    page = @agent.get("http://localhost/tc_bad_links.html")
+
+    @agent.click page.links.first
+
+    assert_match(/alt_text.html$/, @agent.history.last.uri.to_s)
+    assert_equal(2, @agent.history.length)
+  end
+
   def test_click_more
     @agent.get 'http://localhost/test_click.html'
     @agent.click 'A Button'
@@ -109,26 +138,6 @@ class TestMechanize < Test::Unit::TestCase
     @agent.click @agent.page.link_with(:text => 'A Link')
     assert_equal 'http://localhost/index.html',
       @agent.page.uri.to_s
-  end
-
-  def test_click_hpricot_style
-    page = @agent.get("http://localhost/frame_test.html")
-
-    link = (page/"//a[@class='bar']").first
-    assert_not_nil(link)
-    page = @agent.click(link)
-    assert_equal("http://localhost/form_test.html",
-      @agent.history.last.uri.to_s)
-  end
-
-  def test_click_frame_hpricot_style
-    page = @agent.get("http://localhost/frame_test.html")
-
-    link = (page/"//frame[@name='frame2']").first
-    assert_not_nil(link)
-    page = @agent.click(link)
-    assert_equal("http://localhost/form_test.html",
-      @agent.history.last.uri.to_s)
   end
 
   def test_connection_for_file
@@ -333,6 +342,16 @@ class TestMechanize < Test::Unit::TestCase
     requests.each do |request|
       assert_nil request['referer']
     end
+  end
+
+  def test_get_space
+    page = nil
+
+    page = @agent.get("http://localhost/tc_bad_links.html ")
+
+    assert_match(/tc_bad_links.html$/, @agent.history.last.uri.to_s)
+
+    assert_equal(1, @agent.history.length)
   end
 
   def test_get_tilde

@@ -113,7 +113,6 @@ test/htdocs/test_click.html
 test/htdocs/unusual______.html
 test/servlets.rb
 test/ssl_server.rb
-test/test_bad_links.rb
 test/test_blank_form.rb
 test/test_checkboxes.rb
 test/test_content_type.rb

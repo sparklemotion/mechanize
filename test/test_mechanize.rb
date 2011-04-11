@@ -311,6 +311,14 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal(content_length.to_i, page_as_string.length.to_i)
   end
 
+  def test_get_gzip
+    page = @agent.get("http://localhost/gzip?file=index.html")
+
+    assert_kind_of(Mechanize::Page, page)
+
+    assert_match('Hello World', page.body)
+  end
+
   def test_get_kcode
     $KCODE = 'u'
     page = @agent.get("http://localhost/?a=#{[0xd6].pack('U')}")
@@ -881,7 +889,7 @@ class TestMechanize < Test::Unit::TestCase
   end
 
   def test_response_read_encoding_gzip
-    def @res.read_body()
+    def @res.read_body
       yield "\037\213\b\0002\002\225M\000\003"
       yield "+H,*\001\000\306p\017I\004\000\000\000"
     end

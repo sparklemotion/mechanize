@@ -722,6 +722,22 @@ class TestMechanize < Test::Unit::TestCase
     assert_match %r%Ruby/#{ruby_version}%, @req['user-agent']
   end
 
+  def test_resolve_bad_uri
+    e = assert_raises ArgumentError do
+      @agent.resolve 'google'
+    end
+
+    assert_equal 'absolute URL needed (not google)', e.message
+  end
+
+  def test_resolve_utf8
+    uri = 'http://example?q=ü'
+
+    resolved = @agent.resolve uri
+
+    assert_equal '/?q=%C3%BC', resolved.request_uri
+  end
+
   def test_resolve_parameters_body
     input_params = { :q => 'hello' }
 

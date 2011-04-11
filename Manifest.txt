@@ -114,7 +114,6 @@ test/htdocs/unusual______.html
 test/servlets.rb
 test/ssl_server.rb
 test/test_cookies.rb
-test/test_errors.rb
 test/test_field_precedence.rb
 test/test_follow_meta.rb
 test/test_form_action.rb
@@ -122,7 +121,6 @@ test/test_form_as_hash.rb
 test/test_form_button.rb
 test/test_form_no_inputname.rb
 test/test_frames.rb
-test/test_gzipping.rb
 test/test_headers.rb
 test/test_history.rb
 test/test_history_added.rb

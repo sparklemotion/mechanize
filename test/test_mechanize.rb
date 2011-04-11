@@ -269,6 +269,12 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal('http://localhost/?foo=bar%22', page.uri.to_s)
   end
 
+  def test_get_bad_url
+    assert_raise ArgumentError do
+      @agent.get('/foo.html')
+    end
+  end
+
   def test_get_basic_auth_bad
     @agent.basic_auth('aaron', 'aaron')
 
@@ -370,6 +376,12 @@ class TestMechanize < Test::Unit::TestCase
     requests.each do |request|
       assert_nil request['referer']
     end
+  end
+
+  def test_get_scheme_unsupported
+    assert_raise(Mechanize::UnsupportedSchemeError) {
+      @agent.get('ftp://server.com/foo.html')
+    }
   end
 
   def test_get_space
@@ -1074,6 +1086,13 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal(@agent.http.proxy_uri.password, 'lol')
   end
 
+  def test_submit_bad_form_method
+    page = @agent.get("http://localhost/bad_form_test.html")
+    assert_raise ArgumentError do
+      @agent.submit(page.forms.first)
+    end
+  end
+
   def test_submit_check_one
     page = @agent.get('http://localhost/tc_checkboxes.html')
     form = page.forms.first
@@ -1109,6 +1128,16 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal 'bar', headers['foo']
   end
 
+  def test_submit_too_many_radiobuttons
+    page = @agent.get("http://localhost/form_test.html")
+    form = page.form_with(:name => 'post_form1')
+    form.radiobuttons.each { |r| r.checked = true }
+
+    assert_raises Mechanize::Error do
+      @agent.submit(form)
+    end
+  end
+
   def test_transact
     @agent.get("http://localhost/frame_test.html")
     assert_equal(1, @agent.history.length)
@@ -1119,6 +1148,12 @@ class TestMechanize < Test::Unit::TestCase
       assert_equal(6, @agent.history.length)
     }
     assert_equal(1, @agent.history.length)
+  end
+
+  def test_user_agent_alias_equals_unknown
+    assert_raises ArgumentError do
+      @agent.user_agent_alias = "Aaron's Browser"
+    end
   end
 
   def test_visited_eh

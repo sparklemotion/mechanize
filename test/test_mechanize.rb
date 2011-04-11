@@ -51,6 +51,12 @@ class TestMechanize < Test::Unit::TestCase
       @agent.history.last.uri.to_s)
   end
 
+  def test_basic_auth
+    @agent.basic_auth('user', 'pass')
+    page = @agent.get("http://localhost/basic_auth")
+    assert_equal('You are authenticated', page.body)
+  end
+
   def test_cert_key_file
     Tempfile.open 'key' do |key|
       Tempfile.open 'cert' do |cert|
@@ -219,6 +225,41 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal('http://localhost/?foo=bar%22', page.uri.to_s)
   end
 
+  def test_get_basic_auth_bad
+    @agent.basic_auth('aaron', 'aaron')
+
+    e = assert_raises Mechanize::ResponseCodeError do
+      @agent.get("http://localhost/basic_auth")
+    end
+
+    assert_equal("401", e.response_code)
+  end
+
+  def test_get_basic_auth_none
+    e = assert_raises Mechanize::ResponseCodeError do
+      @agent.get("http://localhost/basic_auth")
+    end
+
+    assert_equal("401", e.response_code)
+  end
+
+  def test_get_digest_auth
+    block_called = false
+
+    @agent.basic_auth('user', 'pass')
+
+    @agent.pre_connect_hooks << lambda { |_, request|
+      block_called = true
+      request.to_hash.each do |k,v|
+        assert_equal(1, v.length)
+      end
+    }
+
+    page = @agent.get("http://localhost/digest_auth")
+    assert_equal('You are authenticated', page.body)
+    assert block_called
+  end
+
   def test_get_file
     page = @agent.get("http://localhost/frame_test.html")
     content_length = page.header['Content-Length']
@@ -380,6 +421,26 @@ class TestMechanize < Test::Unit::TestCase
       assert_equal(10, @agent.history.size)
       @agent.get("http://localhost/")
     end
+  end
+
+  def test_post_basic_auth
+    class << @agent
+      alias :old_fetch_page :fetch_page
+      attr_accessor :requests
+      def fetch_page(uri, method, *args)
+        @requests ||= []
+        x = old_fetch_page(uri, method, *args)
+        @requests << method
+        x
+      end
+    end
+    @agent.basic_auth('user', 'pass')
+    page = @agent.post("http://localhost/basic_auth")
+    assert_equal('You are authenticated', page.body)
+    assert_equal(2, @agent.requests.length)
+    r1 = @agent.requests[0]
+    r2 = @agent.requests[1]
+    assert_equal(r1, r2)
   end
 
   def test_post_connect

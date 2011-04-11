@@ -1,22 +1,8 @@
 require 'helper'
 
-class TestFieldPrecedence < Test::Unit::TestCase
-  def setup
-    @agent = Mechanize.new
-    @page = @agent.get('http://localhost/tc_field_precedence.html')
-  end
+class TestMechanizeFormField < Test::Unit::TestCase
 
-  def test_first_field_wins
-    form = @page.forms.first
-    assert !form.checkboxes.empty?
-    assert_equal "1", form.checkboxes.first.value
-
-    submitted = form.submit
-
-    assert_equal 'ticky=1&ticky=0', submitted.parser.at('#query').text
-  end
-
-  def test_field_sort
+  def test_field_spaceship
     doc = Nokogiri::HTML::Document.new
     node = doc.create_element('input')
     node['name'] = 'foo'
@@ -30,4 +16,6 @@ class TestFieldPrecedence < Test::Unit::TestCase
     assert_equal [a, b], [b, a].sort
     assert_equal [b, c].sort, [b, c].sort
   end
+
 end
+

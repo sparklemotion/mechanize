@@ -43,6 +43,18 @@ class TestMechanizeForm < Test::Unit::TestCase
     assert_match('/form_no_action.html?first=Aaron', page.uri.to_s)
   end
 
+  def test_submit_first_field_wins
+    page = @agent.get('http://localhost/tc_field_precedence.html')
+    form = page.forms.first
+
+    assert !form.checkboxes.empty?
+    assert_equal "1", form.checkboxes.first.value
+
+    submitted = form.submit
+
+    assert_equal 'ticky=1&ticky=0', submitted.parser.at('#query').text
+  end
+
   def test_submit_takes_arbirary_headers
     page = @agent.get('http://localhost:2000/form_no_action.html')
     assert form = page.forms.first

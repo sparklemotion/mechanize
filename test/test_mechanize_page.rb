@@ -49,6 +49,17 @@ class TestMechanizePage < Test::Unit::TestCase
     Mechanize::Page.new @uri, res, body, 200, @agent
   end
 
+  def test_initialize_content_type
+    assert Mechanize::Page.new nil, 'content-type' => 'application/xhtml+xml'
+    assert Mechanize::Page.new nil, 'content-type' => 'text/html'
+
+    e = assert_raises Mechanize::ContentTypeError do
+      Mechanize::Page.new nil, 'content-type' => 'text/plain'
+    end
+
+    assert_equal 'text/plain', e.content_type
+  end
+
   def test_canonical_uri
     page = @agent.get("http://localhost/canonical_uri.html")
     assert_equal(URI("http://localhost/canonical_uri"), page.canonical_uri)

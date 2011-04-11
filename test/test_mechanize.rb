@@ -317,12 +317,110 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal(content_length.to_i, page_as_string.length.to_i)
   end
 
+  def test_get_follow_meta_refresh
+    @agent.follow_meta_refresh = true
+
+    page = @agent.get('http://localhost/tc_follow_meta.html')
+
+    assert_equal(2, @agent.history.length)
+
+    assert_equal('http://localhost/tc_follow_meta.html',
+                 @agent.history.first.uri.to_s)
+    assert_equal('http://localhost/index.html', page.uri.to_s)
+    assert_equal('http://localhost/index.html', @agent.history.last.uri.to_s)
+  end
+
+  def test_get_follow_meta_refresh_disabled
+    page = @agent.get('http://localhost/tc_follow_meta.html')
+    assert_equal('http://localhost/tc_follow_meta.html', page.uri.to_s)
+    assert_equal(1, page.meta.length)
+  end
+
+  def test_get_follow_meta_refresh_empty_url
+    @agent.follow_meta_refresh = true
+
+    page = @agent.get('http://localhost/refresh_with_empty_url')
+
+    assert_equal(3, @agent.history.length)
+    assert_equal('http://localhost/refresh_with_empty_url',
+                 @agent.history[0].uri.to_s)
+    assert_equal('http://localhost/refresh_with_empty_url',
+                 @agent.history[1].uri.to_s)
+    assert_equal('http://localhost/index.html', page.uri.to_s)
+    assert_equal('http://localhost/index.html', @agent.history.last.uri.to_s)
+  end
+
+  def test_get_follow_meta_refresh_in_body
+    @agent.follow_meta_refresh = true
+    requests = []
+    @agent.pre_connect_hooks << lambda { |_, request|
+      requests << request
+    }
+
+    @agent.get('http://localhost/tc_meta_in_body.html')
+    assert_equal 1, requests.length
+  end
+
+  def test_get_follow_meta_refresh_no_url
+    @agent.follow_meta_refresh = true
+
+    page = @agent.get('http://localhost/refresh_without_url')
+
+    assert_equal(3, @agent.history.length)
+    assert_equal('http://localhost/refresh_without_url',
+                 @agent.history[0].uri.to_s)
+    assert_equal('http://localhost/refresh_without_url',
+                 @agent.history[1].uri.to_s)
+    assert_equal('http://localhost/index.html', page.uri.to_s)
+    assert_equal('http://localhost/index.html', @agent.history.last.uri.to_s)
+  end
+
+  def test_get_follow_meta_refresh_referer_not_sent
+    @agent.follow_meta_refresh = true
+
+    requests = []
+
+    @agent.pre_connect_hooks << lambda { |_, request|
+      requests << request
+    }
+
+    @agent.get('http://localhost/tc_follow_meta.html')
+
+    assert_equal 2, @agent.history.length
+    assert_nil requests.last['referer']
+  end
+
   def test_get_gzip
     page = @agent.get("http://localhost/gzip?file=index.html")
 
     assert_kind_of(Mechanize::Page, page)
 
     assert_match('Hello World', page.body)
+  end
+
+  def test_get_http_refresh
+    @agent.follow_meta_refresh = true
+    page = @agent.get('http://localhost/http_refresh?refresh_time=0')
+    assert_equal('http://localhost/index.html', page.uri.to_s)
+    assert_equal(2, @agent.history.length)
+  end
+
+  def test_get_http_refresh_delay
+    @agent.follow_meta_refresh = true
+    class << @agent
+      attr_accessor :slept
+      def sleep *args
+        @slept = args
+      end
+    end
+
+    @agent.get('http://localhost/http_refresh?refresh_time=1')
+    assert_equal [1], @agent.slept
+  end
+
+  def test_get_http_refresh_disabled
+    page = @agent.get('http://localhost/http_refresh?refresh_time=0')
+    assert_equal('http://localhost/http_refresh?refresh_time=0', page.uri.to_s)
   end
 
   def test_get_kcode
@@ -344,6 +442,20 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal(page.uri.to_s, 'http://localhost/verb')
 
     assert_equal 'GET', page.header['X-Request-Method']
+  end
+
+  def test_get_redirect_found
+    page = @agent.get('http://localhost/response_code?code=302&ct=test/xml')
+
+    assert_equal('http://localhost/index.html', page.uri.to_s)
+
+    assert_equal(2, @agent.history.length)
+  end
+
+  def test_get_redirect_infinite
+    assert_raises(Mechanize::RedirectLimitReachedError) {
+      @agent.get('http://localhost/infinite_refresh')
+    }
   end
 
   def test_get_referer

@@ -46,6 +46,7 @@ lib/mechanize/pluggable_parsers.rb
 lib/mechanize/redirect_limit_reached_error.rb
 lib/mechanize/redirect_not_get_or_head_error.rb
 lib/mechanize/response_code_error.rb
+lib/mechanize/robots_disallowed_error.rb
 lib/mechanize/unsupported_scheme_error.rb
 lib/mechanize/uri_resolver.rb
 lib/mechanize/util.rb
@@ -58,6 +59,7 @@ test/helper.rb
 test/htdocs/alt_text.html
 test/htdocs/bad_form_test.html
 test/htdocs/button.jpg
+test/htdocs/canonical_uri.html
 test/htdocs/dir with spaces/foo.html
 test/htdocs/empty_form.html
 test/htdocs/file_upload.html
@@ -79,8 +81,14 @@ test/htdocs/index.html
 test/htdocs/link with space.html
 test/htdocs/meta_cookie.html
 test/htdocs/no_title_test.html
+test/htdocs/nofollow.html
+test/htdocs/noindex.html
+test/htdocs/norobots.html
 test/htdocs/rails_3_encoding_hack_form_test.html
+test/htdocs/rel_nofollow.html
 test/htdocs/relative/tc_relative_links.html
+test/htdocs/robots.html
+test/htdocs/robots.txt
 test/htdocs/tc_bad_charset.html
 test/htdocs/tc_bad_links.html
 test/htdocs/tc_base_images.html
@@ -106,7 +114,6 @@ test/htdocs/test_click.html
 test/htdocs/unusual______.html
 test/servlets.rb
 test/ssl_server.rb
-test/test_authenticate.rb
 test/test_bad_links.rb
 test/test_blank_form.rb
 test/test_checkboxes.rb
@@ -120,11 +127,8 @@ test/test_form_action.rb
 test/test_form_as_hash.rb
 test/test_form_button.rb
 test/test_form_no_inputname.rb
-test/test_forms.rb
 test/test_frames.rb
-test/test_get_headers.rb
 test/test_gzipping.rb
-test/test_hash_api.rb
 test/test_headers.rb
 test/test_history.rb
 test/test_history_added.rb
@@ -132,16 +136,17 @@ test/test_html_unscape_forms.rb
 test/test_if_modified_since.rb
 test/test_images.rb
 test/test_links.rb
-test/test_mech.rb
-test/test_mech_proxy.rb
 test/test_mechanize.rb
 test/test_mechanize_cookie.rb
 test/test_mechanize_cookie_jar.rb
 test/test_mechanize_file.rb
 test/test_mechanize_file_request.rb
 test/test_mechanize_file_response.rb
+test/test_mechanize_form.rb
 test/test_mechanize_form_image_button.rb
 test/test_mechanize_page.rb
+test/test_mechanize_redirect_not_get_or_head_error.rb
+test/test_mechanize_subclass.rb
 test/test_mechanize_uri_resolver.rb
 test/test_mechanize_util.rb
 test/test_meta.rb
@@ -153,11 +158,11 @@ test/test_post_form.rb
 test/test_pretty_print.rb
 test/test_radiobutton.rb
 test/test_redirect_limit_reached.rb
-test/test_redirect_verb_handling.rb
 test/test_referer.rb
 test/test_relative_links.rb
 test/test_request.rb
 test/test_response_code.rb
+test/test_robots.rb
 test/test_save_file.rb
 test/test_scheme.rb
 test/test_select.rb
@@ -166,7 +171,6 @@ test/test_select_none.rb
 test/test_select_noopts.rb
 test/test_set_fields.rb
 test/test_ssl_server.rb
-test/test_subclass.rb
 test/test_textarea.rb
 test/test_upload.rb
 test/test_verbs.rb

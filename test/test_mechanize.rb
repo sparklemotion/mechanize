@@ -144,6 +144,14 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal @agent.http, conn
   end
 
+  def test_delete_redirect
+    page = @agent.delete('http://localhost/redirect')
+
+    assert_equal(page.uri.to_s, 'http://localhost/verb')
+
+    assert_equal 'GET', page.header['X-Request-Method']
+  end
+
   #def test_download
   #  Dir.mktmpdir do |dir|
   #    file = "#{dir}/download"
@@ -274,6 +282,50 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal(content_length.to_i, page_as_string.length.to_i)
   end
 
+  def test_get_header # HACK push down to request_*
+    page = @agent.get('http://localhost/http_headers', [], nil,
+                      { "X-BS-French-Header" => 'Ou est la bibliotheque?' })
+
+    assert_header(page, 'x-bs-french-header' => 'Ou est la bibliotheque?')
+  end
+
+  def test_get_header_bad
+    assert_raises ArgumentError do
+      @agent.get("http://localhost/", [], nil, { :foobar => "is fubar"})
+    end
+  end
+
+  def test_get_header_cookie # HACK push down to request_*
+    page = @agent.get("http://localhost/send_cookies", [], nil,
+                      {'Cookie' => 'name=Aaron' })
+
+    assert_equal(1, page.links.length)
+
+    assert_not_nil(page.links.find { |l| l.text == "name:Aaron" })
+  end
+
+  def test_get_header_etag # HACK push down to request_*
+    page = @agent.get('http://localhost/http_headers', [], nil,
+                      { :etag => '160604-24bc-9fe2c40'})
+
+    assert_header(page, 'etag' => '160604-24bc-9fe2c40')
+  end
+
+  def test_get_header_host # HACK push down to request_*
+    page = @agent.get('http://localhost/http_headers', [], nil,
+                      { :etag => '160604-24bc-9fe2c40' })
+    assert_header(page, 'host' => 'localhost')
+  end
+
+  def test_get_header_if_modified_since_header # HACK push down to request_*
+    value = (Time.now - 600).strftime("%a, %d %b %Y %H:%M:%S %z")
+
+    page = @agent.get('http://localhost/http_headers', [], nil,
+                      { :if_modified_since => value})
+
+    assert_header(page, 'if-modified-since' => value)
+  end
+
   def test_get_kcode
     $KCODE = 'u'
     page = @agent.get("http://localhost/?a=#{[0xd6].pack('U')}")
@@ -285,6 +337,14 @@ class TestMechanize < Test::Unit::TestCase
   def test_get_query
     page = @agent.get('http://localhost/', { :q => 'hello' })
     assert_equal('http://localhost/?q=hello', page.uri.to_s)
+  end
+
+  def test_get_redirect
+    page = @agent.get('http://localhost/redirect')
+
+    assert_equal(page.uri.to_s, 'http://localhost/verb')
+
+    assert_equal 'GET', page.header['X-Request-Method']
   end
 
   def test_get_referer
@@ -319,6 +379,16 @@ class TestMechanize < Test::Unit::TestCase
     end
   end
 
+  def test_get_response_if_modified_since # HACK push down to response_*
+    value = (Time.now - 600).strftime("%a, %d %b %Y %H:%M:%S %z")
+
+    page = @agent.get('http://localhost/if_modified_since', [], nil,
+                      { :if_modified_since => value })
+
+    assert_equal "304", page.code
+    assert_equal "0", page.header['content-length']
+  end
+
   def test_get_tilde
     page = @agent.get('http://localhost/?foo=~2')
     assert_equal('http://localhost/?foo=~2', page.uri.to_s)
@@ -345,6 +415,14 @@ class TestMechanize < Test::Unit::TestCase
 
     assert pages
     assert_equal('File Upload Form', pages.title)
+  end
+
+  def test_head_redirect
+    page = @agent.head('http://localhost/redirect')
+
+    assert_equal(page.uri.to_s, 'http://localhost/verb')
+
+    assert_equal 'HEAD', page.header['X-Request-Method']
   end
 
   def test_history
@@ -447,6 +525,14 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal(r1, r2)
   end
 
+  def test_post_redirect
+    page = @agent.post('http://localhost/redirect')
+
+    assert_equal(page.uri.to_s, 'http://localhost/verb')
+
+    assert_equal 'GET', page.header['X-Request-Method']
+  end
+
   def test_post_connect
     @agent.post_connect_hooks << proc { |agent, response|
       assert_equal @agent, agent
@@ -469,6 +555,14 @@ class TestMechanize < Test::Unit::TestCase
     assert_throws :called do
       @agent.pre_connect @req
     end
+  end
+
+  def test_put_redirect
+    page = @agent.put('http://localhost/redirect', 'foo')
+
+    assert_equal(page.uri.to_s, 'http://localhost/verb')
+
+    assert_equal 'GET', page.header['X-Request-Method']
   end
 
   def test_request_cookies
@@ -1012,5 +1106,17 @@ class TestMechanize < Test::Unit::TestCase
                  @agent.visited?('http://localhost/response_code?code=302'))
   end
 
+  def assert_header(page, header)
+    headers = {}
+
+    page.body.split(/[\r\n]+/).each do |page_header|
+      headers.[]=(*page_header.chomp.split(/\|/))
+    end
+
+    header.each do |key, value|
+      assert(headers.has_key?(key))
+      assert_equal(value, headers[key])
+    end
+  end
 end
 

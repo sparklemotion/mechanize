@@ -1,8 +1,18 @@
 require "helper"
 
-class FormsMechTest < Test::Unit::TestCase
+class TestMechanizeForm < Test::Unit::TestCase
+
   def setup
     @agent = Mechanize.new
+  end
+
+  def test_field_with
+    page = @agent.get("http://localhost/google.html")
+    search = page.forms.find { |f| f.name == "f" }
+    assert_not_nil(search)
+    assert_not_nil(search.field_with(:name => 'q'))
+    assert_not_nil(search.field_with(:name => 'hl'))
+    assert_not_nil(search.fields.find { |f| f.name == 'ie' })
   end
 
   def test_post_with_rails_3_encoding_hack

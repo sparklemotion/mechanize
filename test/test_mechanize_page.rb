@@ -134,6 +134,19 @@ class TestMechanizePage < Test::Unit::TestCase
     assert_equal 'ISO-8859-2', page.parser.encoding
   end
 
+  def test_frames_with
+    page = @agent.get("http://localhost/frame_test.html")
+    assert_equal(3, page.frames.size)
+
+    find_orig = page.frames.find_all { |f| f.name == 'frame1' }
+
+    find1 = page.frames_with(:name => 'frame1')
+
+    find_orig.zip(find1).each { |a,b|
+      assert_equal(a, b)
+    }
+  end
+
   def test_title
     page = util_page
 

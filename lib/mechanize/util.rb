@@ -24,18 +24,19 @@ class Mechanize::Util
     end
   end
 
-  def self.from_native_charset(s, code)
+  def self.from_native_charset(s, code, encode_option=nil, log=nil)
     return s unless s && code
     return s unless Mechanize.html_parser == Nokogiri::HTML
 
     if RUBY_VERSION < '1.9.2'
       begin
         Iconv.iconv(code.to_s, "UTF-8", s).join("")
-      rescue Iconv::InvalidEncoding, Iconv::IllegalSequence
+      rescue Iconv::InvalidEncoding
+        log.info("from_native_charset: Iconv::InvalidEncoding: #{code}") if log
         s
       end
     else
-      s.encode("UTF-8") rescue s
+      s.encode(code, encode_option)
     end
   end
 

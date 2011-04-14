@@ -3,115 +3,116 @@ require "helper"
 
 class TestMechanizeFormEncoding < Test::Unit::TestCase
 
+  # See also: tests of Util.from_native_charset
   # Encoding test should do with non-utf-8 characters
 
-  MULTIBYTE_VALUE = "テスト" # "test" in Japanese UTF-8 encoding
-  MULTIBYTE_ENCODING = 'Shift_JIS' # one of Japanese encoding
+  INPUTTED_VALUE = "テスト" # "test" in Japanese UTF-8 encoding
+  CONTENT_ENCODING = 'Shift_JIS' # one of Japanese encoding
   encoded_value = "\x83\x65\x83\x58\x83\x67" # "test" in Japanese Shift_JIS encoding
   encoded_value.force_encoding(::Encoding::SHIFT_JIS) if encoded_value.respond_to?(:force_encoding)
-  pct_escaped = CGI.escape(encoded_value) # same to Util.build_query_string
-  EXPECTED_MULTIBYTE_QUERY= "first_name=#{pct_escaped}&first_name=&gender=&green%5Beggs%5D="
+  EXPECTED_QUERY = "first_name=#{CGI.escape(encoded_value)}&first_name=&gender=&green%5Beggs%5D="
 
-  FROM_NATIVE_CHARSET_USES_ICONV = RUBY_VERSION < '1.9.2'
-  ENCODING_MISMATCH = if FROM_NATIVE_CHARSET_USES_ICONV
-                        Iconv::IllegalSequence
-                      else
-                        Encoding::UndefinedConversionError
-                      end
+  if Mechanize::Util::NEW_RUBY_ENCODING
+    ENCODING_ERRORS = [EncodingError, Encoding::ConverterNotFoundError] # and so on
+  else
+    ENCODING_ERRORS = [Iconv::InvalidEncoding, Iconv::IllegalSequence]
+  end
 
-  RAILS3_HACK_RESULT = /\Autf8=%E2%9C%93/
+  ENCODING_LOG_MESSAGE = /INFO -- : form encoding: Shift_JIS/
+  INVALID_ENCODING = 'UTF-eight'
 
   def setup
     @agent = Mechanize.new
   end
 
-  def server_received
-    @agent.page.at('div#query').inner_text
+  def set_form_with_encoding(enc)
+    page = @agent.get("http://localhost/form_set_fields.html")
+    form = page.forms.first
+    form.encoding = enc
+    form['first_name'] = INPUTTED_VALUE
+    form
   end
 
-  # note: rails_3_encoding_hack_form_test.html has html-escaped UTF-8 value in hidden
-  #       Mechanize parses this html as ISO-8859-1, because html-escaped value is ASCII
 
-  def test_post_with_form_accept_charset
+  def test_form_encoding_returns_accept_charset
     page = @agent.get("http://localhost/rails_3_encoding_hack_form_test.html")
     form = page.forms.first
-    form.field('user_session[email]').value = 'email@example.com'
+    accept_charset = form.form_node['accept-charset']
 
-    assert_not_equal 'UTF-8', page.encoding
-    assert_equal 'UTF-8', form.encoding
-    assert_nothing_raised(ENCODING_MISMATCH){ form.submit }
-    assert_match RAILS3_HACK_RESULT, server_received
+    assert accept_charset
+    assert_equal accept_charset, form.encoding
+    assert_not_equal page.encoding, form.encoding
   end
 
-  def test_post_with_form_wrong_accept_charset
-    page = @agent.get("http://localhost/rails_3_encoding_hack_form_test.html")
+  def test_form_encoding_returns_page_encoding_when_no_accept_charset
+    page = @agent.get("http://localhost/form_set_fields.html")
     form = page.forms.first
-    form.field('user_session[email]').value = 'email@example.com'
-    form.encoding = 'ISO-8859-1'
+    accept_charset = form.form_node['accept-charset']
 
-    assert_not_equal 'UTF-8', form.encoding
-    assert_raise(ENCODING_MISMATCH){ form.submit }
+    assert_nil accept_charset
+    assert_not_equal accept_charset, form.encoding
+    assert_equal page.encoding, form.encoding
   end
 
-  unless FROM_NATIVE_CHARSET_USES_ICONV
-    def test_post_multibytes_as_ascii
-      page = @agent.get("http://localhost/rails_3_encoding_hack_form_test.html")
-      form = page.forms.first
-      form.field('user_session[email]').value = 'email@example.com'
-      form.encoding = 'ISO-8859-1', {:undef => :replace}
+  def test_form_encoding_equals_sets_new_encoding
+    page = @agent.get("http://localhost/form_set_fields.html")
+    form = page.forms.first
 
-      assert_nothing_raised(ENCODING_MISMATCH){ form.submit }
-      assert_not_match RAILS3_HACK_RESULT, server_received
+    assert_not_equal CONTENT_ENCODING, form.encoding
+
+    form.encoding = CONTENT_ENCODING
+
+    assert_equal CONTENT_ENCODING, form.encoding
+  end
+
+  def test_form_encoding_returns_nil_when_no_page_in_initialize
+    # this sequence is seen at Mechanize#post(url, query_hash)
+
+    node = {}
+    # Create a fake form
+    class << node
+      def search(*args); []; end
     end
+    node['method'] = 'POST'
+    node['enctype'] = 'application/x-www-form-urlencoded'
+    form = Mechanize::Form.new(node)
+
+    assert_equal nil, form.encoding
   end
 
 
-  def test_post_multibytes_raises_error_without_encoding_infomation
-    page = @agent.get("http://localhost/form_set_fields.html")
-    form = page.forms.first
-    form['first_name'] = MULTIBYTE_VALUE
+  def test_post_form_with_form_encoding
+    form = set_form_with_encoding CONTENT_ENCODING
+    form.submit
 
-    assert_not_equal MULTIBYTE_ENCODING, form.encoding
-    assert_raise(ENCODING_MISMATCH){ form.submit }
+    # we can not use "links.find{|l| l.text == 'key:val'}" assertion here
+    # because the link text encoding is always UTF-8 regaredless of html encoding
+    assert EXPECTED_QUERY, @agent.page.at('div#query').inner_text
   end
 
-  def test_post_multibytes_with_page_encoding
-    page = @agent.get("http://localhost/form_set_fields.html")
-    page.encoding = MULTIBYTE_ENCODING # set correct encoding to page
-    form = page.forms.first
-    form['first_name'] = MULTIBYTE_VALUE
+  def test_post_form_with_problematic_encoding
+    form = set_form_with_encoding INVALID_ENCODING
 
-    assert_equal MULTIBYTE_ENCODING, form.encoding
-    assert_nothing_raised(ENCODING_MISMATCH){ form.submit }
-    assert_equal EXPECTED_MULTIBYTE_QUERY, server_received
+    assert_raise(*ENCODING_ERRORS){ form.submit }
   end
 
-  def test_post_multibytes_with_form_encoding
-    page = @agent.get("http://localhost/form_set_fields.html")
-    form = page.forms.first
-    form.encoding = MULTIBYTE_ENCODING # set correct encoding to form
-    form['first_name'] = MULTIBYTE_VALUE
+  def test_form_ignore_encoding_error_is_true
+    form = set_form_with_encoding INVALID_ENCODING
+    form.ignore_encoding_error = true
 
-    assert_equal MULTIBYTE_ENCODING, form.encoding
-    assert_nothing_raised(ENCODING_MISMATCH){ form.submit }
-    assert_equal EXPECTED_MULTIBYTE_QUERY, server_received
+    assert_nothing_raised(*ENCODING_ERRORS){ form.submit }
   end
 
-  if FROM_NATIVE_CHARSET_USES_ICONV
-    def test_post_multibytes_failure_logged
-      sio = StringIO.new
-      @agent.log = Logger.new(sio)
-      @agent.log.level = Logger::INFO
-      page = @agent.get("http://localhost/form_set_fields.html")
-      form = page.forms.first
-      form.encoding = 'utf-eight'
-      form['first_name'] = MULTIBYTE_VALUE
+  def test_post_form_logs_form_encoding
+    sio = StringIO.new
+    @agent.log = Logger.new(sio)
+    @agent.log.level = Logger::INFO
 
-      assert_nothing_raised(ENCODING_MISMATCH){ form.submit }
-      assert_not_equal EXPECTED_MULTIBYTE_QUERY, server_received
-      assert_match /from_native_charset: Iconv::InvalidEncoding: utf-eight/, sio.string
+    form = set_form_with_encoding CONTENT_ENCODING
+    form.submit
 
-      Mechanize.log = nil
-    end
-  end
+    assert_match ENCODING_LOG_MESSAGE, sio.string
+
+    @agent.log = nil
+   end
 end

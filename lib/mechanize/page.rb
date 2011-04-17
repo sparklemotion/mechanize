@@ -15,6 +15,11 @@ class Mechanize::Page < Mechanize::File
 
   attr_accessor :mech
 
+  ##
+  # Possible encodings for this page based on HTTP headers and meta elements
+
+  attr_reader :encodings
+
   def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
     raise Mechanize::ContentTypeError, response['content-type'] unless
       response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/i
@@ -98,7 +103,9 @@ class Mechanize::Page < Mechanize::File
         break if @parser.errors.empty?
 
         break unless @parser.errors.any? do |error|
-          error.message =~ /(indicate encoding)|(Invalid char)/
+          error.message =~ /(indicate\ encoding)|
+                            (Invalid\ char)|
+                            (input\ conversion failed)/x
         end
       end
     end

@@ -46,6 +46,7 @@ class TestMechanizePage < Test::Unit::TestCase
   end
 
   def util_page body = @body, res = @res
+    body.force_encoding Encoding::BINARY if body.respond_to? :force_encoding
     Mechanize::Page.new @uri, res, body, 200, @agent
   end
 
@@ -102,6 +103,18 @@ class TestMechanizePage < Test::Unit::TestCase
     assert_equal [], page.parser.errors
 
     assert_equal 'SHIFT_JIS', page.encoding
+  end
+
+  def test_encoding_charset_bad
+    page = util_page "<title>#{UTF8_TITLE}</title>"
+    page.encodings.replace %w[
+      UTF-8
+      Shift_JIS
+    ]
+
+    assert_equal [], page.parser.errors
+
+    assert_equal 'UTF-8', page.encoding
   end
 
   def test_encoding_equals

@@ -1,14 +1,14 @@
-# = Synopsis
+##
 # This class encapsulates an HTML page.  If Mechanize finds a content
 # type of 'text/html', this class will be instantiated and returned.
 #
-# == Example
-#  require 'rubygems'
-#  require 'mechanize'
+# Example:
 #
-#  agent = Mechanize.new
-#  agent.get('http://google.com/').class  #=> Mechanize::Page
+#   require 'mechanize'
 #
+#   agent = Mechanize.new
+#   agent.get('http://google.com/').class # => Mechanize::Page
+
 class Mechanize::Page < Mechanize::File
   extend Forwardable
   extend Mechanize::ElementMatcher

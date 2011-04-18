@@ -90,6 +90,18 @@ class Mechanize::Page < Mechanize::File
     parser.respond_to?(:encoding) ? parser.encoding : nil
   end
 
+  # Return whether parser result has errors related to encoding or not.
+  # false indicates just parser has no encoding errors, not encoding is vaild.
+  def encoding_error?(parser=nil)
+    parser = self.parser unless parser
+    return false if parser.errors.empty?
+    parser.errors.any? do |error|
+      error.message =~ /(indicate\ encoding)|
+                        (Invalid\ char)|
+                        (input\ conversion\ failed)/x
+    end
+  end
+
   def parser
     return @parser if @parser
     return nil unless @body
@@ -100,13 +112,7 @@ class Mechanize::Page < Mechanize::File
       @encodings.reverse_each do |encoding|
         @parser = mech.html_parser.parse(html_body, nil, encoding)
 
-        break if @parser.errors.empty?
-
-        break unless @parser.errors.any? do |error|
-          error.message =~ /(indicate\ encoding)|
-                            (Invalid\ char)|
-                            (input\ conversion\ failed)/x
-        end
+        break unless encoding_error?(@parser)
       end
     end
 

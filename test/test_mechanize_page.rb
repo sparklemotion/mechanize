@@ -38,6 +38,8 @@ class TestMechanizePage < Test::Unit::TestCase
 <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
   HTML
 
+  ENCODING_ERROR_CLASS = Nokogiri::XML::SyntaxError
+
   def setup
     @agent = Mechanize.new
     @uri = URI('http://example')
@@ -94,7 +96,7 @@ class TestMechanizePage < Test::Unit::TestCase
   def test_encoding_charset_after_title
     page = util_page SJIS_AFTER_TITLE
 
-    assert_equal [], page.parser.errors
+    assert_equal false, page.encoding_error?
 
     assert_equal 'Shift_JIS', page.encoding
   end
@@ -102,7 +104,7 @@ class TestMechanizePage < Test::Unit::TestCase
   def test_encoding_charset_after_title_bad
     page = util_page UTF8
 
-    assert_equal [], page.parser.errors
+    assert_equal false, page.encoding_error?
 
     assert_equal 'UTF-8', page.encoding
   end
@@ -110,7 +112,7 @@ class TestMechanizePage < Test::Unit::TestCase
   def test_encoding_charset_after_title_double_bad
     page = util_page SJIS_BAD_AFTER_TITLE
 
-    assert_equal [], page.parser.errors
+    assert_equal false, page.encoding_error?
 
     assert_equal 'SHIFT_JIS', page.encoding
   end
@@ -122,7 +124,7 @@ class TestMechanizePage < Test::Unit::TestCase
       Shift_JIS
     ]
 
-    assert_equal [], page.parser.errors
+    assert_equal false, page.encoding_error?
 
     assert_equal 'UTF-8', page.encoding
   end
@@ -140,6 +142,48 @@ class TestMechanizePage < Test::Unit::TestCase
     assert_equal 'UTF-8', page.parser.encoding
   end
 
+  def test_page_encoding_error?
+    page = util_page
+    page.parser.errors.clear
+    assert_equal false, page.encoding_error?
+  end
+
+  def test_detect_libxml2error_indicate_encoding
+    page = util_page
+    page.parser.errors.clear
+
+    # error in libxml2-2.7.8/parser.c, HTMLparser.c or parserInternals.c
+    page.parser.errors = [ENCODING_ERROR_CLASS.new("Input is not proper UTF-8, indicate encoding !\n")]
+    assert_equal true, page.encoding_error?
+  end
+
+  def test_detect_libxml2error_invalid_char
+    page = util_page
+    page.parser.errors.clear
+
+    # error in libxml2-2.7.8/HTMLparser.c
+    page.parser.errors = [ENCODING_ERROR_CLASS.new("Invalid char in CDATA 0x%X\n")]
+    assert_equal true, page.encoding_error?
+  end
+
+  def test_detect_libxml2error_input_conversion_failed
+    page = util_page
+    page.parser.errors.clear
+
+    # error in libxml2-2.7.8/encoding.c
+    page.parser.errors = [ENCODING_ERROR_CLASS.new("input conversion failed due to input error\n")]
+    assert_equal true, page.encoding_error?
+  end
+
+  def test_detect_libxml2error_which_unsupported_by_mechanize
+    page = util_page
+    page.parser.errors.clear
+
+    # error in libxml2-2.7.8/HTMLparser.c
+    page.parser.errors = [ENCODING_ERROR_CLASS.new("encoder error\n")]
+    assert_equal false, page.encoding_error?
+  end
+
   def test_encoding_equals_before_parser
     # document has a bad encoding information - windows-1255
     page = util_page BAD
@@ -147,7 +191,7 @@ class TestMechanizePage < Test::Unit::TestCase
     # encoding is wrong, so user wants to force ISO-8859-2
     page.encoding = 'ISO-8859-2'
 
-    assert_equal [], page.parser.errors
+    assert_equal false, page.encoding_error?
     assert_equal 'ISO-8859-2', page.encoding
     assert_equal 'ISO-8859-2', page.parser.encoding
   end
@@ -159,11 +203,13 @@ class TestMechanizePage < Test::Unit::TestCase
 
     # autodetection sets encoding to windows-1255
     assert_equal 'windows-1255', page.encoding
+    # believe in yourself, not machine
+    assert_equal false, page.encoding_error?
 
     # encoding is wrong, so user wants to force ISO-8859-2
     page.encoding = 'ISO-8859-2'
 
-    assert_equal [], page.parser.errors
+    assert_equal false, page.encoding_error?
     assert_equal 'ISO-8859-2', page.encoding
     assert_equal 'ISO-8859-2', page.parser.encoding
   end

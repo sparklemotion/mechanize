@@ -29,7 +29,13 @@ class Mechanize
     attr_accessor :method, :action, :name
 
     attr_reader :fields, :buttons, :file_uploads, :radiobuttons, :checkboxes
+    # encoding for sending form (i.e. application/x-www-form-urlencoded)
     attr_accessor :enctype
+    # encoding for contents itself (i.e. UTF-8)
+    attr_accessor :encoding
+
+    # when true, encoding errors never raise on submit. default is false
+    attr_accessor :ignore_encoding_error
 
     alias :elements :fields
 
@@ -46,6 +52,8 @@ class Mechanize
       @page             = page
       @mech             = mech
 
+      @encoding = node['accept-charset'] || (page && page.encoding) || nil
+      @ignore_encoding_error = false
       parse
     end
 
@@ -173,7 +181,7 @@ class Mechanize
     private :proc_query
 
     def from_native_charset str
-      Util.from_native_charset(str,page && page.encoding)
+      Util.from_native_charset(str, encoding, @ignore_encoding_error, @mech && @mech.log)
     end
     private :from_native_charset
 
@@ -182,6 +190,7 @@ class Mechanize
     # be used to create a query string for this form.
     def build_query(buttons = [])
       query = []
+      @mech.log.info("form encoding: #{encoding}") if @mech && @mech.log
 
       (fields + checkboxes).sort.each do |f|
         case f

@@ -1060,6 +1060,21 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal 'Unsupported Content-Encoding: unknown', e.message
   end
 
+  def test_response_read_error
+    def @res.read_body()
+      yield 'part'
+      raise Net::HTTP::Persistent::Error
+    end
+
+    e = assert_raises Mechanize::ResponseReadError do
+      @agent.response_read @res, @req
+    end
+
+    assert_equal @res, e.response
+    assert_equal 'part', e.body.read
+    assert_kind_of Net::HTTP::Persistent::Error, e.error
+  end
+
   def test_response_read_file
     Tempfile.open 'pi.txt' do |tempfile|
       tempfile.write "π\n"

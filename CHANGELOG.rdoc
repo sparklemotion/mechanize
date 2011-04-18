@@ -60,6 +60,9 @@ Mechanize is now under the MIT license
   * Manual robots.txt test can be performed with
     Mechanize#robots_allowed? and #robots_disallowed?.
   * Mechanize::Form now supports the accept-charset attribute.  GH #96
+  * Mechanize::ResponseReadError is raised if there is an exception while
+    reading the response body.  This allows recovery from broken HTTP servers
+    (or connections).  GH #90
 
 * Bug Fixes:
 

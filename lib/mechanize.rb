@@ -826,11 +826,16 @@ class Mechanize
     body.set_encoding Encoding::BINARY if body.respond_to? :set_encoding
     total = 0
 
-    response.read_body { |part|
-      total += part.length
-      body.write(part)
-      log.debug("Read #{part.length} bytes (#{total} total)") if log
-    }
+    begin
+      response.read_body { |part|
+        total += part.length
+        body.write(part)
+        log.debug("Read #{part.length} bytes (#{total} total)") if log
+      }
+    rescue Net::HTTP::Persistent::Error => e
+      body.rewind
+      raise Mechanize::ResponseReadError.new(e, response, body)
+    end
 
     body.rewind
 
@@ -1098,6 +1103,7 @@ require 'mechanize/pluggable_parsers'
 require 'mechanize/redirect_limit_reached_error'
 require 'mechanize/redirect_not_get_or_head_error'
 require 'mechanize/response_code_error'
+require 'mechanize/response_read_error'
 require 'mechanize/robots_disallowed_error'
 require 'mechanize/unsupported_scheme_error'
 require 'mechanize/util'

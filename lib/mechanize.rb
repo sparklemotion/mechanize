@@ -829,7 +829,7 @@ class Mechanize
     response.read_body { |part|
       total += part.length
       body.write(part)
-      log.debug("Read #{total} bytes") if log
+      log.debug("Read #{part.length} bytes (#{total} total)") if log
     }
 
     body.rewind

@@ -395,7 +395,7 @@ class Mechanize
       # Find all textarea tags
       form_node.search('textarea').each do |node|
         next unless node['name']
-        @fields << Field.new(node, node.inner_text)
+        @fields << Textarea.new(node, node.inner_text)
       end
 
       # Find all select tags

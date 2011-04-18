@@ -8,6 +8,14 @@ class TestRobots < Test::Unit::TestCase
     }
   end
 
+  def test_mechanize_webrobots_http_get
+    robotstxt = @agent.__send__(:webrobots_http_get, 'http://localhost/robots.txt')
+    assert_not_equal '', robotstxt
+
+    robotstxt = @agent.__send__(:webrobots_http_get, 'http://localhost/response_code?code=404')
+    assert_equal '', robotstxt
+  end
+
   def test_robots
     assert_equal "Welcome!", @robot.get("http://localhost/robots.html").title
 

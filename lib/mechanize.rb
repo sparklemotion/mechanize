@@ -939,12 +939,8 @@ class Mechanize
   def webrobots_http_get(uri)
     get_file(uri)
   rescue Mechanize::ResponseCodeError => e
-    case e.response_code
-    when '404'
-      ''
-    else
-      raise e
-    end
+    return '' if e.response_code == '404'
+    raise e
   end
 
   def webrobots

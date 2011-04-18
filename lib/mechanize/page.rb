@@ -131,7 +131,13 @@ class Mechanize::Page < Mechanize::File
   # Return the canonical URI for the page if there is a link tag
   # with href="canonical".
   def canonical_uri
-    link = at('link[@rel="canonical"][@href]') and URI(link['href'])
+    link = at('link[@rel="canonical"][@href]')
+    return unless link
+    href = link['href']
+
+    URI(link['href'])
+  rescue URI::InvalidURIError
+    URI Mechanize::Util.uri_escape link['href']
   end
 
   # Get the content type

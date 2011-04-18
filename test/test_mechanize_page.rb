@@ -40,7 +40,7 @@ class TestMechanizePage < Test::Unit::TestCase
 
   def setup
     @agent = Mechanize.new
-    @uri = URI.parse 'http://example'
+    @uri = URI('http://example')
     @res = { 'content-type' => 'text/html' }
     @body = '<title>hi</title>'
   end
@@ -67,6 +67,16 @@ class TestMechanizePage < Test::Unit::TestCase
 
     page = @agent.get("http://localhost/file_upload.html")
     assert_equal(nil, page.canonical_uri)
+  end
+
+  def test_canonical_uri_unescaped
+    page = util_page <<-BODY
+<head>
+  <link rel="canonical" href="http://example/white space"/>
+</head>
+    BODY
+
+    assert_equal @uri + '/white%20space', page.canonical_uri
   end
 
   def test_charset

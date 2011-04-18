@@ -745,6 +745,51 @@ class Mechanize
     return uri, parameters
   end
 
+  def response_content_encoding response, body_io
+    case response['Content-Encoding']
+    when nil, 'none', '7bit' then
+      body_io.string
+    when 'deflate' then
+      log.debug('deflate body') if log
+
+      if response.content_length > 0 or body_io.length > 0 then
+        begin
+            Zlib::Inflate.inflate body_io.string
+        rescue Zlib::BufError, Zlib::DataError
+          log.error('Unable to inflate page, retrying with raw deflate') if log
+          begin
+            Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body_io.string)
+          rescue Zlib::BufError, Zlib::DataError
+            log.error("unable to inflate page: #{$!}") if log
+            ''
+          end
+        end
+      end
+    when 'gzip', 'x-gzip' then
+      log.debug('gzip body') if log
+
+      if response.content_length > 0 or body_io.length > 0 then
+        begin
+          zio = Zlib::GzipReader.new body_io
+          zio.read
+        rescue Zlib::BufError, Zlib::GzipFile::Error
+          log.error('Unable to gunzip body, trying raw inflate') if log
+          body_io.rewind
+          body_io.read 10
+          Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body_io.read)
+        rescue Zlib::DataError
+          log.error("unable to gunzip page: #{$!}") if log
+          ''
+        ensure
+          zio.close if zio and not zio.closed?
+        end
+      end
+    else
+      raise Mechanize::Error,
+            "Unsupported Content-Encoding: #{response['Content-Encoding']}"
+    end
+  end
+
   def response_cookies response, uri, page
     if Mechanize::Page === page and page.body =~ /Set-Cookie/n
       page.search('//head/meta[@http-equiv="Set-Cookie"]').each do |meta|
@@ -822,22 +867,22 @@ class Mechanize
   end
 
   def response_read response, request
-    body = StringIO.new
-    body.set_encoding Encoding::BINARY if body.respond_to? :set_encoding
+    body_io = StringIO.new
+    body_io.set_encoding Encoding::BINARY if body_io.respond_to? :set_encoding
     total = 0
 
     begin
       response.read_body { |part|
         total += part.length
-        body.write(part)
+        body_io.write(part)
         log.debug("Read #{part.length} bytes (#{total} total)") if log
       }
     rescue Net::HTTP::Persistent::Error => e
-      body.rewind
-      raise Mechanize::ResponseReadError.new(e, response, body)
+      body_io.rewind
+      raise Mechanize::ResponseReadError.new(e, response, body_io)
     end
 
-    body.rewind
+    body_io.rewind
 
     raise Mechanize::ResponseCodeError, response if
       Net::HTTPUnknownResponse === response
@@ -846,52 +891,11 @@ class Mechanize
 
     unless Net::HTTP::Head === request or Net::HTTPRedirection === response then
       raise EOFError, "Content-Length (#{content_length}) does not match " \
-                      "response body length (#{body.length})" if
-        content_length and content_length != body.length
+                      "response body length (#{body_io.length})" if
+        content_length and content_length != body_io.length
     end
 
-    case response['Content-Encoding']
-    when nil, 'none', '7bit' then
-      body.string
-    when 'deflate' then
-      log.debug('deflate body') if log
-
-      if content_length > 0 or body.length > 0 then
-        begin
-            Zlib::Inflate.inflate body.string
-        rescue Zlib::BufError, Zlib::DataError
-          log.error('Unable to inflate page, retrying with raw deflate') if log
-          begin
-            Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body.string)
-          rescue Zlib::BufError, Zlib::DataError
-            log.error("unable to inflate page: #{$!}") if log
-            ''
-          end
-        end
-      end
-    when 'gzip', 'x-gzip' then
-      log.debug('gzip body') if log
-
-      if content_length > 0 or body.length > 0 then
-        begin
-          zio = Zlib::GzipReader.new body
-          zio.read
-        rescue Zlib::BufError, Zlib::GzipFile::Error
-          log.error('Unable to gunzip body, trying raw inflate') if log
-          body.rewind
-          body.read 10
-          Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body.read)
-        rescue Zlib::DataError
-          log.error("unable to gunzip page: #{$!}") if log
-          ''
-        ensure
-          zio.close if zio and not zio.closed?
-        end
-      end
-    else
-      raise Mechanize::Error,
-            "Unsupported Content-Encoding: #{response['Content-Encoding']}"
-    end
+    body_io
   end
 
   def response_redirect response, method, page, redirects
@@ -1039,16 +1043,18 @@ class Mechanize
 
     request_log request
 
-    response_body = nil
+    response_body_io = nil
 
     # Send the request
     response = connection.request(uri, request) { |res|
       response_log res
 
-      response_body = response_read res, request
+      response_body_io = response_read res, request
 
       res
     }
+
+    response_body = response_content_encoding response, response_body_io
 
     post_connect response
 

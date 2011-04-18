@@ -881,6 +881,78 @@ class TestMechanize < Test::Unit::TestCase
     assert_nil params
   end
 
+  def test_response_content_encoding_7_bit
+    def @res.content_length() 4 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[7bit]
+
+    body = @agent.response_content_encoding @res, StringIO.new('part')
+
+    assert_equal 'part', body
+  end
+
+  def test_response_content_encoding_deflate
+    def @res.content_length() 12 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
+    body_io = StringIO.new "x\x9C+H,*\x01\x00\x04?\x01\xB8"
+
+    body = @agent.response_content_encoding @res, body_io
+
+    assert_equal 'part', body
+  end
+
+  # IIS/6.0 ASP.NET/2.0.50727 does not wrap deflate with zlib, WTF?
+  def test_response_content_encoding_deflate_no_zlib
+    def @res.content_length() 6 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
+
+    body = @agent.response_content_encoding @res, StringIO.new("+H,*\001\000")
+
+    assert_equal 'part', body
+  end
+
+  def test_response_content_encoding_gzip
+    def @res.content_length() 24 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[gzip]
+    body_io = StringIO.new \
+      "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017I\004\000\000\000"
+
+    body = @agent.response_content_encoding @res, body_io
+
+    assert_equal 'part', body
+  end
+
+  def test_response_content_encoding_none
+    def @res.content_length() 4 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[none]
+
+    body = @agent.response_content_encoding @res, StringIO.new('part')
+
+    assert_equal 'part', body
+  end
+
+  def test_response_content_encoding_x_gzip
+    def @res.content_length() 24 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[x-gzip]
+    body_io = StringIO.new \
+      "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017I\004\000\000\000"
+
+    body = @agent.response_content_encoding @res, body_io
+
+    assert_equal 'part', body
+  end
+
+  def test_response_content_encoding_unknown
+    def @res.content_length() 4 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[unknown]
+    body = StringIO.new 'part'
+
+    e = assert_raises Mechanize::Error do
+      @agent.response_content_encoding @res, body
+    end
+
+    assert_equal 'Unsupported Content-Encoding: unknown', e.message
+  end
+
   def test_response_cookies
     uri = URI.parse 'http://host.example.com'
     cookie_str = 'a=b domain=.example.com'
@@ -937,9 +1009,12 @@ class TestMechanize < Test::Unit::TestCase
     def @res.read_body() yield 'part' end
     def @res.content_length() 4 end
 
-    body = @agent.response_read @res, @req
+    io = @agent.response_read @res, @req
+
+    body = io.read
 
     assert_equal 'part', body
+    assert_equal Encoding::BINARY, body.encoding if body.respond_to? :encoding
   end
 
   def test_response_read_content_length_head
@@ -948,9 +1023,9 @@ class TestMechanize < Test::Unit::TestCase
     def @res.content_length() end
     def @res.read_body() end
 
-    body = @agent.response_read @res, req
+    io = @agent.response_read @res, req
 
-    assert_equal '', body
+    assert_equal '', io.read
   end
 
   def test_response_read_content_length_mismatch
@@ -972,92 +1047,9 @@ class TestMechanize < Test::Unit::TestCase
     def res.read_body() yield 'part' end
     res.instance_variable_set :@header, {}
 
-    body = @agent.response_read res, @req
+    io = @agent.response_read res, @req
 
-    assert_equal 'part', body
-  end
-
-  def test_response_read_encoding_7_bit
-    def @res.read_body() yield 'part' end
-    def @res.content_length() 4 end
-    @res.instance_variable_set :@header, 'content-encoding' => %w[7bit]
-
-    body = @agent.response_read @res, @req
-
-    assert_equal 'part', body
-  end
-
-  def test_response_read_encoding_deflate
-    def @res.read_body()
-      yield "x\x9C+H,*\x01\x00\x04?\x01\xB8"
-    end
-    def @res.content_length() 12 end
-    @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
-
-    body = @agent.response_read @res, @req
-
-    assert_equal 'part', body
-  end
-
-  # IIS/6.0 ASP.NET/2.0.50727 does not wrap deflate with zlib, WTF?
-  def test_response_read_encoding_deflate_no_zlib
-    def @res.read_body()
-      yield "+H,*\001\000"
-    end
-    def @res.content_length() 6 end
-    @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
-
-    body = @agent.response_read @res, @req
-
-    assert_equal 'part', body
-  end
-
-  def test_response_read_encoding_gzip
-    def @res.read_body
-      yield "\037\213\b\0002\002\225M\000\003"
-      yield "+H,*\001\000\306p\017I\004\000\000\000"
-    end
-    def @res.content_length() 24 end
-    @res.instance_variable_set :@header, 'content-encoding' => %w[gzip]
-
-    body = @agent.response_read @res, @req
-
-    assert_equal 'part', body
-  end
-
-  def test_response_read_encoding_none
-    def @res.read_body() yield 'part' end
-    def @res.content_length() 4 end
-    @res.instance_variable_set :@header, 'content-encoding' => %w[none]
-
-    body = @agent.response_read @res, @req
-
-    assert_equal 'part', body
-  end
-
-  def test_response_read_encoding_x_gzip
-    def @res.read_body()
-      yield "\037\213\b\0002\002\225M\000\003"
-      yield "+H,*\001\000\306p\017I\004\000\000\000"
-    end
-    def @res.content_length() 24 end
-    @res.instance_variable_set :@header, 'content-encoding' => %w[x-gzip]
-
-    body = @agent.response_read @res, @req
-
-    assert_equal 'part', body
-  end
-
-  def test_response_read_encoding_unknown
-    def @res.read_body() yield 'part' end
-    def @res.content_length() 4 end
-    @res.instance_variable_set :@header, 'content-encoding' => %w[unknown]
-
-    e = assert_raises Mechanize::Error do
-      @agent.response_read @res, @req
-    end
-
-    assert_equal 'Unsupported Content-Encoding: unknown', e.message
+    assert_equal 'part', io.read
   end
 
   def test_response_read_error
@@ -1085,11 +1077,12 @@ class TestMechanize < Test::Unit::TestCase
       req = Mechanize::FileRequest.new uri
       res = Mechanize::FileResponse.new tempfile.path
 
-      body = @agent.response_read res, req
+      io = @agent.response_read res, req
 
       expected = "π\n"
       expected.force_encoding Encoding::BINARY if expected.respond_to? :encoding
 
+      body = io.read
       assert_equal expected, body
       assert_equal Encoding::BINARY, body.encoding if body.respond_to? :encoding
     end
@@ -1101,9 +1094,9 @@ class TestMechanize < Test::Unit::TestCase
     def @res.content_length() end
     def @res.read_body() end
 
-    body = @agent.response_read @res, req
+    io = @agent.response_read @res, req
 
-    assert_equal '', body
+    assert_equal '', io.read
   end
 
   def test_response_read_unknown_code

@@ -1,11 +1,11 @@
 = Mechanize CHANGELOG
 
-=== 2.0.pre.1 / 2011-04-09
+=== 2.0.pre.2 / 2011-04-17
 
 Mechanize is now under the MIT license
 
 * API changes
-  * WWW::Mechanize has been removed.
+  * WWW::Mechanize has been removed.  Use Mechanize.
   * Pre connect hooks are now called with the agent and the request.  See
     Mechanize#pre_connect_hooks.
   * Post connect hooks are now called with the agent and the response.  See
@@ -25,8 +25,14 @@ Mechanize is now under the MIT license
   * Mechanize now requires ruby 1.8.7 or newer.
   * Hpricot support has been removed as webrobots requires nokogiri.
   * Mechanize#get no longer accepts the referer as the second argument.
+  * Mechanize#get no longer allows the HTTP method to be changed (:verb
+    option).
+
+* Deprecations
   * Mechanize#get with an options hash is deprecated and will be removed after
     October, 2011.
+  * Mechanize::Util::to_native_charset is deprecated as it is no longer used
+    by Mechanize.
 
 * New Features
 

@@ -9,6 +9,7 @@ class Mechanize::Util
 
   # true if RUBY_VERSION is 1.9.0 or later
   NEW_RUBY_ENCODING = RUBY_VERSION >= '1.9.0'
+
   # contains encoding error classes to raise
   ENCODING_ERRORS = if NEW_RUBY_ENCODING
                       [EncodingError]
@@ -23,8 +24,9 @@ class Mechanize::Util
     }.compact.join('&')
   end
 
-  # Mechanize does not use it anymore
   def self.to_native_charset(s, code=nil)
+    location = Gem.location_of_caller.join ':'
+    warn "#{location}: Mechanize::Util::to_native_charset is deprecated and will be removed October 2011"
     if Mechanize.html_parser == Nokogiri::HTML
       return unless s
       code ||= detect_charset(s)
@@ -34,8 +36,7 @@ class Mechanize::Util
     end
   end
 
-  # convert string +s+ from +code+ to UTF-8.
-  # by String#encode (ruby 1.9.0 or later) or Iconv.conv (ruby 1.8.x)
+  # Converts string +s+ from +code+ to UTF-8.
   def self.from_native_charset(s, code, ignore_encoding_error=false, log=nil)
     return s unless s && code
     return s unless Mechanize.html_parser == Nokogiri::HTML

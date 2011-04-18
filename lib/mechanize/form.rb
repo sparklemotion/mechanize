@@ -29,12 +29,15 @@ class Mechanize
     attr_accessor :method, :action, :name
 
     attr_reader :fields, :buttons, :file_uploads, :radiobuttons, :checkboxes
-    # encoding for sending form (i.e. application/x-www-form-urlencoded)
+
+    # Content-Type for form data (i.e. application/x-www-form-urlencoded)
     attr_accessor :enctype
-    # encoding for contents itself (i.e. UTF-8)
+
+    # Character encoding of form data (i.e. UTF-8)
     attr_accessor :encoding
 
-    # when true, encoding errors never raise on submit. default is false
+    # When true, character encoding errors will never be never raised on form
+    # submission.  Default is false
     attr_accessor :ignore_encoding_error
 
     alias :elements :fields

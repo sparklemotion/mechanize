@@ -23,6 +23,20 @@ class TestMechanizeForm < Test::Unit::TestCase
     assert_not_nil(search.fields.find { |f| f.name == 'ie' })
   end
 
+  def test_parse_textarea
+    form = Nokogiri::HTML <<-FORM
+<form>
+<textarea name="t">hi</textarea>
+</form>
+    FORM
+
+    form = Mechanize::Form.new form, @agent
+    textarea = form.fields.first
+
+    assert_kind_of Mechanize::Form::Textarea, textarea
+    assert_equal 'hi', textarea.value
+  end
+
   def test_post_with_rails_3_encoding_hack
     page = @agent.get("http://localhost/rails_3_encoding_hack_form_test.html")
     form = page.forms.first

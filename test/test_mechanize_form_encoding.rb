@@ -114,5 +114,5 @@ class TestMechanizeFormEncoding < Test::Unit::TestCase
     assert_match ENCODING_LOG_MESSAGE, sio.string
 
     @agent.log = nil
-   end
+  end
 end

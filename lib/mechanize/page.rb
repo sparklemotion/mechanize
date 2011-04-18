@@ -135,9 +135,9 @@ class Mechanize::Page < Mechanize::File
     return unless link
     href = link['href']
 
-    URI(link['href'])
+    URI href
   rescue URI::InvalidURIError
-    URI Mechanize::Util.uri_escape link['href']
+    URI Mechanize::Util.uri_escape href
   end
 
   # Get the content type

@@ -105,7 +105,7 @@ class Mechanize::Page < Mechanize::File
         break unless @parser.errors.any? do |error|
           error.message =~ /(indicate\ encoding)|
                             (Invalid\ char)|
-                            (input\ conversion failed)/x
+                            (input\ conversion\ failed)/x
         end
       end
     end

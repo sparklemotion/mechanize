@@ -134,6 +134,7 @@ test/test_mechanize_file_request.rb
 test/test_mechanize_file_response.rb
 test/test_mechanize_form.rb
 test/test_mechanize_form_check_box.rb
+test/test_mechanize_form_encoding.rb
 test/test_mechanize_form_field.rb
 test/test_mechanize_form_image_button.rb
 test/test_mechanize_page.rb

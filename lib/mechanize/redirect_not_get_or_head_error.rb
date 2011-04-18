@@ -11,7 +11,8 @@ class Mechanize
     end
 
     def to_s
-      "#{@response_code} redirect received after a #{@verb.upcase} request"
+      method = @verb.to_s.upcase
+      "#{@response_code} redirect received after a #{method} request"
     end
     alias :inspect :to_s
   end

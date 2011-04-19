@@ -1,6 +1,6 @@
-require "helper"
+require 'helper'
 
-class MetaTest < Test::Unit::TestCase
+class TestMechanizePageMeta < Test::Unit::TestCase
   Meta = Mechanize::Page::Meta
 
   #

@@ -1063,7 +1063,7 @@ class TestMechanize < Test::Unit::TestCase
     end
 
     assert_equal @res, e.response
-    assert_equal 'part', e.body.read
+    assert_equal 'part', e.body_io.read
     assert_kind_of Net::HTTP::Persistent::Error, e.error
   end
 

@@ -900,6 +900,16 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal 'part', body
   end
 
+  def test_response_content_encoding_deflate_chunked
+    def @res.content_length() nil end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
+    body_io = StringIO.new "x\x9C+H,*\x01\x00\x04?\x01\xB8"
+
+    body = @agent.response_content_encoding @res, body_io
+
+    assert_equal 'part', body
+  end
+
   # IIS/6.0 ASP.NET/2.0.50727 does not wrap deflate with zlib, WTF?
   def test_response_content_encoding_deflate_no_zlib
     def @res.content_length() 6 end
@@ -912,6 +922,17 @@ class TestMechanize < Test::Unit::TestCase
 
   def test_response_content_encoding_gzip
     def @res.content_length() 24 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[gzip]
+    body_io = StringIO.new \
+      "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017I\004\000\000\000"
+
+    body = @agent.response_content_encoding @res, body_io
+
+    assert_equal 'part', body
+  end
+
+  def test_response_content_encoding_gzip_chunked
+    def @res.content_length() nil end
     @res.instance_variable_set :@header, 'content-encoding' => %w[gzip]
     body_io = StringIO.new \
       "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017I\004\000\000\000"

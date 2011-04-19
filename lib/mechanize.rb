@@ -746,43 +746,45 @@ class Mechanize
   end
 
   def response_content_encoding response, body_io
+    length = response.content_length || body_io.length
+
     case response['Content-Encoding']
     when nil, 'none', '7bit' then
       body_io.string
     when 'deflate' then
       log.debug('deflate body') if log
 
-      if response.content_length > 0 or body_io.length > 0 then
+      return if length.zero?
+
+      begin
+        Zlib::Inflate.inflate body_io.string
+      rescue Zlib::BufError, Zlib::DataError
+        log.error('Unable to inflate page, retrying with raw deflate') if log
         begin
-            Zlib::Inflate.inflate body_io.string
+          Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body_io.string)
         rescue Zlib::BufError, Zlib::DataError
-          log.error('Unable to inflate page, retrying with raw deflate') if log
-          begin
-            Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body_io.string)
-          rescue Zlib::BufError, Zlib::DataError
-            log.error("unable to inflate page: #{$!}") if log
-            ''
-          end
+          log.error("unable to inflate page: #{$!}") if log
+          ''
         end
       end
     when 'gzip', 'x-gzip' then
       log.debug('gzip body') if log
 
-      if response.content_length > 0 or body_io.length > 0 then
-        begin
-          zio = Zlib::GzipReader.new body_io
-          zio.read
-        rescue Zlib::BufError, Zlib::GzipFile::Error
-          log.error('Unable to gunzip body, trying raw inflate') if log
-          body_io.rewind
-          body_io.read 10
-          Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body_io.read)
-        rescue Zlib::DataError
-          log.error("unable to gunzip page: #{$!}") if log
-          ''
-        ensure
-          zio.close if zio and not zio.closed?
-        end
+      return if length.zero?
+
+      begin
+        zio = Zlib::GzipReader.new body_io
+        zio.read
+      rescue Zlib::BufError, Zlib::GzipFile::Error
+        log.error('Unable to gunzip body, trying raw inflate') if log
+        body_io.rewind
+        body_io.read 10
+        Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body_io.read)
+      rescue Zlib::DataError
+        log.error("unable to gunzip page: #{$!}") if log
+        ''
+      ensure
+        zio.close if zio and not zio.closed?
       end
     else
       raise Mechanize::Error,

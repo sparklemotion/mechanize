@@ -3,11 +3,7 @@ require 'helper'
 class TestMechanizePageMeta < Test::Unit::TestCase
   Meta = Mechanize::Page::Meta
 
-  #
-  # CONTENT_REGEXP test
-  #
-
-  def test_content_regexp
+  def test_CONTENT_REGEXP
     r = Meta::CONTENT_REGEXP
 
     assert r =~ "0; url=http://localhost:8080/path"
@@ -47,21 +43,31 @@ class TestMechanizePageMeta < Test::Unit::TestCase
   # parse test
   #
 
-  def test_parse_documentation
-    uri = URI.parse('http://current.com/here/')
+  def test_parse
+    uri = URI.parse('http://example/here/')
 
-    assert_equal ['5', 'http://example.com/'], Meta.parse("5;url=http://example.com/", uri)
-    assert_equal ['5', 'http://current.com/here/test'], Meta.parse("5;url=test", uri)
-    assert_equal ['5', 'http://current.com/test'], Meta.parse("5;url=/test", uri)
-    assert_equal ['5', 'http://current.com/here/'], Meta.parse("5;url=", uri) 
-    assert_equal ['5', 'http://current.com/here/'], Meta.parse("5", uri) 
+    assert_equal ['5', 'http://b.example'],
+                 Meta.parse("5;url=http://b.example", uri)
+    assert_equal ['5', 'http://example/a'],
+                 Meta.parse("5;url=http://example/a", uri)
+    assert_equal ['5', 'http://example/here/test'],
+                 Meta.parse("5;url=test", uri)
+    assert_equal ['5', 'http://example/test'], Meta.parse("5;url=/test", uri)
+    assert_equal ['5', 'http://example/here/'], Meta.parse("5;url=", uri)
+    assert_equal ['5', 'http://example/here/'], Meta.parse("5", uri)
     assert_equal nil, Meta.parse("invalid content", uri)
   end
 
-  def test_parse_returns_nil_if_no_delay_and_url_can_be_parsed
-    uri = URI.parse('http://current.com/')
+  def test_parse_invalid
+    uri = URI.parse('http://example/')
 
-    assert_equal nil, Meta.parse("invalid content", uri)
-    assert_equal nil, Meta.parse("invalid content", uri) {|delay, url| 'not nil' }
+    assert_nil Meta.parse("invalid content", uri)
+    assert_nil Meta.parse("invalid content", uri) { |delay, url|
+      assert_nil delay
+      assert_nil url
+      'not nil'
+    }
   end
+
 end
+

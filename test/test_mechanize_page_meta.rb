@@ -58,15 +58,25 @@ class TestMechanizePageMeta < Test::Unit::TestCase
     assert_equal nil, Meta.parse("invalid content", uri)
   end
 
+  def test_parse_block
+    uri = URI 'http://example'
+    yielded = false
+
+    result = Meta.parse('5;url=/a', uri) { |delay, url|
+      assert_equal '5', delay
+      assert_equal 'http://example/a', url
+      yielded = true
+    }
+
+    assert yielded
+
+    assert_equal %w[5 http://example/a], result
+  end
+
   def test_parse_invalid
     uri = URI.parse('http://example/')
 
     assert_nil Meta.parse("invalid content", uri)
-    assert_nil Meta.parse("invalid content", uri) { |delay, url|
-      assert_nil delay
-      assert_nil url
-      'not nil'
-    }
   end
 
 end

@@ -27,17 +27,17 @@ class Mechanize::Page::Meta < Mechanize::Page::Link
   #   Meta.parse("invalid content", uri)         # => nil
   #
   def self.parse(content, uri)
-    if content && content =~ CONTENT_REGEXP
-      delay, url = $1, $3
+    return unless content =~ CONTENT_REGEXP
 
-      dest = uri
-      dest += url if url
-      url = dest.to_s
+    delay, url = $1, $3
 
-      block_given? ? yield(delay, url) : [delay, url]
-    else
-      nil
-    end
+    dest = uri
+    dest += url if url
+    url = dest.to_s
+
+    yield delay, url if block_given?
+
+    return delay, url
   end
 
 end

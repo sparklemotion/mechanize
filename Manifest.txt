@@ -126,7 +126,6 @@ test/test_history_added.rb
 test/test_html_unscape_forms.rb
 test/test_if_modified_since.rb
 test/test_images.rb
-test/test_links.rb
 test/test_mechanize.rb
 test/test_mechanize_cookie.rb
 test/test_mechanize_cookie_jar.rb
@@ -139,6 +138,7 @@ test/test_mechanize_form_encoding.rb
 test/test_mechanize_form_field.rb
 test/test_mechanize_form_image_button.rb
 test/test_mechanize_form_textarea.rb
+test/test_mechanize_link.rb
 test/test_mechanize_page.rb
 test/test_mechanize_page_meta_refresh.rb
 test/test_mechanize_redirect_not_get_or_head_error.rb

@@ -129,7 +129,7 @@ class Mechanize::Page < Mechanize::File
     @links = nil
     @labels = nil
     @labels_hash = nil
-    @meta = nil
+    @meta_refresh = nil
     @parser = nil
     @title = nil
   end
@@ -269,22 +269,13 @@ class Mechanize::Page < Mechanize::File
   end
 
   ##
-  # Return a list of all meta tags
-  def meta
+  # Return a list of all meta refresh elements
+
+  def meta_refresh
     query = @mech.follow_meta_refresh == :anywhere ? 'meta' : 'head > meta'
 
-    @meta ||= search(query).map do |node|
-      next unless node['http-equiv'] && node['content']
-      equiv   = node['http-equiv']
-      content = node['content']
-
-      if equiv && equiv.downcase == 'refresh'
-        MetaRefresh.parse(content, uri) do |delay, href|
-          node['delay'] = delay
-          node['href'] = href
-          MetaRefresh.new(node, @mech, self)
-        end
-      end
+    @meta_refresh ||= search(query).map do |node|
+      MetaRefresh.from_node node, self, uri
     end.compact
   end
 

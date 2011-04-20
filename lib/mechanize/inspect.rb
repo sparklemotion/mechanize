@@ -17,8 +17,8 @@ class Mechanize
         q.breakable
         q.group(1, '{url', '}') {q.breakable; q.pp uri }
         q.breakable
-        q.group(1, '{meta', '}') {
-          meta.each { |link| q.breakable; q.pp link }
+        q.group(1, '{meta_refresh', '}') {
+          meta_refresh.each { |link| q.breakable; q.pp link }
         }
         q.breakable
         q.group(1, '{title', '}') { q.breakable; q.pp title }

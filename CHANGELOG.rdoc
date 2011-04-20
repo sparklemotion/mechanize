@@ -29,6 +29,8 @@ Mechanize is now under the MIT license
     option).
   * Mechanize::Page::Meta is now Mechanize::Page::MetaRefresh to accurately
     depict its responsibilities.
+  * Mechanize::Page#meta is now Mechanize::Page#meta_refresh as it only
+    contains meta elements with http-equiv of "refresh"
 
 * Deprecations
   * Mechanize#get with an options hash is deprecated and will be removed after

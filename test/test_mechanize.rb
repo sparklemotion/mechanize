@@ -344,7 +344,7 @@ class TestMechanize < Test::Unit::TestCase
   def test_get_follow_meta_refresh_disabled
     page = @agent.get('http://localhost/tc_follow_meta.html')
     assert_equal('http://localhost/tc_follow_meta.html', page.uri.to_s)
-    assert_equal(1, page.meta.length)
+    assert_equal(1, page.meta_refresh.length)
   end
 
   def test_get_follow_meta_refresh_empty_url

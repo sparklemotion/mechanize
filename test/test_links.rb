@@ -40,14 +40,14 @@ class LinksMechTest < Test::Unit::TestCase
     assert @agent.visited?("http://localhost/index.html")
   end
 
-  def test_find_meta
+  def test_meta_refresh
     page = @agent.get("http://localhost/find_link.html")
-    assert_equal(3, page.meta.length)
+    assert_equal(3, page.meta_refresh.length)
     assert_equal(%w{
       http://www.drphil.com/
       http://www.upcase.com/
       http://tenderlovemaking.com/ }.sort,
-      page.meta.map { |x| x.href.downcase }.sort)
+      page.meta_refresh.map { |x| x.href.downcase }.sort)
   end
 
   def test_find_link
@@ -58,9 +58,9 @@ class LinksMechTest < Test::Unit::TestCase
   def test_alt_text
     page = @agent.get("http://localhost/alt_text.html")
     assert_equal(5, page.links.length)
-    assert_equal(1, page.meta.length)
+    assert_equal(1, page.meta_refresh.length)
 
-    assert_equal('', page.meta.first.text)
+    assert_equal('', page.meta_refresh.first.text)
     assert_equal('alt text', page.link_with(:href => 'alt_text.html').text)
     assert_equal('', page.link_with(:href => 'no_alt_text.html').text)
     assert_equal('no image', page.link_with(:href => 'no_image.html').text)

@@ -40,7 +40,7 @@ class SchemeTest < Test::Unit::TestCase
     page = link.click
     assert_equal(File.read(path), page.body)
 
-    link = page.meta.first
+    link = page.meta_refresh.first
     assert_not_nil(link)
     page = @agent.click(link)
     assert_equal("http://localhost/index.html", @agent.history.last.uri.to_s)

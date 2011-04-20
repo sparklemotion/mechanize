@@ -5,6 +5,8 @@
 
 class Mechanize::Page::MetaRefresh < Mechanize::Page::Link
 
+  attr_reader :delay
+
   ##
   # Matches the content attribute of a meta refresh element.  After the match:
   #
@@ -15,33 +17,39 @@ class Mechanize::Page::MetaRefresh < Mechanize::Page::Link
   ##
   # Parses the delay and url from the content attribute of a meta refresh
   # element.  Parse requires the uri of the current page to infer a url when
-  # no url is specified.  If a block is given, the parsed delay and url will
-  # be passed to it for further processing.
+  # no url is specified.
+  #
+  # Returns a MetaRefresh instance.
   #
   # Returns nil if the delay and url cannot be parsed.
-  #
-  #   # <meta http-equiv="refresh" content="5;url=http://example/" />
-  #   uri = URI.parse('http://example/')
-  #
-  #   Meta.parse("5;url=http://example/a", uri)  # => ['5', 'http://example/a']
-  #   Meta.parse("5;url=", uri)                  # => ['5', 'http://example/']
-  #   Meta.parse("5", uri)                       # => ['5', 'http://example/']
-  #   Meta.parse("invalid content", uri)         # => nil
 
-  def self.parse(content, uri)
+  def self.parse content, base_uri
     return unless content =~ CONTENT_REGEXP
 
-    delay, url = $1, $3
+    delay, refresh_uri = $1, $3
 
-    dest = uri
-    dest += url if url
-    url = dest.to_s
+    dest = base_uri
+    dest += refresh_uri if refresh_uri
 
-    if block_given? then
-      yield delay, url
-    else
-      return delay, url
-    end
+    return delay, dest
+  end
+
+  def self.from_node node, page, uri
+    http_equiv = node['http-equiv']
+    return unless http_equiv and http_equiv.downcase == 'refresh'
+
+    delay, uri = parse node['content'], uri
+
+    return unless delay
+
+    new node, page, delay, uri.to_s
+  end
+
+  def initialize node, page, delay, href
+    super node, page.mech, page
+
+    @delay = delay.to_i
+    @href  = href
   end
 
 end

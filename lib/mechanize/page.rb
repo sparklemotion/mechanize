@@ -271,9 +271,13 @@ class Mechanize::Page < Mechanize::File
   ##
   # Return a list of all meta tags
   def meta
-    @meta ||= search('head > meta').map do |node|
+    query = @mech.follow_meta_refresh == :anywhere ? 'meta' : 'head > meta'
+
+    @meta ||= search(query).map do |node|
       next unless node['http-equiv'] && node['content']
-      (equiv, content) = node['http-equiv'], node['content']
+      equiv   = node['http-equiv']
+      content = node['content']
+
       if equiv && equiv.downcase == 'refresh'
         Meta.parse(content, uri) do |delay, href|
           node['delay'] = delay

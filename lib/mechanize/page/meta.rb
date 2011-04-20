@@ -35,9 +35,11 @@ class Mechanize::Page::Meta < Mechanize::Page::Link
     dest += url if url
     url = dest.to_s
 
-    yield delay, url if block_given?
-
-    return delay, url
+    if block_given? then
+      yield delay, url
+    else
+      return delay, url
+    end
   end
 
 end

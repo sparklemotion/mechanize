@@ -330,6 +330,17 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal('http://localhost/index.html', @agent.history.last.uri.to_s)
   end
 
+  def test_get_follow_meta_refresh_anywhere
+    @agent.follow_meta_refresh = :anywhere
+    requests = []
+    @agent.pre_connect_hooks << lambda { |_, request|
+      requests << request
+    }
+
+    @agent.get('http://localhost/tc_meta_in_body.html')
+    assert_equal 2, requests.length
+  end
+
   def test_get_follow_meta_refresh_disabled
     page = @agent.get('http://localhost/tc_follow_meta.html')
     assert_equal('http://localhost/tc_follow_meta.html', page.uri.to_s)

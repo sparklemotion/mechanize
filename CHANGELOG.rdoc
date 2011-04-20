@@ -63,6 +63,8 @@ Mechanize is now under the MIT license
   * Mechanize::ResponseReadError is raised if there is an exception while
     reading the response body.  This allows recovery from broken HTTP servers
     (or connections).  GH #90
+  * Mechanize#follow_meta_refresh set to :anywhere will follow meta refresh
+    found outside of a document's head.  GH #99
 
 * Bug Fixes:
 

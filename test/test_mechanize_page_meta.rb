@@ -65,12 +65,12 @@ class TestMechanizePageMeta < Test::Unit::TestCase
     result = Meta.parse('5;url=/a', uri) { |delay, url|
       assert_equal '5', delay
       assert_equal 'http://example/a', url
-      yielded = true
+      yielded = :yielded
     }
 
     assert yielded
 
-    assert_equal %w[5 http://example/a], result
+    assert_equal :yielded, result
   end
 
   def test_parse_invalid

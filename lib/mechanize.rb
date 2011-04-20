@@ -817,8 +817,8 @@ class Mechanize
   def response_follow_meta_refresh response, uri, page, redirects
     return unless @follow_meta_refresh
 
-    redirect_uri  = nil
-    referer       = page
+    redirect_uri = nil
+    referer      = page
 
     if page.respond_to?(:meta) and (redirect = page.meta.first)
       redirect_uri = Mechanize::Util.uri_unescape redirect.uri.to_s

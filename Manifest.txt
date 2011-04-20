@@ -6,6 +6,7 @@ LICENSE.rdoc
 Manifest.txt
 README.rdoc
 Rakefile
+digest.htpasswd
 examples/flickr_upload.rb
 examples/mech-dump.rb
 examples/proxy_req.rb
@@ -118,7 +119,6 @@ test/test_cookies.rb
 test/test_form_action.rb
 test/test_form_as_hash.rb
 test/test_form_button.rb
-test/test_form_no_inputname.rb
 test/test_frames.rb
 test/test_headers.rb
 test/test_history.rb
@@ -165,5 +165,3 @@ test/test_select_none.rb
 test/test_select_noopts.rb
 test/test_set_fields.rb
 test/test_ssl_server.rb
-test/test_upload.rb
-test/test_verbs.rb

@@ -14,6 +14,13 @@ class TestMechanizeForm < Test::Unit::TestCase
     assert query.all? { |x| x[1] == '' }
   end
 
+  def test_checkboxes_no_input_name
+    page = @agent.get('http://localhost/form_no_input_name.html')
+    form = page.forms.first
+
+    assert_equal(0, form.checkboxes.length)
+  end
+
   def test_field_with
     page = @agent.get("http://localhost/google.html")
     search = page.forms.find { |f| f.name == "f" }
@@ -23,11 +30,25 @@ class TestMechanizeForm < Test::Unit::TestCase
     assert_not_nil(search.fields.find { |f| f.name == 'ie' })
   end
 
+  def test_fields_no_input_name
+    page = @agent.get('http://localhost/form_no_input_name.html')
+    form = page.forms.first
+
+    assert_equal(0, form.fields.length)
+  end
+
   def test_file_uploads_no_value
     page = @agent.get("http://localhost/file_upload.html")
     form = page.form('value_test')
     assert_nil(form.file_uploads.first.value)
     assert_nil(form.file_uploads.first.file_name)
+  end
+
+  def test_forms_no_input_name
+    page = @agent.get('http://localhost/form_no_input_name.html')
+    form = page.forms.first
+
+    assert_equal(0, form.radiobuttons.length)
   end
 
   def test_parse_textarea

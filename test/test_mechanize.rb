@@ -665,6 +665,20 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal(r1, r2)
   end
 
+  def test_post_multipart
+    page = @agent.post('http://localhost/file_upload', {
+      :name       => 'Some file',
+      :userfile1  => File.open(__FILE__)
+    })
+
+    name = File.basename __FILE__
+    assert_match(
+      "Content-Disposition: form-data; name=\"userfile1\"; filename=\"#{name}\"",
+      page.body
+    )
+    assert page.body.length > File.read(__FILE__).length
+  end
+
   def test_post_redirect
     page = @agent.post('http://localhost/redirect')
 
@@ -1287,6 +1301,65 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal('green:on', page.links[1].text)
   end
 
+  def test_submit_enctype
+    page = @agent.get("http://localhost/file_upload.html")
+    assert_equal('multipart/form-data', page.forms[0].enctype)
+
+    form = page.forms.first
+    form.file_uploads.first.file_name = "#{BASE_DIR}/helper.rb"
+    form.file_uploads.first.mime_type = "text/plain"
+    form.file_uploads.first.file_data = "Hello World\n\n"
+
+    page = @agent.submit(form)
+
+    assert_match(
+      "Content-Disposition: form-data; name=\"userfile1\"; filename=\"helper.rb\"",
+      page.body
+    )
+    assert_match(
+      "Content-Disposition: form-data; name=\"name\"",
+      page.body
+    )
+    assert_match('Content-Type: text/plain', page.body)
+    assert_match('Hello World', page.body)
+    assert_match('foo[aaron]', page.body)
+  end
+
+  def test_submit_file_data
+    page = @agent.get("http://localhost/file_upload.html")
+    assert_equal('multipart/form-data', page.forms[1].enctype)
+
+    form = page.forms[1]
+    form.file_uploads.first.file_name = "#{BASE_DIR}/helper.rb"
+    form.file_uploads.first.file_data = File.open("#{BASE_DIR}/helper.rb", 'rb')
+
+    page = @agent.submit(form)
+
+    contents = File.open("#{BASE_DIR}/helper.rb", 'rb') { |f| f.read }
+    assert_match(
+      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"helper.rb\"",
+      page.body
+    )
+    assert_match(contents, page.body)
+  end
+
+  def test_submit_file_name
+    page = @agent.get("http://localhost/file_upload.html")
+    assert_equal('multipart/form-data', page.forms[1].enctype)
+
+    form = page.forms[1]
+    form.file_uploads.first.file_name = "#{BASE_DIR}/helper.rb"
+
+    page = @agent.submit(form)
+
+    contents = File.open("#{BASE_DIR}/helper.rb", 'rb') { |f| f.read }
+    assert_match(
+      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"helper.rb\"",
+      page.body
+    )
+    assert_match(contents, page.body)
+  end
+
   def test_submit_headers
     page = @agent.get('http://localhost:2000/form_no_action.html')
     assert form = page.forms.first
@@ -1296,6 +1369,36 @@ class TestMechanize < Test::Unit::TestCase
       page.body.split("\n").map { |x| x.split('|') }.flatten
     )]
     assert_equal 'bar', headers['foo']
+  end
+
+  def test_submit_multipart
+    page = @agent.get("http://localhost/file_upload.html")
+
+    assert_equal('multipart/form-data', page.forms[1].enctype)
+
+    form = page.forms[1]
+    form.file_uploads.first.file_name = "#{BASE_DIR}/helper.rb"
+    form.file_uploads.first.mime_type = "text/plain"
+    form.file_uploads.first.file_data = "Hello World\n\n"
+
+    page = @agent.submit(form)
+
+    assert_match(
+      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"helper.rb\"",
+      page.body
+    )
+  end
+
+  def test_submit_no_file
+    page = @agent.get("http://localhost/file_upload.html")
+    form = page.forms.first
+    form.field_with(:name => 'name').value = 'Aaron'
+    @page = @agent.submit(form)
+    assert_match('Aaron', @page.body)
+    assert_match(
+      "Content-Disposition: form-data; name=\"userfile1\"; filename=\"\"",
+      @page.body
+    )
   end
 
   def test_submit_too_many_radiobuttons

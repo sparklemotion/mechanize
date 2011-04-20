@@ -116,7 +116,8 @@ class Mechanize
   # Disables If-Modified-Since conditional requests (enabled by default)
   attr_accessor :conditional_requests
 
-  # Follow HTML meta refresh
+  # Follow HTML meta refresh.  If set to +:anywhere+ meta refresh tags outside
+  # of the head element will be followed.
   attr_accessor :follow_meta_refresh
 
   # A callback for additional certificate verification.  See

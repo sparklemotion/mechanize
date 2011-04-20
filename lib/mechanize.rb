@@ -43,6 +43,7 @@ class Mechanize
                  else
                    "#{RUBY_VERSION}dev#{RUBY_REVISION}"
                  end
+
   ##
   # User Agent aliases
 
@@ -61,7 +62,14 @@ class Mechanize
   }
 
   # A Mechanize::CookieJar which stores cookies
-  attr_accessor :cookie_jar
+
+  def cookie_jar
+    @agent.cookie_jar
+  end
+
+  def cookie_jar= cookie_jar
+    @agent.cookie_jar = cookie_jar
+  end
 
   # Length of time to wait until a connection is opened in seconds
   attr_accessor :open_timeout
@@ -70,42 +78,77 @@ class Mechanize
   attr_accessor  :read_timeout
 
   # The identification string for the client initiating a web request
-  attr_reader :user_agent
+  def user_agent
+    @agent.user_agent
+  end
 
   # The value of watch_for_set is passed to pluggable parsers for retrieved
   # content
   attr_accessor :watch_for_set
 
   # Path to an OpenSSL server certificate file
-  attr_accessor :ca_file
+  def ca_file
+    @agent.ca_file
+  end
+
+  def ca_file= ca_file
+    @agent.ca_file = ca_file
+  end
+
+  def certificate
+    @agent.certificate
+  end
 
   # An OpenSSL private key or the path to a private key
-  attr_accessor :key
+  def key
+    @agent.key
+  end
+
+  def key= key
+    @agent.key = key
+  end
 
   # An OpenSSL client certificate or the path to a certificate file.
-  attr_accessor :cert
+  def cert
+    @agent.cert
+  end
+
+  def cert= cert
+    @agent.cert = cert
+  end
 
   # OpenSSL key password
-  attr_accessor :pass
+  def pass
+    @agent.pass
+  end
 
-  # Controls how this agent deals with redirects.  If it is set to
-  # true or :all, all 3xx redirects are automatically followed.  This
-  # is the default behavior.  If it is :permanent, only 301 (Moved
-  # Permanently) redirects are followed.  If it is a false value, no
-  # redirects are followed.
-  attr_accessor :redirect_ok
+  def pass= pass
+    @agent.pass = pass
+  end
 
-  # Says this agent should consult the site's robots.txt for each access.
-  attr_reader :robots
+  # Controls how this agent deals with redirects.  The following values are
+  # allowed:
+  #
+  # :all, true:: All 3xx redirects are followed (default)
+  # :permanent:: Only 301 Moved Permanantly redirects are followed
+  # false:: No redirects are followed
 
-  def robots=(value)
-    require 'webrobots' if value
-    @webrobots = nil if value != @robots
-    @robots = value
+  def redirect_ok
+    @agent.redirect_ok
+  end
+
+  def redirect_ok= follow
+    @agent.redirect_ok = follow
+  end
+
+  def gzip_enabled
+    @agent.gzip_enabled
   end
 
   # Disables HTTP/1.1 gzip compression (enabled by default)
-  attr_accessor :gzip_enabled
+  def gzip_enabled=enabled
+    @agent.gzip_enabled = enabled
+  end
 
   # HTTP/1.0 keep-alive time
   attr_accessor :keep_alive_time
@@ -113,23 +156,65 @@ class Mechanize
   # HTTP/1.1 keep-alives are always active.  This does nothing.
   attr_accessor :keep_alive
 
+  def conditional_requests
+    @agent.conditional_requests
+  end
+
   # Disables If-Modified-Since conditional requests (enabled by default)
-  attr_accessor :conditional_requests
+  def conditional_requests= enabled
+    @agent.conditional_requests = enabled
+  end
 
   # Follow HTML meta refresh.  If set to +:anywhere+ meta refresh tags outside
   # of the head element will be followed.
-  attr_accessor :follow_meta_refresh
+  def follow_meta_refresh
+    @agent.follow_meta_refresh
+  end
+
+  def follow_meta_refresh= follow
+    @agent.follow_meta_refresh = follow
+  end
 
   # A callback for additional certificate verification.  See
   # OpenSSL::SSL::SSLContext#verify_callback
-  attr_accessor :verify_callback
+  #
+  # The callback can be used for debugging or to ignore errors by always
+  # returning +true+.  Specifying nil uses the default method that was valid
+  # when the SSLContext was created
+  def verify_callback
+    @agent.verify_callback
+  end
+
+  def verify_callback= verify_callback
+    @agent.verify_callback = verify_callback
+  end
 
   attr_accessor :history_added
-  attr_accessor :scheme_handlers
-  attr_accessor :redirection_limit
+
+  def redirection_limit
+    @agent.redirection_limit
+  end
+
+  def redirection_limit= limit
+    @agent.redirection_limit = limit
+  end
+
+  def scheme_handlers
+    @agent.scheme_handlers
+  end
+
+  def scheme_handlers= scheme_handlers
+    @agent.scheme_handlers = scheme_handlers
+  end
 
   # A hash of custom request headers
-  attr_accessor :request_headers
+  def request_headers
+    @agent.request_headers
+  end
+
+  def request_headers= request_headers
+    @agent.request_headers = request_headers
+  end
 
   # Proxy settings
   attr_reader :proxy_addr
@@ -140,22 +225,28 @@ class Mechanize
   # The HTML parser to be used when parsing documents
   attr_accessor :html_parser
 
-  attr_reader :http # :nodoc:
+  attr_reader :agent # :nodoc:
 
-  attr_reader :history
+  def history
+    @agent.history
+  end
   attr_reader :pluggable_parser
 
   # A list of hooks to call after retrieving a response.  Hooks are called with
   # the agent and the response returned.
 
-  attr_reader :post_connect_hooks
+  def post_connect_hooks
+    @agent.post_connect_hooks
+  end
 
   # A list of hooks to call before making a request.  Hooks are called with
   # the agent and the request to be performed.
 
-  attr_reader :pre_connect_hooks
+  def pre_connect_hooks
+    @agent.pre_connect_hooks
+  end
 
-  alias :follow_redirect? :redirect_ok
+  alias follow_redirect? redirect_ok
 
   @html_parser = Nokogiri::HTML
   class << self
@@ -169,46 +260,21 @@ class Mechanize
   end
 
   def initialize
-    # attr_accessors
-    @cookie_jar     = CookieJar.new
-    @log            = nil
-    @open_timeout   = nil
-    @read_timeout   = nil
-    @user_agent     = AGENT_ALIASES['Mechanize']
-    @watch_for_set  = nil
-    @history_added  = nil
-    @ca_file        = nil # OpenSSL server certificate file
+    @agent = Mechanize::HTTP::Agent.new
+    @agent.context = self
 
-    # callback for OpenSSL errors while verifying the server certificate
-    # chain, can be used for debugging or to ignore errors by always
-    # returning _true_
-    # specifying nil uses the default method that was valid when the SSL was created
-    @verify_callback = nil
-    @cert           = nil # OpenSSL Certificate
-    @key            = nil # OpenSSL Private Key
-    @pass           = nil # OpenSSL Password
-    @redirect_ok    = true
-    @gzip_enabled   = true
+    @scheme_handlers = @agent.scheme_handlers
+
+    # attr_accessors
+    @cookie_jar       = @agent.cookie_jar
+    @open_timeout     = nil
+    @read_timeout     = nil
+    @agent.user_agent = AGENT_ALIASES['Mechanize']
+    @watch_for_set    = nil
+    @history_added    = nil
 
     # attr_readers
-    @history        = Mechanize::History.new
     @pluggable_parser = PluggableParser.new
-
-    # Auth variables
-    @user           = nil # Auth User
-    @password       = nil # Auth Password
-    @digest         = nil # DigestAuth Digest
-    @digest_auth    = Net::HTTP::DigestAuth.new
-    @auth_hash      = {}  # Keep track of urls for sending auth
-    @request_headers= {}  # A hash of request headers to be used
-
-    @conditional_requests = true
-
-    @follow_meta_refresh  = false
-    @redirection_limit    = 20
-
-    @robots         = false
-    @webrobots      = nil
 
     # Connection Cache & Keep alive
     @keep_alive_time  = 300
@@ -220,71 +286,46 @@ class Mechanize
     @proxy_user = nil
     @proxy_pass = nil
 
-    @scheme_handlers = Hash.new { |h, scheme|
-      h[scheme] = lambda { |link, page|
-        raise Mechanize::UnsupportedSchemeError, scheme
-      }
-    }
-
-    @scheme_handlers['http']      = lambda { |link, page| link }
-    @scheme_handlers['https']     = @scheme_handlers['http']
-    @scheme_handlers['relative']  = @scheme_handlers['http']
-    @scheme_handlers['file']      = @scheme_handlers['http']
-
-    @pre_connect_hooks = []
-    @post_connect_hooks = []
-
     @html_parser = self.class.html_parser
 
     yield self if block_given?
 
-    if @proxy_addr and @proxy_pass then
-      set_proxy @proxy_addr, @proxy_port, @proxy_user, @proxy_pass
-    else
-      set_http
-    end
+    @agent.set_proxy @proxy_addr, @proxy_port, @proxy_user, @proxy_pass
+    @agent.set_http
   end
 
-  def max_history=(length); @history.max_size = length end
-  def max_history; @history.max_size end
+  def max_history
+    @agent.history.max_size
+  end
+
+  def max_history= length
+    @agent.history.max_size = length
+  end
+
   def log=(l); self.class.log = l end
   def log; self.class.log end
 
-  # Sets the proxy address, port, user, and password
-  # +addr+ should be a host, with no "http://"
-  def set_proxy(addr, port, user = nil, pass = nil)
-    proxy = URI.parse "http://#{addr}"
-    proxy.port = port
-    proxy.user     = user if user
-    proxy.password = pass if pass
-
-    set_http proxy
-
-    nil
+  def user_agent= user_agent
+    @agent.user_agent = user_agent
   end
 
-  def user_agent=(value)
-    @webrobots = nil if value != @user_agent
-    @user_agent = value
-  end
-
-  # Set the user agent for the Mechanize object.
-  # See AGENT_ALIASES
+  # Set the user agent for the Mechanize object.  See AGENT_ALIASES
   def user_agent_alias=(al)
-    @user_agent = AGENT_ALIASES[al] ||
-      raise(ArgumentError, "unknown agent alias")
+    self.user_agent = AGENT_ALIASES[al] ||
+      raise(ArgumentError, "unknown agent alias #{al.inspect}")
   end
 
   # Returns a list of cookies stored in the cookie jar.
   def cookies
-    @cookie_jar.to_a
+    @agent.cookie_jar.to_a
   end
 
   # Sets the user and password to be used for authentication.
   def auth(user, password)
-    @user       = user
-    @password   = password
+    @agent.user     = user
+    @agent.password = password
   end
+
   alias :basic_auth :auth
 
   # Fetches the URL passed in and returns a page.
@@ -322,7 +363,7 @@ class Mechanize
 
     # fetch the page
     headers ||= {}
-    page = fetch_page uri, method, headers, parameters, referer
+    page = @agent.fetch uri, method, headers, parameters, referer
     add_to_history(page)
     yield page if block_given?
     page
@@ -343,7 +384,7 @@ class Mechanize
   #   delete('http://example/', {'q' => 'foo'}, {})
   #
   def delete(uri, query_params = {}, headers = {})
-    page = fetch_page(uri, :delete, headers, query_params)
+    page = @agent.fetch(uri, :delete, headers, query_params)
     add_to_history(page)
     page
   end
@@ -355,7 +396,7 @@ class Mechanize
   #
   def head(uri, query_params = {}, headers = {})
     # fetch the page
-    page = fetch_page(uri, :head, headers, query_params)
+    page = @agent.fetch(uri, :head, headers, query_params)
     yield page if block_given?
     page
   end
@@ -372,7 +413,7 @@ class Mechanize
     case link
     when Page::Link
       referer = link.page || current_page()
-      if robots
+      if @agent.robots
         if (referer.is_a?(Page) && referer.parser.nofollow?) || link.rel?('nofollow')
           raise RobotsDisallowedError.new(link.href)
         end
@@ -400,7 +441,7 @@ class Mechanize
   # Equivalent to the browser back button.  Returns the most recent page
   # visited.
   def back
-    @history.pop
+    @agent.history.pop
   end
 
   # Posts to the given URL with the request entity.  The request
@@ -469,388 +510,27 @@ class Mechanize
       'Content-Length' => entity.size.to_s,
     }.update headers
 
-    page = fetch_page uri, verb, headers, [entity], cur_page
+    page = @agent.fetch uri, verb, headers, [entity], cur_page
     add_to_history(page)
     page
   end
 
   # Returns the current page loaded by Mechanize
   def current_page
-    @history.last
-  end
-
-  # Returns whether or not a url has been visited
-  def visited?(url)
-    ! visited_page(url).nil?
+    @agent.current_page
   end
 
   # Returns a visited page for the url passed in, otherwise nil
   def visited_page(url)
-    if url.respond_to? :href
-      url = url.href
-    end
-    @history.visited_page(resolve(url))
+    url = url.href if url.respond_to? :href
+
+    @agent.visited_page url
   end
 
-  # Runs given block, then resets the page history as it was before. self is
-  # given as a parameter to the block. Returns the value of the block.
-  def transact
-    history_backup = @history.dup
-    begin
-      yield self
-    ensure
-      @history = history_backup
-    end
-  end
+  # Returns whether or not a url has been visited
+  alias visited? visited_page
 
-  # Tests if this agent is allowed to access +url+, consulting the
-  # site's robots.txt.
-  def robots_allowed?(uri)
-    return true if uri.request_uri == '/robots.txt'
-
-    webrobots.allowed?(uri)
-  end
-
-  # Equivalent to !robots_allowed?(url).
-  def robots_disallowed?(url)
-    !webrobots.allowed?(url)
-  end
-
-  # Returns an error object if there is an error in fetching or
-  # parsing robots.txt of the site +url+.
-  def robots_error(url)
-    webrobots.error(url)
-  end
-
-  # Raises the error if there is an error in fetching or parsing
-  # robots.txt of the site +url+.
-  def robots_error!(url)
-    webrobots.error!(url)
-  end
-
-  # Removes robots.txt cache for the site +url+.
-  def robots_reset(url)
-    webrobots.reset(url)
-  end
-
-  alias :page :current_page
-
-  def connection_for uri
-    case uri.scheme.downcase
-    when 'http', 'https' then
-      return @http
-    when 'file' then
-      return Mechanize::FileConnection.new
-    end
-  end
-
-  def enable_gzip request
-    request['accept-encoding'] = if @gzip_enabled
-                                   'gzip,deflate,identity'
-                                 else
-                                   'identity'
-                                 end
-  end
-
-  def http_request uri, method, params = nil
-    case uri.scheme.downcase
-    when 'http', 'https' then
-      klass = Net::HTTP.const_get(method.to_s.capitalize)
-
-      request ||= klass.new(uri.request_uri)
-      request.body = params.first if params
-
-      request
-    when 'file' then
-      Mechanize::FileRequest.new uri
-    end
-  end
-
-  ##
-  # Invokes hooks added to post_connect_hooks after a +response+ is returned.
-  # Yields the +agent+ and the +response+ returned to each hook.
-
-  def post_connect response # :yields: agent, response
-    @post_connect_hooks.each do |hook|
-      hook.call self, response
-    end
-  end
-
-  ##
-  # Invokes hooks added to pre_connect_hooks before a +request+ is made.
-  # Yields the +agent+ and the +request+ that will be performed to each hook.
-
-  def pre_connect request # :yields: agent, request
-    @pre_connect_hooks.each do |hook|
-      hook.call self, request
-    end
-  end
-
-  def request_auth request, uri
-    auth_type = @auth_hash[uri.host]
-
-    return unless auth_type
-
-    case auth_type
-    when :basic
-      request.basic_auth @user, @password
-    when :digest, :iis_digest
-      uri.user = @user
-      uri.password = @password
-
-      iis = auth_type == :iis_digest
-
-      auth = @digest_auth.auth_header uri, @digest, request.method, iis
-
-      request['Authorization'] = auth
-    end
-  end
-
-  def request_cookies request, uri
-    return if @cookie_jar.empty? uri
-
-    cookies = @cookie_jar.cookies uri
-
-    return if cookies.empty?
-
-    request.add_field 'Cookie', cookies.join('; ')
-  end
-
-  def request_host request, uri
-    port = [80, 443].include?(uri.port.to_i) ? nil : uri.port
-    host = uri.host
-
-    request['Host'] = [host, port].compact.join ':'
-  end
-
-  def request_language_charset request
-    request['accept-charset']  = 'ISO-8859-1,utf-8;q=0.7,*;q=0.7'
-    request['accept-language'] = 'en-us,en;q=0.5'
-  end
-
-  # Log specified headers for the request
-  def request_log request
-    return unless log
-
-    log.info("#{request.class}: #{request.path}")
-
-    request.each_header do |k, v|
-      log.debug("request-header: #{k} => #{v}")
-    end
-  end
-
-  def request_add_headers request, headers = {}
-    @request_headers.each do |k,v|
-      request[k] = v
-    end
-
-    headers.each do |field, value|
-      case field
-      when :etag              then request["ETag"] = value
-      when :if_modified_since then request["If-Modified-Since"] = value
-      when Symbol then
-        raise ArgumentError, "unknown header symbol #{field}"
-      else
-        request[field] = value
-      end
-    end
-  end
-
-  def request_referer request, uri, referer
-    return unless referer
-    return if 'https' == referer.scheme.downcase and
-              'https' != uri.scheme.downcase
-
-    request['Referer'] = referer
-  end
-
-  def request_user_agent request
-    request['User-Agent'] = @user_agent if @user_agent
-  end
-
-  def resolve(uri, referer = current_page())
-    uri = uri.dup if uri.is_a?(URI)
-
-    unless uri.is_a?(URI)
-      uri = uri.to_s.strip.gsub(/[^#{0.chr}-#{126.chr}]/o) { |match|
-        if RUBY_VERSION >= "1.9.0"
-          Mechanize::Util.uri_escape(match)
-        else
-          sprintf('%%%X', match.unpack($KCODE == 'UTF8' ? 'U' : 'C')[0])
-        end
-      }
-
-      unescaped = uri.split(/(?:%[0-9A-Fa-f]{2})+|#/)
-      escaped   = uri.scan(/(?:%[0-9A-Fa-f]{2})+|#/)
-
-      escaped_uri = Mechanize::Util.html_unescape(
-        unescaped.zip(escaped).map { |x,y|
-          "#{WEBrick::HTTPUtils.escape(x)}#{y}"
-        }.join('')
-      )
-
-      begin
-        uri = URI.parse(escaped_uri)
-      rescue
-        uri = URI.parse(WEBrick::HTTPUtils.escape(escaped_uri))
-      end
-    end
-
-    scheme = uri.relative? ? 'relative' : uri.scheme.downcase
-    uri = @scheme_handlers[scheme].call(uri, referer)
-
-    if referer && referer.uri
-      if uri.path.length == 0 && uri.relative?
-        uri.path = referer.uri.path
-      end
-    end
-
-    uri.path = '/' if uri.path.length == 0
-
-    if uri.relative?
-      raise ArgumentError, "absolute URL needed (not #{uri})" unless
-        referer && referer.uri
-
-      base = nil
-      if referer.respond_to?(:bases) && referer.parser
-        base = referer.bases.last
-      end
-
-      uri = ((base && base.uri && base.uri.absolute?) ?
-             base.uri :
-             referer.uri) + uri
-      uri = referer.uri + uri
-      # Strip initial "/.." bits from the path
-      uri.path.sub!(/^(\/\.\.)+(?=\/)/, '')
-    end
-
-    unless ['http', 'https', 'file'].include?(uri.scheme.downcase)
-      raise ArgumentError, "unsupported scheme: #{uri.scheme}"
-    end
-
-    uri
-  end
-
-  def resolve_parameters uri, method, parameters
-    case method
-    when :head, :get, :delete, :trace then
-      if parameters and parameters.length > 0
-        uri.query ||= ''
-        uri.query << '&' if uri.query.length > 0
-        uri.query << Mechanize::Util.build_query_string(parameters)
-      end
-
-      return uri, nil
-    end
-
-    return uri, parameters
-  end
-
-  def response_content_encoding response, body_io
-    length = response.content_length || body_io.length
-
-    case response['Content-Encoding']
-    when nil, 'none', '7bit' then
-      body_io.string
-    when 'deflate' then
-      log.debug('deflate body') if log
-
-      return if length.zero?
-
-      begin
-        Zlib::Inflate.inflate body_io.string
-      rescue Zlib::BufError, Zlib::DataError
-        log.error('Unable to inflate page, retrying with raw deflate') if log
-        begin
-          Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body_io.string)
-        rescue Zlib::BufError, Zlib::DataError
-          log.error("unable to inflate page: #{$!}") if log
-          ''
-        end
-      end
-    when 'gzip', 'x-gzip' then
-      log.debug('gzip body') if log
-
-      return if length.zero?
-
-      begin
-        zio = Zlib::GzipReader.new body_io
-        zio.read
-      rescue Zlib::BufError, Zlib::GzipFile::Error
-        log.error('Unable to gunzip body, trying raw inflate') if log
-        body_io.rewind
-        body_io.read 10
-        Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body_io.read)
-      rescue Zlib::DataError
-        log.error("unable to gunzip page: #{$!}") if log
-        ''
-      ensure
-        zio.close if zio and not zio.closed?
-      end
-    else
-      raise Mechanize::Error,
-            "Unsupported Content-Encoding: #{response['Content-Encoding']}"
-    end
-  end
-
-  def response_cookies response, uri, page
-    if Mechanize::Page === page and page.body =~ /Set-Cookie/n
-      page.search('//head/meta[@http-equiv="Set-Cookie"]').each do |meta|
-        Mechanize::Cookie.parse(uri, meta['content']) { |c|
-          log.debug("saved cookie: #{c}") if log
-          @cookie_jar.add(uri, c)
-        }
-      end
-    end
-
-    header_cookies = response.get_fields 'Set-Cookie'
-
-    return unless header_cookies
-
-    header_cookies.each do |cookie|
-      Mechanize::Cookie.parse(uri, cookie) { |c|
-        log.debug("saved cookie: #{c}") if log
-        @cookie_jar.add(uri, c)
-      }
-    end
-  end
-
-  def response_follow_meta_refresh response, uri, page, redirects
-    return unless @follow_meta_refresh
-
-    redirect_uri = nil
-    referer      = page
-
-    if page.respond_to?(:meta_refresh) and (redirect = page.meta_refresh.first)
-      redirect_uri = Mechanize::Util.uri_unescape redirect.uri.to_s
-      sleep redirect.node['delay'].to_f
-      referer = Page.new(nil, {'content-type'=>'text/html'})
-    elsif refresh = response['refresh']
-      delay, redirect_uri = Page::MetaRefresh.parse refresh, uri
-      raise Mechanize::Error, 'Invalid refresh http header' unless delay
-      raise RedirectLimitReachedError.new(page, redirects) if
-        redirects + 1 > redirection_limit
-      sleep delay.to_f
-    end
-
-    if redirect_uri
-      @history.push(page, page.uri)
-      fetch_page(redirect_uri, :get, {}, [], referer, redirects + 1)
-    end
-  end
-
-  def response_log response
-    return unless log
-
-    log.info("status: #{response.class} #{response.http_version} " \
-             "#{response.code} #{response.message}")
-
-    response.each_header do |k, v|
-      log.debug("response-header: #{k} => #{v}")
-    end
-  end
-
-  def response_parse response, body, uri
+  def parse uri, response, body
     content_type = nil
 
     unless response['Content-Type'].nil?
@@ -859,131 +539,38 @@ class Mechanize
     end
 
     # Find our pluggable parser
-    parser_klass = @pluggable_parser.parser(content_type)
+    parser_klass = @pluggable_parser.parser content_type
 
-    parser_klass.new(uri, response, body, response.code) { |parser|
+    parser_klass.new uri, response, body, response.code do |parser|
       parser.mech = self if parser.respond_to? :mech=
-      if @watch_for_set and parser.respond_to?(:watch_for_set=)
-        parser.watch_for_set = @watch_for_set
-      end
-    }
+
+      parser.watch_for_set = @watch_for_set if
+        @watch_for_set and parser.respond_to?(:watch_for_set=)
+    end
   end
 
-  def response_read response, request
-    body_io = StringIO.new
-    body_io.set_encoding Encoding::BINARY if body_io.respond_to? :set_encoding
-    total = 0
-
+  # Runs given block, then resets the page history as it was before. self is
+  # given as a parameter to the block. Returns the value of the block.
+  def transact
+    history_backup = @agent.history.dup
     begin
-      response.read_body { |part|
-        total += part.length
-        body_io.write(part)
-        log.debug("Read #{part.length} bytes (#{total} total)") if log
-      }
-    rescue Net::HTTP::Persistent::Error => e
-      body_io.rewind
-      raise Mechanize::ResponseReadError.new(e, response, body_io)
+      yield self
+    ensure
+      @agent.history = history_backup
     end
-
-    body_io.rewind
-
-    raise Mechanize::ResponseCodeError, response if
-      Net::HTTPUnknownResponse === response
-
-    content_length = response.content_length
-
-    unless Net::HTTP::Head === request or Net::HTTPRedirection === response then
-      raise EOFError, "Content-Length (#{content_length}) does not match " \
-                      "response body length (#{body_io.length})" if
-        content_length and content_length != body_io.length
-    end
-
-    body_io
   end
 
-  def response_redirect response, method, page, redirects
-    case @redirect_ok
-    when true, :all
-      # shortcut
-    when false, nil
-      return page
-    when :permanent
-      return page if response_class != Net::HTTPMovedPermanently
-    end
-
-    log.info("follow redirect to: #{response['Location']}") if log
-
-    from_uri = page.uri
-
-    raise RedirectLimitReachedError.new(page, redirects) if
-      redirects + 1 > redirection_limit
-
-    redirect_method = method == :head ? :head : :get
-
-    page = fetch_page(response['Location'].to_s, redirect_method, {}, [],
-                      page, redirects + 1)
-
-    @history.push(page, from_uri)
-
-    return page
+  def robots
+    @agent.robots
   end
 
-  def response_authenticate(response, page, uri, request, headers, params,
-                            referer)
-    raise ResponseCodeError, page unless @user || @password
-    raise ResponseCodeError, page if @auth_hash.has_key?(uri.host)
-
-    if response['www-authenticate'] =~ /Digest/i
-      @auth_hash[uri.host] = :digest
-      if response['server'] =~ /Microsoft-IIS/
-        @auth_hash[uri.host] = :iis_digest
-      end
-      @digest = response['www-authenticate']
-    else
-      @auth_hash[uri.host] = :basic
-    end
-
-    fetch_page(uri, request.method.downcase.to_sym, headers, params, referer)
+  def robots= enabled
+    @agent.robots = enabled
   end
+
+  alias :page :current_page
 
   private
-
-  def webrobots_http_get(uri)
-    get_file(uri)
-  rescue Mechanize::ResponseCodeError => e
-    return '' if e.response_code == '404'
-    raise e
-  end
-
-  def webrobots
-    @webrobots ||= WebRobots.new(@user_agent, :http_get => method(:webrobots_http_get))
-  end
-
-  def set_http proxy = nil
-    @http = Net::HTTP::Persistent.new 'mechanize', proxy
-
-    @http.keep_alive = @keep_alive_time
-
-    @http.ca_file         = @ca_file
-    @http.verify_callback = @verify_callback
-
-    if @cert and @key then
-      cert = if OpenSSL::X509::Certificate === @cert then
-               @cert
-             else
-               OpenSSL::X509::Certificate.new ::File.read @cert
-             end
-
-      key = if OpenSSL::PKey::PKey === @key then
-              @key
-            else
-              OpenSSL::PKey::RSA.new ::File.read(@key), @pass
-            end
-
-      @http.certificate = cert
-      @http.private_key = key
-    end
-  end
 
   def post_form(uri, form, headers = {})
     cur_page = form.page || current_page ||
@@ -999,101 +586,16 @@ class Mechanize
     }.merge headers
 
     # fetch the page
-    page = fetch_page uri, :post, headers, [request_data], cur_page
+    page = @agent.fetch uri, :post, headers, [request_data], cur_page
     add_to_history(page)
     page
   end
 
-  # uri is an absolute URI
-  def fetch_page uri, method = :get, headers = {}, params = [],
-                 referer = current_page, redirects = 0
-    referer_uri = referer ? referer.uri : nil
-
-    uri = resolve uri, referer
-
-    uri, params = resolve_parameters uri, method, params
-
-    request = http_request uri, method, params
-
-    connection = connection_for uri
-
-    request_auth request, uri
-
-    enable_gzip request
-
-    request_language_charset request
-    request_cookies request, uri
-    request_host request, uri
-    request_referer request, uri, referer_uri
-    request_user_agent request
-    request_add_headers request, headers
-
-    pre_connect request
-
-    # Consult robots.txt
-    if robots && uri.is_a?(URI::HTTP)
-      robots_allowed?(uri) or raise RobotsDisallowedError.new(uri)
-    end
-
-    # Add If-Modified-Since if page is in history
-    if (page = visited_page(uri)) and page.response['Last-Modified']
-      request['If-Modified-Since'] = page.response['Last-Modified']
-    end if(@conditional_requests)
-
-    # Specify timeouts if given
-    connection.open_timeout = @open_timeout if @open_timeout
-    connection.read_timeout = @read_timeout if @read_timeout
-
-    request_log request
-
-    response_body_io = nil
-
-    # Send the request
-    response = connection.request(uri, request) { |res|
-      response_log res
-
-      response_body_io = response_read res, request
-
-      res
-    }
-
-    response_body = response_content_encoding response, response_body_io
-
-    post_connect response
-
-    page = response_parse response, response_body, uri
-
-    response_cookies response, uri, page
-
-    meta = response_follow_meta_refresh response, uri, page, redirects
-    return meta if meta
-
-    case response
-    when Net::HTTPSuccess
-      if robots && page.is_a?(Page)
-        page.parser.noindex? and raise RobotsDisallowedError.new(uri)
-      end
-
-      page
-    when Mechanize::FileResponse
-      page
-    when Net::HTTPNotModified
-      log.debug("Got cached page") if log
-      visited_page(uri) || page
-    when Net::HTTPRedirection
-      response_redirect response, method, page, redirects
-    when Net::HTTPUnauthorized
-      response_authenticate(response, page, uri, request, headers, params,
-                            referer)
-    else
-      raise ResponseCodeError.new(page), "Unhandled response"
-    end
-  end
-
   def add_to_history(page)
-    @history.push(page, resolve(page.uri))
-    history_added.call(page) if history_added
+    @agent.history.push(page, @agent.resolve(page.uri))
+    @history_added.call(page) if @history_added
   end
+
 end
 
 require 'mechanize/content_type_error'
@@ -1105,6 +607,8 @@ require 'mechanize/file_request'
 require 'mechanize/file_response'
 require 'mechanize/form'
 require 'mechanize/history'
+require 'mechanize/http'
+require 'mechanize/http/agent'
 require 'mechanize/page'
 require 'mechanize/inspect'
 require 'mechanize/monkey_patch'

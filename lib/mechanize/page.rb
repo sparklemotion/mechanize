@@ -26,6 +26,7 @@ class Mechanize::Page < Mechanize::File
 
     @encoding = nil
     @encodings = [nil]
+    raise 'no' if mech and not Mechanize === mech
     @mech = mech
 
     reset
@@ -107,10 +108,10 @@ class Mechanize::Page < Mechanize::File
     return nil unless @body
 
     if @encoding then
-      @parser = mech.html_parser.parse(html_body, nil, @encoding)
+      @parser = @mech.html_parser.parse(html_body, nil, @encoding)
     else
       @encodings.reverse_each do |encoding|
-        @parser = mech.html_parser.parse(html_body, nil, encoding)
+        @parser = @mech.html_parser.parse(html_body, nil, encoding)
 
         break unless encoding_error?(@parser)
       end

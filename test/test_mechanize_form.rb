@@ -102,9 +102,10 @@ class TestMechanizeForm < Test::Unit::TestCase
     assert form = page.forms.first
     form.action = '/http_headers'
     page = @agent.submit(form, nil, { 'foo' => 'bar' })
-    headers = Hash[*(
-      page.body.split("\n").map { |x| x.split('|') }.flatten
-    )]
+
+    headers = page.body.split("\n").map { |x| x.split('|', 2) }.flatten
+    headers = Hash[*headers]
+
     assert_equal 'bar', headers['foo']
   end
 

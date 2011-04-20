@@ -1,142 +1,118 @@
 require "helper"
 
 class TestHistory < Test::Unit::TestCase
+
+  Node = Struct.new :href, :inner_text
+
   def setup
-    @agent    = Mechanize.new
-    @history  = Mechanize::History.new
+    @mech    = Mechanize.new
+    @history = Mechanize::History.new
+    @uri = URI 'http://example'
+  end
+
+  def test_initialize
+    assert_equal 0, @history.length
   end
 
   def test_push
-    assert_equal(0, @history.length)
+    response = { 'content-type' => 'text/html' }
+    page = Mechanize::Page.new @uri, response, '', 200, @mech
 
-    page = @agent.get("http://localhost/tc_bad_links.html")
-    x = @history.push(page)
-    assert_equal(x, @history)
-    assert_equal(1, @history.length)
-    assert(@history.visited?(page))
-    assert(@history.visited?(page.uri))
-    assert(@history.visited?(page.uri.to_s))
-    assert_equal(page, @history.visited_page(page))
-    assert_equal(page, @history.visited_page(page.uri))
-    assert_equal(page, @history.visited_page(page.uri.to_s))
+    obj = @history.push page
 
-    @history.push(@agent.get("/tc_bad_links.html"))
-    assert_equal(2, @history.length)
+    assert_same @history, obj
+    assert_equal 1, @history.length
+    assert @history.visited? @uri
+
+    page = Mechanize::Page.new @uri + '/a', response, '', 200, @mech
+
+    @history.push page
+
+    assert_equal 2, @history.length
+  end
+
+  def test_push_uri
+    obj = @history.push :page, @uri
+
+    assert_same @history, obj
+    assert_equal 1, @history.length
+
+    assert @history.visited? @uri
+
+    @history.push :page2, @uri
+
+    assert_equal 2, @history.length
   end
 
   def test_shift
-    assert_equal(0, @history.length)
-    page = @agent.get("http://localhost/tc_bad_links.html")
-    @history.push(page)
-    assert_equal(1, @history.length)
+    assert_nil @history.shift
 
-    @history.push(@agent.get("/tc_bad_links.html"))
-    assert_equal(2, @history.length)
+    @history.push(:page1, @uri)
+    @history.push(:page2, @uri + '/a')
 
-    @history.push(@agent.get("/index.html"))
-    assert_equal(3, @history.length)
+    page = @history.shift
 
-    page2 = @history.shift
-    assert_equal(page, page2)
-    assert_equal(2, @history.length)
+    assert_equal :page1, page
+    assert_equal 1, @history.length
+    assert !@history.visited?(@uri)
 
     @history.shift
-    assert_equal(1, @history.length)
-    assert_equal(false, @history.visited?(page))
 
-    @history.shift
-    assert_equal(0, @history.length)
-
-    assert_nil(@history.shift)
-    assert_equal(0, @history.length)
+    assert_equal 0, @history.length
   end
 
   def test_pop
-    assert_equal(0, @history.length)
-    page = @agent.get("http://localhost/tc_bad_links.html")
-    @history.push(page)
-    assert_equal(1, @history.length)
+    @history.push(:page, @uri)
 
-    page2 = @agent.get("/index.html")
-    @history.push(page2)
-    assert_equal(2, @history.length)
-    assert_equal(page2, @history.pop)
-    assert_equal(1, @history.length)
-    assert_equal(true, @history.visited?(page))
-    assert_equal(false, @history.visited?(page2))
-    assert_equal(page, @history.pop)
-    assert_equal(0, @history.length)
-    assert_equal(false, @history.visited?(page))
-    assert_equal(false, @history.visited?(page2))
-    assert_nil(@history.pop)
+    assert_equal(:page, @history.pop)
+    assert_equal 0, @history.length
+    assert !@history.visited?(@uri)
+
+    assert_nil @history.pop
   end
 
   def test_max_size
-    @history  = Mechanize::History.new(10)
-    1.upto(20) do |i|
-      page = @agent.get('http://localhost/index.html')
-      @history.push page
-      assert_equal(true, @history.visited?(page))
-      if i < 10
-        assert_equal(i, @history.length)
-      else
-        assert_equal(10, @history.length)
-      end
-    end
+    @history = Mechanize::History.new 2
 
-    @history.clear
-    @history.max_size = 5
-    1.upto(20) do |i|
-      page = @agent.get('http://localhost/index.html')
-      @history.push page
-      assert_equal(true, @history.visited?(page))
-      if i < 5
-        assert_equal(i, @history.length)
-      else
-        assert_equal(5, @history.length)
-      end
-    end
+    1.upto(3) do |i|
+      @history.push :page, @uri
 
-    @history.max_size = 0
-    1.upto(20) do |i|
-      page = @agent.get('http://localhost/index.html')
-      @history.push page
-      assert_equal(false, @history.visited?(page))
-      assert_equal(0, @history.length)
+      if i >= 2
+        assert_equal 2, @history.length
+      else
+        assert_equal i, @history.length
+      end
     end
   end
 
-  def test_no_slash
-    @agent.get('http://localhost')
+  def test_visited_eh
+    @mech.get('http://localhost/')
 
     node = Struct.new(:href, :inner_text).new('http://localhost/', 'blah')
     link = Mechanize::Page::Link.new(node, nil, nil)
-    assert(@agent.visited?(link))
+    assert(@mech.visited?(link))
 
     node = Struct.new(:href, :inner_text).new('http://localhost', 'blah')
     link = Mechanize::Page::Link.new(node, nil, nil)
-    assert(@agent.visited?(link))
+    assert(@mech.visited?(link))
   end
 
-  def test_with_slash
-    @agent.get('http://localhost/')
+  def test_visited_eh_no_slash
+    slash    = URI 'http://example/'
+    no_slash = URI 'http://example'
 
-    node = Struct.new(:href, :inner_text).new('http://localhost/', 'blah')
-    link = Mechanize::Page::Link.new(node, nil, nil)
-    assert(@agent.visited?(link))
+    @history.push :page, slash
 
-    node = Struct.new(:href, :inner_text).new('http://localhost', 'blah')
-    link = Mechanize::Page::Link.new(node, nil, nil)
-    assert(@agent.visited?(link))
+    assert @history.visited?(slash),    'slash'
+    assert @history.visited?(no_slash), 'no slash'
   end
 
   def test_clear
-    page = nil
-    20.times { @history.push(page = @agent.get('http://localhost/index.html')) }
-    assert_equal(20, @history.length)
-    assert_equal(true, @history.visited?(page))
+    @history.push :page, @uri
+
     @history.clear
-    assert_equal(0, @history.length)
-    assert_equal(false, @history.visited?(page))
+
+    assert_equal 0, @history.length
+    assert !@history.visited?(@uri)
   end
 end

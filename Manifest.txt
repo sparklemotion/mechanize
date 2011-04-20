@@ -6,7 +6,6 @@ LICENSE.rdoc
 Manifest.txt
 README.rdoc
 Rakefile
-digest.htpasswd
 examples/flickr_upload.rb
 examples/mech-dump.rb
 examples/proxy_req.rb
@@ -34,6 +33,8 @@ lib/mechanize/form/radio_button.rb
 lib/mechanize/form/select_list.rb
 lib/mechanize/headers.rb
 lib/mechanize/history.rb
+lib/mechanize/http.rb
+lib/mechanize/http/agent.rb
 lib/mechanize/inspect.rb
 lib/mechanize/monkey_patch.rb
 lib/mechanize/page.rb
@@ -138,6 +139,7 @@ test/test_mechanize_form_encoding.rb
 test/test_mechanize_form_field.rb
 test/test_mechanize_form_image_button.rb
 test/test_mechanize_form_textarea.rb
+test/test_mechanize_http_agent.rb
 test/test_mechanize_link.rb
 test/test_mechanize_page.rb
 test/test_mechanize_page_meta_refresh.rb

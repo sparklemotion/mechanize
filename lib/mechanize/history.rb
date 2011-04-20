@@ -14,25 +14,39 @@ class Mechanize
       @history_index = orig.instance_variable_get(:@history_index).dup
     end
 
+    def inspect # :nodoc:
+      uris = map { |page| page.uri }.join ', '
+
+      "[#{uris}]"
+    end
+
     def push(page, uri = nil)
       super(page)
+
       @history_index[(uri ? uri : page.uri).to_s] = page
+
       if @max_size && self.length > @max_size
         while self.length > @max_size
           self.shift
         end
       end
+
       self
     end
     alias :<< :push
 
-    def visited?(url)
-      ! visited_page(url).nil?
+    def visited_page(uri)
+      page = @history_index[uri.to_s]
+
+      return page if page # HACK
+
+      uri = uri.dup
+      uri.path = '/' if uri.path.empty?
+
+      @history_index[uri.to_s]
     end
 
-    def visited_page(url)
-      @history_index[(url.respond_to?(:uri) ? url.uri : url).to_s]
-    end
+    alias visited? visited_page
 
     def clear
       @history_index.clear
@@ -43,7 +57,9 @@ class Mechanize
       return nil if length == 0
       page    = self[0]
       self[0] = nil
+
       super
+
       remove_from_index(page)
       page
     end
@@ -56,10 +72,12 @@ class Mechanize
     end
 
     private
+
     def remove_from_index(page)
       @history_index.each do |k,v|
         @history_index.delete(k) if v == page
       end
     end
+
   end
 end

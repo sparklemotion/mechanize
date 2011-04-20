@@ -1,3 +1,6 @@
+##
+# An HTTP (and local disk access) user agent
+
 class Mechanize::HTTP::Agent
 
   attr_reader :cookie_jar
@@ -52,6 +55,7 @@ class Mechanize::HTTP::Agent
   attr_accessor :scheme_handlers
 
   attr_accessor :user
+  attr_reader :user_agent
 
   # Path to an OpenSSL server certificate file
   attr_accessor :ca_file
@@ -97,6 +101,7 @@ class Mechanize::HTTP::Agent
     @request_headers      = {}
     @robots               = false
     @user                 = nil # HTTP auth user
+    @user_agent           = nil
     @webrobots            = nil
 
     @ca_file         = nil # OpenSSL server certificate file
@@ -671,7 +676,7 @@ class Mechanize::HTTP::Agent
   end
 
   def set_http
-    @http = Net::HTTP::Persistent.new 'mechanize', @proxy
+    @http = Net::HTTP::Persistent.new 'mechanize', @proxy_uri
 
     @http.keep_alive = @keep_alive_time
 

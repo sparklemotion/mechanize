@@ -826,7 +826,7 @@ class Mechanize
       sleep redirect.node['delay'].to_f
       referer = Page.new(nil, {'content-type'=>'text/html'})
     elsif refresh = response['refresh']
-      delay, redirect_uri = Page::Meta.parse(refresh, uri)
+      delay, redirect_uri = Page::MetaRefresh.parse(refresh, uri)
       raise Mechanize::Error, 'Invalid refresh http header' unless delay
       raise RedirectLimitReachedError.new(page, redirects) if
         redirects + 1 > redirection_limit

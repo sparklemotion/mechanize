@@ -41,7 +41,7 @@ lib/mechanize/page/frame.rb
 lib/mechanize/page/image.rb
 lib/mechanize/page/label.rb
 lib/mechanize/page/link.rb
-lib/mechanize/page/meta.rb
+lib/mechanize/page/meta_refresh.rb
 lib/mechanize/pluggable_parsers.rb
 lib/mechanize/redirect_limit_reached_error.rb
 lib/mechanize/redirect_not_get_or_head_error.rb
@@ -139,10 +139,10 @@ test/test_mechanize_form_encoding.rb
 test/test_mechanize_form_field.rb
 test/test_mechanize_form_image_button.rb
 test/test_mechanize_page.rb
+test/test_mechanize_page_meta_refresh.rb
 test/test_mechanize_redirect_not_get_or_head_error.rb
 test/test_mechanize_subclass.rb
 test/test_mechanize_util.rb
-test/test_meta.rb
 test/test_multi_select.rb
 test/test_no_attributes.rb
 test/test_option.rb

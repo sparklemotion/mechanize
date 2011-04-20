@@ -279,10 +279,10 @@ class Mechanize::Page < Mechanize::File
       content = node['content']
 
       if equiv && equiv.downcase == 'refresh'
-        Meta.parse(content, uri) do |delay, href|
+        MetaRefresh.parse(content, uri) do |delay, href|
           node['delay'] = delay
           node['href'] = href
-          Meta.new(node, @mech, self)
+          MetaRefresh.new(node, @mech, self)
         end
       end
     end.compact
@@ -355,5 +355,5 @@ require 'mechanize/page/label'
 require 'mechanize/page/link'
 require 'mechanize/page/base'
 require 'mechanize/page/frame'
-require 'mechanize/page/meta'
+require 'mechanize/page/meta_refresh'
 

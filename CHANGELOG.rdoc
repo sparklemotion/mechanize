@@ -27,6 +27,8 @@ Mechanize is now under the MIT license
   * Mechanize#get no longer accepts the referer as the second argument.
   * Mechanize#get no longer allows the HTTP method to be changed (:verb
     option).
+  * Mechanize::Page::Meta is now Mechanize::Page::MetaRefresh to accurately
+    depict its responsibilities.
 
 * Deprecations
   * Mechanize#get with an options hash is deprecated and will be removed after

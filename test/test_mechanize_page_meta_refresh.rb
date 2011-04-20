@@ -1,10 +1,10 @@
 require 'helper'
 
-class TestMechanizePageMeta < Test::Unit::TestCase
-  Meta = Mechanize::Page::Meta
+class TestMechanizePageMetaRefresh < Test::Unit::TestCase
+  MetaRefresh = Mechanize::Page::MetaRefresh
 
   def test_CONTENT_REGEXP
-    r = Meta::CONTENT_REGEXP
+    r = MetaRefresh::CONTENT_REGEXP
 
     assert r =~ "0; url=http://localhost:8080/path"
     assert_equal "0", $1
@@ -47,22 +47,26 @@ class TestMechanizePageMeta < Test::Unit::TestCase
     uri = URI.parse('http://example/here/')
 
     assert_equal ['5', 'http://b.example'],
-                 Meta.parse("5;url=http://b.example", uri)
+                 MetaRefresh.parse("5;url=http://b.example", uri)
     assert_equal ['5', 'http://example/a'],
-                 Meta.parse("5;url=http://example/a", uri)
+                 MetaRefresh.parse("5;url=http://example/a", uri)
     assert_equal ['5', 'http://example/here/test'],
-                 Meta.parse("5;url=test", uri)
-    assert_equal ['5', 'http://example/test'], Meta.parse("5;url=/test", uri)
-    assert_equal ['5', 'http://example/here/'], Meta.parse("5;url=", uri)
-    assert_equal ['5', 'http://example/here/'], Meta.parse("5", uri)
-    assert_equal nil, Meta.parse("invalid content", uri)
+                 MetaRefresh.parse("5;url=test", uri)
+    assert_equal ['5', 'http://example/test'],
+                 MetaRefresh.parse("5;url=/test", uri)
+    assert_equal ['5', 'http://example/here/'],
+                 MetaRefresh.parse("5;url=", uri)
+    assert_equal ['5', 'http://example/here/'],
+                 MetaRefresh.parse("5", uri)
+
+    assert_nil MetaRefresh.parse("invalid content", uri)
   end
 
   def test_parse_block
     uri = URI 'http://example'
     yielded = false
 
-    result = Meta.parse('5;url=/a', uri) { |delay, url|
+    result = MetaRefresh.parse('5;url=/a', uri) { |delay, url|
       assert_equal '5', delay
       assert_equal 'http://example/a', url
       yielded = :yielded
@@ -76,7 +80,7 @@ class TestMechanizePageMeta < Test::Unit::TestCase
   def test_parse_invalid
     uri = URI.parse('http://example/')
 
-    assert_nil Meta.parse("invalid content", uri)
+    assert_nil MetaRefresh.parse("invalid content", uri)
   end
 
 end

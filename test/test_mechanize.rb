@@ -173,6 +173,12 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal @agent.http, conn
   end
 
+  def test_delete
+    page = @agent.delete('http://localhost/verb', { 'q' => 'foo' })
+    assert_equal 1, @agent.history.length
+    assert_equal 'DELETE', page.header['X-Request-Method']
+  end
+
   def test_delete_redirect
     page = @agent.delete('http://localhost/redirect')
 
@@ -545,6 +551,12 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal('File Upload Form', pages.title)
   end
 
+  def test_head
+    page = @agent.head('http://localhost/verb', { 'q' => 'foo' })
+    assert_equal 0, @agent.history.length
+    assert_equal 'HEAD', page.header['X-Request-Method']
+  end
+
   def test_head_redirect
     page = @agent.head('http://localhost/redirect')
 
@@ -683,6 +695,12 @@ class TestMechanize < Test::Unit::TestCase
     assert_throws :called do
       @agent.pre_connect @req
     end
+  end
+
+  def test_put
+    page = @agent.put('http://localhost/verb', 'foo')
+    assert_equal 1, @agent.history.length
+    assert_equal 'PUT', page.header['X-Request-Method']
   end
 
   def test_put_redirect

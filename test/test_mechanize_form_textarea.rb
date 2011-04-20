@@ -1,6 +1,6 @@
 require "helper"
 
-class TestTextArea < Test::Unit::TestCase
+class TestMechanizeFormTextarea < Test::Unit::TestCase
   def setup
     @agent = Mechanize.new
     @page  = @agent.get("http://localhost/tc_textarea.html")

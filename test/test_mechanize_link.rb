@@ -1,6 +1,6 @@
 require "helper"
 
-class LinksMechTest < Test::Unit::TestCase
+class TestMechanizeLink < Test::Unit::TestCase
   def setup
     @agent = Mechanize.new
   end

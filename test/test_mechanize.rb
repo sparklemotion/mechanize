@@ -551,6 +551,12 @@ class TestMechanize < Test::Unit::TestCase
     end
   end
 
+  def test_open_timeout_equals
+    @mech.open_timeout = 5
+
+    assert_equal 5, @mech.open_timeout
+  end
+
   def test_post_basic_auth
     requests = []
 
@@ -601,6 +607,12 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal(page.uri.to_s, 'http://localhost/verb')
 
     assert_equal 'GET', page.header['X-Request-Method']
+  end
+
+  def test_read_timeout_equals
+    @mech.read_timeout = 5
+
+    assert_equal 5, @mech.read_timeout
   end
 
   def test_submit_bad_form_method

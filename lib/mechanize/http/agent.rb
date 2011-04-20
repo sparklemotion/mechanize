@@ -12,6 +12,9 @@ class Mechanize::HTTP::Agent
   attr_accessor :gzip_enabled
   attr_accessor :history
 
+  # Length of time to wait until a connection is opened in seconds
+  attr_accessor :open_timeout
+
   attr_accessor :password
   attr_reader :proxy_uri
 
@@ -24,6 +27,9 @@ class Mechanize::HTTP::Agent
   # the agent and the request to be performed.
 
   attr_reader :pre_connect_hooks
+
+  # Length of time to attempt to read data from the server
+  attr_accessor  :read_timeout
 
   # Controls how this agent deals with redirects.  The following values are
   # allowed:
@@ -79,10 +85,13 @@ class Mechanize::HTTP::Agent
     @follow_meta_refresh  = false
     @gzip_enabled         = true
     @history              = Mechanize::History.new
+    @keep_alive_time      = 300
+    @open_timeout         = nil
     @password             = nil # HTTP auth password
     @post_connect_hooks   = []
     @pre_connect_hooks    = []
     @proxy_uri            = nil
+    @read_timeout         = nil
     @redirect_ok          = true
     @redirection_limit    = 20
     @request_headers      = {}

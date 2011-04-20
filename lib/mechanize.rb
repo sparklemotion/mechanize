@@ -72,10 +72,22 @@ class Mechanize
   end
 
   # Length of time to wait until a connection is opened in seconds
-  attr_accessor :open_timeout
+  def open_timeout
+    @agent.open_timeout
+  end
+
+  def open_timeout= open_timeout
+    @agent.open_timeout = open_timeout
+  end
 
   # Length of time to attempt to read data from the server
-  attr_accessor  :read_timeout
+  def read_timeout
+    @agent.read_timeout
+  end
+
+  def read_timeout= read_timeout
+    @agent.read_timeout = read_timeout
+  end
 
   # The identification string for the client initiating a web request
   def user_agent
@@ -151,7 +163,13 @@ class Mechanize
   end
 
   # HTTP/1.0 keep-alive time
-  attr_accessor :keep_alive_time
+  def keep_alive_time
+    @agent.keep_alive_time
+  end
+
+  def keep_alive_time= keep_alive_time
+    @agent.keep_alive_time = keep_alive_time
+  end
 
   # HTTP/1.1 keep-alives are always active.  This does nothing.
   attr_accessor :keep_alive
@@ -230,6 +248,7 @@ class Mechanize
   def history
     @agent.history
   end
+
   attr_reader :pluggable_parser
 
   # A list of hooks to call after retrieving a response.  Hooks are called with
@@ -263,12 +282,7 @@ class Mechanize
     @agent = Mechanize::HTTP::Agent.new
     @agent.context = self
 
-    @scheme_handlers = @agent.scheme_handlers
-
     # attr_accessors
-    @cookie_jar       = @agent.cookie_jar
-    @open_timeout     = nil
-    @read_timeout     = nil
     @agent.user_agent = AGENT_ALIASES['Mechanize']
     @watch_for_set    = nil
     @history_added    = nil
@@ -276,8 +290,6 @@ class Mechanize
     # attr_readers
     @pluggable_parser = PluggableParser.new
 
-    # Connection Cache & Keep alive
-    @keep_alive_time  = 300
     @keep_alive       = true
 
     # Proxy

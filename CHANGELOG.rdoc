@@ -69,6 +69,8 @@ Mechanize is now under the MIT license
     (or connections).  GH #90
   * Mechanize#follow_meta_refresh set to :anywhere will follow meta refresh
     found outside of a document's head.  GH #99
+  * Add support for HTML5's rel="noreferrer" attribute which indicates
+    no "Referer" information should be sent when following the link.
 
 * Bug Fixes:
 

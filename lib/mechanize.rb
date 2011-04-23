@@ -356,13 +356,12 @@ class Mechanize
       method     = options[:verb] || method
     end
 
-    unless referer
+    referer ||=
       if uri.to_s =~ %r{\Ahttps?://}
-        referer = Page.new(nil, {'content-type'=>'text/html'})
+        Page.new(nil, {'content-type'=>'text/html'})
       else
-        referer = current_page || Page.new(nil, {'content-type'=>'text/html'})
+        current_page || Page.new(nil, {'content-type'=>'text/html'})
       end
-    end
 
     # FIXME: Huge hack so that using a URI as a referer works.  I need to
     # refactor everything to pass around URIs but still support
@@ -430,7 +429,13 @@ class Mechanize
           raise RobotsDisallowedError.new(link.href)
         end
       end
-      get link.href, [], referer
+      if link.rel?('noreferrer')
+        href = @agent.resolve(link.href, link.page || current_page)
+        referer = Page.new(nil, {'content-type'=>'text/html'})
+      else
+        href = link.href
+      end
+      get href, [], referer
     when String, Regexp
       if real_link = page.link_with(:text => link)
         click real_link

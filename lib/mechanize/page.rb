@@ -43,6 +43,10 @@ class Mechanize::Page < Mechanize::File
       @encodings.concat self.class.meta_charset(body)
     end
 
+    if mech && mech.default_encoding
+      @encodings << mech.default_encoding if mech.default_encoding_fallback
+    end
+
     super(uri, response, body, code)
   end
 
@@ -104,6 +108,8 @@ class Mechanize::Page < Mechanize::File
 
     if @encoding then
       @parser = @mech.html_parser.parse(html_body, nil, @encoding)
+    elsif ! mech.default_encoding_fallback then
+      @parser = @mech.html_parser.parse(html_body, nil, @mech.default_encoding)
     else
       @encodings.reverse_each do |encoding|
         @parser = @mech.html_parser.parse(html_body, nil, encoding)

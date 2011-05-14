@@ -106,10 +106,42 @@ class TestMechanizePageEncoding < Test::Unit::TestCase
   def test_encodings
     response = {'content-type' => 'text/html;charset=HEADER'}
     body = '<meta http-equiv="content-type" content="text/html;charset=META">'
+    @agent.default_encoding = 'DEFAULT'
     page = util_page body, response
 
     assert_equal true, page.encodings.include?('HEADER')
     assert_equal true, page.encodings.include?('META')
     assert_equal true, page.encodings.include?(MECH_ASCII_ENCODING)
+    assert_equal true, page.encodings.include?('DEFAULT')
+  end
+
+  def test_parser_with_default_encoding
+    # pre test
+    assert_equal false, util_page.encodings.include?('Windows-1252')
+
+    @agent.default_encoding = 'Windows-1252'
+    page = util_page
+
+    assert_equal true, page.encodings.include?('Windows-1252')
+  end
+
+  def test_parser_with_default_encoding_fallback
+    @agent.default_encoding = 'Windows-1252'
+    @agent.default_encoding_fallback = false
+    page = util_page
+
+    assert_equal false, page.encodings.include?('Windows-1252')
+  end
+
+  def test_parser_encoding_equals_overwrites_forced_default_encoding
+    @agent.default_encoding = 'Windows-1252'
+    @agent.default_encoding_fallback = false
+    page = util_page
+
+    assert_equal 'Windows-1252', page.encoding
+
+    page.encoding = 'ISO-8859-2'
+
+    assert_equal 'ISO-8859-2', page.encoding
   end
 end

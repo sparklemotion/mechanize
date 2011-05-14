@@ -62,6 +62,10 @@ class Mechanize::Page < Mechanize::File
     self.class.meta_charset(body)
   end
 
+  def detected_encoding
+    Mechanize::Util.detect_charset(body)
+  end
+
   def encoding=(encoding)
     reset
 

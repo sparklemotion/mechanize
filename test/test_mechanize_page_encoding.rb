@@ -6,6 +6,8 @@ require 'cgi'
 
 class TestMechanizePageEncoding < Test::Unit::TestCase
 
+  MECH_ASCII_ENCODING = Mechanize::Util::NEW_RUBY_ENCODING ? 'US-ASCII' : 'ISO-8859-1'
+
   def setup
     @agent = Mechanize.new
     @uri = URI('http://localhost/')
@@ -95,6 +97,12 @@ class TestMechanizePageEncoding < Test::Unit::TestCase
     assert_equal ['META'], page.meta_charset
   end
 
+  def test_detected_encoding
+    page = util_page
+
+    assert_equal MECH_ASCII_ENCODING, page.detected_encoding
+  end
+
   def test_encodings
     response = {'content-type' => 'text/html;charset=HEADER'}
     body = '<meta http-equiv="content-type" content="text/html;charset=META">'
@@ -102,6 +110,6 @@ class TestMechanizePageEncoding < Test::Unit::TestCase
 
     assert_equal true, page.encodings.include?('HEADER')
     assert_equal true, page.encodings.include?('META')
+    assert_equal true, page.encodings.include?(MECH_ASCII_ENCODING)
   end
-
 end

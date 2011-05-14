@@ -50,4 +50,37 @@ class TestMechanizePageEncoding < Test::Unit::TestCase
     assert_equal '111', charset
   end
 
+  def test_page_response_header_charset
+    headers = {'content-type' => 'text/html;charset=HEADER'}
+    charsets = Mechanize::Page.response_header_charset(headers)
+
+    assert_equal ['HEADER'], charsets
+  end
+
+  def test_page_response_header_charset_no_token
+    headers = {'content-type' => 'text/html'}
+    charsets = Mechanize::Page.response_header_charset(headers)
+
+    assert_equal [], charsets
+
+    headers = {'X-My-Header' => 'hello'}
+    charsets = Mechanize::Page.response_header_charset(headers)
+
+    assert_equal [], charsets
+  end
+
+  def test_response_header_charset
+    page = util_page nil, {'content-type' => 'text/html;charset=HEADER'}
+
+    assert_equal ['HEADER'], page.response_header_charset
+  end
+
+  def test_encodings
+    response = {'content-type' => 'text/html;charset=HEADER'}
+    body = nil
+    page = util_page body, response
+
+    assert_equal true, page.encodings.include?('HEADER')
+  end
+
 end

@@ -33,10 +33,7 @@ class Mechanize::Page < Mechanize::File
 
     @encodings << Mechanize::Util.detect_charset(body) if body
 
-    response.each do |header, value|
-      next unless value =~ /charset/i
-      @encodings << self.class.charset(value)
-    end
+    @encodings.concat self.class.response_header_charset(response)
 
     if body
       # Force the encoding to be 8BIT so we can perform regular expressions.
@@ -63,6 +60,10 @@ class Mechanize::Page < Mechanize::File
         title = doc.search('title').inner_text
         title.empty? ? nil : title
       end
+  end
+
+  def response_header_charset
+    self.class.response_header_charset(response)
   end
 
   def encoding=(encoding)
@@ -328,6 +329,15 @@ class Mechanize::Page < Mechanize::File
     charset = content_type[/charset=([^; ]+)/i, 1]
     return nil if charset == 'none'
     charset
+  end
+
+  def self.response_header_charset(response)
+    charsets = []
+    response.each do |header, value|
+      next unless value =~ /charset/i
+      charsets << charset(value)
+    end
+    charsets
   end
 
   private

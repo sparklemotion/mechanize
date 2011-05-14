@@ -75,12 +75,33 @@ class TestMechanizePageEncoding < Test::Unit::TestCase
     assert_equal ['HEADER'], page.response_header_charset
   end
 
+  def test_page_meta_charset
+    body = '<meta http-equiv="content-type" content="text/html;charset=META">'
+    charsets = Mechanize::Page.meta_charset(body)
+
+    assert_equal ['META'], charsets
+  end
+
+  def test_page_meta_charset_is_empty_when_no_charset_meta
+    body = '<meta http-equiv="refresh" content="5; url=index.html">'
+    charsets = Mechanize::Page.meta_charset(body)
+    assert_equal [], charsets
+  end
+
+  def test_meta_charset
+    body = '<meta http-equiv="content-type" content="text/html;charset=META">'
+    page = util_page body
+
+    assert_equal ['META'], page.meta_charset
+  end
+
   def test_encodings
     response = {'content-type' => 'text/html;charset=HEADER'}
-    body = nil
+    body = '<meta http-equiv="content-type" content="text/html;charset=META">'
     page = util_page body, response
 
     assert_equal true, page.encodings.include?('HEADER')
+    assert_equal true, page.encodings.include?('META')
   end
 
 end

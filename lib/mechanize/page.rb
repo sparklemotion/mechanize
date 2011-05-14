@@ -40,15 +40,7 @@ class Mechanize::Page < Mechanize::File
       # We'll set it to the detected encoding later
       body.force_encoding('ASCII-8BIT') if body.respond_to?(:force_encoding)
 
-      body.scan(/<meta .*?>/i) do |meta|
-        next unless meta =~ /http-equiv\s*=\s*(["'])?content-type\1/i
-
-        meta =~ /content=(["'])?(.*?)\1/i
-
-        encoding = self.class.charset $2
-
-        @encodings << encoding if encoding
-      end
+      @encodings.concat self.class.meta_charset(body)
     end
 
     super(uri, response, body, code)
@@ -64,6 +56,10 @@ class Mechanize::Page < Mechanize::File
 
   def response_header_charset
     self.class.response_header_charset(response)
+  end
+
+  def meta_charset
+    self.class.meta_charset(body)
   end
 
   def encoding=(encoding)
@@ -336,6 +332,20 @@ class Mechanize::Page < Mechanize::File
     response.each do |header, value|
       next unless value =~ /charset/i
       charsets << charset(value)
+    end
+    charsets
+  end
+
+  def self.meta_charset(body)
+    charsets = []
+    body.scan(/<meta .*?>/i) do |meta|
+      next unless meta =~ /http-equiv\s*=\s*(["'])?content-type\1/i
+
+      meta =~ /content=(["'])?(.*?)\1/i
+
+      m_charset = charset $2
+
+      charsets << m_charset if m_charset
     end
     charsets
   end

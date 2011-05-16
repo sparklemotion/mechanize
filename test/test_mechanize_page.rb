@@ -81,12 +81,6 @@ class TestMechanizePage < Test::Unit::TestCase
     assert_equal @uri + '/white%20space', page.canonical_uri
   end
 
-  def test_charset
-    charset = util_page.charset 'text/html;charset=UTF-8'
-
-    assert_equal 'UTF-8', charset
-  end
-
   def test_encoding
     page = util_page WINDOWS_1255
 

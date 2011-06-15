@@ -108,10 +108,16 @@ class TestMechanizePage < Test::Unit::TestCase
     assert_equal @uri + '/white%20space', page.canonical_uri
   end
 
-  def test_charset
-    charset = util_page.charset 'text/html;charset=UTF-8'
+  def test_charset_from_content_type
+    charset = Mechanize::Page.__send__ :charset_from_content_type, 'text/html;charset=UTF-8'
 
     assert_equal 'UTF-8', charset
+  end
+
+  def test_charset_from_bad_content_type
+    charset = Mechanize::Page.__send__ :charset_from_content_type, 'text/html'
+
+    assert_nil charset
   end
 
   def test_encoding

@@ -36,7 +36,7 @@ class Mechanize::Page < Mechanize::File
 
     response.each do |header, value|
       next unless value =~ /charset/i
-      @encodings << charset(value)
+      @encodings << self.class.charset_from_content_type(value)
     end
 
     if body
@@ -52,7 +52,7 @@ class Mechanize::Page < Mechanize::File
 
           @meta_content_type = $2
 
-          encoding = charset $2
+          encoding = self.class.charset_from_content_type $2
           @encodings << encoding if encoding
         end
       end
@@ -67,12 +67,6 @@ class Mechanize::Page < Mechanize::File
         title = doc.search('title').inner_text
         title.empty? ? nil : title
       end
-  end
-
-  def charset content_type
-    charset = content_type[/charset=([^; ]+)/i, 1]
-    return nil if charset == 'none'
-    charset
   end
 
   def encoding=(encoding)
@@ -342,6 +336,12 @@ class Mechanize::Page < Mechanize::File
     else
       ''
     end
+  end
+
+  def self.charset_from_content_type content_type
+    charset = content_type[/charset=([^; ]+)/i, 1]
+    return nil if charset == 'none'
+    charset
   end
 end
 

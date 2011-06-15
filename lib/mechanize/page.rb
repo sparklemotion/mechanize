@@ -24,6 +24,7 @@ class Mechanize::Page < Mechanize::File
     raise Mechanize::ContentTypeError, response['content-type'] unless
       response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/i
 
+    @meta_content_type = nil
     @encoding = nil
     @encodings = [nil]
     raise 'no' if mech and not Mechanize === mech
@@ -49,8 +50,9 @@ class Mechanize::Page < Mechanize::File
         elsif meta =~ /http-equiv\s*=\s*(["'])?content-type\1/i
           meta =~ /content=(["'])?(.*?)\1/i
 
-          encoding = charset $2
+          @meta_content_type = $2
 
+          encoding = charset $2
           @encodings << encoding if encoding
         end
       end
@@ -151,7 +153,7 @@ class Mechanize::Page < Mechanize::File
 
   # Get the content type
   def content_type
-    response['content-type']
+    @meta_content_type || response['content-type']
   end
 
   # Search through the page like HPricot

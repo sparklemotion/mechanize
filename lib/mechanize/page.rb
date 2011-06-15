@@ -44,13 +44,15 @@ class Mechanize::Page < Mechanize::File
       body.force_encoding('ASCII-8BIT') if body.respond_to?(:force_encoding)
 
       body.scan(/<meta .*?>/i) do |meta|
-        next unless meta =~ /http-equiv\s*=\s*(["'])?content-type\1/i
+        if meta =~ /charset\s*=\s*(["'])?\s*(.+)\s*\1/i
+          @encodings << $2
+        elsif meta =~ /http-equiv\s*=\s*(["'])?content-type\1/i
+          meta =~ /content=(["'])?(.*?)\1/i
 
-        meta =~ /content=(["'])?(.*?)\1/i
+          encoding = charset $2
 
-        encoding = charset $2
-
-        @encodings << encoding if encoding
+          @encodings << encoding if encoding
+        end
       end
     end
 

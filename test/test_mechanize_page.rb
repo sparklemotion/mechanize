@@ -129,6 +129,12 @@ class TestMechanizePage < Test::Unit::TestCase
     assert_equal 'UTF-8', page.encoding
   end
 
+  def test_encoding_meta_charset
+    page = util_page "<meta charset='UTF-8'>"
+
+    assert_equal 'UTF-8', page.encoding
+  end
+
   def test_encoding_equals
     page = util_page
     page.meta_refresh

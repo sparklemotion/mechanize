@@ -14,6 +14,11 @@ class Mechanize
         @node = node
         @text = node['name']
         @href = node['src']
+        @content = nil
+      end
+      
+      def content
+        @content ||= @mech.get @href
       end
     end
   end

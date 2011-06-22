@@ -18,7 +18,7 @@ class Mechanize
       end
       
       def content
-        @content ||= @mech.get @href
+        @content ||= @mech.get @href, [], page
       end
     end
   end

@@ -34,28 +34,21 @@ class Mechanize::Page < Mechanize::File
 
     @encodings << Mechanize::Util.detect_charset(body) if body
 
-    response.each do |header, value|
-      next unless value =~ /charset/i
-      @encodings << self.class.charset_from_content_type(value)
-    end
+    @encodings.concat self.class.response_header_charset(response)
 
     if body
       # Force the encoding to be 8BIT so we can perform regular expressions.
       # We'll set it to the detected encoding later
-      body.force_encoding('ASCII-8BIT') if body.respond_to?(:force_encoding)
+      body.force_encoding 'ASCII-8BIT' if body.respond_to? :force_encoding
 
-      body.scan(/<meta .*?>/i) do |meta|
-        if meta =~ /charset\s*=\s*(["'])?\s*(.+)\s*\1/i
-          @encodings << $2
-        elsif meta =~ /http-equiv\s*=\s*(["'])?content-type\1/i
-          meta =~ /content=(["'])?(.*?)\1/i
+      @encodings.concat self.class.meta_charset body
 
-          @meta_content_type = $2
+      meta_content_type = self.class.meta_content_type body
+      @meta_content_type = meta_content_type if meta_content_type
+    end
 
-          encoding = self.class.charset_from_content_type $2
-          @encodings << encoding if encoding
-        end
-      end
+    if mech && mech.default_encoding
+      @encodings << mech.default_encoding if mech.default_encoding_fallback
     end
 
     super(uri, response, body, code)
@@ -67,6 +60,18 @@ class Mechanize::Page < Mechanize::File
         title = doc.search('title').inner_text
         title.empty? ? nil : title
       end
+  end
+
+  def response_header_charset
+    self.class.response_header_charset(response)
+  end
+
+  def meta_charset
+    self.class.meta_charset(body)
+  end
+
+  def detected_encoding
+    Mechanize::Util.detect_charset(body)
   end
 
   def encoding=(encoding)
@@ -107,6 +112,8 @@ class Mechanize::Page < Mechanize::File
 
     if @encoding then
       @parser = @mech.html_parser.parse(html_body, nil, @encoding)
+    elsif ! mech.default_encoding_fallback then
+      @parser = @mech.html_parser.parse(html_body, nil, @mech.default_encoding)
     else
       @encodings.reverse_each do |encoding|
         @parser = @mech.html_parser.parse(html_body, nil, encoding)
@@ -326,6 +333,53 @@ class Mechanize::Page < Mechanize::File
       @labels_hash = hash
     end
     return @labels_hash
+  end
+
+  def self.charset content_type
+    charset = content_type[/charset=([^; ]+)/i, 1]
+    return nil if charset == 'none'
+    charset
+  end
+
+  def self.response_header_charset(response)
+    charsets = []
+    response.each do |header, value|
+      next unless value =~ /charset/i
+      charsets << charset(value)
+    end
+    charsets
+  end
+
+  def self.meta_charset body
+    charsets = []
+
+    # HACK use .map
+    body.scan(/<meta .*?>/i) do |meta|
+      if meta =~ /charset\s*=\s*(["'])?\s*(.+)\s*\1/i then
+        charsets << $2
+      elsif meta =~ /http-equiv\s*=\s*(["'])?content-type\1/i then
+        meta =~ /content=(["'])?(.*?)\1/i
+
+        m_charset = charset $2
+
+        charsets << m_charset if m_charset
+      end
+    end
+
+    charsets
+  end
+
+  def self.meta_content_type body
+    # HACK use .map
+    body.scan(/<meta .*?>/i) do |meta|
+      if meta =~ /http-equiv\s*=\s*(["'])?content-type\1/i then
+        meta =~ /content=(["'])?(.*?)\1/i
+
+        return $2
+      end
+    end
+
+    nil
   end
 
   private

@@ -195,16 +195,16 @@ class Mechanize
       query = []
       @mech.log.info("form encoding: #{encoding}") if @mech && @mech.log
 
+      successful_controls = []
+
       (fields + checkboxes).sort.each do |f|
         case f
         when Form::CheckBox
           if f.checked
-            qval = proc_query(f)
-            query.push(*qval)
+            successful_controls << f
           end
         when Form::Field
-          qval = proc_query(f)
-          query.push(*qval)
+          successful_controls << f
         end
       end
 
@@ -221,8 +221,7 @@ class Mechanize
 
         if checked.size == 1
           f = checked.first
-          qval = proc_query(f)
-          query.push(*qval)
+          successful_controls << f
         elsif checked.size > 1
           raise Mechanize::Error,
                 "multiple radiobuttons are checked in the same group!"
@@ -230,9 +229,14 @@ class Mechanize
       end
 
       @clicked_buttons.each { |b|
-        qval = proc_query(b)
-        query.push(*qval)
+        successful_controls << b
       }
+
+      successful_controls.sort.each do |ctrl|
+        qval = proc_query(ctrl)
+        query.push(*qval)
+      end
+
       query
     end
 

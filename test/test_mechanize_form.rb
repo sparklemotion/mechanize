@@ -573,4 +573,21 @@ class TestMechanizeForm < MiniTest::Unit::TestCase
       form.foo
     }
   end
+
+  def test_form_build_query
+    page = @agent.get("http://localhost/form_test.html")
+    get_form = page.forms.find { |f| f.name == "get_form2" }
+
+    # Now set all the fields
+    get_form.fields.find { |f| f.name == "first_name" }.value = "Aaron"
+    get_form.radiobuttons.find { |f|
+      f.name == "gender" && f.value == "male"
+    }.checked = true
+    get_form.checkboxes.find { |f| f.name == "likes ham" }.checked = true
+
+    query = get_form.build_query
+
+    assert_equal([["first_name", "Aaron"], ["gender", "male"], ["likes ham", "on"]], query)
+  end
+
 end

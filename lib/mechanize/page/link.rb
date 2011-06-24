@@ -16,12 +16,12 @@ class Mechanize::Page::Link
   alias :referer :page
 
   def initialize(node, mech, page)
-    @node = node
-    @href = node['href']
-    @text = nil
-    @page = page
-    @mech = mech
+    @node       = node
     @attributes = node
+    @href       = node['href']
+    @mech       = mech
+    @page       = page
+    @text       = nil
   end
 
   # Click on this link
@@ -30,7 +30,8 @@ class Mechanize::Page::Link
   end
 
   # This method is a shorthand to get link's DOM id.
-  # Common usage: page.link_with(:dom_id => "links_exact_id")
+  # Common usage:
+  #   page.link_with(:dom_id => "links_exact_id")
   def dom_id
     node['id']
   end
@@ -41,23 +42,21 @@ class Mechanize::Page::Link
   end
 
   # Test if the rel attribute includes +kind+.
-  def rel?(kind)
-    rel.include?(kind)
+  def rel? kind
+    rel.include? kind
   end
 
   # The text content of this link
   def text
     return @text if @text
 
-    @text = node.inner_text
+    @text = @node.inner_text
 
     # If there is no text, try to find an image and use it's alt text
-    if (@text.nil? or @text.empty?) and not node.search('img').empty? then
-      @text = ''
-
-      @node.search('img').each do |e|
-        @text << ( e['alt'] || '')
-      end
+    if (@text.nil? or @text.empty?) and imgs = @node.search('img') then
+      @text = imgs.map do |e|
+        e['alt']
+      end.join
     end
 
     @text

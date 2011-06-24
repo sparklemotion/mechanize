@@ -31,6 +31,8 @@ Mechanize is now under the MIT license
     depict its responsibilities.
   * Mechanize::Page#meta is now Mechanize::Page#meta_refresh as it only
     contains meta elements with http-equiv of "refresh"
+  * Mechanize::Page#charset is now Mechanize::Page::charset.  GH #112, patch
+    by Godfrey Chan.
 
 * Deprecations
   * Mechanize#get with an options hash is deprecated and will be removed after
@@ -46,6 +48,7 @@ Mechanize is now under the MIT license
     current page. It works as expected when not passed a string or regexp.
   * Provide a way to only follow permanent redirects (301)
     automatically: <tt>agent.redirect_ok = :permanent</tt>  GH #73
+  * Mechanize now supports HTML5 meta charset.  GH #113
   * Documented various Mechanize accessors.  GH #66
   * Mechanize now uses net-http-digest_auth.  GH #31
   * Mechanize now implements session cookies.  GH #78
@@ -71,6 +74,7 @@ Mechanize is now under the MIT license
     found outside of a document's head.  GH #99
   * Add support for HTML5's rel="noreferrer" attribute which indicates
     no "Referer" information should be sent when following the link.
+  * A frame will now load its content when #content is called.  GH #111
 
 * Bug Fixes:
 
@@ -96,6 +100,7 @@ Mechanize is now under the MIT license
   * Mechanize now unescapes URIs for meta refresh.  GH #68
   * Mechanize now has more robust HTML charset detection.  GH #43
   * Mechanize::Form::Textarea is now created from a textarea element.  GH #94
+  * A meta content-type now overrides the HTTP content type.  GH #114
 
 === 1.0.0
 

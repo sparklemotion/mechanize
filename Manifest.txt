@@ -6,6 +6,7 @@ LICENSE.rdoc
 Manifest.txt
 README.rdoc
 Rakefile
+digest.htpasswd
 examples/flickr_upload.rb
 examples/mech-dump.rb
 examples/proxy_req.rb
@@ -76,6 +77,7 @@ test/htdocs/form_select_none.html
 test/htdocs/form_select_noopts.html
 test/htdocs/form_set_fields.html
 test/htdocs/form_test.html
+test/htdocs/frame_referer_test.html
 test/htdocs/frame_test.html
 test/htdocs/google.html
 test/htdocs/iframe_test.html
@@ -141,7 +143,8 @@ test/test_mechanize_form_image_button.rb
 test/test_mechanize_form_textarea.rb
 test/test_mechanize_http_agent.rb
 test/test_mechanize_link.rb
-test/test_mechanize_page.rb
+test/test_mechanize_page_encoding.rb
+test/test_mechanize_page_link.rb
 test/test_mechanize_page_meta_refresh.rb
 test/test_mechanize_redirect_not_get_or_head_error.rb
 test/test_mechanize_subclass.rb

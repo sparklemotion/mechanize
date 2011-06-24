@@ -24,6 +24,7 @@ class Mechanize::Page < Mechanize::File
     raise Mechanize::ContentTypeError, response['content-type'] unless
       response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/i
 
+    @meta_content_type = nil
     @encoding = nil
     @encodings = [nil]
     raise 'no' if mech and not Mechanize === mech
@@ -35,7 +36,7 @@ class Mechanize::Page < Mechanize::File
 
     response.each do |header, value|
       next unless value =~ /charset/i
-      @encodings << charset(value)
+      @encodings << self.class.charset_from_content_type(value)
     end
 
     if body
@@ -44,13 +45,16 @@ class Mechanize::Page < Mechanize::File
       body.force_encoding('ASCII-8BIT') if body.respond_to?(:force_encoding)
 
       body.scan(/<meta .*?>/i) do |meta|
-        next unless meta =~ /http-equiv\s*=\s*(["'])?content-type\1/i
+        if meta =~ /charset\s*=\s*(["'])?\s*(.+)\s*\1/i
+          @encodings << $2
+        elsif meta =~ /http-equiv\s*=\s*(["'])?content-type\1/i
+          meta =~ /content=(["'])?(.*?)\1/i
 
-        meta =~ /content=(["'])?(.*?)\1/i
+          @meta_content_type = $2
 
-        encoding = charset $2
-
-        @encodings << encoding if encoding
+          encoding = self.class.charset_from_content_type $2
+          @encodings << encoding if encoding
+        end
       end
     end
 
@@ -63,12 +67,6 @@ class Mechanize::Page < Mechanize::File
         title = doc.search('title').inner_text
         title.empty? ? nil : title
       end
-  end
-
-  def charset content_type
-    charset = content_type[/charset=([^; ]+)/i, 1]
-    return nil if charset == 'none'
-    charset
   end
 
   def encoding=(encoding)
@@ -149,7 +147,7 @@ class Mechanize::Page < Mechanize::File
 
   # Get the content type
   def content_type
-    response['content-type']
+    @meta_content_type || response['content-type']
   end
 
   # Search through the page like HPricot
@@ -338,6 +336,12 @@ class Mechanize::Page < Mechanize::File
     else
       ''
     end
+  end
+
+  def self.charset_from_content_type content_type
+    charset = content_type[/charset=([^; ]+)/i, 1]
+    return nil if charset == 'none'
+    charset
   end
 end
 

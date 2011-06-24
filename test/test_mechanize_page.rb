@@ -266,6 +266,76 @@ class TestMechanizePage < Test::Unit::TestCase
     }
   end
 
+  def test_links_with_dom_id
+    page = @agent.get("http://localhost/tc_links.html")
+    link = page.links_with(:dom_id => 'bold_aaron_link')
+    link_by_id = page.links_with(:id => 'bold_aaron_link')
+    assert_equal(1, link.length)
+    assert_equal('Aaron Patterson', link.first.text)
+    assert_equal(link, link_by_id)
+  end
+
+  def test_link_with_encoded_space
+    page = @agent.get("http://localhost/tc_links.html")
+    link = page.link_with(:text => 'encoded space')
+    page = @agent.click link
+  end
+
+  def test_link_with_space
+    page = @agent.get("http://localhost/tc_links.html")
+    link = page.link_with(:text => 'not encoded space')
+    page = @agent.click link
+  end
+
+  def test_link_with_unusual_characters
+    page = @agent.get("http://localhost/tc_links.html")
+    link = page.link_with(:text => 'unusual characters')
+    assert_nothing_raised { @agent.click link }
+  end
+
+  def test_links
+    page = @agent.get("http://localhost/find_link.html")
+    assert_equal(18, page.links.length)
+  end
+
+  def test_links_with_bold
+    page = @agent.get("http://localhost/tc_links.html")
+    link = page.links_with(:text => /Bold Dude/)
+    assert_equal(1, link.length)
+    assert_equal('Bold Dude', link.first.text)
+    assert_equal [], link.first.rel
+    assert !link.first.rel?('me')
+    assert !link.first.rel?('nofollow')
+
+    link = page.links_with(:text => 'Aaron James Patterson')
+    assert_equal(1, link.length)
+    assert_equal('Aaron James Patterson', link.first.text)
+    assert_equal ['me'], link.first.rel
+    assert link.first.rel?('me')
+    assert !link.first.rel?('nofollow')
+
+    link = page.links_with(:text => 'Aaron Patterson')
+    assert_equal(1, link.length)
+    assert_equal('Aaron Patterson', link.first.text)
+    assert_equal ['me', 'nofollow'], link.first.rel
+    assert link.first.rel?('me')
+    assert link.first.rel?('nofollow')
+
+    link = page.links_with(:text => 'Ruby Rocks!')
+    assert_equal(1, link.length)
+    assert_equal('Ruby Rocks!', link.first.text)
+  end
+
+  def test_meta_refresh
+    page = @agent.get("http://localhost/find_link.html")
+    assert_equal(3, page.meta_refresh.length)
+    assert_equal(%w{
+      http://www.drphil.com/
+      http://www.upcase.com/
+      http://tenderlovemaking.com/ }.sort,
+      page.meta_refresh.map { |x| x.href.downcase }.sort)
+  end
+
   def test_title
     page = util_page
 

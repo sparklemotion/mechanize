@@ -119,6 +119,18 @@ class TestMechanize < Test::Unit::TestCase
       @mech.history.last.uri.to_s)
   end
 
+  def test_click_link
+    agent = Mechanize.new
+    agent.user_agent_alias = 'Mac Safari'
+    page = agent.get("http://localhost/frame_test.html")
+    link = page.link_with(:text => "Form Test")
+
+    agent.click link
+
+    assert_equal("http://localhost/form_test.html",
+      agent.history.last.uri.to_s)
+  end
+
   def test_click_link_hpricot_style # HACK move to test_search in Page
     page = @mech.get("http://localhost/tc_encoded_links.html")
 

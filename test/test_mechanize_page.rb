@@ -52,15 +52,42 @@ class TestMechanizePage < Test::Unit::TestCase
     Mechanize::Page.new @uri, res, body, 200, @agent
   end
 
-  def test_initialize_content_type
-    assert Mechanize::Page.new nil, 'content-type' => 'application/xhtml+xml'
-    assert Mechanize::Page.new nil, 'content-type' => 'text/html'
+  def test_initialize_supported_content_type
+    page = Mechanize::Page.new nil, 'content-type' => 'application/xhtml+xml'
+    assert page
+    assert_equal 'application/xhtml+xml', page.content_type
 
+    page = Mechanize::Page.new nil, 'content-type' => 'text/html'
+    assert page
+    assert_equal 'text/html', page.content_type
+
+    page = Mechanize::Page.new nil, 'content-type' => 'application/xhtml+xml;charset=utf-8'
+    assert page
+    assert_equal 'application/xhtml+xml;charset=utf-8', page.content_type
+
+    page = Mechanize::Page.new nil, 'content-type' => 'text/html;charset=utf-8'
+    assert page
+    assert_equal 'text/html;charset=utf-8', page.content_type
+  end
+
+  def test_initialize_unsupported_content_type
     e = assert_raises Mechanize::ContentTypeError do
       Mechanize::Page.new nil, 'content-type' => 'text/plain'
     end
 
     assert_equal 'text/plain', e.content_type
+
+    e = assert_raises Mechanize::ContentTypeError do
+      Mechanize::Page.new nil, 'content-type' => 'text/plain;charset=utf-8'
+    end
+
+    assert_equal 'text/plain;charset=utf-8', e.content_type
+  end
+
+  def test_override_content_type
+    page = Mechanize::Page.new nil, {'content-type' => 'text/html'}, WINDOWS_1255
+    assert page
+    assert_equal 'text/html; charset=windows-1255', page.content_type
   end
 
   def test_canonical_uri
@@ -81,10 +108,16 @@ class TestMechanizePage < Test::Unit::TestCase
     assert_equal @uri + '/white%20space', page.canonical_uri
   end
 
-  def test_charset
-    charset = util_page.charset 'text/html;charset=UTF-8'
+  def test_charset_from_content_type
+    charset = Mechanize::Page.__send__ :charset_from_content_type, 'text/html;charset=UTF-8'
 
     assert_equal 'UTF-8', charset
+  end
+
+  def test_charset_from_bad_content_type
+    charset = Mechanize::Page.__send__ :charset_from_content_type, 'text/html'
+
+    assert_nil charset
   end
 
   def test_encoding
@@ -125,6 +158,12 @@ class TestMechanizePage < Test::Unit::TestCase
     ]
 
     assert_equal false, page.encoding_error?
+
+    assert_equal 'UTF-8', page.encoding
+  end
+
+  def test_encoding_meta_charset
+    page = util_page "<meta charset='UTF-8'>"
 
     assert_equal 'UTF-8', page.encoding
   end

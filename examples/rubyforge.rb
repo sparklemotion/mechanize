@@ -1,5 +1,3 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-
 # This example logs a user in to rubyforge and prints out the body of the
 # page after logging the user in.
 require 'rubygems'
@@ -17,6 +15,6 @@ form.form_loginname = ARGV[0]
 form.form_pw        = ARGV[1]
 
 # Submit the form
-page = agent.submit(form, form.buttons.first)
+page = form.submit form.buttons.first
 
 puts page.body # Print out the body

@@ -278,15 +278,14 @@ class Mechanize
     end
   end
 
-  # A encoding name string for first trial of every HTML parsing. Default is nil, nothing added.
-  # The name should be "known" by system iconv-lib used in libxml2-lib used in Nokogiri gem.
-  # Note: The name has no relationship to Iconv on Ruby and Encoding on Ruby 1.9.x. (like Page#encoding=)
+  # A default encoding name used when parsing HTML parsing.  When set it is
+  # used after any other encoding.  The default is nil.
+
   attr_accessor :default_encoding
 
-  # if false and Mechanize#default_encoding is set,
-  # force to use default_encoding and force to ignore encoding errors by it.
-  # default is true, default_encoding is just "first opinion" on trials of HTML parsing.
-  attr_accessor :default_encoding_fallback
+  # Overrides the encodings given by the HTTP server and the HTML page with
+  # the default_encoding when set to true.
+  attr_accessor :force_default_encoding
 
   def initialize
     @agent = Mechanize::HTTP::Agent.new
@@ -311,7 +310,7 @@ class Mechanize
     @html_parser = self.class.html_parser
 
     @default_encoding = nil
-    @default_encoding_fallback = true
+    @force_default_encoding = false
 
     yield self if block_given?
 

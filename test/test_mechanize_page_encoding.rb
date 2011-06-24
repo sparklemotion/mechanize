@@ -125,17 +125,17 @@ class TestMechanizePageEncoding < Test::Unit::TestCase
     assert_equal true, page.encodings.include?('Windows-1252')
   end
 
-  def test_parser_with_default_encoding_fallback
+  def test_parser_force_default_encoding
     @agent.default_encoding = 'Windows-1252'
-    @agent.default_encoding_fallback = false
+    @agent.force_default_encoding = true
     page = util_page
 
-    assert_equal false, page.encodings.include?('Windows-1252')
+    assert_includes page.encodings, 'Windows-1252'
   end
 
-  def test_parser_encoding_equals_overwrites_forced_default_encoding
+  def test_parser_encoding_equals_overwrites_force_default_encoding
     @agent.default_encoding = 'Windows-1252'
-    @agent.default_encoding_fallback = false
+    @agent.force_default_encoding = true
     page = util_page
 
     assert_equal 'Windows-1252', page.encoding

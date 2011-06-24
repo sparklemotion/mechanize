@@ -47,11 +47,9 @@ class Mechanize::Page < Mechanize::File
       @meta_content_type = meta_content_type if meta_content_type
     end
 
-    if mech && mech.default_encoding
-      @encodings << mech.default_encoding if mech.default_encoding_fallback
-    end
+    @encodings << mech.default_encoding if mech and mech.default_encoding
 
-    super(uri, response, body, code)
+    super uri, response, body, code
   end
 
   def title
@@ -111,14 +109,14 @@ class Mechanize::Page < Mechanize::File
     return nil unless @body
 
     if @encoding then
-      @parser = @mech.html_parser.parse(html_body, nil, @encoding)
-    elsif ! mech.default_encoding_fallback then
-      @parser = @mech.html_parser.parse(html_body, nil, @mech.default_encoding)
+      @parser = @mech.html_parser.parse html_body, nil, @encoding
+    elsif mech.force_default_encoding then
+      @parser = @mech.html_parser.parse html_body, nil, @mech.default_encoding
     else
       @encodings.reverse_each do |encoding|
-        @parser = @mech.html_parser.parse(html_body, nil, encoding)
+        @parser = @mech.html_parser.parse html_body, nil, encoding
 
-        break unless encoding_error?(@parser)
+        break unless encoding_error? @parser
       end
     end
 
@@ -341,7 +339,7 @@ class Mechanize::Page < Mechanize::File
     charset
   end
 
-  def self.response_header_charset(response)
+  def self.response_header_charset response
     charsets = []
     response.each do |header, value|
       next unless value =~ /charset/i
@@ -350,28 +348,29 @@ class Mechanize::Page < Mechanize::File
     charsets
   end
 
-  def self.meta_charset body
-    charsets = []
+  ##
+  # Retrieves all charsets from +meta+ tags in +body+
 
+  def self.meta_charset body
     # HACK use .map
-    body.scan(/<meta .*?>/i) do |meta|
+    body.scan(/<meta .*?>/i).map do |meta|
       if meta =~ /charset\s*=\s*(["'])?\s*(.+)\s*\1/i then
-        charsets << $2
+        $2
       elsif meta =~ /http-equiv\s*=\s*(["'])?content-type\1/i then
         meta =~ /content=(["'])?(.*?)\1/i
 
         m_charset = charset $2
 
-        charsets << m_charset if m_charset
+        m_charset if m_charset
       end
-    end
-
-    charsets
+    end.compact
   end
 
+  ##
+  # Retrieves the last <tt>content-type</tt> set by a +meta+ tag in +body+
+
   def self.meta_content_type body
-    # HACK use .map
-    body.scan(/<meta .*?>/i) do |meta|
+    body.scan(/<meta .*?>/i).reverse.map do |meta|
       if meta =~ /http-equiv\s*=\s*(["'])?content-type\1/i then
         meta =~ /content=(["'])?(.*?)\1/i
 

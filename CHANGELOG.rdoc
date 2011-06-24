@@ -75,6 +75,10 @@ Mechanize is now under the MIT license
   * Add support for HTML5's rel="noreferrer" attribute which indicates
     no "Referer" information should be sent when following the link.
   * A frame will now load its content when #content is called.  GH #111
+  * Added Mechanize#default_encoding to provide a default for pages with no
+    encoding specified.  GH #104
+  * Added Mechanize#force_default_encoding which only uses
+    Mechanize#default_encoding for parsing HTML.  GH #104
 
 * Bug Fixes:
 

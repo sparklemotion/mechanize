@@ -1,27 +1,27 @@
-class Mechanize
-  class Page
-    # This class encapsulates a 'frame' tag.  Frame objects can be treated
-    # just like Link objects.  They contain src, the link they refer to,
-    # name, the name of the frame.  'src' and 'name' are aliased to 'href'
-    # and 'text' respectively so that a Frame object can be treated just
-    # like a Link.
-    class Frame < Link
-      alias :src :href
+# This class encapsulates a 'frame' tag.  Frame objects can be treated just
+# like Link objects.  They contain #src, the #link they refer to and a #name,
+# the name of the frame they refer to.  #src and #name are aliased to #href
+# and #text respectively so that a Frame object can be treated just like a
+# Link.
 
-      attr_reader :text
-      alias :name :text
+class Mechanize::Page::Frame < Mechanize::Page::Link
 
-      def initialize(node, mech, referer)
-        super(node, mech, referer)
-        @node = node
-        @text = node['name']
-        @href = node['src']
-        @content = nil
-      end
-      
-      def content
-        @content ||= @mech.get @href, [], page
-      end
-    end
+  alias :src :href
+
+  attr_reader :text
+  alias :name :text
+
+  def initialize(node, mech, referer)
+    super(node, mech, referer)
+    @node = node
+    @text = node['name']
+    @href = node['src']
+    @content = nil
   end
+  
+  def content
+    @content ||= @mech.get @href, [], page
+  end
+
 end
+

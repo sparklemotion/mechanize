@@ -4,7 +4,7 @@ class TestPrettyPrint < Test::Unit::TestCase
   def setup
     @agent = Mechanize.new
   end
-  
+
   def test_pretty_print
     @agent.get("http://localhost/tc_pretty_print.html")
     pretty_string = @agent.pretty_print_inspect

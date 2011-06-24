@@ -1,5 +1,5 @@
 class Mechanize
-  class Page < Mechanize::File
+  class Page
     # This class encapsulates a 'frame' tag.  Frame objects can be treated
     # just like Link objects.  They contain src, the link they refer to,
     # name, the name of the frame.  'src' and 'name' are aliased to 'href'
@@ -7,6 +7,8 @@ class Mechanize
     # like a Link.
     class Frame < Link
       alias :src :href
+
+      attr_reader :text
       alias :name :text
 
       def initialize(node, mech, referer)

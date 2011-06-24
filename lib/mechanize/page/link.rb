@@ -11,32 +11,28 @@
 class Mechanize::Page::Link
   attr_reader :node
   attr_reader :href
-  attr_reader :text
   attr_reader :attributes
   attr_reader :page
-  alias :to_s :text
   alias :referer :page
 
   def initialize(node, mech, page)
     @node = node
     @href = node['href']
-    @text = node.inner_text
+    @text = nil
     @page = page
     @mech = mech
     @attributes = node
-
-    # If there is no text, try to find an image and use it's alt text
-    if (@text.nil? || @text.length == 0) && node.search('img').length > 0
-      @text = ''
-      node.search('img').each do |e|
-        @text << ( e['alt'] || '')
-      end
-    end
-
   end
 
-  def uri
-    @href && URI.parse(WEBrick::HTTPUtils.escape(@href))
+  # Click on this link
+  def click
+    @mech.click self
+  end
+
+  # This method is a shorthand to get link's DOM id.
+  # Common usage: page.link_with(:dom_id => "links_exact_id")
+  def dom_id
+    node['id']
   end
 
   # A list of words in the rel attribute, all lower-cased.
@@ -49,15 +45,28 @@ class Mechanize::Page::Link
     rel.include?(kind)
   end
 
-  # Click on this link
-  def click
-    @mech.click self
+  # The text content of this link
+  def text
+    return @text if @text
+
+    @text = node.inner_text
+
+    # If there is no text, try to find an image and use it's alt text
+    if (@text.nil? or @text.empty?) and not node.search('img').empty? then
+      @text = ''
+
+      @node.search('img').each do |e|
+        @text << ( e['alt'] || '')
+      end
+    end
+
+    @text
   end
 
-  # This method is a shorthand to get link's DOM id.
-  # Common usage: page.link_with(:dom_id => "links_exact_id")
-  def dom_id
-    node['id']
+  alias :to_s :text
+
+  def uri
+    @href && URI.parse(WEBrick::HTTPUtils.escape(@href))
   end
 
 end

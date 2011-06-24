@@ -105,6 +105,8 @@ Mechanize is now under the MIT license
   * Mechanize now has more robust HTML charset detection.  GH #43
   * Mechanize::Form::Textarea is now created from a textarea element.  GH #94
   * A meta content-type now overrides the HTTP content type.  GH #114
+  * Mechanize::Page::Link#uri now handles both escaped and unescaped hrefs.
+    GH #107
 
 === 1.0.0
 

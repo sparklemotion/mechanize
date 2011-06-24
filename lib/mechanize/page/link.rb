@@ -22,6 +22,7 @@ class Mechanize::Page::Link
     @mech       = mech
     @page       = page
     @text       = nil
+    @uri        = nil
   end
 
   # Click on this link
@@ -64,8 +65,17 @@ class Mechanize::Page::Link
 
   alias :to_s :text
 
+  # A URI for the #href for this link.  The link is first parsed as a raw
+  # link.  If that fails parsing an escaped link is attepmted.
+
   def uri
-    @href && URI.parse(WEBrick::HTTPUtils.escape(@href))
+    @uri ||= if @href then
+               begin
+                 URI.parse @href
+               rescue URI::InvalidURIError
+                 URI.parse WEBrick::HTTPUtils.escape @href
+               end
+             end
   end
 
 end

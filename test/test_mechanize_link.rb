@@ -50,17 +50,32 @@ class TestMechanizeLink < Test::Unit::TestCase
     assert_empty             page.link_with(:href => 'nil_alt_text.html').text
   end
 
+  def test_uri_escaped
+    doc = Nokogiri::HTML::Document.new
+
+    node = Nokogiri::XML::Node.new('foo', doc)
+    node['href'] = 'http://foo.bar/%20baz'
+
+    link = Mechanize::Page::Link.new(node, nil, nil)
+
+    assert_equal 'http://foo.bar/%20baz', link.uri.to_s
+  end
+
   def test_uri_no_path
     page = @agent.get("http://localhost/relative/tc_relative_links.html")
     page = page.link_with(:text => 'just the query string').click
-    assert_equal('http://localhost/relative/tc_relative_links.html?a=b', page.uri.to_s)
+    assert_equal('http://localhost/relative/tc_relative_links.html?a=b',
+                 page.uri.to_s)
   end
 
   def test_uri_weird
     doc = Nokogiri::HTML::Document.new
+
     node = Nokogiri::XML::Node.new('foo', doc)
     node['href'] = 'http://foo.bar/ baz'
+
     link = Mechanize::Page::Link.new(node, nil, nil)
+
     assert_equal 'http://foo.bar/%20baz', link.uri.to_s
   end
 

@@ -1,5 +1,10 @@
 = Mechanize CHANGELOG
 
+=== 2.0.1
+
+* Bug Fixes
+  * Restored Mechanize#set_proxy.  Issue #118
+
 === 2.0 / 2011-06-27
 
 Mechanize is now under the MIT license

@@ -578,6 +578,18 @@ class Mechanize
     end
   end
 
+  ##
+  # Sets the proxy +address+ at +port+ with an optional +user+ and +password+
+
+  def set_proxy address, port, user = nil, password = nil
+    @proxy_addr = address
+    @proxy_port = port
+    @proxy_user = user
+    @proxy_pass = password
+
+    @agent.set_proxy address, port, user, password
+  end
+
   # Runs given block, then resets the page history as it was before. self is
   # given as a parameter to the block. Returns the value of the block.
   def transact

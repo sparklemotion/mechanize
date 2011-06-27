@@ -627,6 +627,15 @@ class TestMechanize < Test::Unit::TestCase
     assert_equal 5, @mech.read_timeout
   end
 
+  def test_set_proxy
+    @mech.set_proxy 'localhost', 8080, 'user', 'pass'
+
+    assert_equal 'localhost', @mech.proxy_addr
+    assert_equal 8080,        @mech.proxy_port
+    assert_equal 'user',      @mech.proxy_user
+    assert_equal 'pass',      @mech.proxy_pass
+  end
+
   def test_submit_bad_form_method
     page = @mech.get("http://localhost/bad_form_test.html")
     assert_raise ArgumentError do

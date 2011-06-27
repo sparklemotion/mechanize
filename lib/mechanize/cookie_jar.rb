@@ -83,12 +83,7 @@ class Mechanize::CookieJar
     open(file, 'w') { |f|
       case format
       when :yaml then
-        begin
-          require 'psych'
-        rescue LoadError
-        end
-
-        require 'yaml'
+        load_yaml
 
         YAML.dump(jar.jar, f)
       when :cookiestxt then
@@ -110,7 +105,9 @@ class Mechanize::CookieJar
     @jar = open(file) { |f|
       case format
       when :yaml then
-        YAML::load(f)
+        load_yaml
+
+        YAML.load(f)
       when :cookiestxt then
         load_cookiestxt(f)
       else
@@ -121,6 +118,15 @@ class Mechanize::CookieJar
     cleanup
 
     self
+  end
+
+  def load_yaml # :nodoc:
+    begin
+      require 'psych'
+    rescue LoadError
+    end
+
+    require 'yaml'
   end
 
   # Clear the cookie jar

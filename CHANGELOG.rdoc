@@ -3,7 +3,8 @@
 === 2.0.1
 
 * Bug Fixes
-  * Restored Mechanize#set_proxy.  Issue #118
+  * Restored Mechanize#set_proxy.  Issue #117, #118
+  * Mechanize::CookieJar#load now lazy-loads YAML.  Issue #118
 
 === 2.0 / 2011-06-27
 

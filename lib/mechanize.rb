@@ -235,6 +235,11 @@ class Mechanize
   end
 
   # Proxy settings
+
+  def set_proxy(addr,port)
+    @agent.set_proxy(addr,port)
+  end 
+
   attr_reader :proxy_addr
   attr_reader :proxy_pass
   attr_reader :proxy_port

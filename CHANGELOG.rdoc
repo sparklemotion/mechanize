@@ -1,6 +1,6 @@
 = Mechanize CHANGELOG
 
-=== 2.0.pre.2 / 2011-04-17
+=== 2.0 / 2011-06-27
 
 Mechanize is now under the MIT license
 

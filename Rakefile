@@ -13,6 +13,8 @@ Hoe.spec 'mechanize' do
   self.history_file     = 'CHANGELOG.rdoc'
   self.extra_rdoc_files += Dir['*.rdoc']
 
+  rdoc_locations << 'drbrain@rubyforge.org:/var/www/gforge-projects/mechanize/'
+
   self.extra_deps << ['nokogiri',             '~> 1.4']
   self.extra_deps << ['net-http-persistent',  '~> 1.8']
   self.extra_deps << ['net-http-digest_auth', '~> 1.1', '>= 1.1.1']

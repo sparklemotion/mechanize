@@ -16,7 +16,7 @@ Hoe.spec 'mechanize' do
   self.extra_deps << ['nokogiri',             '~> 1.4']
   self.extra_deps << ['net-http-persistent',  '~> 1.8']
   self.extra_deps << ['net-http-digest_auth', '~> 1.1', '>= 1.1.1']
-  self.extra_deps << ['webrobots',            '~> 0.0', '>= 0.0.6']
+  self.extra_deps << ['webrobots',            '~> 0.0', '>= 0.0.9']
 
   self.spec_extras[:required_ruby_version] = '>= 1.8.7'
 end

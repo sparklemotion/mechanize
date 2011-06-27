@@ -44,6 +44,14 @@ class Mechanize
                    "#{RUBY_VERSION}dev#{RUBY_REVISION}"
                  end
 
+  # HTTP/1.1 keep-alives are always active.  This does nothing.
+  attr_accessor :keep_alive
+
+  # HTTP/1.0 keep-alive time.  This is no longer supported by mechanize as it
+  # now uses net-http-persistent which only supports HTTP/1.1 persistent
+  # connections
+  attr_accessor :keep_alive_time
+
   ##
   # User Agent aliases
 
@@ -161,18 +169,6 @@ class Mechanize
   def gzip_enabled=enabled
     @agent.gzip_enabled = enabled
   end
-
-  # HTTP/1.0 keep-alive time
-  def keep_alive_time
-    @agent.keep_alive_time
-  end
-
-  def keep_alive_time= keep_alive_time
-    @agent.keep_alive_time = keep_alive_time
-  end
-
-  # HTTP/1.1 keep-alives are always active.  This does nothing.
-  attr_accessor :keep_alive
 
   def conditional_requests
     @agent.conditional_requests
@@ -300,6 +296,7 @@ class Mechanize
     @pluggable_parser = PluggableParser.new
 
     @keep_alive       = true
+    @keep_alive_time  = 0
 
     # Proxy
     @proxy_addr = nil

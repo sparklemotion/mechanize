@@ -5,6 +5,8 @@
 * Bug Fixes
   * Restored Mechanize#set_proxy.  Issue #117, #118
   * Mechanize::CookieJar#load now lazy-loads YAML.  Issue #118
+  * Mechanize#keep_alive_time is fixed but does nothing as net-http-persistent
+    does not support HTTP/1.0 keep-alive connections.
 
 === 2.0 / 2011-06-27
 

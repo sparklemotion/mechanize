@@ -550,6 +550,14 @@ class TestMechanize < Test::Unit::TestCase
     }
   end
 
+  def test_keep_alive_time
+    assert_equal 0, @mech.keep_alive_time
+
+    @mech.keep_alive_time = 1
+
+    assert_equal 1, @mech.keep_alive_time
+  end
+
   def test_max_history_equals
     @mech.max_history = 10
     0.upto(10) do |i|

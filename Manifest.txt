@@ -6,7 +6,6 @@ LICENSE.rdoc
 Manifest.txt
 README.rdoc
 Rakefile
-digest.htpasswd
 examples/flickr_upload.rb
 examples/mech-dump.rb
 examples/proxy_req.rb

@@ -585,6 +585,7 @@ class Mechanize
     @proxy_pass = password
 
     @agent.set_proxy address, port, user, password
+    @agent.set_http
   end
 
   # Runs given block, then resets the page history as it was before. self is

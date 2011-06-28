@@ -2,6 +2,9 @@
 
 === 2.0.1 / 2011-06-28
 
+Mechanize now uses minitest to avoid 1.9 vs 1.8 assertion availability in
+test/unit
+
 * Bug Fixes
   * Restored Mechanize#set_proxy.  Issue #117, #118, #119
   * Mechanize::CookieJar#load now lazy-loads YAML.  Issue #118

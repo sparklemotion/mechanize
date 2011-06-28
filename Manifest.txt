@@ -1,3 +1,4 @@
+.autotest
 CHANGELOG.rdoc
 EXAMPLES.rdoc
 FAQ.rdoc

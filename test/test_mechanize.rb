@@ -636,12 +636,16 @@ class TestMechanize < Test::Unit::TestCase
   end
 
   def test_set_proxy
+    http = @mech.agent.http
+
     @mech.set_proxy 'localhost', 8080, 'user', 'pass'
 
     assert_equal 'localhost', @mech.proxy_addr
     assert_equal 8080,        @mech.proxy_port
     assert_equal 'user',      @mech.proxy_user
     assert_equal 'pass',      @mech.proxy_pass
+
+    refute_same http, @mech.agent.http
   end
 
   def test_submit_bad_form_method

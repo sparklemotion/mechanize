@@ -1,11 +1,11 @@
-Q: I keep getting an EOFError:
-  protocol.rb:133:in `sysread': end of file reached (EOFError)
+Q:: Why do I keep getting an EOFError?
 
-A:  Some people have experienced an EOFError during normal mechanize usage.
-    Most of the time this occurs because the remote website claims to support
-    keep alives, but does not implement them correctly.  Try turning off
-    keep alives on your mechanize object:
+A:: For older versions of mechanize turning off keep_alive could help with the
+    problem, but mechanize is now has more robust handling of persistent
+    connections.
 
-      mech.keep_alive = false
-
-
+    Older versions of mechanize would raise an EOFError when a chunked body was
+    not terminated properly, a common bug of IIS servers.  Since 2.0
+    Mechanize::ResponseReadError is raised containing the original response and
+    body read so far so if the server is broken you can still retrieve the
+    entire content.

@@ -1,6 +1,6 @@
 require "helper"
 
-class SchemeTest < Test::Unit::TestCase
+class SchemeTest < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
     @agent.log = Class.new(Object) do
@@ -34,15 +34,15 @@ class SchemeTest < Test::Unit::TestCase
     f = File.expand_path(File.join(File.dirname(__FILE__), "htdocs"))
     page = @agent.get("file://#{f}")
     link = page.links.find { |l| l.text =~ /tc_follow_meta/ }
-    assert_not_nil(link)
+
     path = URI.parse(link.href).path
 
     page = link.click
     assert_equal(File.read(path), page.body)
 
     link = page.meta_refresh.first
-    assert_not_nil(link)
     page = @agent.click(link)
+
     assert_equal("http://localhost/index.html", @agent.history.last.uri.to_s)
   end
 end

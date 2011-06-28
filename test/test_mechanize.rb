@@ -2,7 +2,7 @@
 
 require 'helper'
 
-class TestMechanize < Test::Unit::TestCase
+class TestMechanize < MiniTest::Unit::TestCase
 
   KEY = OpenSSL::PKey::RSA.new 512
   name = OpenSSL::X509::Name.parse 'CN=nobody/DC=example'
@@ -91,32 +91,31 @@ class TestMechanize < Test::Unit::TestCase
     @mech.user_agent_alias = 'Mac Safari'
     page = @mech.get("http://localhost/frame_test.html")
     link = page.link_with(:text => "Form Test")
-    assert_not_nil(link)
+
     page = @mech.click(link)
+
     assert_equal("http://localhost/form_test.html",
-      @mech.history.last.uri.to_s)
+                 @mech.history.last.uri.to_s)
   end
 
   def test_click_frame_hpricot_style
     page = @mech.get("http://localhost/frame_test.html")
-
     link = (page/"//frame[@name='frame2']").first
-    assert_not_nil(link)
+
     page = @mech.click(link)
+
     assert_equal("http://localhost/form_test.html",
-      @mech.history.last.uri.to_s)
+                 @mech.history.last.uri.to_s)
   end
 
   def test_click_hpricot_style # HACK move to test_divide in Page
     page = @mech.get("http://localhost/frame_test.html")
-
     link = (page/"//a[@class='bar']").first
-    assert_not_nil(link)
 
     page = @mech.click(link)
 
     assert_equal("http://localhost/form_test.html",
-      @mech.history.last.uri.to_s)
+                 @mech.history.last.uri.to_s)
   end
 
   def test_click_link
@@ -216,8 +215,8 @@ class TestMechanize < Test::Unit::TestCase
   end
 
   def test_get_bad_url
-    assert_raise ArgumentError do
-      @mech.get('/foo.html')
+    assert_raises ArgumentError do
+      @mech.get '/foo.html'
     end
   end
 
@@ -383,8 +382,9 @@ class TestMechanize < Test::Unit::TestCase
   def test_get_kcode
     $KCODE = 'u'
     page = @mech.get("http://localhost/?a=#{[0xd6].pack('U')}")
-    assert_not_nil(page)
+
     assert_equal('http://localhost/?a=%D6', page.uri.to_s)
+
     $KCODE = 'NONE'
   end unless RUBY_VERSION >= '1.9.0'
 
@@ -426,9 +426,10 @@ class TestMechanize < Test::Unit::TestCase
   end
 
   def test_get_referer_file
-    assert_nothing_raised do
-      @mech.get('http://localhost', [], Mechanize::File.new(URI.parse('http://tenderlovemaking.com/crossdomain.xml')))
-    end
+    uri = URI.parse 'http://tenderlovemaking.com/crossdomain.xml'
+    file = Mechanize::File.new uri
+
+    @mech.get('http://localhost', [], file)
 
     # HACK no assertion of behavior
   end
@@ -448,9 +449,9 @@ class TestMechanize < Test::Unit::TestCase
   end
 
   def test_get_scheme_unsupported
-    assert_raise(Mechanize::UnsupportedSchemeError) {
+    assert_raises Mechanize::UnsupportedSchemeError do
       @mech.get('ftp://server.com/foo.html')
-    }
+    end
   end
 
   def test_get_space
@@ -470,15 +471,11 @@ class TestMechanize < Test::Unit::TestCase
   end
 
   def test_get_weird
-    assert_nothing_raised {
-      @mech.get('http://localhost/?action=bing&bang=boom=1|a=|b=|c=')
-    }
-    assert_nothing_raised {
-      @mech.get('http://localhost/?a=b&#038;b=c&#038;c=d')
-    }
-    assert_nothing_raised {
-      @mech.get("http://localhost/?a=#{[0xd6].pack('U')}")
-    }
+    @mech.get('http://localhost/?action=bing&bang=boom=1|a=|b=|c=')
+    @mech.get('http://localhost/?a=b&#038;b=c&#038;c=d')
+    @mech.get("http://localhost/?a=#{[0xd6].pack('U')}")
+
+    # HACK no assertion of behavior
   end
 
   def test_get_yield
@@ -650,7 +647,7 @@ class TestMechanize < Test::Unit::TestCase
 
   def test_submit_bad_form_method
     page = @mech.get("http://localhost/bad_form_test.html")
-    assert_raise ArgumentError do
+    assert_raises ArgumentError do
       @mech.submit(page.forms.first)
     end
   end

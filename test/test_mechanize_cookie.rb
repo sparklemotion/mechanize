@@ -17,7 +17,7 @@ module Enumerable
   end
 end
 
-class TestMechanizeCookie < Test::Unit::TestCase
+class TestMechanizeCookie < MiniTest::Unit::TestCase
   def silently
     warn_level = $VERBOSE
     $VERBOSE = false
@@ -183,7 +183,7 @@ class TestMechanizeCookie < Test::Unit::TestCase
       end
       cookie = nil
       Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
-      assert_not_nil(cookie)
+
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('/', cookie.path)
 
@@ -218,7 +218,7 @@ class TestMechanizeCookie < Test::Unit::TestCase
       end
       cookie = nil
       Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
-      assert_not_nil(cookie)
+
       assert_equal('12345%7D=', cookie.to_s)
       assert_equal('', cookie.value)
       assert_equal('/', cookie.path)
@@ -256,7 +256,7 @@ class TestMechanizeCookie < Test::Unit::TestCase
       end
       cookie = nil
       Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
-      assert_not_nil(cookie)
+
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('/', cookie.path)
 
@@ -293,7 +293,7 @@ class TestMechanizeCookie < Test::Unit::TestCase
       end
       cookie = nil
       Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
-      assert_not_nil(cookie)
+
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('/', cookie.path)
       assert_equal(true, cookie.secure)
@@ -329,7 +329,7 @@ class TestMechanizeCookie < Test::Unit::TestCase
       end
       cookie = nil
       Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
-      assert_not_nil(cookie)
+
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('/', cookie.path)
 

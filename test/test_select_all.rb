@@ -1,5 +1,5 @@
 require "helper"
-class SelectAllTest < Test::Unit::TestCase
+class SelectAllTest < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
     @page = @agent.get("http://localhost/form_select_all.html")

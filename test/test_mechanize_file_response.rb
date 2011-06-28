@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestMechanizeFileConnection < Test::Unit::TestCase
+class TestMechanizeFileConnection < MiniTest::Unit::TestCase
 
   def test_request
     uri = URI.parse "file://#{File.expand_path __FILE__}"

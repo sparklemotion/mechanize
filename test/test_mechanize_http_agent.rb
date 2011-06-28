@@ -1,7 +1,7 @@
 # coding: utf-8
 require 'helper'
 
-class TestMechanizeHttpAgent < Test::Unit::TestCase
+class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
 
   def setup
     @mech = Mechanize.new
@@ -95,7 +95,7 @@ class TestMechanizeHttpAgent < Test::Unit::TestCase
 
   def test_get_robots
     robotstxt = @agent.get_robots 'http://localhost/robots.txt'
-    assert_not_equal '', robotstxt
+    refute_equal '', robotstxt
 
     robotstxt = @agent.get_robots 'http://localhost/response_code?code=404'
     assert_equal '', robotstxt

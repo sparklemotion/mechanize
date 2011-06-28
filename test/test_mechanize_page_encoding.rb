@@ -4,7 +4,7 @@ require 'cgi'
 
 # tests for Page encoding and charset and parsing
 
-class TestMechanizePageEncoding < Test::Unit::TestCase
+class TestMechanizePageEncoding < MiniTest::Unit::TestCase
 
   MECH_ASCII_ENCODING = Mechanize::Util::NEW_RUBY_ENCODING ? 'US-ASCII' : 'ISO-8859-1'
 

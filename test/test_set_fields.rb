@@ -1,6 +1,6 @@
 require "helper"
 
-class TestSetFields < Test::Unit::TestCase
+class TestSetFields < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
     @page = @agent.get("http://localhost/form_set_fields.html")

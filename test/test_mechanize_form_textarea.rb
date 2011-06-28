@@ -1,6 +1,6 @@
 require "helper"
 
-class TestMechanizeFormTextarea < Test::Unit::TestCase
+class TestMechanizeFormTextarea < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
     @page  = @agent.get("http://localhost/tc_textarea.html")
@@ -26,20 +26,26 @@ class TestMechanizeFormTextarea < Test::Unit::TestCase
 
   def test_multi_textfield
     form = @page.form_with(:name => 'form3')
+
     assert_equal(2, form.fields_with(:name => 'text1').length)
     assert_equal('', form.fields_with(:name => 'text1')[0].value)
     assert_equal('sample text', form.fields_with(:name => 'text1')[1].value)
+
     form.text1 = 'Hello World'
+
     assert_equal('Hello World', form.fields_with(:name => 'text1')[0].value)
     assert_equal('sample text', form.fields_with(:name => 'text1')[1].value)
+
     page = @agent.submit(form)
+
     assert_equal(2, page.links.length)
+
     link = page.links_with(:text => 'text1:sample text')
-    assert_not_nil(link)
+
     assert_equal(1, link.length)
 
     link = page.links_with(:text => 'text1:Hello World')
-    assert_not_nil(link)
+
     assert_equal(1, link.length)
   end
 end

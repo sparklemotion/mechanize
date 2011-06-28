@@ -3,7 +3,7 @@
 require 'helper'
 require 'cgi'
 
-class TestMechanizePage < Test::Unit::TestCase
+class TestMechanizePage < MiniTest::Unit::TestCase
 
   WINDOWS_1255 = <<-HTML
 <meta http-equiv="content-type" content="text/html; charset=windows-1255">
@@ -290,7 +290,10 @@ class TestMechanizePage < Test::Unit::TestCase
   def test_link_with_unusual_characters
     page = @agent.get("http://localhost/tc_links.html")
     link = page.link_with(:text => 'unusual characters')
-    assert_nothing_raised { @agent.click link }
+
+    @agent.click link
+
+    # HACK no assertion
   end
 
   def test_links

@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestMechanizePageMetaRefresh < Test::Unit::TestCase
+class TestMechanizePageMetaRefresh < MiniTest::Unit::TestCase
 
   def setup
     @MR = Mechanize::Page::MetaRefresh

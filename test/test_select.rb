@@ -1,6 +1,6 @@
 require "helper"
 
-class SelectTest < Test::Unit::TestCase
+class SelectTest < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
     @page = @agent.get("http://localhost/form_select.html")
@@ -34,11 +34,14 @@ class SelectTest < Test::Unit::TestCase
 
   def test_click_all
     @form.field_with(:name => 'list').options.each { |o| o.click }
+
     option_list = @form.field_with(:name => 'list').options
-    assert_not_nil(option_list)
+
     assert_equal(6, option_list.length)
     assert_equal(option_list.last.value, @form.list)
+
     page = @agent.submit(@form)
+
     assert_equal(1, page.links.length)
     assert_equal(1, page.links_with(:text => "list:#{option_list.last}").length)
   end

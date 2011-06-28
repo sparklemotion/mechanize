@@ -1,7 +1,7 @@
 require 'helper'
 require 'tmpdir'
 
-class TestMechanizeCookieJar < Test::Unit::TestCase
+class TestMechanizeCookieJar < MiniTest::Unit::TestCase
 
   def setup
     @jar = Mechanize::CookieJar.new
@@ -378,9 +378,10 @@ class TestMechanizeCookieJar < Test::Unit::TestCase
 
     @jar.jar['rubyforge.org'] = {}
 
-    assert_nothing_raised do
-      @jar.add(url, cookie_from_hash(cookie_values))
-    end
+
+    @jar.add url, cookie_from_hash(cookie_values)
+
+    # HACK no asertion
   end
 
   def test_ssl_cookies

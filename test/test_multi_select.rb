@@ -1,6 +1,6 @@
 require "helper"
 
-class MultiSelectTest < Test::Unit::TestCase
+class MultiSelectTest < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
     @page = @agent.get("http://localhost/form_multi_select.html")

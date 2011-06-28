@@ -1,30 +1,21 @@
 require "helper"
 
-class PluggableParserTest < Test::Unit::TestCase
+class PluggableParserTest < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
   end
 
   def test_content_type_error
     page = @agent.get("http://localhost/bad_content_type")
-    assert_raise(Mechanize::ContentTypeError) {
-      page = Mechanize::Page.new(
-                                      page.uri, 
-                                      page.response, 
-                                      page.body,
-                                      page.code
-                                     )
-    }
-    begin
-      page = Mechanize::Page.new(
-                                      page.uri, 
-                                      page.response, 
-                                      page.body,
-                                      page.code
-                                     )
-    rescue Mechanize::ContentTypeError => ex
-      assert_equal('text/xml', ex.content_type)
+
+    e = assert_raises Mechanize::ContentTypeError do
+      page = Mechanize::Page.new(page.uri,
+                                 page.response,
+                                 page.body,
+                                 page.code)
     end
+
+    assert_equal('text/xml', e.content_type)
   end
 
   def test_content_type
@@ -55,9 +46,10 @@ class PluggableParserTest < Test::Unit::TestCase
   def test_filter
     @agent.pluggable_parser.html = Filter
     page = @agent.get("http://localhost/find_link.html")
+
     assert_kind_of(Filter, page)
+
     assert_equal(19, page.links.length)
-    assert_not_nil(page.link_with(:text => 'Net::DAAP::Client'))
     assert_equal(1, page.links_with(:text => 'Net::DAAP::Client').length)
   end
 
@@ -68,7 +60,6 @@ class PluggableParserTest < Test::Unit::TestCase
     assert_equal(Filter, @agent.pluggable_parser['text/html'])
     assert_kind_of(Filter, page)
     assert_equal(19, page.links.length)
-    assert_not_nil(page.link_with(:text => 'Net::DAAP::Client'))
     assert_equal(1, page.links_with(:text => 'Net::DAAP::Client').length)
   end
 

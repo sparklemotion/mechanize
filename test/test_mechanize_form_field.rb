@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestMechanizeFormField < Test::Unit::TestCase
+class TestMechanizeFormField < MiniTest::Unit::TestCase
 
   def test_field_spaceship
     doc = Nokogiri::HTML::Document.new

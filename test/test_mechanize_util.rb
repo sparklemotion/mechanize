@@ -1,7 +1,7 @@
 # coding: utf-8
 require 'helper'
 
-class TestMechanizeUtil < Test::Unit::TestCase
+class TestMechanizeUtil < MiniTest::Unit::TestCase
 
   INPUTTED_VALUE = "テスト" # "test" in Japanese UTF-8 encoding
   CONTENT_ENCODING = 'Shift_JIS' # one of Japanese encoding
@@ -19,7 +19,7 @@ class TestMechanizeUtil < Test::Unit::TestCase
   INVALID_ENCODING = 'UTF-eight'
 
   def setup
-    @result = "non_nil"
+    @result = "not set"
   end
 
   def test_from_native_charset
@@ -34,7 +34,7 @@ class TestMechanizeUtil < Test::Unit::TestCase
 
   def test_from_native_charset_doesnot_convert_when_no_encoding
     @result = Mechanize::Util.from_native_charset(INPUTTED_VALUE, nil)
-    assert_not_equal ENCODED_VALUE, @result
+    refute_equal ENCODED_VALUE, @result
     assert_equal INPUTTED_VALUE, @result
   end
 
@@ -43,28 +43,28 @@ class TestMechanizeUtil < Test::Unit::TestCase
     Mechanize.html_parser = 'Another HTML Parser'
 
     @result = Mechanize::Util.from_native_charset(INPUTTED_VALUE, CONTENT_ENCODING)
-    assert_not_equal ENCODED_VALUE, @result
+    refute_equal ENCODED_VALUE, @result
     assert_equal INPUTTED_VALUE, @result
-
+  ensure
     Mechanize.html_parser = parser
   end
 
   def test_from_native_charset_raises_error_with_bad_encoding
-    assert_raise(*ENCODING_ERRORS){
-      @result = Mechanize::Util.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING)
-    }
+    assert_raises(*ENCODING_ERRORS) do
+      Mechanize::Util.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING)
+    end
   end
 
   def test_from_native_charset_suppress_encoding_error_when_3rd_arg_is_true
-    assert_nothing_raised(*ENCODING_ERRORS){
-      @result = Mechanize::Util.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, true)
-    }
+    Mechanize::Util.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, true)
+
+    # HACK no assertion
   end
 
   def test_from_native_charset_doesnot_convert_when_encoding_error_raised_and_ignored
     @result = Mechanize::Util.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, true)
 
-    assert_not_equal ENCODED_VALUE, @result
+    refute_equal ENCODED_VALUE, @result
     assert_equal INPUTTED_VALUE, @result
   end
 
@@ -73,9 +73,10 @@ class TestMechanizeUtil < Test::Unit::TestCase
     log = Logger.new(sio)
     log.level = Logger::DEBUG
 
-    assert_raise(*ENCODING_ERRORS){
-      @result = Mechanize::Util.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, nil, log)
-    }
+    assert_raises(*ENCODING_ERRORS) do
+      Mechanize::Util.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, nil, log)
+    end
+
     assert_match ERROR_LOG_MESSAGE, sio.string
   end
 
@@ -84,9 +85,8 @@ class TestMechanizeUtil < Test::Unit::TestCase
     log = Logger.new(sio)
     log.level = Logger::DEBUG
 
-    assert_nothing_raised(*ENCODING_ERRORS){
-      @result = Mechanize::Util.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, true, log)
-    }
+    Mechanize::Util.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, true, log)
+
     assert_match ERROR_LOG_MESSAGE, sio.string
   end
 end

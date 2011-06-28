@@ -1,6 +1,6 @@
 require "helper"
 
-class TestSaveFile < Test::Unit::TestCase
+class TestSaveFile < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
   end

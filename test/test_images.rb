@@ -1,6 +1,6 @@
 require "helper"
 
-class ImagesMechTest < Test::Unit::TestCase
+class ImagesMechTest < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
   end

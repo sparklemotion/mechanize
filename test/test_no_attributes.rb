@@ -1,13 +1,13 @@
 require "helper"
 
-class TestNoAttributes < Test::Unit::TestCase
+class TestNoAttributes < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
   end
 
   def test_parse_no_attributes
-    assert_nothing_raised do
-      @agent.get('http://localhost/tc_no_attributes.html')
-    end
+    @agent.get('http://localhost/tc_no_attributes.html')
+
+    # HACK no assertions
   end
 end

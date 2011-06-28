@@ -1,6 +1,6 @@
 require "helper"
 
-class TestRedirectLimitReached < Test::Unit::TestCase
+class TestRedirectLimitReached < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
   end

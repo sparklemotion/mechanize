@@ -1,6 +1,6 @@
 require "helper"
 
-class ResponseCodeMechTest < Test::Unit::TestCase
+class ResponseCodeMechTest < MiniTest::Unit::TestCase
   def setup
     @mech = Mechanize.new
   end

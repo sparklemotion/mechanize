@@ -1,6 +1,6 @@
 require "helper"
 
-class TestMechanizeLink < Test::Unit::TestCase
+class TestMechanizeLink < MiniTest::Unit::TestCase
 
   def setup
     @agent = Mechanize.new
@@ -9,7 +9,7 @@ class TestMechanizeLink < Test::Unit::TestCase
   def test_click
     page = @agent.get("http://localhost/frame_test.html")
     link = page.link_with(:text => "Form Test")
-    assert_not_nil(link)
+
     assert_equal('Form Test', link.text)
     page = link.click
     assert_equal("http://localhost/form_test.html",
@@ -25,16 +25,17 @@ class TestMechanizeLink < Test::Unit::TestCase
   def test_click_unsupported_scheme
     page = @agent.get("http://google.com/tc_links.html")
     link = page.link_with(:text => 'javascript link')
-    assert_raise(Mechanize::UnsupportedSchemeError) {
+    assert_raises Mechanize::UnsupportedSchemeError do
       link.click
-    }
+    end
 
     @agent.scheme_handlers['javascript'] = lambda { |my_link, my_page|
       URI.parse('http://localhost/tc_links.html')
     }
-    assert_nothing_raised {
-      link.click
-    }
+
+    link.click
+
+    # HACK no assertion
   end
 
   def test_text_alt_text

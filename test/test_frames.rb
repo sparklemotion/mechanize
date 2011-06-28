@@ -1,6 +1,6 @@
 require "helper"
 
-class FramesMechTest < Test::Unit::TestCase
+class FramesMechTest < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
   end

@@ -1,7 +1,7 @@
 # coding: utf-8
 require "helper"
 
-class TestMechanizeFormEncoding < Test::Unit::TestCase
+class TestMechanizeFormEncoding < MiniTest::Unit::TestCase
 
   # See also: tests of Util.from_native_charset
   # Encoding test should do with non-utf-8 characters
@@ -41,7 +41,7 @@ class TestMechanizeFormEncoding < Test::Unit::TestCase
 
     assert accept_charset
     assert_equal accept_charset, form.encoding
-    assert_not_equal page.encoding, form.encoding
+    refute_equal page.encoding, form.encoding
   end
 
   def test_form_encoding_returns_page_encoding_when_no_accept_charset
@@ -50,7 +50,7 @@ class TestMechanizeFormEncoding < Test::Unit::TestCase
     accept_charset = form.form_node['accept-charset']
 
     assert_nil accept_charset
-    assert_not_equal accept_charset, form.encoding
+    refute_equal accept_charset, form.encoding
     assert_equal page.encoding, form.encoding
   end
 
@@ -58,7 +58,7 @@ class TestMechanizeFormEncoding < Test::Unit::TestCase
     page = @agent.get("http://localhost/form_set_fields.html")
     form = page.forms.first
 
-    assert_not_equal CONTENT_ENCODING, form.encoding
+    refute_equal CONTENT_ENCODING, form.encoding
 
     form.encoding = CONTENT_ENCODING
 
@@ -93,14 +93,16 @@ class TestMechanizeFormEncoding < Test::Unit::TestCase
   def test_post_form_with_problematic_encoding
     form = set_form_with_encoding INVALID_ENCODING
 
-    assert_raise(*ENCODING_ERRORS){ form.submit }
+    assert_raises(*ENCODING_ERRORS){ form.submit }
   end
 
   def test_form_ignore_encoding_error_is_true
     form = set_form_with_encoding INVALID_ENCODING
     form.ignore_encoding_error = true
 
-    assert_nothing_raised(*ENCODING_ERRORS){ form.submit }
+    form.submit
+
+    # HACK no assertions
   end
 
   def test_post_form_logs_form_encoding

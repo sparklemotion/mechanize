@@ -1,6 +1,6 @@
 require "helper"
 
-class TestCheckBoxes < Test::Unit::TestCase
+class TestCheckBoxes < MiniTest::Unit::TestCase
   def test_field
     f = Mechanize::Form::Field.new({'name' => 'a&amp;b'}, 'a&amp;b')
     assert_equal('a&b', f.name)

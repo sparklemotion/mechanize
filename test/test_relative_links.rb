@@ -1,6 +1,6 @@
 require "helper"
 
-class TestRelativeLinks < Test::Unit::TestCase
+class TestRelativeLinks < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
   end
@@ -14,7 +14,7 @@ class TestRelativeLinks < Test::Unit::TestCase
   def test_too_many_dots
     @page = @agent.get("http://localhost/relative/tc_relative_links.html")
     page = @page.link_with(:text => 'too many dots').click
-    assert_not_nil(page)
+
     assert_equal('http://localhost/tc_relative_links.html', page.uri.to_s)
   end
 

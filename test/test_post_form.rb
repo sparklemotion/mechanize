@@ -1,6 +1,6 @@
 require "helper"
 
-class PostForm < Test::Unit::TestCase
+class PostForm < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
   end
@@ -9,10 +9,8 @@ class PostForm < Test::Unit::TestCase
     page = @agent.post("http://localhost/form_post",
                         'gender' => 'female'
                       )
-    assert_not_nil(
-      page.links.find { |l| l.text == "gender:female" },
-      "gender field missing"
-    )
+    assert(page.links.find { |l| l.text == "gender:female" },
+           "gender field missing")
   end
 
   def test_post_form_json
@@ -28,14 +26,12 @@ class PostForm < Test::Unit::TestCase
                          ['gender', 'male']
                        ]
                       )
-    assert_not_nil(
-      page.links.find { |l| l.text == "gender:female" },
-      "gender field missing"
-    )
-    assert_not_nil(
-      page.links.find { |l| l.text == "gender:male" },
-      "gender field missing"
-    )
+    assert(page.links.find { |l| l.text == "gender:female" },
+           "gender field missing")
+
+    assert(page.links.find { |l| l.text == "gender:male" },
+           "gender field missing")
+
     assert_equal(2, page.links.length)
   end
 end

@@ -1,6 +1,6 @@
 require "helper"
 
-class TestHistory < Test::Unit::TestCase
+class TestHistory < MiniTest::Unit::TestCase
 
   Node = Struct.new :href, :inner_text
 

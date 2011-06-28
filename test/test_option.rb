@@ -1,6 +1,6 @@
 require "helper"
 
-class OptionTest < Test::Unit::TestCase
+class OptionTest < MiniTest::Unit::TestCase
   class FakeAttribute < Hash
     attr_reader :inner_text
     def initialize(inner_text)

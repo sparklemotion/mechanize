@@ -1,6 +1,6 @@
 require "helper"
 
-class HistoryAddedTest < Test::Unit::TestCase
+class HistoryAddedTest < MiniTest::Unit::TestCase
   def setup
     @agent = Mechanize.new
   end

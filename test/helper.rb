@@ -1,5 +1,5 @@
-require 'test/unit'
 require 'rubygems'
+require 'minitest/autorun'
 require 'mechanize'
 require 'webrick/httputils'
 require 'servlets'

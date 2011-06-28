@@ -1,6 +1,6 @@
 require "helper"
 
-class TestRobots < Test::Unit::TestCase
+class TestRobots < MiniTest::Unit::TestCase
 
   def setup
     @mech = Mechanize.new
@@ -12,9 +12,9 @@ class TestRobots < Test::Unit::TestCase
   def test_robots
     assert_equal "Welcome!", @robot.get("http://localhost/robots.html").title
 
-    assert_raise(Mechanize::RobotsDisallowedError) {
+    assert_raises Mechanize::RobotsDisallowedError do
       @robot.get("http://localhost/norobots.html")
-    }
+    end
   end
 
   def test_robots_allowed_eh
@@ -28,55 +28,44 @@ class TestRobots < Test::Unit::TestCase
   end
 
   def test_noindex
-    assert_nothing_raised {
-      @mech.get("http://localhost/noindex.html")
-    }
+    @mech.get("http://localhost/noindex.html")
 
     assert @robot.agent.robots_allowed? URI("http://localhost/noindex.html")
 
-    assert_raise(Mechanize::RobotsDisallowedError) {
+    assert_raises Mechanize::RobotsDisallowedError do
       @robot.get("http://localhost/noindex.html")
-    }
+    end
   end
 
   def test_nofollow
     page = @mech.get("http://localhost/nofollow.html")
 
-    assert_nothing_raised {
-      page.links[0].click
-    }
-    assert_nothing_raised {
-      page.links[1].click
-    }
+    page.links[0].click
+    page.links[1].click
 
     page = @robot.get("http://localhost/nofollow.html")
 
-    assert_raise(Mechanize::RobotsDisallowedError) {
+    assert_raises Mechanize::RobotsDisallowedError do
       page.links[0].click
-    }
-    assert_raise(Mechanize::RobotsDisallowedError) {
+    end
+    assert_raises Mechanize::RobotsDisallowedError do
       page.links[1].click
-    }
+    end
   end
 
   def test_rel_nofollow
     page = @mech.get("http://localhost/rel_nofollow.html")
 
-    assert_nothing_raised {
-      page.links[0].click
-    }
-    assert_nothing_raised {
-      page.links[1].click
-    }
+    page.links[0].click
+    page.links[1].click
 
     page = @robot.get("http://localhost/rel_nofollow.html")
 
-    assert_nothing_raised {
-      page.links[0].click
-    }
-    assert_raise(Mechanize::RobotsDisallowedError) {
+    page.links[0].click
+
+    assert_raises Mechanize::RobotsDisallowedError do
       page.links[1].click
-    }
+    end
   end
 
 end

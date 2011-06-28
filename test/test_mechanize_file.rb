@@ -1,6 +1,6 @@
 require "helper"
 
-class TestMechanizeFile < Test::Unit::TestCase
+class TestMechanizeFile < MiniTest::Unit::TestCase
   def test_content_disposition
     file = Mechanize::File.new(
                                     URI.parse('http://localhost/foo'),

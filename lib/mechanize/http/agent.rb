@@ -31,6 +31,8 @@ class Mechanize::HTTP::Agent
 
   attr_reader :pre_connect_hooks
 
+  attr_reader :content_encoding_hooks
+
   # Length of time to attempt to read data from the server
   attr_accessor  :read_timeout
 
@@ -83,6 +85,7 @@ class Mechanize::HTTP::Agent
     @auth_hash            = {} # Keep track of urls for sending auth
     @conditional_requests = true
     @context              = nil
+    @content_encoding_hooks = []
     @cookie_jar           = Mechanize::CookieJar.new
     @digest               = nil # DigestAuth Digest
     @digest_auth          = Net::HTTP::DigestAuth.new
@@ -208,6 +211,8 @@ class Mechanize::HTTP::Agent
 
       res
     }
+
+    hook_content_encoding response, uri, response_body_io
 
     response_body = response_content_encoding response, response_body_io
 
@@ -495,6 +500,12 @@ class Mechanize::HTTP::Agent
     else
       raise Mechanize::Error,
             "Unsupported Content-Encoding: #{response['Content-Encoding']}"
+    end
+  end
+
+  def hook_content_encoding response, uri, response_body_io
+    @content_encoding_hooks.each do |hook|
+      hook.call self, uri, response, response_body_io
     end
   end
 

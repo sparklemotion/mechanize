@@ -126,7 +126,7 @@ class GzipServlet < WEBrick::HTTPServlet::AbstractServlet
       else
         res.body = ''
       end
-      res['Content-Encoding'] = 'gzip'
+      res['Content-Encoding'] = req['X-ResponseContentEncoding'] || 'gzip'
       res['Content-Type'] = "text/html"
     else
       res.code = 400

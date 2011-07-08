@@ -172,6 +172,16 @@ class TestMechanize < MiniTest::Unit::TestCase
       @mech.page.uri.to_s
   end
 
+  def test_cookie_jar
+    assert_kind_of Mechanize::CookieJar, @mech.cookie_jar
+
+    jar = Mechanize::CookieJar.new
+
+    @mech.cookie_jar = jar
+
+    assert_equal jar, @mech.cookie_jar
+  end
+
   def test_delete
     page = @mech.delete('http://localhost/verb', { 'q' => 'foo' })
     assert_equal 1, @mech.history.length

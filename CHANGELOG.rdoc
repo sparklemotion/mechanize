@@ -1,5 +1,10 @@
 = Mechanize CHANGELOG
 
+=== 2.0.2 / ??
+
+* Bug fixes
+  * Mechanize#cookie_jar= works again.  Issue #126
+
 === 2.0.1 / 2011-06-28
 
 Mechanize now uses minitest to avoid 1.9 vs 1.8 assertion availability in

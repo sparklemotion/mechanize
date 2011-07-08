@@ -3,7 +3,7 @@
 
 class Mechanize::HTTP::Agent
 
-  attr_reader :cookie_jar
+  attr_accessor :cookie_jar
 
   # Disables If-Modified-Since conditional requests (enabled by default)
   attr_accessor :conditional_requests

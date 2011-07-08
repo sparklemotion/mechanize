@@ -473,7 +473,7 @@ class Mechanize::HTTP::Agent
           ''
         end
       end
-    when 'gzip', 'x-gzip' then
+    when 'gzip', 'x-gzip', 'agzip' then
       log.debug('gzip body') if log
 
       return if length.zero?

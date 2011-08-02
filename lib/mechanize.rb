@@ -33,7 +33,7 @@ class Mechanize
 
   ##
   # The version of Mechanize you are using.
-  VERSION = '2.0.2'
+  VERSION = '2.0.2.doxo'
 
   class Error < RuntimeError
   end

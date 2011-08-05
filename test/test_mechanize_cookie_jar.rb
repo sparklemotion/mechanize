@@ -184,6 +184,22 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     assert_equal(1, @jar.cookies(url).length)
   end
 
+  def test_cookies_with_leading_dot_match_parent_domains
+    url = URI.parse('http://rubyforge.org/')
+
+    @jar.add(url, cookie_from_hash(cookie_values(:domain => '.rubyforge.org')))
+
+    assert_equal(1, @jar.cookies(url).length)
+  end
+
+  def test_cookies_with_leading_dot_match_parent_domains_exactly
+    url = URI.parse('http://arubyforge.org/')
+
+    @jar.add(url, cookie_from_hash(cookie_values(:domain => '.rubyforge.org')))
+
+    assert_equal(0, @jar.cookies(url).length)
+  end
+
   def test_cookies_dot
     url = URI.parse('http://www.host.example/')
 

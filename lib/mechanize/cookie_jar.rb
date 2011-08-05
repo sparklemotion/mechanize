@@ -40,7 +40,7 @@ class Mechanize::CookieJar
     domains = @jar.find_all { |domain, _|
       cookie_domain = self.class.strip_port(domain)
       if cookie_domain.start_with?('.')
-        url.host =~ /#{Regexp.escape cookie_domain}$/i
+        url.host =~ /(^|\.)#{Regexp.escape cookie_domain[1..-1]}$/i
       else
         url.host =~ /^#{Regexp.escape cookie_domain}$/i
       end

@@ -20,7 +20,7 @@ class Mechanize::CookieJar
 
   # Add a cookie to the Jar.
   def add(uri, cookie)
-    return unless valid_cookie_for_uri?(uri, cookie)
+    return unless cookie.acceptable_from_uri?(uri)
 
     normal_domain = cookie.domain.downcase
 
@@ -37,24 +37,16 @@ class Mechanize::CookieJar
     cleanup
     url.path = '/' if url.path.empty?
 
-    domains = @jar.find_all { |domain, _|
-      cookie_domain = self.class.strip_port(domain)
-      if cookie_domain.start_with?('.')
-        url.host =~ /(^|\.)#{Regexp.escape cookie_domain[1..-1]}$/i
-      else
-        url.host =~ /^#{Regexp.escape cookie_domain}$/i
-      end
+    [].tap { |cookies|
+      @jar.each { |domain, paths|
+        paths.each { |path, hash|
+          hash.each_value { |cookie|
+            next if cookie.expired? || !cookie.valid_for_uri?(url)
+            cookies << cookie
+          }
+        }
+      }
     }
-
-    return [] unless domains.length > 0
-
-    cookies = domains.map { |_,paths|
-      paths.find_all { |path, _|
-        url.path =~ /^#{Regexp.escape(path)}/
-      }.map { |_,cookie| cookie.values }
-    }.flatten
-
-    cookies.find_all { |cookie| ! cookie.expired? }
   end
 
   def empty?(url)
@@ -193,33 +185,6 @@ class Mechanize::CookieJar
     end
   end
 
-  private
-  # Determine if the cookie's domain and path are valid for
-  # the uri.host based on the rules in RFC 2965
-  def valid_cookie_for_uri?(uri, cookie)
-    cookie_domain = self.class.strip_port(cookie.domain)
-
-    # reject cookies whose domains do not contain an embedded dot
-    # cookies for localhost and .local. are exempt from this rule
-    return false if
-      cookie_domain !~ /.\../ && cookie_domain !~ /(localhost|\.?local)\.?$/
-
-    cookie_domain = if cookie_domain.start_with? '.' then
-                      ".?#{Regexp.escape cookie_domain[1..-1]}"
-                    else
-                      Regexp.escape cookie_domain
-                    end
-
-    # Permitted:     A Set-Cookie for x.foo.com for Domain=.foo.com
-    # Not Permitted: A Set-Cookie for y.x.foo.com for Domain=.foo.com because
-    #                y.x contains a dot
-    # Not Permitted: A Set-Cookie for foo.com for Domain=.bar.com
-    match = uri.host.match(/#{cookie_domain}/i)
-    return false if match.nil? || match.pre_match =~ /.\../
-
-    true
-  end
-
   protected
 
   # Remove expired cookies
@@ -232,10 +197,6 @@ class Mechanize::CookieJar
         end
       end
     end
-  end
-
-  def self.strip_port(host)
-    host.gsub(/:[0-9]+$/,'')
   end
 end
 

@@ -94,6 +94,21 @@ class Mechanize::Cookie < WEBrick::Cookie
     Time.now > expires
   end
 
+  alias secure? secure
+
+  def acceptable_from_uri?(uri)
+    dom = domain or return false
+    host = self.class.normalize_domain(uri.host)
+
+    return true if host == dom
+    return false if dom.match(/^(?!local)[^.]+$/)
+    return host.end_with?('.' << dom)
+  end
+
+  def valid_for_uri?(uri)
+    acceptable_from_uri?(uri) && uri.path.start_with?(path)
+  end
+
   def to_s
     "#{@name}=#{@value}"
   end

@@ -158,22 +158,22 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     assert_equal(1, @jar.cookies(url).length)
   end
 
-  def test_add_rejects_cookies_from_a_nested_subdomain
+  def test_add_does_not_reject_cookies_from_a_nested_subdomain
     url = URI.parse('http://y.x.foo.com')
 
     cookie = cookie_from_hash(cookie_values(:domain => '.foo.com'))
     @jar.add(url, cookie)
 
-    assert_equal(0, @jar.cookies(url).length)
+    assert_equal(1, @jar.cookies(url).length)
   end
 
-  def test_cookie_without_leading_dot_does_not_match_subdomains
+  def test_cookie_without_leading_dot_matches_subdomains
     url = URI.parse('http://admin.rubyforge.org/')
 
     cookie = cookie_from_hash(cookie_values(:domain => 'rubyforge.org'))
     @jar.add(url, cookie)
 
-    assert_equal(0, @jar.cookies(url).length)
+    assert_equal(1, @jar.cookies(url).length)
   end
 
   def test_cookies_with_leading_dot_match_subdomains

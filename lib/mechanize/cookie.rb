@@ -106,6 +106,7 @@ class Mechanize::Cookie < WEBrick::Cookie
   end
 
   def valid_for_uri?(uri)
+    return false if secure? && uri.scheme != 'https'
     acceptable_from_uri?(uri) && uri.path.start_with?(path)
   end
 

@@ -414,4 +414,20 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     @jar.add(url, cookie)
     assert_equal(2, @jar.cookies(url).length, "did not handle SSL cookie with :443")
   end
+
+  def test_secure_cookie
+    nurl  = URI.parse('http://rubyforge.org/login')
+    surl = URI.parse('https://rubyforge.org/login')
+
+    ncookie = cookie_from_hash(cookie_values(:name => 'Foo1'))
+    scookie = cookie_from_hash(cookie_values(:name => 'Foo2', :secure => true))
+
+    @jar.add(nurl, ncookie)
+    @jar.add(nurl, scookie)
+    @jar.add(surl, ncookie)
+    @jar.add(surl, scookie)
+
+    assert_equal('Foo1',      @jar.cookies(nurl).map { |c| c.name }.sort.join(' ') )
+    assert_equal('Foo1 Foo2', @jar.cookies(surl).map { |c| c.name }.sort.join(' ') )
+  end
 end

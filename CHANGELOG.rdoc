@@ -12,6 +12,7 @@
     host name is TLD, and rejected otherwise.  To retain compatibility
     and convention, host/domain names starting with "local" are exempt
     from this rule.
+  * "Secure" cookies are not sent via non-https connection.
 
 * Bug fixes
   * Mechanize#cookie_jar= works again.  Issue #126

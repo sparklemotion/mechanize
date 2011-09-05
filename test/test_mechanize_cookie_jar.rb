@@ -403,7 +403,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_ssl_cookies
     # thanks to michal "ocher" ochman for reporting the bug responsible for this test.
     values = cookie_values(:expires => nil)
-    values_ssl = values.merge(:domain => "#{values[:domain]}:443")
+    values_ssl = values.merge(:name => 'Baz', :domain => "#{values[:domain]}:443")
     url = URI.parse('https://rubyforge.org/login')
 
     cookie = cookie_from_hash(values)

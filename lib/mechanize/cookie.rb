@@ -31,7 +31,6 @@ class Mechanize::Cookie < WEBrick::Cookie
 
           case key.downcase
           when "domain" then
-            value = ".#{value}" unless value =~ /^\./
             cookie.domain = value
           when "path" then
             cookie.path = value
@@ -74,6 +73,20 @@ class Mechanize::Cookie < WEBrick::Cookie
         cookie
       }
     end
+
+    def normalize_domain(domain)
+      # RFC 6265 #4.1.2.3
+      return nil if domain.end_with?('.')
+      domain.downcase.tap { |dom|
+        dom.sub!(/:[0-9]+$/,'')
+        dom.sub!(/^\./,'')
+      }
+    end
+  end
+
+  alias set_domain domain=
+  def domain=(domain)
+    set_domain(self.class.normalize_domain(domain))
   end
 
   def expired?

@@ -128,7 +128,7 @@ class TestMechanizeCookie < MiniTest::Unit::TestCase
 
     cookie = Mechanize::Cookie.parse(url, cookie_str).first
 
-    assert_equal '.example.com', cookie.domain
+    assert_equal 'example.com', cookie.domain
   end
 
   def test_parse_domain_no_dot
@@ -138,7 +138,7 @@ class TestMechanizeCookie < MiniTest::Unit::TestCase
 
     cookie = Mechanize::Cookie.parse(url, cookie_str).first
 
-    assert_equal '.example.com', cookie.domain
+    assert_equal 'example.com', cookie.domain
   end
 
   def test_parse_domain_none

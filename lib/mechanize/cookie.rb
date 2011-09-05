@@ -65,7 +65,7 @@ class Mechanize::Cookie < WEBrick::Cookie
           end
         end
 
-        cookie.path    ||= uri.path.to_s.sub(%r%[^/]*$%, '')
+        cookie.path    ||= (uri + './').path
         cookie.secure  ||= false
         cookie.domain  ||= uri.host
         # Move this in to the cookie jar

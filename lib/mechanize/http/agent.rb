@@ -598,7 +598,7 @@ class Mechanize::HTTP::Agent
     when false, nil
       return page
     when :permanent
-      return page if response_class != Net::HTTPMovedPermanently
+      return page unless Net::HTTPMovedPermanently === response
     end
 
     log.info("follow redirect to: #{response['Location']}") if log

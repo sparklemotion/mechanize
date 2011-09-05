@@ -2,6 +2,17 @@
 
 === 2.0.2 / ??
 
+* Mechanize now handles cookies just as normal browsers do, roughly
+  based on RFC 6265.
+  * domain=.example.com (which is invalid) is considered indentical to
+    domain=example.com.
+  * A cookie with domain=example.com is sent to host.sub.example.com
+    as well as host.example.com and example.com.
+  * A cookie with domain=TLD (no dots) is accepted and sent if the
+    host name is TLD, and rejected otherwise.  To retain compatibility
+    and convention, host/domain names starting with "local" are exempt
+    from this rule.
+
 * Bug fixes
   * Mechanize#cookie_jar= works again.  Issue #126
 

@@ -325,8 +325,8 @@ class Mechanize
     @agent.history.max_size = length
   end
 
-  def log=(l); self.class.log = l end
-  def log; self.class.log end
+  def log=(l); Mechanize.log = l end
+  def log; Mechanize.log end
 
   def user_agent= user_agent
     @agent.user_agent = user_agent

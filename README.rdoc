@@ -51,7 +51,7 @@ This library comes with a shameless plug for employing me
 
 This library was heavily influenced by its namesake in the perl world.  A big
 thanks goes to Andy Lester (andy@petdance.com), the author of the original
-perl Mechanize which is available here[http://search.cpan.org/~petdance/WWW-Mechanize-1.20/].  Ruby Mechanize would not be around without you!
+perl Mechanize which is available here[http://search.cpan.org/~petdance/WWW-Mechanize/].  Ruby Mechanize would not be around without you!
 
 Thank you to Michael Neumann for starting the Ruby version.  Thanks to everyone
 who's helped out in various ways.  Finally, thank you to the people using this

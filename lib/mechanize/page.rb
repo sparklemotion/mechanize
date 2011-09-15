@@ -357,7 +357,7 @@ class Mechanize::Page < Mechanize::File
       if meta =~ /charset\s*=\s*(["'])?\s*(.+)\s*\1/i then
         $2
       elsif meta =~ /http-equiv\s*=\s*(["'])?content-type\1/i then
-        meta =~ /content=(["'])?(.*?)\1/i
+        meta =~ /content\s*=\s*(["'])?(.*?)\1/i
 
         m_charset = charset $2
 

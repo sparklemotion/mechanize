@@ -19,7 +19,7 @@ class Mechanize::Page::MetaRefresh < Mechanize::Page::Link
   # element.  Parse requires the uri of the current page to infer a url when
   # no url is specified.
   #
-  # Returns a MetaRefresh instance.
+  # Returns an array of [delay, url]. (both in string)
   #
   # Returns nil if the delay and url cannot be parsed.
 

@@ -524,12 +524,10 @@ class Mechanize::HTTP::Agent
     return unless @follow_meta_refresh
 
     redirect_uri = nil
-    referer      = page
 
     if page.respond_to?(:meta_refresh) and (redirect = page.meta_refresh.first)
       redirect_uri = Mechanize::Util.uri_unescape redirect.uri.to_s
       sleep redirect.node['delay'].to_f
-      referer = Mechanize::Page.new(nil, {'content-type'=>'text/html'})
     elsif refresh = response['refresh']
       delay, redirect_uri = Mechanize::Page::MetaRefresh.parse refresh, uri
       raise Mechanize::Error, 'Invalid refresh http header' unless delay
@@ -540,7 +538,8 @@ class Mechanize::HTTP::Agent
 
     if redirect_uri
       @history.push(page, page.uri)
-      fetch redirect_uri, :get, {}, [], referer, redirects + 1
+      fetch redirect_uri, :get, {}, [],
+            Mechanize::Page.new(nil, {'content-type'=>'text/html'}), redirects + 1
     end
   end
 

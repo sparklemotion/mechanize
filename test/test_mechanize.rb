@@ -366,9 +366,18 @@ class TestMechanize < MiniTest::Unit::TestCase
 
   def test_get_http_refresh
     @mech.follow_meta_refresh = true
+
+    requests = []
+
+    @mech.pre_connect_hooks << lambda { |_, request|
+      requests << request
+    }
+
     page = @mech.get('http://localhost/http_refresh?refresh_time=0')
+
     assert_equal('http://localhost/index.html', page.uri.to_s)
     assert_equal(2, @mech.history.length)
+    assert_nil requests.last['referer']
   end
 
   def test_get_http_refresh_delay

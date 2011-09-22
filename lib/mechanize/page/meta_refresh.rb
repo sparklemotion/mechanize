@@ -48,7 +48,7 @@ class Mechanize::Page::MetaRefresh < Mechanize::Page::Link
   def initialize node, page, delay, href
     super node, page.mech, page
 
-    @delay = delay.to_i
+    @delay = delay =~ /\./ ? delay.to_f : delay.to_i
     @href  = href
   end
 

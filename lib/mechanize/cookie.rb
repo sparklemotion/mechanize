@@ -101,7 +101,16 @@ class Mechanize::Cookie < WEBrick::Cookie
     host = self.class.normalize_domain(uri.host)
 
     return true if host == dom
+
+    # RFC 6265 #5.1.3
+    # Do not perform subdomain matching against IP addresses.
+    return false if host.match(/^(?:[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+|\[[0-9a-fA-F:]+\])$/)
+
+    # RFC 6265 #4.1.1
+    # Domain-value must be a subdomain.
     return false if dom.match(/^(?!local)[^.]+$/)
+    # We exempt local* from this rule for testing purposes for now.
+
     return host.end_with?('.' << dom)
   end
 

@@ -209,6 +209,33 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     assert_equal(0, @jar.cookies(url).length)
   end
 
+  def test_cookie_for_ipv4_address_matches_the_exact_ipaddress
+    url = URI.parse('http://192.168.0.1/')
+
+    cookie = cookie_from_hash(cookie_values(:domain => '192.168.0.1'))
+    @jar.add(url, cookie)
+
+    assert_equal(1, @jar.cookies(url).length)
+  end
+
+  def test_cookie_for_ipv4_address_does_not_cause_subdomain_match
+    url = URI.parse('http://192.168.0.1/')
+
+    cookie = cookie_from_hash(cookie_values(:domain => '.0.1'))
+    @jar.add(url, cookie)
+
+    assert_equal(0, @jar.cookies(url).length)
+  end
+
+  def test_cookie_for_ipv6_address_matches_the_exact_ipaddress
+    url = URI.parse('http://[fe80::0123:4567:89ab:cdef]/')
+
+    cookie = cookie_from_hash(cookie_values(:domain => '[fe80::0123:4567:89ab:cdef]'))
+    @jar.add(url, cookie)
+
+    assert_equal(1, @jar.cookies(url).length)
+  end
+
   def test_cookies_dot
     url = URI.parse('http://www.host.example/')
 

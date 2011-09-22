@@ -233,7 +233,7 @@ class Mechanize::HTTP::Agent
       log.debug("Got cached page") if log
       visited_page(uri) || page
     when Net::HTTPRedirection
-      response_redirect response, method, page, redirects
+      response_redirect response, method, page, redirects, referer
     when Net::HTTPUnauthorized
       response_authenticate(response, page, uri, request, headers, params,
                             referer)
@@ -592,7 +592,7 @@ class Mechanize::HTTP::Agent
     body_io
   end
 
-  def response_redirect response, method, page, redirects
+  def response_redirect response, method, page, redirects, referer = current_page
     case @redirect_ok
     when true, :all
       # shortcut
@@ -604,19 +604,15 @@ class Mechanize::HTTP::Agent
 
     log.info("follow redirect to: #{response['Location']}") if log
 
-    from_uri = page.uri
-
     raise Mechanize::RedirectLimitReachedError.new(page, redirects) if
       redirects + 1 > @redirection_limit
 
     redirect_method = method == :head ? :head : :get
 
-    page = fetch(response['Location'].to_s, redirect_method, {}, [], page,
-                 redirects + 1)
-
+    from_uri = page.uri
     @history.push(page, from_uri)
-
-    return page
+    new_uri = from_uri + response['Location'].to_s
+    fetch(new_uri, redirect_method, {}, [], referer, redirects + 1)
   end
 
   def response_authenticate(response, page, uri, request, headers, params,

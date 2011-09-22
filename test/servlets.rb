@@ -204,6 +204,7 @@ end
 class RedirectOkTest < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     res['Content-Type'] = "text/plain"
+    res['X-Referer'] = req['referer']
     case q = req.query['q']
     when '1'..'2'
       res.status = '301'

@@ -78,4 +78,16 @@ class RefererTest < MiniTest::Unit::TestCase
     page = @agent.click page.links[4]
     assert_equal("", page.body)
   end
+
+  def test_redirection_keeps_referer
+    referer = 'http://localhost/?test=1'
+    @agent.redirect_ok = :permanent
+    page = @agent.get('http://localhost/redirect_ok', nil, referer)
+    assert_equal(referer, page['X-Referer'])
+
+    referer = 'http://localhost/?test=2'
+    @agent.redirect_ok = true
+    page = @agent.get('http://localhost/redirect_ok', nil, referer)
+    assert_equal(referer, page['X-Referer'])
+  end
 end

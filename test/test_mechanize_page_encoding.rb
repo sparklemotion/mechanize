@@ -90,6 +90,13 @@ class TestMechanizePageEncoding < MiniTest::Unit::TestCase
     assert_equal [], charsets
   end
 
+  # Test to fix issue: https://github.com/tenderlove/mechanize/issues/143
+  def test_page_meta_charset_handles_whitespace
+    body = '<meta http-equiv = "Content-Type" content = "text/html; charset=iso-8859-1">'
+    charsets = Mechanize::Page.meta_charset(body)
+    assert_equal ["iso-8859-1"], charsets
+  end
+
   def test_meta_charset
     body = '<meta http-equiv="content-type" content="text/html;charset=META">'
     page = util_page body

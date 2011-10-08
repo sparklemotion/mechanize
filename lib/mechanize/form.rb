@@ -2,6 +2,7 @@ require 'mechanize/element_matcher'
 require 'mechanize/form/field'
 require 'mechanize/form/button'
 require 'mechanize/form/file_upload'
+require 'mechanize/form/keygen'
 require 'mechanize/form/image_button'
 require 'mechanize/form/multi_select_list'
 require 'mechanize/form/option'
@@ -80,6 +81,7 @@ class Mechanize
     def texts    ; @texts     ||=  fields.select { |f| f.class == Text     }; end
     def hiddens  ; @hiddens   ||=  fields.select { |f| f.class == Hidden   }; end
     def textareas; @textareas ||=  fields.select { |f| f.class == Textarea }; end
+    def keygens  ; @keygens   ||=  fields.select { |f| f.class == Keygen   }; end
 
     def submit_button?(button_name)   submits.find{|f| f.name == button_name}; end
     def reset_button?(button_name)     resets.find{|f| f.name == button_name}; end
@@ -426,6 +428,11 @@ class Mechanize
         type = (node['type'] || 'submit').downcase
         next if type == 'reset'
         @buttons << Button.new(node)
+      end
+      
+      # Find all keygen tags
+      form_node.search('keygen').each do |node|
+        @fields << Keygen.new(node, node['value'] || '')
       end
     end
 

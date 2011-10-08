@@ -2,7 +2,7 @@ class Mechanize
   class Form
     # This class represents a field in a form.  It handles the following input
     # tags found in a form:
-    # text, password, hidden, int, textarea
+    # text, password, hidden, int, textarea, keygen
     #
     # To set the value of a field, just use the value method:
     # field.value = "foo"

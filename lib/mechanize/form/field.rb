@@ -35,6 +35,12 @@ class Mechanize
       def dom_id
         node['id']
       end
+
+      # This method is a shortcut to get field's DOM id.
+      # Common usage: form.field_with(:dom_class => "foo")
+      def dom_class
+        node['class']
+      end
     end
 
     class Text     < Field; end

@@ -96,6 +96,15 @@ class Mechanize
       form_node['id']
     end
 
+    # This method is a shortcut to get form's DOM class.
+    # Common usage:
+    #   page.form_with(:dom_class => "foorm")
+    # Note that you can also use +:class+ to get to this method:
+    #   page.form_with(:class => "foorm")
+    def dom_class
+      form_node['class']
+    end
+
     # Add a field with +field_name+ and +value+
     def add_field!(field_name, value = nil)
       fields << Field.new({'name' => field_name}, value)

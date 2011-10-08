@@ -8,6 +8,7 @@ module Mechanize::ElementMatcher
                    else
                      criteria.map do |k, v|
                        k = :dom_id if k.to_sym == :id
+                       k = :dom_class if k.to_sym == :class
                        [k, v]
                      end
                    end

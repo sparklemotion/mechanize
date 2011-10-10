@@ -28,6 +28,7 @@ lib/mechanize/form/check_box.rb
 lib/mechanize/form/field.rb
 lib/mechanize/form/file_upload.rb
 lib/mechanize/form/image_button.rb
+lib/mechanize/form/keygen.rb
 lib/mechanize/form/multi_select_list.rb
 lib/mechanize/form/option.rb
 lib/mechanize/form/radio_button.rb
@@ -105,6 +106,7 @@ test/htdocs/tc_field_precedence.html
 test/htdocs/tc_follow_meta.html
 test/htdocs/tc_form_action.html
 test/htdocs/tc_images.html
+test/htdocs/tc_keygen.html
 test/htdocs/tc_links.html
 test/htdocs/tc_meta_in_body.html
 test/htdocs/tc_no_attributes.html
@@ -122,6 +124,7 @@ test/test_cookies.rb
 test/test_form_action.rb
 test/test_form_as_hash.rb
 test/test_form_button.rb
+test/test_form_keygen.rb
 test/test_frames.rb
 test/test_headers.rb
 test/test_history.rb
@@ -157,6 +160,7 @@ test/test_post_form.rb
 test/test_pretty_print.rb
 test/test_radiobutton.rb
 test/test_redirect_limit_reached.rb
+test/test_redirect_ok.rb
 test/test_referer.rb
 test/test_relative_links.rb
 test/test_request.rb

@@ -275,6 +275,14 @@ class TestMechanizePage < MiniTest::Unit::TestCase
     assert_equal(link, link_by_id)
   end
 
+  def test_links_with_dom_class
+    page = @agent.get("http://localhost/tc_links.html")
+    link = page.links_with(:dom_class => 'thing_link')
+    link_by_class = page.links_with(:class => 'thing_link')
+    assert_equal(1, link.length)
+    assert_equal(link, link_by_class)
+  end
+
   def test_link_with_encoded_space
     page = @agent.get("http://localhost/tc_links.html")
     link = page.link_with(:text => 'encoded space')

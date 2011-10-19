@@ -531,6 +531,20 @@ class TestMechanizeForm < MiniTest::Unit::TestCase
     assert_equal(form.fields_with(:dom_id => 'name_first'), form.fields_with(:id => 'name_first'))
   end
 
+  def test_form_and_fields_dom_class
+    # blatant copypasta of test above
+    page = @agent.get("http://localhost/form_test.html")
+    form = page.form_with(:dom_class => 'really_generic_form')
+    form_by_class = page.form_with(:class => 'really_generic_form')
+
+    assert_equal(1, form.fields_with(:dom_class => 'text_input').length)
+    assert_equal('first_name', form.field_with(:dom_class => 'text_input').name)
+
+    #  *_with(:class => blah) should work exactly like (:dom_class => blah)
+    assert_equal(form, form_by_class)
+    assert_equal(form.fields_with(:dom_class => 'text_input'), form.fields_with(:class => 'text_input'))
+  end
+
   def test_add_field
     page = @agent.get("http://localhost/form_multival.html")
     form = page.form_with(:name => 'post_form')

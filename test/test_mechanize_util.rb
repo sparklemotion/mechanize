@@ -69,7 +69,7 @@ class TestMechanizeUtil < MiniTest::Unit::TestCase
   end
 
   def test_from_native_charset_logs_form_when_encoding_error_raised
-    sio = StringIO.new
+    sio = StringIO.new("")
     log = Logger.new(sio)
     log.level = Logger::DEBUG
 
@@ -81,7 +81,7 @@ class TestMechanizeUtil < MiniTest::Unit::TestCase
   end
 
   def test_from_native_charset_logs_form_when_encoding_error_is_ignored
-    sio = StringIO.new
+    sio = StringIO.new("")
     log = Logger.new(sio)
     log.level = Logger::DEBUG
 

@@ -25,6 +25,7 @@
     * Subdomain match is not performed against an IP address.
   * The original Referer value persists on redirection.  Issue #150
   * Do not send a referer on a Refresh header based redirection.
+  * Fixed encoding error in tests when LANG=C.  Patch #142 by jinschoi.
 
 === 2.0.1 / 2011-06-28
 

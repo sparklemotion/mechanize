@@ -3,6 +3,8 @@
 === 2.1 / ??
 
 * Minor enhancements
+  * Added dom_class to elements and the element matcher like dom_id.  Patch
+    #156 by Dan Hansen.
   * Added support for the HTML5 keygen form element.  See
     http://dev.w3.org/html5/spec/Overview.html#the-keygen-element  Patch #157
     by Victor Costan.

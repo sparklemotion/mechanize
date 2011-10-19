@@ -37,6 +37,13 @@ class Mechanize::Page::Link
     node['id']
   end
 
+  # This method is a shorthand to get a link's DOM class
+  # Common usage:
+  #   page.link_with(:dom_class => "links_exact_class")
+  def dom_class
+    node['class']
+  end
+
   # A list of words in the rel attribute, all lower-cased.
   def rel
     @rel ||= (val = attributes['rel']) ? val.downcase.split(' ') : []

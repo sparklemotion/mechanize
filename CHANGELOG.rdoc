@@ -1,12 +1,17 @@
 = Mechanize CHANGELOG
 
-=== 2.0.2 / ??
+=== 2.1 / ??
+
+* Minor enhancements
+  * Added support for the HTML5 keygen form element.  See
+    http://dev.w3.org/html5/spec/Overview.html#the-keygen-element  Patch #157
+    by Victor Costan.
 
 * Bug fixes
   * Mechanize#cookie_jar= works again.  Issue #126
   * Mechanize now handles cookies just as most modern browsers do,
     roughly based on RFC 6265.
-    * domain=.example.com (which is invalid) is considered indentical to
+    * domain=.example.com (which is invalid) is considered identical to
       domain=example.com.
     * A cookie with domain=example.com is sent to host.sub.example.com
       as well as host.example.com and example.com.

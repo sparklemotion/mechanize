@@ -30,6 +30,7 @@
   * Fixed encoding error in tests when LANG=C.  Patch #142 by jinschoi.
   * The order of items in a form submission now match the DOM order.  Patch
     #129 by kitamomonga
+  * Fixed proxy example in EXAMPLE.  Issue #146 by NielsKSchjoedt
 
 === 2.0.1 / 2011-06-28
 

@@ -1,37 +1,43 @@
-class Mechanize
-  # = Synopsis
-  # This is a pluggable parser that automatically saves every file
-  # it encounters.  It saves the files as a tree, reflecting the
-  # host and file path.
-  #
-  # == Example to save all PDF's
-  #  require 'rubygems'
-  #  require 'mechanize'
-  #
-  #  agent = Mechanize.new
-  #  agent.pluggable_parser.pdf = Mechanize::FileSaver
-  #  agent.get('http://example.com/foo.pdf')
-  #
-  class FileSaver < File
-    attr_reader :filename
+##
+# This is a pluggable parser that automatically saves every file it
+# encounters.  It saves the files as a tree, reflecting the host and file
+# path.
+#
+# == Example
+#
+# This example saves all .pdf files
+#
+#   require 'mechanize'
+#
+#   agent = Mechanize.new
+#   agent.pluggable_parser.pdf = Mechanize::FileSaver
+#   agent.get('http://example.com/foo.pdf')
+#
+#   Dir['example.com/*'] # => foo.pdf
 
-    def initialize(uri=nil, response=nil, body=nil, code=nil)
-      super(uri, response, body, code)
-      path = uri.path.empty? ? 'index.html' : uri.path.gsub(/^[\/]*/, '')
-      path += 'index.html' if path =~ /\/$/
+class Mechanize::FileSaver < Mechanize::File
 
-      split_path = path.split(/\//)
-      filename = split_path.length > 0 ? split_path.pop : 'index.html'
-      joined_path = split_path.join(::File::SEPARATOR)
-      path = if joined_path.empty?
-               uri.host
-             else
-               "#{uri.host}#{::File::SEPARATOR}#{joined_path}"
-             end
+  attr_reader :filename
 
-      @filename = "#{path}#{::File::SEPARATOR}#{filename}"
-      FileUtils.mkdir_p(path)
-      save_as(@filename)
-    end
+  def initialize(uri=nil, response=nil, body=nil, code=nil)
+    super(uri, response, body, code)
+
+    path = uri.path.empty? ? 'index.html' : uri.path.gsub(/^[\/]*/, '')
+    path += 'index.html' if path =~ /\/$/
+
+    split_path = path.split(/\//)
+    filename = split_path.length > 0 ? split_path.pop : 'index.html'
+    joined_path = split_path.join(File::SEPARATOR)
+    path = if joined_path.empty?
+             uri.host
+           else
+             "#{uri.host}#{File::SEPARATOR}#{joined_path}"
+           end
+
+    @filename = "#{path}#{File::SEPARATOR}#{filename}"
+    FileUtils.mkdir_p(path)
+    save_as(@filename)
   end
+
 end
+

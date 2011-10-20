@@ -43,6 +43,19 @@ class PluggableParserTest < MiniTest::Unit::TestCase
     end
   end
 
+  def test_file_saver
+    @agent.pluggable_parser.html = Mechanize::FileSaver
+    page = @agent.get('http://localhost:2000/form_no_action.html')
+    length = page.response['Content-Length']
+    file_length = nil
+    File.open("localhost/form_no_action.html", "r") { |f|
+      file_length = f.read.length
+    }
+
+    FileUtils.rm_rf("localhost")
+    assert_equal(length.to_i, file_length)
+  end
+
   def test_filter
     @agent.pluggable_parser.html = Filter
     page = @agent.get("http://localhost/find_link.html")
@@ -61,18 +74,6 @@ class PluggableParserTest < MiniTest::Unit::TestCase
     assert_kind_of(Filter, page)
     assert_equal(19, page.links.length)
     assert_equal(1, page.links_with(:text => 'Net::DAAP::Client').length)
-  end
-
-  def test_file_saver
-    @agent.pluggable_parser.html = Mechanize::FileSaver
-    page = @agent.get('http://localhost:2000/form_no_action.html')
-    length = page.response['Content-Length']
-    file_length = nil
-    File.open("localhost/form_no_action.html", "r") { |f|
-      file_length = f.read.length
-    }
-    FileUtils.rm_rf("localhost")
-    assert_equal(length.to_i, file_length)
   end
 
   def test_content_type_pdf
@@ -99,38 +100,4 @@ class PluggableParserTest < MiniTest::Unit::TestCase
     assert_kind_of(FileFilter, page)
   end
 
-  def test_file_saver_no_path
-    url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '', nil, nil, nil)
-    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
-    assert_equal('example.com/index.html', fs.filename)
-    FileUtils.rm_rf('example.com')
-  end
-
-  def test_file_saver_slash
-    url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '/', nil, nil, nil)
-    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
-    assert_equal('example.com/index.html', fs.filename)
-    FileUtils.rm_rf('example.com')
-  end
-
-  def test_file_saver_slash_file
-    url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '/foo.html', nil, nil, nil)
-    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
-    assert_equal('example.com/foo.html', fs.filename)
-    FileUtils.rm_rf('example.com')
-  end
-
-  def test_file_saver_long_path_no_file
-    url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '/one/two/', nil, nil, nil)
-    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
-    assert_equal('example.com/one/two/index.html', fs.filename)
-    FileUtils.rm_rf('example.com')
-  end
-
-  def test_file_saver_long_path
-    url = URI::HTTP.new('http', nil, 'example.com', nil, nil, '/one/two/foo.html', nil, nil, nil)
-    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
-    assert_equal('example.com/one/two/foo.html', fs.filename)
-    FileUtils.rm_rf('example.com')
-  end
 end

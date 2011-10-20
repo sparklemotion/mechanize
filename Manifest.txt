@@ -72,6 +72,7 @@ test/htdocs/form_multi_select.html
 test/htdocs/form_multival.html
 test/htdocs/form_no_action.html
 test/htdocs/form_no_input_name.html
+test/htdocs/form_order_test.html
 test/htdocs/form_select.html
 test/htdocs/form_select_all.html
 test/htdocs/form_select_none.html
@@ -138,6 +139,7 @@ test/test_mechanize_cookie_jar.rb
 test/test_mechanize_file.rb
 test/test_mechanize_file_request.rb
 test/test_mechanize_file_response.rb
+test/test_mechanize_file_saver.rb
 test/test_mechanize_form.rb
 test/test_mechanize_form_check_box.rb
 test/test_mechanize_form_encoding.rb

@@ -22,22 +22,14 @@ class Mechanize::FileSaver < Mechanize::File
   def initialize uri = nil, response = nil, body = nil, code = nil
     super
 
-    path = uri.path.empty? ? 'index.html' : uri.path.gsub(/^[\/]*/, '')
-    path += 'index.html' if path =~ /\/$/
+    # ensure the path does not end in /
+    path = uri.path.empty? ? 'index.html' : uri.path
+    path += 'index.html' if path.end_with? '/'
 
-    split_path = path.split(/\//)
-    filename = split_path.length > 0 ? split_path.pop : 'index.html'
+    path = File.join uri.host, path
+    @filename = path.gsub %r%//+%, '/' # make the path pretty
 
-    joined_path = File.join split_path
-
-    path = if joined_path.empty? then
-             uri.host
-           else
-             File.join uri.host, joined_path
-           end
-
-    @filename = File.join path, filename
-    FileUtils.mkdir_p path
+    FileUtils.mkdir_p File.dirname @filename
     save_as @filename
   end
 

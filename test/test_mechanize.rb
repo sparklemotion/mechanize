@@ -364,6 +364,38 @@ class TestMechanize < MiniTest::Unit::TestCase
     assert_match('Hello World', page.body)
   end
 
+  def test_content_encoding_hooks_header
+    h = {'X-ResponseContentEncoding' => 'agzip'}
+
+    # test of X-ResponseContentEncoding feature
+    assert_raises(Mechanize::Error, 'Unsupported Content-Encoding: agzip') do
+      @mech.get("http://localhost/gzip?file=index.html", nil, nil, h)
+    end
+
+    @mech.content_encoding_hooks << lambda{|agent, uri, response, response_body_io|
+      response['content-encoding'] = 'gzip' if response['content-encoding'] == 'agzip'}
+
+    page = @mech.get("http://localhost/gzip?file=index.html", nil, nil, h)
+
+    assert_match('Hello World', page.body)
+  end
+
+  def external_cmd(io); Zlib::GzipReader.new(io).read; end
+
+  def test_content_encoding_hooks_body_io
+    h = {'X-ResponseContentEncoding' => 'unsupported_content_encoding'}
+
+   @mech.content_encoding_hooks << lambda{|agent, uri, response, response_body_io|
+      if response['content-encoding'] == 'unsupported_content_encoding'
+        response['content-encoding'] = 'none'
+        response_body_io.string = external_cmd(response_body_io)
+      end}
+
+    page = @mech.get("http://localhost/gzip?file=index.html", nil, nil, h)
+
+    assert_match('Hello World', page.body)
+  end
+
   def test_get_http_refresh
     @mech.follow_meta_refresh = true
 

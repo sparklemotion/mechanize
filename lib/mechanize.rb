@@ -263,6 +263,12 @@ class Mechanize
     @agent.pre_connect_hooks
   end
 
+  # An array of hooks(Proc objects) to #call before reading response header 'content-encoding'.
+  #    agent.content_encoding_hooks << lambda{|httpagent, uri, http_response, response_body_io| ... }
+  def content_encoding_hooks
+    @agent.content_encoding_hooks
+  end
+
   alias follow_redirect? redirect_ok
 
   @html_parser = Nokogiri::HTML

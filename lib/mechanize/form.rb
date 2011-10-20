@@ -243,7 +243,7 @@ class Mechanize
         successful_controls << b
       }
 
-      successful_controls.sort.each do |ctrl|
+      successful_controls.sort.each do |ctrl| # DOM order
         qval = proc_query(ctrl)
         query.push(*qval)
       end

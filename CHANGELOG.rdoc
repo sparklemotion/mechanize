@@ -3,6 +3,8 @@
 === 2.1 / ??
 
 * Minor enhancements
+  * Added Mechanize#content_encoding_hooks which allow handling of
+    non-standard content encodings like "agzip".  Patch #125 by kitamomonga
   * Added dom_class to elements and the element matcher like dom_id.  Patch
     #156 by Dan Hansen.
   * Added support for the HTML5 keygen form element.  See

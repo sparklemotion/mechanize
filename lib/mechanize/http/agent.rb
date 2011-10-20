@@ -82,30 +82,30 @@ class Mechanize::HTTP::Agent
   attr_reader :http # :nodoc:
 
   def initialize
-    @auth_hash            = {} # Keep track of urls for sending auth
-    @conditional_requests = true
-    @context              = nil
+    @auth_hash              = {} # Keep track of urls for sending auth
+    @conditional_requests   = true
+    @context                = nil
     @content_encoding_hooks = []
-    @cookie_jar           = Mechanize::CookieJar.new
-    @digest               = nil # DigestAuth Digest
-    @digest_auth          = Net::HTTP::DigestAuth.new
-    @follow_meta_refresh  = false
-    @gzip_enabled         = true
-    @history              = Mechanize::History.new
-    @keep_alive_time      = 300
-    @open_timeout         = nil
-    @password             = nil # HTTP auth password
-    @post_connect_hooks   = []
-    @pre_connect_hooks    = []
-    @proxy_uri            = nil
-    @read_timeout         = nil
-    @redirect_ok          = true
-    @redirection_limit    = 20
-    @request_headers      = {}
-    @robots               = false
-    @user                 = nil # HTTP auth user
-    @user_agent           = nil
-    @webrobots            = nil
+    @cookie_jar             = Mechanize::CookieJar.new
+    @digest                 = nil # DigestAuth Digest
+    @digest_auth            = Net::HTTP::DigestAuth.new
+    @follow_meta_refresh    = false
+    @gzip_enabled           = true
+    @history                = Mechanize::History.new
+    @keep_alive_time        = 300
+    @open_timeout           = nil
+    @password               = nil # HTTP auth password
+    @post_connect_hooks     = []
+    @pre_connect_hooks      = []
+    @proxy_uri              = nil
+    @read_timeout           = nil
+    @redirect_ok            = true
+    @redirection_limit      = 20
+    @request_headers        = {}
+    @robots                 = false
+    @user                   = nil # HTTP auth user
+    @user_agent             = nil
+    @webrobots              = nil
 
     @ca_file         = nil # OpenSSL server certificate file
     @cert            = nil # OpenSSL Certificate

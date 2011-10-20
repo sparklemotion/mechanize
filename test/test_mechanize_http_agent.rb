@@ -440,6 +440,17 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     assert_equal 'Unsupported Content-Encoding: unknown', e.message
   end
 
+  def test_hook_content_encoding_response
+    @mech.content_encoding_hooks << lambda{|agent, uri, response, response_body_io|
+      response['content-encoding'] = 'gzip' if response['content-encoding'] == 'agzip'}
+
+    @res.instance_variable_set :@header, 'content-encoding' => %w[agzip]
+    body_io = StringIO.new 'part'
+    @agent.hook_content_encoding @res, @uri, body_io
+
+    assert_equal 'gzip', @res['content-encoding']
+  end
+
   def test_response_cookies
     uri = URI.parse 'http://host.example.com'
     cookie_str = 'a=b domain=.example.com'

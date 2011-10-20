@@ -26,6 +26,8 @@
   * The original Referer value persists on redirection.  Issue #150
   * Do not send a referer on a Refresh header based redirection.
   * Fixed encoding error in tests when LANG=C.  Patch #142 by jinschoi.
+  * The order of items in a form submission now match the DOM order.  Patch
+    #129 by kitamomonga
 
 === 2.0.1 / 2011-06-28
 

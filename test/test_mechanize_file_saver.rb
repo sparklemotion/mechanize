@@ -59,5 +59,12 @@ class TestMechanizeFileSaver < MiniTest::Unit::TestCase
     assert_equal('example.com/foo.html', fs.filename)
   end
 
+  def test_initialize_query
+    url = URI 'http://example.com/?id=5'
+
+    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
+    assert_equal('example.com/index.html?id=5', fs.filename)
+  end
+
 end
 

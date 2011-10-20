@@ -27,7 +27,8 @@ class Mechanize::FileSaver < Mechanize::File
     path += 'index.html' if path.end_with? '/'
 
     path = File.join uri.host, path
-    @filename = path.gsub %r%//+%, '/' # make the path pretty
+    path = path.gsub %r%//+%, '/' # make the path pretty
+    @filename = [path, uri.query].compact.join '?'
 
     FileUtils.mkdir_p File.dirname @filename
     save_as @filename

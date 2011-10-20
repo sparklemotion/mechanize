@@ -19,24 +19,26 @@ class Mechanize::FileSaver < Mechanize::File
 
   attr_reader :filename
 
-  def initialize(uri=nil, response=nil, body=nil, code=nil)
-    super(uri, response, body, code)
+  def initialize uri = nil, response = nil, body = nil, code = nil
+    super
 
     path = uri.path.empty? ? 'index.html' : uri.path.gsub(/^[\/]*/, '')
     path += 'index.html' if path =~ /\/$/
 
     split_path = path.split(/\//)
     filename = split_path.length > 0 ? split_path.pop : 'index.html'
-    joined_path = split_path.join(File::SEPARATOR)
-    path = if joined_path.empty?
+
+    joined_path = File.join split_path
+
+    path = if joined_path.empty? then
              uri.host
            else
-             "#{uri.host}#{File::SEPARATOR}#{joined_path}"
+             File.join uri.host, joined_path
            end
 
-    @filename = "#{path}#{File::SEPARATOR}#{filename}"
-    FileUtils.mkdir_p(path)
-    save_as(@filename)
+    @filename = File.join path, filename
+    FileUtils.mkdir_p path
+    save_as @filename
   end
 
 end

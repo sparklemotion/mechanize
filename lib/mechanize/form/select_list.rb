@@ -1,10 +1,13 @@
-  # This class represents a select list or drop down box in a Form.  Set the
-  # value for the list by calling SelectList#value=.  SelectList contains a
-  # list of Option that were found.  After finding the correct option, set
-  # the select lists value to the option value:
-  #  selectlist.value = selectlist.options.first.value
-  # Options can also be selected by "clicking" or selecting them.  See Option
+# This class represents a select list or drop down box in a Form.  Set the
+# value for the list by calling SelectList#value=.  SelectList contains a list
+# of Option that were found.  After finding the correct option, set the select
+# lists value to the option value:
+#
+#   selectlist.value = selectlist.options.first.value
+#
+# Options can also be selected by "clicking" or selecting them.  See Option
 class Mechanize::Form::SelectList < Mechanize::Form::MultiSelectList
+
   def initialize node
     super
     if selected_options.length > 1
@@ -36,5 +39,6 @@ class Mechanize::Form::SelectList < Mechanize::Form::MultiSelectList
   def query_value
     value ? [[name, value]] : nil
   end
+
 end
 

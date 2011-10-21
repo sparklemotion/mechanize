@@ -342,6 +342,7 @@ class Mechanize::Page < Mechanize::File
   def self.response_header_charset response
     charsets = []
     response.each do |header, value|
+      next unless header == 'content-type'
       next unless value =~ /charset/i
       charsets << charset(value)
     end

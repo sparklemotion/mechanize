@@ -53,7 +53,7 @@ class TestMechanizePageEncoding < MiniTest::Unit::TestCase
   end
 
   def test_page_response_header_charset
-    headers = {'content-type' => 'text/html;charset=HEADER'}
+    headers = { 'content-type' => 'text/html;charset=HEADER' }
     charsets = Mechanize::Page.response_header_charset(headers)
 
     assert_equal ['HEADER'], charsets
@@ -66,6 +66,13 @@ class TestMechanizePageEncoding < MiniTest::Unit::TestCase
     assert_equal [], charsets
 
     headers = {'X-My-Header' => 'hello'}
+    charsets = Mechanize::Page.response_header_charset(headers)
+
+    assert_equal [], charsets
+  end
+
+  def test_page_response_header_charset_wrong_header
+    headers = { 'x-content-type' => 'text/html;charset=bogus' }
     charsets = Mechanize::Page.response_header_charset(headers)
 
     assert_equal [], charsets

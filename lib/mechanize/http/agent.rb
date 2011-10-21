@@ -559,9 +559,10 @@ class Mechanize::HTTP::Agent
       [redirect.delay, redirect.href] unless
         not @follow_meta_refresh_self and redirect.link_self
     elsif refresh = response['refresh']
-      delay, href = Mechanize::Page::MetaRefresh.parse refresh, uri
+      delay, href, link_self = Mechanize::Page::MetaRefresh.parse refresh, uri
       raise Mechanize::Error, 'Invalid refresh http header' unless delay
-      return [delay.to_f, href]
+      [delay.to_f, href] unless
+        not @follow_meta_refresh_self and link_self
     end
   end
 

@@ -440,7 +440,42 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     assert_equal 'Unsupported Content-Encoding: unknown', e.message
   end
 
-  def test_get_meta_refresh_follow_self
+  def test_get_meta_refresh_header_follow_self
+    @agent.follow_meta_refresh = true
+    @agent.follow_meta_refresh_self = true
+
+    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, '',
+                               200, @mech)
+    @res.instance_variable_set :@header, 'refresh' => ['0']
+
+    refresh = @agent.get_meta_refresh @res, @uri, page
+
+    assert_equal [0.0, URI('http://example/')], refresh
+  end
+
+  def test_get_meta_refresh_header_no_follow
+    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, '',
+                               200, @mech)
+    @res.instance_variable_set :@header, 'refresh' => ['0']
+
+    refresh = @agent.get_meta_refresh @res, @uri, page
+
+    assert_nil refresh
+  end
+
+  def test_get_meta_refresh_header_no_follow_self
+    @agent.follow_meta_refresh = true
+
+    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, '',
+                               200, @mech)
+    @res.instance_variable_set :@header, 'refresh' => ['0']
+
+    refresh = @agent.get_meta_refresh @res, @uri, page
+
+    assert_nil refresh
+  end
+
+  def test_get_meta_refresh_meta_follow_self
     @agent.follow_meta_refresh = true
     @agent.follow_meta_refresh_self = true
 
@@ -457,7 +492,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     assert_equal [0, 'http://example/'], refresh
   end
 
-  def test_get_meta_refresh_no_follow
+  def test_get_meta_refresh_meta_no_follow
     body = <<-BODY
 <title></title>
 <meta http-equiv="refresh" content="0">
@@ -471,7 +506,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     assert_nil refresh
   end
 
-  def test_get_meta_refresh_no_follow_self
+  def test_get_meta_refresh_meta_no_follow_self
     @agent.follow_meta_refresh = true
 
     body = <<-BODY

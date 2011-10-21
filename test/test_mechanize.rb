@@ -304,6 +304,7 @@ class TestMechanize < MiniTest::Unit::TestCase
 
   def test_get_follow_meta_refresh_empty_url
     @mech.follow_meta_refresh = true
+    @mech.follow_meta_refresh_self = true
 
     page = @mech.get('http://localhost/refresh_with_empty_url')
 
@@ -329,6 +330,7 @@ class TestMechanize < MiniTest::Unit::TestCase
 
   def test_get_follow_meta_refresh_no_url
     @mech.follow_meta_refresh = true
+    @mech.follow_meta_refresh_self = true
 
     page = @mech.get('http://localhost/refresh_without_url')
 

@@ -12,6 +12,12 @@ class Mechanize::HTTP::Agent
   # Follow HTML meta refresh.  If set to +:anywhere+ meta refresh tags outside
   # of the head element will be followed.
   attr_accessor :follow_meta_refresh
+
+  # Follow an HTML meta refresh that has no "url=" in the content attribute.
+  #
+  # Defaults to false to prevent infinite refresh loops.
+  attr_accessor :follow_meta_refresh_self
+
   attr_accessor :gzip_enabled
   attr_accessor :history
 
@@ -82,30 +88,31 @@ class Mechanize::HTTP::Agent
   attr_reader :http # :nodoc:
 
   def initialize
-    @auth_hash              = {} # Keep track of urls for sending auth
-    @conditional_requests   = true
-    @context                = nil
-    @content_encoding_hooks = []
-    @cookie_jar             = Mechanize::CookieJar.new
-    @digest                 = nil # DigestAuth Digest
-    @digest_auth            = Net::HTTP::DigestAuth.new
-    @follow_meta_refresh    = false
-    @gzip_enabled           = true
-    @history                = Mechanize::History.new
-    @keep_alive_time        = 300
-    @open_timeout           = nil
-    @password               = nil # HTTP auth password
-    @post_connect_hooks     = []
-    @pre_connect_hooks      = []
-    @proxy_uri              = nil
-    @read_timeout           = nil
-    @redirect_ok            = true
-    @redirection_limit      = 20
-    @request_headers        = {}
-    @robots                 = false
-    @user                   = nil # HTTP auth user
-    @user_agent             = nil
-    @webrobots              = nil
+    @auth_hash                = {} # Keep track of urls for sending auth
+    @conditional_requests     = true
+    @context                  = nil
+    @content_encoding_hooks   = []
+    @cookie_jar               = Mechanize::CookieJar.new
+    @digest                   = nil # DigestAuth Digest
+    @digest_auth              = Net::HTTP::DigestAuth.new
+    @follow_meta_refresh      = false
+    @follow_meta_refresh_self = false
+    @gzip_enabled             = true
+    @history                  = Mechanize::History.new
+    @keep_alive_time          = 300
+    @open_timeout             = nil
+    @password                 = nil # HTTP auth password
+    @post_connect_hooks       = []
+    @pre_connect_hooks        = []
+    @proxy_uri                = nil
+    @read_timeout             = nil
+    @redirect_ok              = true
+    @redirection_limit        = 20
+    @request_headers          = {}
+    @robots                   = false
+    @user                     = nil # HTTP auth user
+    @user_agent               = nil
+    @webrobots                = nil
 
     @ca_file         = nil # OpenSSL server certificate file
     @cert            = nil # OpenSSL Certificate
@@ -547,8 +554,10 @@ class Mechanize::HTTP::Agent
   def get_meta_refresh response, uri, page
     return nil unless @follow_meta_refresh
 
-    if page.respond_to?(:meta_refresh) and (redirect = page.meta_refresh.first)
-      return [redirect.delay, redirect.href]
+    if page.respond_to?(:meta_refresh) and
+       (redirect = page.meta_refresh.first) then
+      [redirect.delay, redirect.href] unless
+        not @follow_meta_refresh_self and redirect.link_self
     elsif refresh = response['refresh']
       delay, href = Mechanize::Page::MetaRefresh.parse refresh, uri
       raise Mechanize::Error, 'Invalid refresh http header' unless delay

@@ -10,6 +10,10 @@
   * Added support for the HTML5 keygen form element.  See
     http://dev.w3.org/html5/spec/Overview.html#the-keygen-element  Patch #157
     by Victor Costan.
+  * Mechanize no longer follows meta refreshes that have no "url=" in the
+    content attribute to avoid infinite loops.  To follow a meta refresh to
+    the same page set Mechanize#follow_meta_refresh_self to true.  Issue #134
+    by Jo Hund.
 
 * Bug fixes
   * Mechanize#cookie_jar= works again.  Issue #126

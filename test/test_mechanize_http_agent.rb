@@ -440,6 +440,53 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     assert_equal 'Unsupported Content-Encoding: unknown', e.message
   end
 
+  def test_get_meta_refresh_follow_self
+    @agent.follow_meta_refresh = true
+    @agent.follow_meta_refresh_self = true
+
+    body = <<-BODY
+<title></title>
+<meta http-equiv="refresh" content="0">
+    BODY
+
+    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, body,
+                               200, @mech)
+
+    refresh = @agent.get_meta_refresh @res, @uri, page
+
+    assert_equal [0, 'http://example/'], refresh
+  end
+
+  def test_get_meta_refresh_no_follow
+    body = <<-BODY
+<title></title>
+<meta http-equiv="refresh" content="0">
+    BODY
+
+    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, body,
+                               200, @mech)
+
+    refresh = @agent.get_meta_refresh @res, @uri, page
+
+    assert_nil refresh
+  end
+
+  def test_get_meta_refresh_no_follow_self
+    @agent.follow_meta_refresh = true
+
+    body = <<-BODY
+<title></title>
+<meta http-equiv="refresh" content="0">
+    BODY
+
+    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, body,
+                               200, @mech)
+
+    refresh = @agent.get_meta_refresh @res, @uri, page
+
+    assert_nil refresh
+  end
+
   def test_hook_content_encoding_response
     @mech.content_encoding_hooks << lambda{|agent, uri, response, response_body_io|
       response['content-encoding'] = 'gzip' if response['content-encoding'] == 'agzip'}
@@ -497,6 +544,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
                                200, @mech)
 
     @agent.follow_meta_refresh = true
+    @agent.follow_meta_refresh_self = true
 
     page = @agent.response_follow_meta_refresh @res, uri, page, 0
 

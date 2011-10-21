@@ -24,37 +24,48 @@ class TestMechanizePageMetaRefresh < MiniTest::Unit::TestCase
   end
 
   def test_class_parse
-    delay, uri = @MR.parse "0; url=http://localhost:8080/path", @uri
+    delay, uri, link_self = @MR.parse "0; url=http://localhost:8080/path", @uri
     assert_equal "0", delay
     assert_equal "http://localhost:8080/path", uri.to_s
+    refute link_self
 
-    delay, uri = @MR.parse "100.001; url=http://localhost:8080/path", @uri
+    delay, uri, link_self =
+      @MR.parse "100.001; url=http://localhost:8080/path", @uri
     assert_equal "100.001", delay
     assert_equal "http://localhost:8080/path", uri.to_s
+    refute link_self
 
-    delay, uri = @MR.parse "0; url='http://localhost:8080/path'", @uri
+    delay, uri, link_self =
+      @MR.parse "0; url='http://localhost:8080/path'", @uri
     assert_equal "0", delay
     assert_equal "http://localhost:8080/path", uri.to_s
+    refute link_self
 
-    delay, uri = @MR.parse "0; url=\"http://localhost:8080/path\"", @uri
+    delay, uri, link_self =
+      @MR.parse "0; url=\"http://localhost:8080/path\"", @uri
     assert_equal "0", delay
     assert_equal "http://localhost:8080/path", uri.to_s
+    refute link_self
 
-    delay, uri = @MR.parse "0; url=", @uri
+    delay, uri, link_self = @MR.parse "0; url=", @uri
     assert_equal "0", delay
     assert_equal "http://example/here/", uri.to_s
+    assert link_self
 
-    delay, uri = @MR.parse "0", @uri
+    delay, uri, link_self = @MR.parse "0", @uri
     assert_equal "0", delay
     assert_equal "http://example/here/", uri.to_s
+    assert link_self
 
-    delay, uri = @MR.parse "   0;   ", @uri
+    delay, uri, link_self = @MR.parse "   0;   ", @uri
     assert_equal "0", delay
     assert_equal "http://example/here/", uri.to_s
+    assert link_self
 
-    delay, uri = @MR.parse "0; UrL=http://localhost:8080/path", @uri
+    delay, uri, link_self = @MR.parse "0; UrL=http://localhost:8080/path", @uri
     assert_equal "0", delay
     assert_equal "http://localhost:8080/path", uri.to_s
+    refute link_self
   end
 
   def test_class_from_node

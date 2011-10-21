@@ -5,13 +5,23 @@
 
 class Mechanize::Page::MetaRefresh < Mechanize::Page::Link
 
+  ##
+  # Time to wait before next refresh
+
   attr_reader :delay
+
+  ##
+  # This MetaRefresh links did not contain a url= in the content attribute and
+  # links to itself.
+
+  attr_reader :link_self
 
   ##
   # Matches the content attribute of a meta refresh element.  After the match:
   #
   #   $1:: delay
   #   $3:: url
+
   CONTENT_REGEXP = /^\s*(\d+\.?\d*)(;|;\s*url=\s*['"]?(\S*?)['"]?)?\s*$/i
 
   ##
@@ -26,30 +36,32 @@ class Mechanize::Page::MetaRefresh < Mechanize::Page::Link
   def self.parse content, base_uri
     return unless content =~ CONTENT_REGEXP
 
+    link_self = $3.nil? || $3.empty?
     delay, refresh_uri = $1, $3
 
     dest = base_uri
     dest += refresh_uri if refresh_uri
 
-    return delay, dest
+    return delay, dest, link_self
   end
 
   def self.from_node node, page, uri
     http_equiv = node['http-equiv']
     return unless http_equiv and http_equiv.downcase == 'refresh'
 
-    delay, uri = parse node['content'], uri
+    delay, uri, link_self = parse node['content'], uri
 
     return unless delay
 
-    new node, page, delay, uri.to_s
+    new node, page, delay, uri.to_s, link_self
   end
 
-  def initialize node, page, delay, href
+  def initialize node, page, delay, href, link_self = false
     super node, page.mech, page
 
-    @delay = delay =~ /\./ ? delay.to_f : delay.to_i
-    @href  = href
+    @delay     = delay =~ /\./ ? delay.to_f : delay.to_i
+    @href      = href
+    @link_self = link_self
   end
 
 end

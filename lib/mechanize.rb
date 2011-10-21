@@ -191,6 +191,17 @@ class Mechanize
     @agent.follow_meta_refresh = follow
   end
 
+  # Follow an HTML meta refresh that has no "url=" in the content attribute.
+  #
+  # Defaults to false to prevent infinite refresh loops.
+  def follow_meta_refresh_self
+    @agent.follow_meta_refresh_self
+  end
+
+  def follow_meta_refresh_self= follow
+    @agent.follow_meta_refresh_self = follow
+  end
+
   # A callback for additional certificate verification.  See
   # OpenSSL::SSL::SSLContext#verify_callback
   #

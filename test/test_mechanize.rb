@@ -356,6 +356,14 @@ class TestMechanize < MiniTest::Unit::TestCase
     assert_nil requests.last['referer']
   end
 
+  def test_follow_meta_refresh_self
+    refute @mech.agent.follow_meta_refresh_self
+
+    @mech.follow_meta_refresh_self = true
+
+    assert @mech.agent.follow_meta_refresh_self
+  end
+
   def test_get_gzip
     page = @mech.get("http://localhost/gzip?file=index.html")
 

@@ -160,10 +160,15 @@ class TestMechanizePageEncoding < MiniTest::Unit::TestCase
   end
 
   def test_parser_encoding_when_searching_elements
-    body = '<span id="isoencoded">hi</span>'
-    page = util_page body
-    us_encoded_string = page.search('#isoencoded').text.encoding.to_s
+    skip "Encoding not implemented" unless Object.const_defined? :Encoding
+    
+    body = '<span id="latin1">hi</span>'
+    page = util_page body, 'content-type' => 'text/html,charset=ISO-8859-1'
 
-    assert_equal page.encoding, us_encoded_string
+    result = page.search('#latin1')
+
+    assert_equal Encoding::UTF_8, result.text.encoding
   end
+
 end
+

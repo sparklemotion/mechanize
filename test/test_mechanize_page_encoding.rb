@@ -151,4 +151,12 @@ class TestMechanizePageEncoding < MiniTest::Unit::TestCase
 
     assert_equal 'ISO-8859-2', page.encoding
   end
+
+  def test_parser_encoding_when_searching_elements
+    body = '<span id="isoencoded">hi</span>'
+    page = util_page body
+    us_encoded_string = page.search('#isoencoded').text.encoding.to_s
+
+    assert_equal page.encoding, us_encoded_string
+  end
 end

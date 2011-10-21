@@ -334,7 +334,7 @@ class Mechanize::Page < Mechanize::File
   end
 
   def self.charset content_type
-    charset = content_type[/charset=([^; ]+)/i, 1]
+    content_type && charset = content_type[/charset=([^; ]+)/i, 1]
     return nil if charset == 'none'
     charset
   end

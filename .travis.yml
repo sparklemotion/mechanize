@@ -1,0 +1,11 @@
+before_script:
+  - gem install hoe
+  - rake check_extra_deps
+rvm:
+  - 1.8.7
+  - 1.9.2
+  - 1.9.3
+  - ruby-head
+notifications:
+  email:
+    - drbrain@segment7.net

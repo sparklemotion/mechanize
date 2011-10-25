@@ -81,6 +81,15 @@ class Mechanize
     @agent.cookie_jar = cookie_jar
   end
 
+  # Reset connections that have not been used in this many seconds
+  def idle_timeout
+    @agent.idle_timeout
+  end
+
+  def idle_timeout= idle_timeout
+    @agent.idle_timeout = idle_timeout
+  end
+
   # Length of time to wait until a connection is opened in seconds
   def open_timeout
     @agent.open_timeout

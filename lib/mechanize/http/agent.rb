@@ -21,6 +21,9 @@ class Mechanize::HTTP::Agent
   attr_accessor :gzip_enabled
   attr_accessor :history
 
+  # Reset connections that have not been used in this many seconds
+  attr_accessor  :idle_timeout
+
   # Length of time to wait until a connection is opened in seconds
   attr_accessor :open_timeout
 
@@ -99,6 +102,7 @@ class Mechanize::HTTP::Agent
     @follow_meta_refresh_self = false
     @gzip_enabled             = true
     @history                  = Mechanize::History.new
+    @idle_timeout             = nil
     @keep_alive_time          = 300
     @open_timeout             = nil
     @password                 = nil # HTTP auth password
@@ -697,6 +701,7 @@ class Mechanize::HTTP::Agent
     @http = Net::HTTP::Persistent.new 'mechanize', @proxy_uri
 
     @http.keep_alive = @keep_alive_time
+    @http.idle_timeout = @idle_timeout if @idle_timeout
 
     @http.ca_file         = @ca_file
     @http.verify_callback = @verify_callback

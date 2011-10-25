@@ -3,6 +3,10 @@
 === 2.1 / ??
 
 * Minor enhancements
+  * Mechanize now depends on net-http-persistent 2.2+.  This new version
+    brings idle timeouts to help with the dreaded "too many connection resets"
+    issue when POSTing to a closed connection.  Also, SSL connections will be
+    verified against the system certificate store by default.  Issue #123
   * Added Mechanize#content_encoding_hooks which allow handling of
     non-standard content encodings like "agzip".  Patch #125 by kitamomonga
   * Added dom_class to elements and the element matcher like dom_id.  Patch

@@ -608,6 +608,12 @@ class TestMechanize < MiniTest::Unit::TestCase
     }
   end
 
+  def test_idle_timeout_equals
+    @mech.idle_timeout = 5
+
+    assert_equal 5, @mech.idle_timeout
+  end
+
   def test_keep_alive_time
     assert_equal 0, @mech.keep_alive_time
 

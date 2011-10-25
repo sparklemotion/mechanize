@@ -778,6 +778,14 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     assert_equal 'UTF-8', page.encoding
   end
 
+  def test_set_http
+    @agent.idle_timeout = 1
+    @agent.set_http
+
+    assert_equal 'mechanize', @agent.http.name
+    assert_equal 1, @agent.http.idle_timeout
+  end
+
   def test_set_proxy
     @agent.set_proxy('www.example.com', 9001, 'joe', 'lol')
 

@@ -21,6 +21,8 @@
     content attribute to avoid infinite loops.  To follow a meta refresh to
     the same page set Mechanize#follow_meta_refresh_self to true.  Issue #134
     by Jo Hund.
+  * Updated 'Mac Safari' User-Agent alias to Safari 5.1.1.  'Mac Safari 4' can
+    be used for the old 'Mac Safari' alias.
 
 * Bug fixes
   * Mechanize#cookie_jar= works again.  Issue #126

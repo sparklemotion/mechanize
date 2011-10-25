@@ -7,6 +7,9 @@
     brings idle timeouts to help with the dreaded "too many connection resets"
     issue when POSTing to a closed connection.  Also, SSL connections will be
     verified against the system certificate store by default.  Issue #123
+  * Added Mechanize#retry_change_requests to allow mechanize to retry POST and
+    other non-idempotent requests when you know it is safe to do so.  Issue
+    #123
   * Added Mechanize#content_encoding_hooks which allow handling of
     non-standard content encodings like "agzip".  Patch #125 by kitamomonga
   * Added dom_class to elements and the element matcher like dom_id.  Patch

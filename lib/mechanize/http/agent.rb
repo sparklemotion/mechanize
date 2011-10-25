@@ -59,6 +59,10 @@ class Mechanize::HTTP::Agent
 
   attr_accessor :request_headers
 
+  # Retry non-idempotent requests?
+
+  attr_reader :retry_change_requests
+
   # When true, this agent will consult the site's robots.txt for each access.
 
   attr_reader :robots
@@ -113,6 +117,7 @@ class Mechanize::HTTP::Agent
     @redirect_ok              = true
     @redirection_limit        = 20
     @request_headers          = {}
+    @retry_change_requests    = false
     @robots                   = false
     @user                     = nil # HTTP auth user
     @user_agent               = nil
@@ -305,6 +310,12 @@ class Mechanize::HTTP::Agent
     @pre_connect_hooks.each do |hook|
       hook.call self, request
     end
+  end
+
+  # Retry non-idempotent requests
+  def retry_change_requests= retri
+    @retry_change_requests = retri
+    @http.retry_change_requests = retri if @http
   end
 
   def request_auth request, uri
@@ -702,6 +713,7 @@ class Mechanize::HTTP::Agent
 
     @http.keep_alive = @keep_alive_time
     @http.idle_timeout = @idle_timeout if @idle_timeout
+    @http.retry_change_requests = @retry_change_requests
 
     @http.ca_file         = @ca_file
     @http.verify_callback = @verify_callback

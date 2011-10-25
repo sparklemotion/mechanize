@@ -699,6 +699,14 @@ class TestMechanize < MiniTest::Unit::TestCase
     assert_equal 5, @mech.read_timeout
   end
 
+  def test_retry_change_requests_equals
+    refute @mech.retry_change_requests
+
+    @mech.retry_change_requests = true
+
+    assert @mech.retry_change_requests
+  end
+
   def test_set_proxy
     http = @mech.agent.http
 

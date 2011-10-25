@@ -779,11 +779,26 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
   end
 
   def test_set_http
+    @agent.set_http
+
+    assert_equal 'mechanize', @agent.http.name
+    refute @agent.http.retry_change_requests
+  end
+
+  def test_set_http_idle_timeout
     @agent.idle_timeout = 1
     @agent.set_http
 
     assert_equal 'mechanize', @agent.http.name
     assert_equal 1, @agent.http.idle_timeout
+  end
+
+  def test_set_http_retry_change_request
+    @agent.retry_change_requests = true
+    @agent.set_http
+
+    assert_equal 'mechanize', @agent.http.name
+    assert @agent.http.retry_change_requests
   end
 
   def test_set_proxy

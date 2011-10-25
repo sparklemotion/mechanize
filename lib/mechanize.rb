@@ -108,6 +108,15 @@ class Mechanize
     @agent.read_timeout = read_timeout
   end
 
+  # Retry POST and other non-idempotent requests.  See RFC 2616 9.1.2.
+  def retry_change_requests
+    @agent.retry_change_requests
+  end
+
+  def retry_change_requests= retry_change_requests
+    @agent.retry_change_requests = retry_change_requests
+  end
+
   # The identification string for the client initiating a web request
   def user_agent
     @agent.user_agent

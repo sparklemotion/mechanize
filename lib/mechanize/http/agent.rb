@@ -22,7 +22,7 @@ class Mechanize::HTTP::Agent
   attr_accessor :history
 
   # Reset connections that have not been used in this many seconds
-  attr_accessor  :idle_timeout
+  attr_reader   :idle_timeout
 
   # Length of time to wait until a connection is opened in seconds
   attr_accessor :open_timeout
@@ -283,6 +283,12 @@ class Mechanize::HTTP::Agent
     when 'file' then
       Mechanize::FileRequest.new uri
     end
+  end
+
+  # Sets the conection idle timeout for persistent connections
+  def idle_timeout= timeout
+    @idle_timeout = timeout
+    @http.idle_timeout = timeout if @http
   end
 
   def log

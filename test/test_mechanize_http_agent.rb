@@ -123,6 +123,13 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     assert_equal '/', request.path
   end
 
+  def test_idle_timeout_equals
+    @agent.set_http
+    @agent.idle_timeout = 1
+
+    assert_equal 1, @agent.http.idle_timeout
+  end
+
   def test_post_connect
     @agent.post_connect_hooks << proc { |agent, uri, response, body|
       assert_equal @agent, agent

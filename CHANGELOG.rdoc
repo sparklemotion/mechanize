@@ -17,6 +17,11 @@
     All responses larger than Mechanize#max_file_buffer are downloaded to a
     Tempfile.  For backwards compatibility Mechanize::File subclasses still
     load the response body into memory.
+
+    To force all unknown content types to download to disk instead of memory
+    set:
+
+      agent.pluggable_parser.default = Mechanize::Download
   * Added Mechanize#content_encoding_hooks which allow handling of
     non-standard content encodings like "agzip".  Patch #125 by kitamomonga
   * Added dom_class to elements and the element matcher like dom_id.  Patch

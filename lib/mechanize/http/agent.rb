@@ -193,11 +193,11 @@ class Mechanize::HTTP::Agent
     enable_gzip request
 
     request_language_charset request
-    request_cookies request, uri
-    request_host request, uri
-    request_referer request, uri, referer_uri
-    request_user_agent request
-    request_add_headers request, headers
+    request_cookies          request, uri
+    request_host             request, uri
+    request_referer          request, uri, referer_uri
+    request_user_agent       request
+    request_add_headers      request, headers
 
     pre_connect request
 

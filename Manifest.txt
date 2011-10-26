@@ -16,6 +16,7 @@ lib/mechanize.rb
 lib/mechanize/content_type_error.rb
 lib/mechanize/cookie.rb
 lib/mechanize/cookie_jar.rb
+lib/mechanize/download.rb
 lib/mechanize/element_matcher.rb
 lib/mechanize/file.rb
 lib/mechanize/file_connection.rb
@@ -46,6 +47,7 @@ lib/mechanize/page/image.rb
 lib/mechanize/page/label.rb
 lib/mechanize/page/link.rb
 lib/mechanize/page/meta_refresh.rb
+lib/mechanize/parser.rb
 lib/mechanize/pluggable_parsers.rb
 lib/mechanize/redirect_limit_reached_error.rb
 lib/mechanize/redirect_not_get_or_head_error.rb
@@ -136,6 +138,7 @@ test/test_images.rb
 test/test_mechanize.rb
 test/test_mechanize_cookie.rb
 test/test_mechanize_cookie_jar.rb
+test/test_mechanize_download.rb
 test/test_mechanize_file.rb
 test/test_mechanize_file_request.rb
 test/test_mechanize_file_response.rb
@@ -151,6 +154,7 @@ test/test_mechanize_link.rb
 test/test_mechanize_page_encoding.rb
 test/test_mechanize_page_link.rb
 test/test_mechanize_page_meta_refresh.rb
+test/test_mechanize_parser.rb
 test/test_mechanize_redirect_not_get_or_head_error.rb
 test/test_mechanize_subclass.rb
 test/test_mechanize_util.rb
@@ -168,7 +172,6 @@ test/test_relative_links.rb
 test/test_request.rb
 test/test_response_code.rb
 test/test_robots.rb
-test/test_save_file.rb
 test/test_scheme.rb
 test/test_select.rb
 test/test_select_all.rb

@@ -19,7 +19,7 @@ class TestMechanize < MiniTest::Unit::TestCase
   def setup
     @mech = Mechanize.new
     @mech.log = nil
-    @uri = URI.parse 'http://example/'
+    @uri = URI 'http://example/'
     @req = Net::HTTP::Get.new '/'
 
     @res = Net::HTTPOK.allocate
@@ -487,7 +487,7 @@ class TestMechanize < MiniTest::Unit::TestCase
   end
 
   def test_get_referer_file
-    uri = URI.parse 'http://tenderlovemaking.com/crossdomain.xml'
+    uri = URI 'http://tenderlovemaking.com/crossdomain.xml'
     file = Mechanize::File.new uri
 
     @mech.get('http://localhost', [], file)
@@ -622,6 +622,12 @@ class TestMechanize < MiniTest::Unit::TestCase
     assert_equal 1, @mech.keep_alive_time
   end
 
+  def test_max_file_buffer_equals
+    @mech.max_file_buffer = 1024
+
+    assert_equal 1024, @mech.agent.max_file_buffer
+  end
+
   def test_max_history_equals
     @mech.max_history = 10
     0.upto(10) do |i|
@@ -639,6 +645,17 @@ class TestMechanize < MiniTest::Unit::TestCase
     @mech.open_timeout = 5
 
     assert_equal 5, @mech.open_timeout
+  end
+
+  def test_parser_download
+    @mech.pluggable_parser['application/octet-stream'] = Mechanize::Download
+
+    response = { 'Content-Type' => 'application/octet-stream' }
+    def response.code() 200 end
+
+    download = @mech.parse @uri, response, StringIO.new('raw')
+
+    assert_kind_of Mechanize::Download, download
   end
 
   def test_post_basic_auth

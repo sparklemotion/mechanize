@@ -1,53 +1,59 @@
 require "helper"
 
 class TestMechanizeFile < MiniTest::Unit::TestCase
-  def test_content_disposition
-    file = Mechanize::File.new(
-                                    URI.parse('http://localhost/foo'),
-           { 'content-disposition' => 'attachment; filename=genome.jpeg; modification-date="Wed, 12 Feb 1997 16:29:51 -0500"', }
-           )
-    assert_equal('genome.jpeg', file.filename)
 
-    file = Mechanize::File.new(
-                                    URI.parse('http://localhost/foo'),
-           { 'content-disposition' => 'filename=genome.jpeg; modification-date="Wed, 12 Feb 1997 16:29:51 -0500"', }
-           )
-    assert_equal('genome.jpeg', file.filename)
-
-    file = Mechanize::File.new(
-                                    URI.parse('http://localhost/foo'),
-           { 'content-disposition' => 'filename=genome.jpeg', }
-           )
-    assert_equal('genome.jpeg', file.filename)
+  def setup
+    @parser = Mechanize::File
   end
 
-  def test_content_disposition_double_semicolon
-    agent = Mechanize.new
-    page = agent.get("http://localhost/http_headers?content-disposition=#{CGI.escape('attachment;; filename=fooooo')}")
-    assert page.parser
+  def test_save
+    uri = URI 'http://example/name.html'
+    page = Mechanize::File.new uri, nil, '0123456789'
+
+    Dir.mktmpdir do |dir|
+      Dir.chdir dir do
+        page.save 'test.html'
+
+        assert_equal '0123456789', File.read('test.html')
+      end
+    end
   end
 
-  def test_from_uri
-    file = Mechanize::File.new(
-                                    URI.parse('http://localhost/foo'),
-                                    {}
-           )
-    assert_equal('foo.html', file.filename)
+  def test_save_default
+    uri = URI 'http://example/test.html'
+    page = Mechanize::File.new uri, nil, ''
 
-    file = Mechanize::File.new(
-                                    URI.parse('http://localhost/foo.jpg'),
-                                    {}
-           )
-    assert_equal('foo.jpg', file.filename)
+    Dir.mktmpdir do |dir|
+      Dir.chdir dir do
+        page.save
 
-    file = Mechanize::File.new(
-                                    URI.parse('http://localhost/foo.jpg')
-           )
-    assert_equal('foo.jpg', file.filename)
+        assert File.exist? 'test.html'
+
+        page.save
+
+        assert File.exist? 'test.html.1'
+
+        page.save
+
+        assert File.exist? 'test.html.2'
+      end
+    end
   end
 
-  def test_no_uri
-    file = Mechanize::File.new()
-    assert_equal('index.html', file.filename)
+  def test_save_default_dots
+    uri = URI 'http://localhost/../test.html'
+    page = Mechanize::File.new uri, nil, ''
+
+    Dir.mktmpdir do |dir|
+      Dir.chdir dir do
+        page.save
+        assert File.exist? 'test.html'
+
+        page.save
+        assert File.exist? 'test.html.1'
+      end
+    end
   end
+
 end
+

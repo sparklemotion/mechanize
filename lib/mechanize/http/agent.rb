@@ -1,3 +1,5 @@
+require 'tempfile'
+
 ##
 # An HTTP (and local disk access) user agent
 
@@ -69,6 +71,10 @@ class Mechanize::HTTP::Agent
 
   attr_accessor :scheme_handlers
 
+  # Responses larger than this will be written to a Tempfile instead of stored
+  # in memory.
+  attr_accessor :max_file_buffer
+
   attr_accessor :user
   attr_reader :user_agent
 
@@ -108,6 +114,7 @@ class Mechanize::HTTP::Agent
     @history                  = Mechanize::History.new
     @idle_timeout             = nil
     @keep_alive_time          = 300
+    @max_file_buffer          = 10240
     @open_timeout             = nil
     @password                 = nil # HTTP auth password
     @post_connect_hooks       = []
@@ -207,6 +214,8 @@ class Mechanize::HTTP::Agent
     end
 
     # Add If-Modified-Since if page is in history
+    page = visited_page(uri)
+
     if (page = visited_page(uri)) and page.response['Last-Modified']
       request['If-Modified-Since'] = page.response['Last-Modified']
     end if(@conditional_requests)
@@ -289,6 +298,19 @@ class Mechanize::HTTP::Agent
   def idle_timeout= timeout
     @idle_timeout = timeout
     @http.idle_timeout = timeout if @http
+  end
+
+  def inflate compressed, window_bits = nil
+    inflate = Zlib::Inflate.new window_bits
+    out_io = Tempfile.new 'mechanize-decode'
+
+    until compressed.eof? do
+      out_io.write inflate.inflate compressed.read 1024
+    end
+
+    out_io.write inflate.finish
+
+    out_io
   end
 
   def log
@@ -485,25 +507,35 @@ class Mechanize::HTTP::Agent
   end
 
   def response_content_encoding response, body_io
-    length = response.content_length || body_io.length
+    length = response.content_length
+
+    length = case body_io
+             when IO, Tempfile then
+               body_io.stat.size
+             else
+               body_io.length
+             end unless length
+
+    out_io = nil
 
     case response['Content-Encoding']
     when nil, 'none', '7bit' then
-      body_io.string
+      out_io = body_io
     when 'deflate' then
       log.debug('deflate body') if log
 
       return if length.zero?
 
       begin
-        Zlib::Inflate.inflate body_io.string
+        out_io = inflate body_io
       rescue Zlib::BufError, Zlib::DataError
         log.error('Unable to inflate page, retrying with raw deflate') if log
+        body_io.rewind
         begin
-          Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body_io.string)
+          out_io = inflate body_io, -Zlib::MAX_WBITS
         rescue Zlib::BufError, Zlib::DataError
           log.error("unable to inflate page: #{$!}") if log
-          ''
+          nil
         end
       end
     when 'gzip', 'x-gzip' then
@@ -513,12 +545,17 @@ class Mechanize::HTTP::Agent
 
       begin
         zio = Zlib::GzipReader.new body_io
-        zio.read
+        out_io = Tempfile.new 'mechanize-decode'
+
+        until zio.eof? do
+          out_io.write zio.read 16384
+        end
       rescue Zlib::BufError, Zlib::GzipFile::Error
         log.error('Unable to gunzip body, trying raw inflate') if log
         body_io.rewind
         body_io.read 10
-        Zlib::Inflate.new(-Zlib::MAX_WBITS).inflate(body_io.read)
+
+        out_io = inflate body_io, -Zlib::MAX_WBITS
       rescue Zlib::DataError
         log.error("unable to gunzip page: #{$!}") if log
         ''
@@ -529,6 +566,11 @@ class Mechanize::HTTP::Agent
       raise Mechanize::Error,
             "Unsupported Content-Encoding: #{response['Content-Encoding']}"
     end
+
+    out_io.flush
+    out_io.rewind
+
+    out_io
   end
 
   def hook_content_encoding response, uri, response_body_io
@@ -598,18 +640,36 @@ class Mechanize::HTTP::Agent
     end
   end
 
-  def response_parse response, body, uri
-    @context.parse uri, response, body
+  def response_parse response, body_io, uri
+    @context.parse uri, response, body_io
   end
 
   def response_read response, request
-    body_io = StringIO.new
+    content_length = response.content_length
+
+    if content_length and content_length > @max_file_buffer then
+      body_io = Tempfile.new 'mechanize-raw'
+      body_io.binmode if defined? body_io.binmode
+    else
+      body_io = StringIO.new
+    end
+
     body_io.set_encoding Encoding::BINARY if body_io.respond_to? :set_encoding
     total = 0
 
     begin
       response.read_body { |part|
         total += part.length
+
+        if StringIO === body_io and total > @max_file_buffer then
+          new_io = Tempfile.new 'mechanize-raw'
+          new_io.binmode if defined? binmode
+
+          new_io.write body_io.string
+
+          body_io = new_io
+        end
+
         body_io.write(part)
         log.debug("Read #{part.length} bytes (#{total} total)") if log
       }
@@ -618,6 +678,7 @@ class Mechanize::HTTP::Agent
       raise Mechanize::ResponseReadError.new(e, response, body_io)
     end
 
+    body_io.flush
     body_io.rewind
 
     raise Mechanize::ResponseCodeError, response if

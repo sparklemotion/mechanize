@@ -361,6 +361,16 @@ class Mechanize
     @agent.history.max_size = length
   end
 
+  # Responses larger than this will be written to a Tempfile instead of stored
+  # in memory.  The default is 10240 bytes
+  def max_file_buffer
+    @agent.max_file_buffer
+  end
+
+  def max_file_buffer= bytes
+    @agent.max_file_buffer = bytes
+  end
+
   def log=(l); Mechanize.log = l end
   def log; Mechanize.log end
 
@@ -605,11 +615,20 @@ class Mechanize
     # Find our pluggable parser
     parser_klass = @pluggable_parser.parser content_type
 
+    unless Mechanize::Download === parser_klass then
+      body = case body
+             when IO, Tempfile, StringIO then
+               body.read
+             else
+               body
+             end
+    end
+
     parser_klass.new uri, response, body, response.code do |parser|
       parser.mech = self if parser.respond_to? :mech=
 
-      parser.watch_for_set = @watch_for_set if
-        @watch_for_set and parser.respond_to?(:watch_for_set=)
+        parser.watch_for_set = @watch_for_set if
+      @watch_for_set and parser.respond_to?(:watch_for_set=)
     end
   end
 
@@ -678,6 +697,8 @@ end
 require 'mechanize/content_type_error'
 require 'mechanize/cookie'
 require 'mechanize/cookie_jar'
+require 'mechanize/parser'
+require 'mechanize/download'
 require 'mechanize/file'
 require 'mechanize/file_connection'
 require 'mechanize/file_request'

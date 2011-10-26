@@ -360,7 +360,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
 
     body = @agent.response_content_encoding @res, StringIO.new('part')
 
-    assert_equal 'part', body
+    assert_equal 'part', body.read
   end
 
   def test_response_content_encoding_deflate
@@ -370,7 +370,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
 
     body = @agent.response_content_encoding @res, body_io
 
-    assert_equal 'part', body
+    assert_equal 'part', body.read
   end
 
   def test_response_content_encoding_deflate_chunked
@@ -380,7 +380,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
 
     body = @agent.response_content_encoding @res, body_io
 
-    assert_equal 'part', body
+    assert_equal 'part', body.read
   end
 
   # IIS/6.0 ASP.NET/2.0.50727 does not wrap deflate with zlib, WTF?
@@ -390,7 +390,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
 
     body = @agent.response_content_encoding @res, StringIO.new("+H,*\001\000")
 
-    assert_equal 'part', body
+    assert_equal 'part', body.read
   end
 
   def test_response_content_encoding_gzip
@@ -401,7 +401,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
 
     body = @agent.response_content_encoding @res, body_io
 
-    assert_equal 'part', body
+    assert_equal 'part', body.read
   end
 
   def test_response_content_encoding_gzip_chunked
@@ -412,7 +412,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
 
     body = @agent.response_content_encoding @res, body_io
 
-    assert_equal 'part', body
+    assert_equal 'part', body.read
   end
 
   def test_response_content_encoding_none
@@ -421,7 +421,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
 
     body = @agent.response_content_encoding @res, StringIO.new('part')
 
-    assert_equal 'part', body
+    assert_equal 'part', body.read
   end
 
   def test_response_content_encoding_x_gzip
@@ -432,7 +432,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
 
     body = @agent.response_content_encoding @res, body_io
 
-    assert_equal 'part', body
+    assert_equal 'part', body.read
   end
 
   def test_response_content_encoding_unknown
@@ -605,6 +605,28 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     assert_equal Encoding::BINARY, body.encoding if body.respond_to? :encoding
   end
 
+  def test_response_read_large
+    def @res.read_body() yield 'a' * 10241 end
+    def @res.content_length() 10241 end
+
+    io = @agent.response_read @res, @req
+
+    assert_kind_of Tempfile, io
+    assert_equal 10241, io.stat.size
+  end
+
+  def test_response_read_large_chunked
+    def @res.read_body
+      11.times do yield 'a' * 1024 end
+    end
+    def @res.content_length() end
+
+    io = @agent.response_read @res, @req
+
+    assert_kind_of Tempfile, io
+    assert_equal 11264, io.stat.size
+  end
+
   def test_response_read_content_length_head
     req = Net::HTTP::Head.new '/'
 
@@ -690,6 +712,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
   def test_response_read_unknown_code
     res = Net::HTTPUnknownResponse.allocate
     res.instance_variable_set :@code, 9999
+    res.instance_variable_set :@header, {}
     def res.read_body() yield 'part' end
 
     e = assert_raises Mechanize::ResponseCodeError do

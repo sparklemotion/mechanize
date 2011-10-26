@@ -10,6 +10,13 @@
   * Added Mechanize#retry_change_requests to allow mechanize to retry POST and
     other non-idempotent requests when you know it is safe to do so.  Issue
     #123
+  * Mechanize can now stream files directly to disk without loading them into
+    memory first through Mechanize::Download, a pluggable parser for
+    downloading files.
+
+    All responses larger than Mechanize#max_file_buffer are downloaded to a
+    Tempfile.  For backwards compatibility Mechanize::File subclasses still
+    load the response body into memory.
   * Added Mechanize#content_encoding_hooks which allow handling of
     non-standard content encodings like "agzip".  Patch #125 by kitamomonga
   * Added dom_class to elements and the element matcher like dom_id.  Patch

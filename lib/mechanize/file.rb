@@ -16,17 +16,7 @@
 
 class Mechanize::File
 
-  extend Forwardable
-
-  ##
-  # The URI this file was retrieved from
-
-  attr_accessor :uri
-
-  ##
-  # The Net::HTTPResponse for this file
-
-  attr_accessor :response
+  include Mechanize::Parser
 
   ##
   # The HTTP response body, the raw file contents
@@ -34,89 +24,24 @@ class Mechanize::File
   attr_accessor :body
 
   ##
-  # The HTTP response code
-
-  attr_accessor :code
-
-  ##
   # The filename for this file based on the content-disposition of the
   # response or the basename of the URL
 
   attr_accessor :filename
 
-  ##
-  # Alias for the HTTP response object
-
-  alias :header :response
-
-  ##
-  # :method: [](header)
-  #
-  # Access HTTP +header+ by name
-
-  def_delegator :header, :[], :[]
-
-  ##
-  # :method: []=(header, value)
-  #
-  # Set HTTP +header+ to +value+
-
-  def_delegator :header, :[]=, :[]=
-
-  ##
-  # :method: key?(header)
-  #
-  # Is the named +header+ present?
-
-  def_delegator :header, :key?, :key?
-
-  ##
-  # :method: each
-  #
-  # Enumerate HTTP headers
-
-  def_delegator :header, :each, :each
-
-  ##
-  # :method: each
-  #
-  # Enumerate HTTP headers in capitalized (canonical) form
-
-  def_delegator :header, :canonical_each, :canonical_each
-
-  alias :content :body
+  alias content body
 
   ##
   # Creates a new file retrieved from the given +uri+ and +response+ object.
   # The +body+ is the HTTP response body and +code+ is the HTTP status.
 
-  def initialize(uri=nil, response=nil, body=nil, code=nil)
-    @uri = uri
+  def initialize uri = nil, response = nil, body = nil, code = nil
+    @uri  = uri
     @body = body
     @code = code
-    @response = Mechanize::Headers.new
 
-    # Copy the headers in to a hash to prevent memory leaks
-    if response
-      response.each { |k,v|
-        @response[k] = v
-      }
-    end
-
-    @filename = 'index.html'
-
-    # Set the filename
-    if disposition = @response['content-disposition']
-      disposition.split(/;\s*/).each do |pair|
-        k,v = pair.split(/=/, 2)
-        @filename = v if k && k.downcase == 'filename'
-      end
-    else
-      if @uri
-        @filename = @uri.path.split(/\//).last || 'index.html'
-        @filename << ".html" unless @filename =~ /\./
-      end
-    end
+    fill_header response
+    extract_filename
 
     yield self if block_given?
   end
@@ -124,22 +49,15 @@ class Mechanize::File
   ##
   # Use this method to save the content of this object to +filename+
 
-  def save_as(filename = nil)
-    if filename.nil?
-      filename = @filename
-      number = 1
-      while(File.exists?(filename))
-        filename = "#{@filename}.#{number}"
-        number += 1
-      end
-    end
+  def save filename = nil
+    filename = find_free_name filename
 
-    open filename, "wb" do |f|
+    open filename, 'wb' do |f|
       f.write body
     end
   end
 
-  alias :save :save_as
+  alias save_as save
 
 end
 

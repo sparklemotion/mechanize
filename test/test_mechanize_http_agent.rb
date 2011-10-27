@@ -272,6 +272,46 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     assert_equal 'unknown header symbol content_length', e.message
   end
 
+  def test_request_auth_none
+    @agent.request_auth @req, @uri
+
+    assert_nil @req['Authorization']
+  end
+
+  def test_request_auth_basic
+    @agent.user = 'user'
+    @agent.password = 'password'
+    @agent.auth_hash[@uri.host] = :basic
+
+    @agent.request_auth @req, @uri
+
+    assert_match %r%^Basic %, @req['Authorization']
+  end
+
+  def test_request_auth_digest
+    @agent.user = 'user'
+    @agent.password = 'password'
+    @agent.auth_hash[@uri.host] = :digest
+    @agent.instance_variable_set :@digest, 'Digest qop="blah"'
+
+    @agent.request_auth @req, @uri
+
+    assert_match %r%^Digest %,   @req['Authorization']
+    assert_match %r%qop=blah%, @req['Authorization']
+  end
+
+  def test_request_auth_iis_digest
+    @agent.user = 'user'
+    @agent.password = 'password'
+    @agent.auth_hash[@uri.host] = :iis_digest
+    @agent.instance_variable_set :@digest, 'Digest qop="blah"'
+
+    @agent.request_auth @req, @uri
+
+    assert_match %r%^Digest %,   @req['Authorization']
+    assert_match %r%qop="blah"%, @req['Authorization']
+  end
+
   def test_request_referer
     referer = URI.parse 'http://old.example'
 

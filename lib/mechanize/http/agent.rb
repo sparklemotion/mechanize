@@ -5,6 +5,8 @@ require 'tempfile'
 
 class Mechanize::HTTP::Agent
 
+  attr_reader :auth_hash # :nodoc:
+
   attr_accessor :cookie_jar
 
   # Disables If-Modified-Since conditional requests (enabled by default)
@@ -732,9 +734,9 @@ class Mechanize::HTTP::Agent
     raise Mechanize::ResponseCodeError, page unless @user || @password
     raise Mechanize::ResponseCodeError, page if @auth_hash.has_key?(uri.host)
 
-    if response['www-authenticate'] =~ /Digest/i
+    if response['www-authenticate'] =~ /Digest/i then
       @auth_hash[uri.host] = :digest
-      if response['server'] =~ /Microsoft-IIS/
+      if response['server'] =~ /Microsoft-IIS/ then
         @auth_hash[uri.host] = :iis_digest
       end
       @digest = response['www-authenticate']

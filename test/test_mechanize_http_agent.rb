@@ -368,6 +368,47 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     assert_nil params
   end
 
+  def test_response_authenticate
+    @res.instance_variable_set :@header, 'www-authenticate' => ['Basic']
+    @agent.user = 'user'
+    @agent.password = 'password'
+
+    @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
+
+    assert_equal :basic, @agent.auth_hash['example']
+  end
+
+  def test_response_authenticate_digest_iis
+    @res.instance_variable_set(:@header,
+                               'www-authenticate' => ['Basic Digest'],
+                               'server'           => ['Microsoft-IIS'])
+    @agent.user = 'user'
+    @agent.password = 'password'
+
+    @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
+
+    assert_equal :iis_digest, @agent.auth_hash['example']
+  end
+
+  def test_response_authenticate_no_account
+    page = Mechanize::File.new nil, nil, nil, 401
+    @res.instance_variable_set :@header, 'www-authenticate' => ['Basic']
+
+    assert_raises Mechanize::ResponseCodeError do
+      @agent.response_authenticate @res, page, @uri, @req, nil, nil, nil
+    end
+  end
+
+  def test_response_authenticate_multiple
+    @res.instance_variable_set :@header, 'www-authenticate' => ['Basic Digest']
+    @agent.user = 'user'
+    @agent.password = 'password'
+
+    @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
+
+    assert_equal :digest, @agent.auth_hash['example']
+  end
+
   def test_response_content_encoding_7_bit
     def @res.content_length() 4 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[7bit]

@@ -734,14 +734,17 @@ class Mechanize::HTTP::Agent
     raise Mechanize::ResponseCodeError, page unless @user || @password
     raise Mechanize::ResponseCodeError, page if @auth_hash.has_key?(uri.host)
 
-    if response['www-authenticate'] =~ /Digest/i then
+    case response['www-authenticate']
+    when /\bDigest\b/i then
       @auth_hash[uri.host] = :digest
       if response['server'] =~ /Microsoft-IIS/ then
         @auth_hash[uri.host] = :iis_digest
       end
       @digest = response['www-authenticate']
-    else
+    when /\bBasic\b/ then
       @auth_hash[uri.host] = :basic
+    else
+      raise Mechanize::ResponseCodeError, page
     end
 
     fetch uri, request.method.downcase.to_sym, headers, params, referer

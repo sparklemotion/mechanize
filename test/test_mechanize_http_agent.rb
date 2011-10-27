@@ -449,6 +449,17 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     assert_equal :digest, @agent.auth_hash['example']
   end
 
+  def test_response_authenticate_unknown
+    @agent.user = 'user'
+    @agent.password = 'password'
+    page = Mechanize::File.new nil, nil, nil, 401
+    @res.instance_variable_set :@header, 'www-authenticate' => ['Unknown']
+
+    assert_raises Mechanize::ResponseCodeError do
+      @agent.response_authenticate @res, page, @uri, @req, nil, nil, nil
+    end
+  end
+
   def test_response_content_encoding_7_bit
     def @res.content_length() 4 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[7bit]

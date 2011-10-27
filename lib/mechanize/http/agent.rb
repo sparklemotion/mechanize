@@ -26,6 +26,9 @@ class Mechanize::HTTP::Agent
   # Reset connections that have not been used in this many seconds
   attr_reader   :idle_timeout
 
+  # Set to false to disable HTTP/1.1 keep-alive requests
+  attr_accessor :keep_alive
+
   # Length of time to wait until a connection is opened in seconds
   attr_accessor :open_timeout
 
@@ -113,6 +116,7 @@ class Mechanize::HTTP::Agent
     @gzip_enabled             = true
     @history                  = Mechanize::History.new
     @idle_timeout             = nil
+    @keep_alive               = true
     @keep_alive_time          = 300
     @max_file_buffer          = 10240
     @open_timeout             = nil
@@ -174,6 +178,10 @@ class Mechanize::HTTP::Agent
     @history.last
   end
 
+  def disable_keep_alive request
+    request['connection'] = 'close' unless @keep_alive
+  end
+
   def enable_gzip request
     request['accept-encoding'] = if @gzip_enabled
                                    'gzip,deflate,identity'
@@ -195,9 +203,10 @@ class Mechanize::HTTP::Agent
 
     connection = connection_for uri
 
-    request_auth request, uri
+    request_auth             request, uri
 
-    enable_gzip request
+    disable_keep_alive       request
+    enable_gzip              request
 
     request_language_charset request
     request_cookies          request, uri
@@ -206,7 +215,7 @@ class Mechanize::HTTP::Agent
     request_user_agent       request
     request_add_headers      request, headers
 
-    pre_connect request
+    pre_connect              request
 
     # Consult robots.txt
     if robots && uri.is_a?(URI::HTTP)
@@ -421,7 +430,7 @@ class Mechanize::HTTP::Agent
     return if 'https' == referer.scheme.downcase and
               'https' != uri.scheme.downcase
 
-    request['Referer'] = referer
+    #request['Referer'] = referer
   end
 
   def request_user_agent request

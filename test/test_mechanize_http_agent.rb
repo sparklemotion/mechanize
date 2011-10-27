@@ -34,6 +34,20 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     assert_equal @agent.http, conn
   end
 
+  def test_disable_keep_alive
+    @agent.disable_keep_alive @req
+
+    refute @req['connection']
+  end
+
+  def test_disable_keep_alive_no
+    @agent.keep_alive = false
+
+    @agent.disable_keep_alive @req
+
+    assert_equal 'close', @req['connection']
+  end
+
   def test_enable_gzip
     @agent.enable_gzip @req
 

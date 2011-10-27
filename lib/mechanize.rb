@@ -33,7 +33,7 @@ class Mechanize
 
   ##
   # The version of Mechanize you are using.
-  VERSION = '2.0.2'
+  VERSION = '2.1'
 
   class Error < RuntimeError
   end
@@ -43,9 +43,6 @@ class Mechanize
                  else
                    "#{RUBY_VERSION}dev#{RUBY_REVISION}"
                  end
-
-  # HTTP/1.1 keep-alives are always active.  This does nothing.
-  attr_accessor :keep_alive
 
   # HTTP/1.0 keep-alive time.  This is no longer supported by mechanize as it
   # now uses net-http-persistent which only supports HTTP/1.1 persistent
@@ -116,6 +113,15 @@ class Mechanize
 
   def retry_change_requests= retry_change_requests
     @agent.retry_change_requests = retry_change_requests
+  end
+
+  # Set to false to disable HTTP/1.1 keep-alive connections
+  def keep_alive
+    @agent.keep_alive
+  end
+
+  def keep_alive= enable
+    @agent.keep_alive = enable
   end
 
   # The identification string for the client initiating a web request
@@ -333,7 +339,6 @@ class Mechanize
     # attr_readers
     @pluggable_parser = PluggableParser.new
 
-    @keep_alive       = true
     @keep_alive_time  = 0
 
     # Proxy

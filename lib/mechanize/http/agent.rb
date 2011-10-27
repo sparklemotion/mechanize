@@ -430,7 +430,7 @@ class Mechanize::HTTP::Agent
     return if 'https' == referer.scheme.downcase and
               'https' != uri.scheme.downcase
 
-    #request['Referer'] = referer
+    request['Referer'] = referer
   end
 
   def request_user_agent request

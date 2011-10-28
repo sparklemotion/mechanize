@@ -7,6 +7,12 @@ require 'strscan'
 
 class Mechanize::HTTP::AuthChallenge
 
+  Challenge = Struct.new :scheme, :params do
+    def to_s
+      "#{scheme} #{params.map { |param| param.join '=' }.join ', '}"
+    end
+  end
+
   attr_accessor :scanner # :nodoc:
 
   ##
@@ -24,30 +30,33 @@ class Mechanize::HTTP::AuthChallenge
   def parse
     @challenges = []
     @scanner = StringScanner.new @www_authenticate
-    challenge = ''
 
     while true do
       break if @scanner.eos?
+      challenge = Challenge.new
 
       scheme = auth_scheme
-
       next unless scheme
+      challenge.scheme = scheme
+
       next unless spaces
 
-      params = []
+      params = {}
 
       while true do
         pos = @scanner.pos
+        name, value = auth_param
 
-        unless param = auth_param then
-          @challenges << "#{scheme} #{params.join ', '}"
+        unless name then
+          challenge.params = params
+          @challenges << challenge
           break if @scanner.eos?
 
           @scanner.pos = pos # rewind
           challenge = '' # a token should be next, new challenge
           break
         else
-          params << param
+          params[name] = value
         end
 
         spaces
@@ -103,7 +112,7 @@ class Mechanize::HTTP::AuthChallenge
 
     return nil unless value
 
-    "#{name}=#{value}"
+    return name, value
   end
 
   ##

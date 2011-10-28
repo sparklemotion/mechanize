@@ -738,15 +738,15 @@ class Mechanize::HTTP::Agent
       Mechanize::HTTP::AuthChallenge.new response['www-authenticate']
     challenges = auth_challenge.parse
 
-    if challenge = challenges.find { |c| c =~ /^Digest\b/i } then
+    if challenge = challenges.find { |c| c.scheme =~ /^Digest$/i } then
       @auth_hash[uri.host] = if response['server'] =~ /Microsoft-IIS/ then
                                :iis_digest
                              else
                                :digest
                              end
 
-      @digest = challenge
-    elsif not challenges.grep(/^Basic\b/i).empty? then
+      @digest = challenge.to_s
+    elsif challenges.find { |c| c.scheme =~ /^Basic$/i } then
       @auth_hash[uri.host] = :basic
     else
       raise Mechanize::ResponseCodeError, page

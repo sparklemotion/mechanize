@@ -409,7 +409,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
   end
 
   def test_response_authenticate
-    @res.instance_variable_set :@header, 'www-authenticate' => ['Basic']
+    @res.instance_variable_set :@header, 'www-authenticate' => ['Basic realm=r']
     @agent.user = 'user'
     @agent.password = 'password'
 
@@ -420,7 +420,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
 
   def test_response_authenticate_digest_iis
     @res.instance_variable_set(:@header,
-                               'www-authenticate' => ['Basic Digest'],
+                               'www-authenticate' => ['Digest realm=r'],
                                'server'           => ['Microsoft-IIS'])
     @agent.user = 'user'
     @agent.password = 'password'
@@ -432,7 +432,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
 
   def test_response_authenticate_no_account
     page = Mechanize::File.new nil, nil, nil, 401
-    @res.instance_variable_set :@header, 'www-authenticate' => ['Basic']
+    @res.instance_variable_set :@header, 'www-authenticate' => 'Basic realm=r'
 
     assert_raises Mechanize::ResponseCodeError do
       @agent.response_authenticate @res, page, @uri, @req, nil, nil, nil
@@ -440,7 +440,9 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
   end
 
   def test_response_authenticate_multiple
-    @res.instance_variable_set :@header, 'www-authenticate' => ['Basic Digest']
+    @res.instance_variable_set(:@header,
+                               'www-authenticate' =>
+                                 ['Basic realm=r, Digest realm=r'])
     @agent.user = 'user'
     @agent.password = 'password'
 
@@ -453,7 +455,8 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     @agent.user = 'user'
     @agent.password = 'password'
     page = Mechanize::File.new nil, nil, nil, 401
-    @res.instance_variable_set :@header, 'www-authenticate' => ['Unknown']
+    @res.instance_variable_set(:@header,
+                               'www-authenticate' => ['Unknown realm=r'])
 
     assert_raises Mechanize::ResponseCodeError do
       @agent.response_authenticate @res, page, @uri, @req, nil, nil, nil

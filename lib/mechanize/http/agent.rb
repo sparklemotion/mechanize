@@ -734,14 +734,19 @@ class Mechanize::HTTP::Agent
     raise Mechanize::ResponseCodeError, page unless @user || @password
     raise Mechanize::ResponseCodeError, page if @auth_hash.has_key?(uri.host)
 
-    case response['www-authenticate']
-    when /\bDigest\b/i then
-      @auth_hash[uri.host] = :digest
-      if response['server'] =~ /Microsoft-IIS/ then
-        @auth_hash[uri.host] = :iis_digest
-      end
-      @digest = response['www-authenticate']
-    when /\bBasic\b/ then
+    auth_challenge =
+      Mechanize::HTTP::AuthChallenge.new response['www-authenticate']
+    challenges = auth_challenge.parse
+
+    if challenge = challenges.find { |c| c =~ /^Digest\b/i } then
+      @auth_hash[uri.host] = if response['server'] =~ /Microsoft-IIS/ then
+                               :iis_digest
+                             else
+                               :digest
+                             end
+
+      @digest = challenge
+    elsif not challenges.grep(/^Basic\b/i).empty? then
       @auth_hash[uri.host] = :basic
     else
       raise Mechanize::ResponseCodeError, page

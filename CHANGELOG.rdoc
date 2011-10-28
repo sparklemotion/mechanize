@@ -35,6 +35,8 @@
     by Jo Hund.
   * Updated 'Mac Safari' User-Agent alias to Safari 5.1.1.  'Mac Safari 4' can
     be used for the old 'Mac Safari' alias.
+  * When given multiple HTTP authentication options mechanize can better pick
+    the strongest method.
 
 * Bug fixes
   * Mechanize#cookie_jar= works again.  Issue #126

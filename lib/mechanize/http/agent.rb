@@ -5,7 +5,8 @@ require 'tempfile'
 
 class Mechanize::HTTP::Agent
 
-  attr_reader :auth_hash # :nodoc:
+  attr_reader :authenticate_methods # :nodoc:
+  attr_reader :digest_challenges # :nodoc:
 
   attr_accessor :cookie_jar
 
@@ -106,13 +107,10 @@ class Mechanize::HTTP::Agent
   attr_reader :http # :nodoc:
 
   def initialize
-    @auth_hash                = {} # Keep track of urls for sending auth
     @conditional_requests     = true
     @context                  = nil
     @content_encoding_hooks   = []
     @cookie_jar               = Mechanize::CookieJar.new
-    @digest                   = nil # DigestAuth Digest
-    @digest_auth              = Net::HTTP::DigestAuth.new
     @follow_meta_refresh      = false
     @follow_meta_refresh_self = false
     @gzip_enabled             = true
@@ -122,7 +120,6 @@ class Mechanize::HTTP::Agent
     @keep_alive_time          = 300
     @max_file_buffer          = 10240
     @open_timeout             = nil
-    @password                 = nil # HTTP auth password
     @post_connect_hooks       = []
     @pre_connect_hooks        = []
     @proxy_uri                = nil
@@ -132,9 +129,20 @@ class Mechanize::HTTP::Agent
     @request_headers          = {}
     @retry_change_requests    = false
     @robots                   = false
-    @user                     = nil # HTTP auth user
     @user_agent               = nil
     @webrobots                = nil
+
+    # HTTP Authentication
+    @authenticate_parser  = Mechanize::HTTP::WWWAuthenticateParser.new
+    @authenticate_methods = Hash.new do |methods, uri|
+      methods[uri] = Hash.new do |realms, auth_scheme|
+        realms[auth_scheme] = []
+      end
+    end
+    @digest_auth          = Net::HTTP::DigestAuth.new
+    @digest_challenges    = {}
+    @password             = nil # HTTP auth password
+    @user                 = nil # HTTP auth user
 
     @ca_file         = nil # OpenSSL server certificate file
     @cert            = nil # OpenSSL Certificate
@@ -358,23 +366,26 @@ class Mechanize::HTTP::Agent
   end
 
   def request_auth request, uri
-    auth_type = @auth_hash[uri.host]
+    base_uri = uri + '/'
+    schemes = @authenticate_methods[base_uri]
 
-    return unless auth_type
-
-    case auth_type
-    when :basic
+    if realm = schemes[:digest].find { |r| r.uri == base_uri } then
+      request_auth_digest request, uri, realm, base_uri, false
+    elsif realm = schemes[:iis_digest].find { |r| r.uri == base_uri } then
+      request_auth_digest request, uri, realm, base_uri, true
+    elsif schemes[:basic].find { |r| r.uri == base_uri } then
       request.basic_auth @user, @password
-    when :digest, :iis_digest
-      uri.user = @user
-      uri.password = @password
-
-      iis = auth_type == :iis_digest
-
-      auth = @digest_auth.auth_header uri, @digest, request.method, iis
-
-      request['Authorization'] = auth
     end
+  end
+
+  def request_auth_digest request, uri, realm, base_uri, iis
+    challenge = @digest_challenges[realm]
+
+    uri.user = @user
+    uri.password = @password
+
+    auth = @digest_auth.auth_header uri, challenge.to_s, request.method, iis
+    request['Authorization'] = auth
   end
 
   def request_cookies request, uri
@@ -732,21 +743,33 @@ class Mechanize::HTTP::Agent
   def response_authenticate(response, page, uri, request, headers, params,
                             referer)
     raise Mechanize::ResponseCodeError, page unless @user || @password
-    raise Mechanize::ResponseCodeError, page if @auth_hash.has_key?(uri.host)
 
-    parser = Mechanize::HTTP::WWWAuthenticateParser.new
-    challenges = parser.parse response['www-authenticate']
-
+    challenges = @authenticate_parser.parse response['www-authenticate']
     if challenge = challenges.find { |c| c.scheme =~ /^Digest$/i } then
-      @auth_hash[uri.host] = if response['server'] =~ /Microsoft-IIS/ then
-                               :iis_digest
-                             else
-                               :digest
-                             end
+      realm = challenge.realm uri
 
-      @digest = challenge.to_s
-    elsif challenges.find { |c| c.scheme =~ /^Basic$/i } then
-      @auth_hash[uri.host] = :basic
+      auth_scheme = if response['server'] =~ /Microsoft-IIS/ then
+                      :iis_digest
+                    else
+                      :digest
+                    end
+
+      existing_realms = @authenticate_methods[realm.uri][auth_scheme]
+
+      raise Mechanize::ResponseCodeError, page if
+        existing_realms.include? realm
+
+      existing_realms << realm
+      @digest_challenges[realm] = challenge
+    elsif challenge = challenges.find { |c| c.scheme == 'Basic' } then
+      realm = challenge.realm uri
+
+      existing_realms = @authenticate_methods[realm.uri][:basic]
+
+      raise Mechanize::ResponseCodeError, page if
+        existing_realms.include? realm
+
+      existing_realms << realm
     else
       raise Mechanize::ResponseCodeError, page
     end

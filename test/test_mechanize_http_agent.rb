@@ -21,6 +21,14 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
                end
   end
 
+  def auth_realm uri, scheme, type
+    base_uri = uri + '/'
+    realm = Mechanize::HTTP::AuthRealm.new scheme, base_uri, 'r'
+    @agent.authenticate_methods[base_uri][type] << realm
+
+    realm
+  end
+
   def test_connection_for_file
     uri = URI.parse 'file:///nonexistent'
     conn = @agent.connection_for uri
@@ -281,7 +289,8 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
   def test_request_auth_basic
     @agent.user = 'user'
     @agent.password = 'password'
-    @agent.auth_hash[@uri.host] = :basic
+
+    auth_realm @uri, 'Basic', :basic
 
     @agent.request_auth @req, @uri
 
@@ -291,25 +300,27 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
   def test_request_auth_digest
     @agent.user = 'user'
     @agent.password = 'password'
-    @agent.auth_hash[@uri.host] = :digest
-    @agent.instance_variable_set :@digest, 'Digest qop="blah"'
+
+    realm = auth_realm @uri, 'Digest', :digest
+    @agent.digest_challenges[realm] = 'Digest realm=r, qop="auth"'
 
     @agent.request_auth @req, @uri
 
-    assert_match %r%^Digest %,   @req['Authorization']
-    assert_match %r%qop=blah%, @req['Authorization']
+    assert_match %r%^Digest %, @req['Authorization']
+    assert_match %r%qop=auth%, @req['Authorization']
   end
 
   def test_request_auth_iis_digest
     @agent.user = 'user'
     @agent.password = 'password'
-    @agent.auth_hash[@uri.host] = :iis_digest
-    @agent.instance_variable_set :@digest, 'Digest qop="blah"'
+
+    realm = auth_realm @uri, 'Digest', :digest
+    @agent.digest_challenges[realm] = 'Digest realm=r, qop="auth"'
 
     @agent.request_auth @req, @uri
 
-    assert_match %r%^Digest %,   @req['Authorization']
-    assert_match %r%qop="blah"%, @req['Authorization']
+    assert_match %r%^Digest %, @req['Authorization']
+    assert_match %r%qop=auth%, @req['Authorization']
   end
 
   def test_request_referer
@@ -415,7 +426,22 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
 
     @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
 
-    assert_equal :basic, @agent.auth_hash['example']
+    base_uri = @uri + '/'
+    realm = Mechanize::HTTP::AuthRealm.new 'Basic', base_uri, 'r'
+    assert_equal [realm], @agent.authenticate_methods[base_uri][:basic]
+  end
+
+  def test_response_authenticate_digest
+    @res.instance_variable_set(:@header,
+                               'www-authenticate' => ['Digest realm=r'])
+    @agent.user = 'user'
+    @agent.password = 'password'
+
+    @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
+
+    base_uri = @uri + '/'
+    realm = Mechanize::HTTP::AuthRealm.new 'Digest', base_uri, 'r'
+    assert_equal [realm], @agent.authenticate_methods[base_uri][:digest]
   end
 
   def test_response_authenticate_digest_iis
@@ -427,7 +453,9 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
 
     @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
 
-    assert_equal :iis_digest, @agent.auth_hash['example']
+    base_uri = @uri + '/'
+    realm = Mechanize::HTTP::AuthRealm.new 'Digest', base_uri, 'r'
+    assert_equal [realm], @agent.authenticate_methods[base_uri][:iis_digest]
   end
 
   def test_response_authenticate_no_account
@@ -448,7 +476,11 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
 
     @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
 
-    assert_equal :digest, @agent.auth_hash['example']
+    base_uri = @uri + '/'
+    realm = Mechanize::HTTP::AuthRealm.new 'Digest', base_uri, 'r'
+    assert_equal [realm], @agent.authenticate_methods[base_uri][:digest]
+
+    assert_empty @agent.authenticate_methods[base_uri][:basic]
   end
 
   def test_response_authenticate_unknown

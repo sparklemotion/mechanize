@@ -117,7 +117,7 @@ class Mechanize::HTTP::WWWAuthenticateParser
   def quoted_string
     return nil unless @scanner.scan /"/
 
-    text = '"'
+    text = ''
 
     while true do
       chunk = @scanner.scan(/[\r\n \t\041\043-\176\200-\377]+/) # not "
@@ -129,7 +129,7 @@ class Mechanize::HTTP::WWWAuthenticateParser
           chunk.end_with? '\\' and '"' == @scanner.peek(1)
       else
         if '"' == @scanner.peek(1) then
-          text << @scanner.get_byte
+          @scanner.get_byte
           break
         else
           return nil

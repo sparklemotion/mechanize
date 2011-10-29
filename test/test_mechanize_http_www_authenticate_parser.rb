@@ -37,7 +37,7 @@ class TestMechanizeHttpWwwAuthenticateParser < MiniTest::Unit::TestCase
 
     param = @parser.auth_param
 
-    assert_equal ['realm', '"this site"'], param
+    assert_equal ['realm', 'this site'], param
   end
 
   def test_parse
@@ -71,7 +71,7 @@ class TestMechanizeHttpWwwAuthenticateParser < MiniTest::Unit::TestCase
 
     string = @parser.quoted_string
 
-    assert_equal '"text"', string
+    assert_equal 'text', string
   end
 
   def test_quoted_string_bad
@@ -85,7 +85,7 @@ class TestMechanizeHttpWwwAuthenticateParser < MiniTest::Unit::TestCase
 
     string = @parser.quoted_string
 
-    assert_equal '"escaped \\" here"', string
+    assert_equal 'escaped \\" here', string
   end
 
   def test_quoted_string_quote_end
@@ -93,7 +93,7 @@ class TestMechanizeHttpWwwAuthenticateParser < MiniTest::Unit::TestCase
 
     string = @parser.quoted_string
 
-    assert_equal '"end \""', string
+    assert_equal 'end \"', string
   end
 
   def test_token

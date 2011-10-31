@@ -43,6 +43,7 @@ class Net::HTTP
     '/one_cookie_no_space'    => OneCookieNoSpacesTest,
     '/many_cookies'           => ManyCookiesTest,
     '/many_cookies_as_string' => ManyCookiesAsStringTest,
+    '/ntlm'                   => NTLMServlet,
     '/send_cookies'           => SendCookiesTest,
     '/quoted_value_cookie'    => QuotedValueCookieTest,
     '/if_modified_since'      => ModifiedSinceServlet,
@@ -61,8 +62,8 @@ class Net::HTTP
 
   alias :old_request :request
 
-  def request(request, *data, &block)
-    url = URI.parse(request.path)
+  def request(req, *data, &block)
+    url = URI.parse(req.path)
     path = WEBrick::HTTPUtils.unescape(url.path)
 
     path = '/index.html' if path == '/'
@@ -70,21 +71,22 @@ class Net::HTTP
     res = ::Response.new
     res.query_params = url.query
 
-    request.query = if 'POST' != request.method && url.query then
-                      WEBrick::HTTPUtils.parse_query url.query
-                    elsif request['content-type'] =~ /www-form-urlencoded/ then
-                      WEBrick::HTTPUtils.parse_query request.body
-                    elsif request['content-type'] =~ /boundary=(.+)/ then
-                      boundary = WEBrick::HTTPUtils.dequote $1
-                      WEBrick::HTTPUtils.parse_form_data request.body, boundary
-                    else
-                      {}
-                    end
+    req.query = if 'POST' != req.method && url.query then
+                  WEBrick::HTTPUtils.parse_query url.query
+                elsif req['content-type'] =~ /www-form-urlencoded/ then
+                  WEBrick::HTTPUtils.parse_query req.body
+                elsif req['content-type'] =~ /boundary=(.+)/ then
+                  boundary = WEBrick::HTTPUtils.dequote $1
+                  WEBrick::HTTPUtils.parse_form_data req.body, boundary
+                else
+                  {}
+                end
 
-    request.cookies = WEBrick::Cookie.parse(request['Cookie'])
+    req.cookies = WEBrick::Cookie.parse(req['Cookie'])
 
-    if SERVLETS[path]
-      SERVLETS[path].new({}).send("do_#{request.method}", request, res)
+    if servlet_klass = SERVLETS[path]
+      servlet = servlet_klass.new({})
+      servlet.send "do_#{req.method}", req, res
     else
       filename = "htdocs#{path.gsub(/[^\/\\.\w\s]/, '_')}"
       unless PAGE_CACHE[filename]
@@ -126,7 +128,7 @@ class Net::HTTP
       dest << string[0, clen]
     end
 
-    body_exist = request.response_body_permitted? &&
+    body_exist = req.response_body_permitted? &&
                  response_klass.body_permitted?
 
     response.instance_variable_set :@body_exist, body_exist

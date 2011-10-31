@@ -442,6 +442,9 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     base_uri = @uri + '/'
     realm = Mechanize::HTTP::AuthRealm.new 'Digest', base_uri, 'r'
     assert_equal [realm], @agent.authenticate_methods[base_uri][:digest]
+
+    challenge = Mechanize::HTTP::AuthChallenge.new 'Digest', 'realm' => 'r'
+    assert_equal challenge, @agent.digest_challenges[realm]
   end
 
   def test_response_authenticate_digest_iis
@@ -456,15 +459,6 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     base_uri = @uri + '/'
     realm = Mechanize::HTTP::AuthRealm.new 'Digest', base_uri, 'r'
     assert_equal [realm], @agent.authenticate_methods[base_uri][:iis_digest]
-  end
-
-  def test_response_authenticate_no_account
-    page = Mechanize::File.new nil, nil, nil, 401
-    @res.instance_variable_set :@header, 'www-authenticate' => 'Basic realm=r'
-
-    assert_raises Mechanize::ResponseCodeError do
-      @agent.response_authenticate @res, page, @uri, @req, nil, nil, nil
-    end
   end
 
   def test_response_authenticate_multiple
@@ -483,6 +477,18 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     assert_empty @agent.authenticate_methods[base_uri][:basic]
   end
 
+  def test_response_authenticate_ntlm
+    @uri += '/ntlm'
+    @res.instance_variable_set(:@header,
+                               'www-authenticate' => ['NTLM'])
+    @agent.user = 'user'
+    @agent.password = 'password'
+
+    page = @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
+
+    assert_equal 'ok', page.body # lame test
+  end
+
   def test_response_authenticate_unknown
     @agent.user = 'user'
     @agent.password = 'password'
@@ -490,7 +496,7 @@ class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
     @res.instance_variable_set(:@header,
                                'www-authenticate' => ['Unknown realm=r'])
 
-    assert_raises Mechanize::ResponseCodeError do
+    assert_raises Mechanize::UnauthorizedError do
       @agent.response_authenticate @res, page, @uri, @req, nil, nil, nil
     end
   end

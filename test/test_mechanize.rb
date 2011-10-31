@@ -233,7 +233,7 @@ class TestMechanize < MiniTest::Unit::TestCase
   def test_get_basic_auth_bad
     @mech.basic_auth('aaron', 'aaron')
 
-    e = assert_raises Mechanize::ResponseCodeError do
+    e = assert_raises Mechanize::UnauthorizedError do
       @mech.get("http://localhost/basic_auth")
     end
 
@@ -241,7 +241,7 @@ class TestMechanize < MiniTest::Unit::TestCase
   end
 
   def test_get_basic_auth_none
-    e = assert_raises Mechanize::ResponseCodeError do
+    e = assert_raises Mechanize::UnauthorizedError do
       @mech.get("http://localhost/basic_auth")
     end
 

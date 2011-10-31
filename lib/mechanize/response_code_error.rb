@@ -17,6 +17,6 @@ class Mechanize
       "#{@response_code} => #{Net::HTTPResponse::CODE_TO_OBJ[@response_code]}"
     end
 
-    def inspect; to_s; end
+    alias inspect to_s
   end
 end

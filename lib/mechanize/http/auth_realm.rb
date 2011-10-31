@@ -7,7 +7,7 @@ class Mechanize::HTTP::AuthRealm
   def initialize scheme, uri, realm
     @scheme = scheme
     @uri    = uri
-    @realm  = realm.downcase
+    @realm  = realm.downcase if realm
   end
 
   def == other

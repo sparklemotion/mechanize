@@ -66,6 +66,22 @@ class TestMechanizeHttpWwwAuthenticateParser < MiniTest::Unit::TestCase
     assert_equal expected, @parser.parse('Basic realm=foo,, Digest realm=foo')
   end
 
+  def test_parse_ntlm_init
+    expected = [
+      challenge('NTLM', nil),
+    ]
+
+    assert_equal expected, @parser.parse('NTLM')
+  end
+
+  def test_parse_ntlm_type_2_3
+    expected = [
+      challenge('NTLM', 'foo='),
+    ]
+
+    assert_equal expected, @parser.parse('NTLM foo=')
+  end
+
   def test_quoted_string
     @parser.scanner = StringScanner.new '"text"'
 

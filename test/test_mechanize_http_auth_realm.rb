@@ -8,6 +8,16 @@ class TestMechanizeHttpAuthRealm < MiniTest::Unit::TestCase
     @realm = @AR.new 'Digest', @uri, 'r'
   end
 
+  def test_initialize
+    assert_equal 'r', @realm.realm
+
+    realm = @AR.new 'Digest', @uri, 'R'
+    assert_equal 'r', realm.realm
+
+    realm = @AR.new 'Digest', @uri, nil
+    assert_nil realm.realm
+  end
+
   def test_equals2
     other = @realm.dup
     assert_equal @realm, other

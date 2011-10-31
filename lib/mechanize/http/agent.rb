@@ -1,4 +1,6 @@
 require 'tempfile'
+require 'net/ntlm'
+require 'kconv'
 
 ##
 # An HTTP (and local disk access) user agent
@@ -742,9 +744,10 @@ class Mechanize::HTTP::Agent
 
   def response_authenticate(response, page, uri, request, headers, params,
                             referer)
-    raise Mechanize::ResponseCodeError, page unless @user || @password
+    raise Mechanize::UnauthorizedError, page unless @user || @password
 
     challenges = @authenticate_parser.parse response['www-authenticate']
+
     if challenge = challenges.find { |c| c.scheme =~ /^Digest$/i } then
       realm = challenge.realm uri
 
@@ -756,22 +759,41 @@ class Mechanize::HTTP::Agent
 
       existing_realms = @authenticate_methods[realm.uri][auth_scheme]
 
-      raise Mechanize::ResponseCodeError, page if
+      raise Mechanize::UnauthorizedError, page if
         existing_realms.include? realm
 
       existing_realms << realm
       @digest_challenges[realm] = challenge
+    elsif challenge = challenges.find { |c| c.scheme == 'NTLM' } then
+      existing_realms = @authenticate_methods[uri + '/'][:ntlm]
+
+      raise Mechanize::UnauthorizedError, page if
+        existing_realms.include?(realm) and not challenge.params
+
+      existing_realms << realm
+
+      if challenge.params then
+        type_2 = Net::NTLM::Message.decode64 challenge.params
+
+        type_3 = type_2.response({ :user => @user, :password => @password, },
+                                 { :ntlmv2 => true }).encode64
+
+        headers['Authorization'] = "NTLM #{type_3}"
+      else
+        type_1 = Net::NTLM::Message::Type1.new.encode64
+        headers['Authorization'] = "NTLM #{type_1}"
+      end
     elsif challenge = challenges.find { |c| c.scheme == 'Basic' } then
       realm = challenge.realm uri
 
       existing_realms = @authenticate_methods[realm.uri][:basic]
 
-      raise Mechanize::ResponseCodeError, page if
+      raise Mechanize::UnauthorizedError, page if
         existing_realms.include? realm
 
       existing_realms << realm
     else
-      raise Mechanize::ResponseCodeError, page
+      raise Mechanize::UnauthorizedError, page
     end
 
     fetch uri, request.method.downcase.to_sym, headers, params, referer

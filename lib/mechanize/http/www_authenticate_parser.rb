@@ -31,7 +31,18 @@ class Mechanize::HTTP::WWWAuthenticateParser
       next unless scheme
       challenge.scheme = scheme
 
-      next unless spaces
+      space = spaces
+
+      if scheme == 'NTLM' then
+        if space then
+          challenge.params = @scanner.scan(/.*/)
+        end
+
+        challenges << challenge
+        next
+      end
+
+      next unless space
 
       params = {}
 

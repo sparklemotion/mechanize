@@ -22,6 +22,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
       :value    => 'Bar',
       :path     => '/',
       :expires  => Time.now + (10 * 86400),
+      :for_domain => true,
       :domain   => 'rubyforge.org'
    }.merge(options)
   end
@@ -61,6 +62,15 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
 
     url2 = URI.parse('http://RuByFoRgE.oRg/')
     assert_equal(2, @jar.cookies(url2).length)
+  end
+
+  def test_no_domain_case
+    url = URI.parse('http://www.rubyforge.org/')
+
+    @jar.add(url, Mechanize::Cookie.new(
+        cookie_values(:domain => 'rubyforge.org', :for_domain => false)))
+
+    assert_equal(0, @jar.cookies(url).length)
   end
 
   def test_empty_value

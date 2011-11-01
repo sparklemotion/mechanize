@@ -38,14 +38,15 @@ class Mechanize::Download
   def save filename = nil
     filename = find_free_name filename
 
-    if @body_io.respond_to? :path then
-      FileUtils.cp @body_io.path, filename
-    else
+    # Ruby 1.8.7 implements StringIO#path, can't use respond_to? :path
+    if StringIO === @body_io then
       open filename, 'wb' do |io|
         until @body_io.eof? do
           io.write @body_io.read 16384
         end
       end
+    else
+      FileUtils.cp @body_io.path, filename
     end
   end
 

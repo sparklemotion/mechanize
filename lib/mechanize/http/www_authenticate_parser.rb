@@ -88,7 +88,7 @@ class Mechanize::HTTP::WWWAuthenticateParser
   # Parses a token
 
   def token
-    @scanner.scan(/[^\000-\037\177()<>@,;:\\"\/\[\]?={} \t]+/)
+    @scanner.scan(/[^\000-\037\177()<>@,;:\\"\/\[\]?={} ]+/)
   end
 
   ##
@@ -126,7 +126,7 @@ class Mechanize::HTTP::WWWAuthenticateParser
   # For TEXT, the rules of RFC 2047 are ignored.
 
   def quoted_string
-    return nil unless @scanner.scan /"/
+    return nil unless @scanner.scan(/"/)
 
     text = ''
 

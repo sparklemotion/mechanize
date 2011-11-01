@@ -8,6 +8,10 @@ class TestMechanizeParser < MiniTest::Unit::TestCase
     attr_accessor :filename
     attr_accessor :response
     attr_accessor :uri
+
+    def initialize
+      @uri = URI 'http://example'
+    end
   end
 
   def setup

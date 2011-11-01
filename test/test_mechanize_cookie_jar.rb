@@ -27,21 +27,12 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
    }.merge(options)
   end
 
-  def cookie_from_hash(hash)
-    c = Mechanize::Cookie.new(hash[:name], hash[:value])
-    hash.each { |k,v|
-      next if k == :name || k == :value
-      c.send("#{k}=", v)
-    }
-    c
-  end
-
   def test_two_cookies_same_domain_and_name_different_paths
     url = URI.parse('http://rubyforge.org/')
 
-    cookie = cookie_from_hash(cookie_values)
+    cookie = Mechanize::Cookie.new(cookie_values)
     @jar.add(url, cookie)
-    @jar.add(url, cookie_from_hash(cookie_values(:path => '/onetwo')))
+    @jar.add(url, Mechanize::Cookie.new(cookie_values(:path => '/onetwo')))
 
     assert_equal(1, @jar.cookies(url).length)
     assert_equal 2, @jar.cookies(URI.parse('http://rubyforge.org/onetwo')).length
@@ -51,11 +42,11 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     url = URI.parse('http://rubyforge.org/')
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(cookie_values)
+    cookie = Mechanize::Cookie.new(cookie_values)
     @jar.add(url, cookie)
     assert_equal(1, @jar.cookies(url).length)
 
-    @jar.add(url, cookie_from_hash(
+    @jar.add(url, Mechanize::Cookie.new(
         cookie_values(:domain => 'RuByForge.Org', :name   => 'aaron')))
 
     assert_equal(2, @jar.cookies(url).length)
@@ -78,11 +69,11 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     url = URI.parse('http://rubyforge.org/')
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(values)
+    cookie = Mechanize::Cookie.new(values)
     @jar.add(url, cookie)
     assert_equal(1, @jar.cookies(url).length)
 
-    @jar.add(url, cookie_from_hash( values.merge(  :domain => 'RuByForge.Org',
+    @jar.add(url, Mechanize::Cookie.new( values.merge(  :domain => 'RuByForge.Org',
                                                   :name   => 'aaron'
                                                ) ) )
 
@@ -96,12 +87,12 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     url = URI.parse('http://rubyforge.org/')
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(cookie_values)
+    cookie = Mechanize::Cookie.new(cookie_values)
     @jar.add(url, cookie)
     assert_equal(1, @jar.cookies(url).length)
 
     # Add the same cookie, and we should still only have one
-    @jar.add(url, cookie_from_hash(cookie_values))
+    @jar.add(url, Mechanize::Cookie.new(cookie_values))
     assert_equal(1, @jar.cookies(url).length)
 
     # Make sure we can get the cookie from different paths
@@ -115,12 +106,12 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     url = URI.parse('http://rubyforge.org/')
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(cookie_values)
+    cookie = Mechanize::Cookie.new(cookie_values)
     @jar.add(url, cookie)
     assert_equal(1, @jar.cookies(url).length)
 
     # Add the same cookie, and we should still only have one
-    @jar.add(url, cookie_from_hash(cookie_values(:name => 'Baz')))
+    @jar.add(url, Mechanize::Cookie.new(cookie_values(:name => 'Baz')))
     assert_equal(2, @jar.cookies(url).length)
 
     # Make sure we can get the cookie from different paths
@@ -133,9 +124,9 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_add_rejects_cookies_that_do_not_contain_an_embedded_dot
     url = URI.parse('http://rubyforge.org/')
 
-    tld_cookie = cookie_from_hash(cookie_values(:domain => '.org'))
+    tld_cookie = Mechanize::Cookie.new(cookie_values(:domain => '.org'))
     @jar.add(url, tld_cookie)
-    single_dot_cookie = cookie_from_hash(cookie_values(:domain => '.'))
+    single_dot_cookie = Mechanize::Cookie.new(cookie_values(:domain => '.'))
     @jar.add(url, single_dot_cookie)
 
     assert_equal(0, @jar.cookies(url).length)
@@ -144,7 +135,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_add_makes_exception_for_local_tld
     url = URI.parse('http://example.local')
 
-    tld_cookie = cookie_from_hash(cookie_values(:domain => '.local'))
+    tld_cookie = Mechanize::Cookie.new(cookie_values(:domain => '.local'))
     @jar.add(url, tld_cookie)
 
     assert_equal(1, @jar.cookies(url).length)
@@ -153,7 +144,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_add_makes_exception_for_localhost
     url = URI.parse('http://localhost')
 
-    tld_cookie = cookie_from_hash(cookie_values(:domain => 'localhost'))
+    tld_cookie = Mechanize::Cookie.new(cookie_values(:domain => 'localhost'))
     @jar.add(url, tld_cookie)
 
     assert_equal(1, @jar.cookies(url).length)
@@ -162,7 +153,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_add_cookie_for_the_parent_domain
     url = URI.parse('http://x.foo.com')
 
-    cookie = cookie_from_hash(cookie_values(:domain => '.foo.com'))
+    cookie = Mechanize::Cookie.new(cookie_values(:domain => '.foo.com'))
     @jar.add(url, cookie)
 
     assert_equal(1, @jar.cookies(url).length)
@@ -171,7 +162,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_add_does_not_reject_cookies_from_a_nested_subdomain
     url = URI.parse('http://y.x.foo.com')
 
-    cookie = cookie_from_hash(cookie_values(:domain => '.foo.com'))
+    cookie = Mechanize::Cookie.new(cookie_values(:domain => '.foo.com'))
     @jar.add(url, cookie)
 
     assert_equal(1, @jar.cookies(url).length)
@@ -180,7 +171,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_cookie_without_leading_dot_does_not_cause_substring_match
     url = URI.parse('http://arubyforge.org/')
 
-    cookie = cookie_from_hash(cookie_values(:domain => 'rubyforge.org'))
+    cookie = Mechanize::Cookie.new(cookie_values(:domain => 'rubyforge.org'))
     @jar.add(url, cookie)
 
     assert_equal(0, @jar.cookies(url).length)
@@ -189,7 +180,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_cookie_without_leading_dot_matches_subdomains
     url = URI.parse('http://admin.rubyforge.org/')
 
-    cookie = cookie_from_hash(cookie_values(:domain => 'rubyforge.org'))
+    cookie = Mechanize::Cookie.new(cookie_values(:domain => 'rubyforge.org'))
     @jar.add(url, cookie)
 
     assert_equal(1, @jar.cookies(url).length)
@@ -198,7 +189,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_cookies_with_leading_dot_match_subdomains
     url = URI.parse('http://admin.rubyforge.org/')
 
-    @jar.add(url, cookie_from_hash(cookie_values(:domain => '.rubyforge.org')))
+    @jar.add(url, Mechanize::Cookie.new(cookie_values(:domain => '.rubyforge.org')))
 
     assert_equal(1, @jar.cookies(url).length)
   end
@@ -206,7 +197,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_cookies_with_leading_dot_match_parent_domains
     url = URI.parse('http://rubyforge.org/')
 
-    @jar.add(url, cookie_from_hash(cookie_values(:domain => '.rubyforge.org')))
+    @jar.add(url, Mechanize::Cookie.new(cookie_values(:domain => '.rubyforge.org')))
 
     assert_equal(1, @jar.cookies(url).length)
   end
@@ -214,7 +205,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_cookies_with_leading_dot_match_parent_domains_exactly
     url = URI.parse('http://arubyforge.org/')
 
-    @jar.add(url, cookie_from_hash(cookie_values(:domain => '.rubyforge.org')))
+    @jar.add(url, Mechanize::Cookie.new(cookie_values(:domain => '.rubyforge.org')))
 
     assert_equal(0, @jar.cookies(url).length)
   end
@@ -222,7 +213,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_cookie_for_ipv4_address_matches_the_exact_ipaddress
     url = URI.parse('http://192.168.0.1/')
 
-    cookie = cookie_from_hash(cookie_values(:domain => '192.168.0.1'))
+    cookie = Mechanize::Cookie.new(cookie_values(:domain => '192.168.0.1'))
     @jar.add(url, cookie)
 
     assert_equal(1, @jar.cookies(url).length)
@@ -231,7 +222,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_cookie_for_ipv4_address_does_not_cause_subdomain_match
     url = URI.parse('http://192.168.0.1/')
 
-    cookie = cookie_from_hash(cookie_values(:domain => '.0.1'))
+    cookie = Mechanize::Cookie.new(cookie_values(:domain => '.0.1'))
     @jar.add(url, cookie)
 
     assert_equal(0, @jar.cookies(url).length)
@@ -240,7 +231,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_cookie_for_ipv6_address_matches_the_exact_ipaddress
     url = URI.parse('http://[fe80::0123:4567:89ab:cdef]/')
 
-    cookie = cookie_from_hash(cookie_values(:domain => '[fe80::0123:4567:89ab:cdef]'))
+    cookie = Mechanize::Cookie.new(cookie_values(:domain => '[fe80::0123:4567:89ab:cdef]'))
     @jar.add(url, cookie)
 
     assert_equal(1, @jar.cookies(url).length)
@@ -250,7 +241,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     url = URI.parse('http://www.host.example/')
 
     @jar.add(url,
-             cookie_from_hash(cookie_values(:domain => 'www.host.example')))
+             Mechanize::Cookie.new(cookie_values(:domain => 'www.host.example')))
 
     url = URI.parse('http://wwwxhost.example/')
     assert_equal(0, @jar.cookies(url).length)
@@ -260,9 +251,9 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     url = URI.parse('http://rubyforge.org/')
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(cookie_values)
+    cookie = Mechanize::Cookie.new(cookie_values)
     @jar.add(url, cookie)
-    @jar.add(url, cookie_from_hash(cookie_values(:name => 'Baz')))
+    @jar.add(url, Mechanize::Cookie.new(cookie_values(:name => 'Baz')))
     assert_equal(2, @jar.cookies(url).length)
 
     @jar.clear!
@@ -274,14 +265,14 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     url = URI.parse('http://rubyforge.org/')
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(cookie_values)
-    s_cookie = cookie_from_hash(cookie_values(:name => 'Bar',
+    cookie = Mechanize::Cookie.new(cookie_values)
+    s_cookie = Mechanize::Cookie.new(cookie_values(:name => 'Bar',
                                               :expires => nil,
                                               :session => true))
 
     @jar.add(url, cookie)
     @jar.add(url, s_cookie)
-    @jar.add(url, cookie_from_hash(cookie_values(:name => 'Baz')))
+    @jar.add(url, Mechanize::Cookie.new(cookie_values(:name => 'Baz')))
 
     assert_equal(3, @jar.cookies(url).length)
 
@@ -298,14 +289,14 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     url = URI.parse('http://rubyforge.org/')
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(cookie_values)
-    s_cookie = cookie_from_hash(cookie_values(:name => 'Bar',
+    cookie = Mechanize::Cookie.new(cookie_values)
+    s_cookie = Mechanize::Cookie.new(cookie_values(:name => 'Bar',
                                               :expires => nil,
                                               :session => true))
 
     @jar.add(url, cookie)
     @jar.add(url, s_cookie)
-    @jar.add(url, cookie_from_hash(cookie_values(:name => 'Baz')))
+    @jar.add(url, Mechanize::Cookie.new(cookie_values(:name => 'Baz')))
 
     assert_equal(3, @jar.cookies(url).length)
 
@@ -322,24 +313,24 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     url = URI.parse('http://rubyforge.org/')
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(cookie_values)
+    cookie = Mechanize::Cookie.new(cookie_values)
     @jar.add(url, cookie)
     assert_equal(1, @jar.cookies(url).length)
 
     # Add a second cookie
-    @jar.add(url, cookie_from_hash(cookie_values(:name => 'Baz')))
+    @jar.add(url, Mechanize::Cookie.new(cookie_values(:name => 'Baz')))
     assert_equal(2, @jar.cookies(url).length)
 
     # Make sure we can get the cookie from different paths
     assert_equal(2, @jar.cookies(URI.parse('http://rubyforge.org/login')).length)
 
     # Expire the first cookie
-    @jar.add(url, cookie_from_hash(
+    @jar.add(url, Mechanize::Cookie.new(
         cookie_values(:expires => Time.now - (10 * 86400))))
     assert_equal(1, @jar.cookies(url).length)
 
     # Expire the second cookie
-    @jar.add(url, cookie_from_hash(
+    @jar.add(url, Mechanize::Cookie.new(
         cookie_values( :name => 'Baz', :expires => Time.now - (10 * 86400))))
     assert_equal(0, @jar.cookies(url).length)
   end
@@ -349,23 +340,23 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     url = URI.parse('http://rubyforge.org/')
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(values)
+    cookie = Mechanize::Cookie.new(values)
     @jar.add(url, cookie)
     assert_equal(1, @jar.cookies(url).length)
 
     # Add a second cookie
-    @jar.add(url, cookie_from_hash(values.merge(:name => 'Baz')))
+    @jar.add(url, Mechanize::Cookie.new(values.merge(:name => 'Baz')))
     assert_equal(2, @jar.cookies(url).length)
 
     # Make sure we can get the cookie from different paths
     assert_equal(2, @jar.cookies(URI.parse('http://rubyforge.org/login')).length)
 
     # Expire the first cookie
-    @jar.add(url, cookie_from_hash(values.merge(:expires => Time.now - (10 * 86400))))
+    @jar.add(url, Mechanize::Cookie.new(values.merge(:expires => Time.now - (10 * 86400))))
     assert_equal(1, @jar.cookies(url).length)
 
     # Expire the second cookie
-    @jar.add(url, cookie_from_hash(
+    @jar.add(url, Mechanize::Cookie.new(
         values.merge(:name => 'Baz', :expires => Time.now - (10 * 86400))))
     assert_equal(0, @jar.cookies(url).length)
 
@@ -375,7 +366,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     assert_equal '', url.path
     assert_equal(0, @jar.cookies(url).length)
     # Now add a cookie with the path set to '/':
-    @jar.add(url, cookie_from_hash(values.merge( :name => 'has_root_path',
+    @jar.add(url, Mechanize::Cookie.new(values.merge( :name => 'has_root_path',
                                           :path => '/')))
     assert_equal(1, @jar.cookies(url).length)
   end
@@ -385,12 +376,12 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     url = URI.parse('http://rubyforge.org/login')
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(values)
+    cookie = Mechanize::Cookie.new(values)
     @jar.add(url, cookie)
     assert_equal(1, @jar.cookies(url).length)
 
     # Add a second cookie
-    @jar.add(url, cookie_from_hash(values.merge( :name => 'Baz' )))
+    @jar.add(url, Mechanize::Cookie.new(values.merge( :name => 'Baz' )))
     assert_equal(2, @jar.cookies(url).length)
 
     # Make sure we don't get the cookie in a different path
@@ -398,11 +389,11 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     assert_equal(0, @jar.cookies(URI.parse('http://rubyforge.org/')).length)
 
     # Expire the first cookie
-    @jar.add(url, cookie_from_hash(values.merge( :expires => Time.now - (10 * 86400))))
+    @jar.add(url, Mechanize::Cookie.new(values.merge( :expires => Time.now - (10 * 86400))))
     assert_equal(1, @jar.cookies(url).length)
 
     # Expire the second cookie
-    @jar.add(url, cookie_from_hash(values.merge( :name => 'Baz',
+    @jar.add(url, Mechanize::Cookie.new(values.merge( :name => 'Baz',
                                           :expires => Time.now - (10 * 86400))))
     assert_equal(0, @jar.cookies(url).length)
   end
@@ -411,9 +402,9 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     url = URI.parse('http://rubyforge.org/')
 
     # Add one cookie with an expiration date in the future
-    cookie = cookie_from_hash(cookie_values)
+    cookie = Mechanize::Cookie.new(cookie_values)
     @jar.add(url, cookie)
-    @jar.add(url, cookie_from_hash(cookie_values(:name => 'Baz')))
+    @jar.add(url, Mechanize::Cookie.new(cookie_values(:name => 'Baz')))
     assert_equal(2, @jar.cookies(url).length)
 
     @jar.save_as("cookies.txt", :cookiestxt)
@@ -426,7 +417,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
   def test_save_and_read_cookiestxt_with_session_cookies
     url = URI.parse('http://rubyforge.org/')
 
-    @jar.add(url, cookie_from_hash(cookie_values(:expires => nil)))
+    @jar.add(url, Mechanize::Cookie.new(cookie_values(:expires => nil)))
     @jar.save_as("cookies.txt", :cookiestxt)
     @jar.clear!
 
@@ -441,7 +432,7 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     @jar.jar['rubyforge.org'] = {}
 
 
-    @jar.add url, cookie_from_hash(cookie_values)
+    @jar.add url, Mechanize::Cookie.new(cookie_values)
 
     # HACK no asertion
   end
@@ -452,11 +443,11 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     values_ssl = values.merge(:name => 'Baz', :domain => "#{values[:domain]}:443")
     url = URI.parse('https://rubyforge.org/login')
 
-    cookie = cookie_from_hash(values)
+    cookie = Mechanize::Cookie.new(values)
     @jar.add(url, cookie)
     assert_equal(1, @jar.cookies(url).length, "did not handle SSL cookie")
 
-    cookie = cookie_from_hash(values_ssl)
+    cookie = Mechanize::Cookie.new(values_ssl)
     @jar.add(url, cookie)
     assert_equal(2, @jar.cookies(url).length, "did not handle SSL cookie with :443")
   end
@@ -465,8 +456,8 @@ class TestMechanizeCookieJar < MiniTest::Unit::TestCase
     nurl  = URI.parse('http://rubyforge.org/login')
     surl = URI.parse('https://rubyforge.org/login')
 
-    ncookie = cookie_from_hash(cookie_values(:name => 'Foo1'))
-    scookie = cookie_from_hash(cookie_values(:name => 'Foo2', :secure => true))
+    ncookie = Mechanize::Cookie.new(cookie_values(:name => 'Foo1'))
+    scookie = Mechanize::Cookie.new(cookie_values(:name => 'Foo2', :secure => true))
 
     @jar.add(nurl, ncookie)
     @jar.add(nurl, scookie)

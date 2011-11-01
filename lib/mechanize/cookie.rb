@@ -6,9 +6,52 @@ class Mechanize::Cookie < WEBrick::Cookie
 
   attr_accessor :session
 
+  # :call-seq:
+  #     new(name, value)
+  #     new(name, value, attr_hash)
+  #     new(attr_hash)
+  #
+  # Creates a cookie object.  For each key of +attr_hash+, the setter
+  # is called if defined.  Each key can be either a symbol or a
+  # string, downcased or not.
+  #
+  # e.g.
+  #     new("uid", "a12345")
+  #     new("uid", "a12345", :domain => 'example.org',
+  #                          :for_domain => true, :expired => Time.now + 7*86400)
+  #     new("name" => "uid", "value" => "a12345", "Domain" => 'www.example.org')
+  #
   def initialize(*args)
-    super(*args)
-    @for_domain = false
+    case args.size
+    when 2
+      super(*args)
+      return
+    when 3
+      name, value, attr_hash = *args
+      super(name, value)
+    when 1
+      attr_hash = args.first
+      super(nil, nil)
+    else
+      raise ArgumentError, "wrong number of arguments (#{args.size} for 1-3)"
+    end
+    for_domain = false
+    attr_hash.each_pair { |key, val|
+      skey = key.to_s.downcase
+      skey.sub!(/[!?]\z/, '')
+      case skey
+      when 'for_domain'
+        for_domain = !!val
+      when 'name'
+        @name = val
+      when 'value'
+        @value = val
+      else
+        setter = :"#{skey}="
+        send(setter, val) if respond_to?(setter)
+      end
+    }
+    @for_domain = for_domain
   end
 
   # If this flag is true, this cookie will be sent to any host in the

@@ -14,14 +14,12 @@ class Mechanize::Cookie < WEBrick::Cookie
         first_elem.strip!
         key, value = first_elem.split(/\=/, 2)
 
-        cookie = nil
         begin
           cookie = new(key, value.dup)
         rescue
           log.warn("Couldn't parse key/value: #{first_elem}") if log
+          next
         end
-
-        next unless cookie
 
         cookie_elem.each do |pair|
           pair.strip!
@@ -30,12 +28,12 @@ class Mechanize::Cookie < WEBrick::Cookie
           value = WEBrick::HTTPUtils.dequote(value.strip) if value
 
           case key.downcase
-          when "domain" then
+          when 'domain'
             cookie.domain = value
-          when "path" then
+          when 'path'
             cookie.path = value
           when 'expires'
-            if value.empty? then
+            if value.empty?
               cookie.session = true
               next
             end
@@ -45,22 +43,23 @@ class Mechanize::Cookie < WEBrick::Cookie
             rescue
               log.warn("Couldn't parse expires: #{value}") if log
             end
-          when "max-age" then
+          when 'max-age'
             begin
               cookie.max_age = Integer(value)
             rescue
               log.warn("Couldn't parse max age '#{value}'") if log
-              cookie.max_age = nil
             end
-          when "comment" then cookie.comment = value
-          when "version" then
+          when 'comment'
+            cookie.comment = value
+          when 'version'
             begin
               cookie.version = Integer(value)
             rescue
               log.warn("Couldn't parse version '#{value}'") if log
               cookie.version = nil
             end
-          when "secure"  then cookie.secure = true
+          when 'secure'
+            cookie.secure = true
           end
         end
 

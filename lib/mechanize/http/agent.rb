@@ -7,17 +7,49 @@ require 'kconv'
 
 class Mechanize::HTTP::Agent
 
-  attr_reader :authenticate_methods # :nodoc:
-  attr_reader :digest_challenges # :nodoc:
-
-  attr_accessor :cookie_jar
+  # :section: Headers
 
   # Disables If-Modified-Since conditional requests (enabled by default)
   attr_accessor :conditional_requests
-  attr_accessor :context
 
-  # Follow HTML meta refresh.  If set to +:anywhere+ meta refresh tags outside
-  # of the head element will be followed.
+  # Is gzip compression of requests enabled?
+  attr_accessor :gzip_enabled
+
+  # A hash of request headers to be used for every request
+  attr_accessor :request_headers
+
+  # The User-Agent header to send
+  attr_reader :user_agent
+
+  # :section: History
+
+  # history of requests made
+  attr_accessor :history
+
+  # :section: Hooks
+
+  # A list of hooks to call after retrieving a response.  Hooks are called with
+  # the agent and the response returned.
+  attr_reader :post_connect_hooks
+
+  # A list of hooks to call before making a request.  Hooks are called with
+  # the agent and the request to be performed.
+  attr_reader :pre_connect_hooks
+
+  # A list of hooks to call to handle the content-encoding of a request.
+  attr_reader :content_encoding_hooks
+
+  # :section: HTTP Authentication
+
+  attr_reader :authenticate_methods # :nodoc:
+  attr_reader :digest_challenges # :nodoc:
+  attr_accessor :user
+  attr_accessor :password
+
+  # :section: Redirection
+
+  # Follow HTML meta refresh and HTTP Refresh.  If set to +:anywhere+ meta
+  # refresh tags outside of the head element will be followed.
   attr_accessor :follow_meta_refresh
 
   # Follow an HTML meta refresh that has no "url=" in the content attribute.
@@ -25,66 +57,23 @@ class Mechanize::HTTP::Agent
   # Defaults to false to prevent infinite refresh loops.
   attr_accessor :follow_meta_refresh_self
 
-  attr_accessor :gzip_enabled
-  attr_accessor :history
-
-  # Reset connections that have not been used in this many seconds
-  attr_reader   :idle_timeout
-
-  # Set to false to disable HTTP/1.1 keep-alive requests
-  attr_accessor :keep_alive
-
-  # Length of time to wait until a connection is opened in seconds
-  attr_accessor :open_timeout
-
-  attr_accessor :password
-  attr_reader :proxy_uri
-
-  # A list of hooks to call after retrieving a response.  Hooks are called with
-  # the agent and the response returned.
-
-  attr_reader :post_connect_hooks
-
-  # A list of hooks to call before making a request.  Hooks are called with
-  # the agent and the request to be performed.
-
-  attr_reader :pre_connect_hooks
-
-  attr_reader :content_encoding_hooks
-
-  # Length of time to attempt to read data from the server
-  attr_accessor  :read_timeout
-
   # Controls how this agent deals with redirects.  The following values are
   # allowed:
   #
   # :all, true:: All 3xx redirects are followed (default)
   # :permanent:: Only 301 Moved Permanantly redirects are followed
   # false:: No redirects are followed
-
   attr_accessor :redirect_ok
+
+  # Maximum number of redirects to follow
   attr_accessor :redirection_limit
 
-  # A hash of request headers to be used
-
-  attr_accessor :request_headers
-
-  # Retry non-idempotent requests?
-
-  attr_reader :retry_change_requests
+  # :section: Robots
 
   # When true, this agent will consult the site's robots.txt for each access.
-
   attr_reader :robots
 
-  attr_accessor :scheme_handlers
-
-  # Responses larger than this will be written to a Tempfile instead of stored
-  # in memory.
-  attr_accessor :max_file_buffer
-
-  attr_accessor :user
-  attr_reader :user_agent
+  # :section: SSL
 
   # Path to an OpenSSL server certificate file
   attr_accessor :ca_file
@@ -106,7 +95,49 @@ class Mechanize::HTTP::Agent
   # when the SSLContext was created
   attr_accessor :verify_callback
 
+  # :section: Timeouts
+
+  # Reset connections that have not been used in this many seconds
+  attr_reader   :idle_timeout
+
+  # Set to false to disable HTTP/1.1 keep-alive requests
+  attr_accessor :keep_alive
+
+  # Length of time to wait until a connection is opened in seconds
+  attr_accessor :open_timeout
+
+  # Length of time to attempt to read data from the server
+  attr_accessor  :read_timeout
+
+  # :section:
+
+  # The cookies for this agent
+  attr_accessor :cookie_jar
+
+  # URI for a proxy connection
+  attr_reader :proxy_uri
+
+  # Retry non-idempotent requests?
+  attr_reader :retry_change_requests
+
+  # Responses larger than this will be written to a Tempfile instead of stored
+  # in memory.
+  attr_accessor :max_file_buffer
+
+  # :section: Utility
+
+  # The context parses responses into pages
+  attr_accessor :context
+
   attr_reader :http # :nodoc:
+
+  # Handlers for various URI schemes
+  attr_accessor :scheme_handlers
+
+  # :section:
+
+  # Creates a new Mechanize HTTP user agent.  The user agent is an
+  # implementation detail of mechanize and its API may change at any time.
 
   def initialize
     @conditional_requests     = true
@@ -164,45 +195,14 @@ class Mechanize::HTTP::Agent
     @scheme_handlers['file']      = @scheme_handlers['http']
   end
 
-  # Equivalent to the browser back button.  Returns the most recent page
-  # visited.
-  def back
-    @history.pop
-  end
+  # Retrieves +uri+ and parses it into a page or other object according to
+  # PluggableParser.  If the URI is an HTTP or HTTPS scheme URI the given HTTP
+  # +method+ is used to retrieve it, along with the HTTP +headers+, request
+  # +params+ and HTTP +referer+.
+  #
+  # +redirects+ tracks the number of redirects experienced when retrieving the
+  # page.  If it is over the redirection_limit an error will be raised.
 
-  def certificate
-    @http.certificate
-  end
-
-  def connection_for uri
-    case uri.scheme.downcase
-    when 'http', 'https' then
-      return @http
-    when 'file' then
-      return Mechanize::FileConnection.new
-    end
-  end
-
-  ##
-  # Returns the latest page loaded by the agent
-
-  def current_page
-    @history.last
-  end
-
-  def disable_keep_alive request
-    request['connection'] = 'close' unless @keep_alive
-  end
-
-  def enable_gzip request
-    request['accept-encoding'] = if @gzip_enabled
-                                   'gzip,deflate,identity'
-                                 else
-                                   'identity'
-                                 end
-  end
-
-  # uri is an absolute URI
   def fetch uri, method = :get, headers = {}, params = [],
             referer = current_page, redirects = 0
     referer_uri = referer ? referer.uri : nil
@@ -293,6 +293,35 @@ class Mechanize::HTTP::Agent
     end
   end
 
+  # Retry non-idempotent requests
+
+  def retry_change_requests= retri
+    @retry_change_requests = retri
+    @http.retry_change_requests = retri if @http
+  end
+
+  # :section: Headers
+
+  def user_agent= user_agent
+    @webrobots = nil if user_agent != @user_agent
+    @user_agent = user_agent
+  end
+
+  # :section: History
+
+  # Equivalent to the browser back button.  Returns the most recent page
+  # visited.
+  def back
+    @history.pop
+  end
+
+  ##
+  # Returns the latest page loaded by the agent
+
+  def current_page
+    @history.last
+  end
+
   def max_history
     @history.max_size
   end
@@ -301,41 +330,17 @@ class Mechanize::HTTP::Agent
     @history.max_size = length
   end
 
-  def http_request uri, method, params = nil
-    case uri.scheme.downcase
-    when 'http', 'https' then
-      klass = Net::HTTP.const_get(method.to_s.capitalize)
+  # Returns a visited page for the url passed in, otherwise nil
+  def visited_page url
+    @history.visited_page resolve url
+  end
 
-      request ||= klass.new(uri.request_uri)
-      request.body = params.first if params
+  # :section: Hooks
 
-      request
-    when 'file' then
-      Mechanize::FileRequest.new uri
+  def hook_content_encoding response, uri, response_body_io
+    @content_encoding_hooks.each do |hook|
+      hook.call self, uri, response, response_body_io
     end
-  end
-
-  # Sets the conection idle timeout for persistent connections
-  def idle_timeout= timeout
-    @idle_timeout = timeout
-    @http.idle_timeout = timeout if @http
-  end
-
-  def inflate compressed, window_bits = nil
-    inflate = Zlib::Inflate.new window_bits
-    out_io = Tempfile.new 'mechanize-decode'
-
-    until compressed.eof? do
-      out_io.write inflate.inflate compressed.read 1024
-    end
-
-    out_io.write inflate.finish
-
-    out_io
-  end
-
-  def log
-    Mechanize.log
   end
 
   ##
@@ -361,10 +366,58 @@ class Mechanize::HTTP::Agent
     end
   end
 
-  # Retry non-idempotent requests
-  def retry_change_requests= retri
-    @retry_change_requests = retri
-    @http.retry_change_requests = retri if @http
+  # :section: Request
+
+  def connection_for uri
+    case uri.scheme.downcase
+    when 'http', 'https' then
+      return @http
+    when 'file' then
+      return Mechanize::FileConnection.new
+    end
+  end
+
+  def disable_keep_alive request
+    request['connection'] = 'close' unless @keep_alive
+  end
+
+  def enable_gzip request
+    request['accept-encoding'] = if @gzip_enabled
+                                   'gzip,deflate,identity'
+                                 else
+                                   'identity'
+                                 end
+  end
+
+  def http_request uri, method, params = nil
+    case uri.scheme.downcase
+    when 'http', 'https' then
+      klass = Net::HTTP.const_get(method.to_s.capitalize)
+
+      request ||= klass.new(uri.request_uri)
+      request.body = params.first if params
+
+      request
+    when 'file' then
+      Mechanize::FileRequest.new uri
+    end
+  end
+
+  def request_add_headers request, headers = {}
+    @request_headers.each do |k,v|
+      request[k] = v
+    end
+
+    headers.each do |field, value|
+      case field
+      when :etag              then request["ETag"] = value
+      when :if_modified_since then request["If-Modified-Since"] = value
+      when Symbol then
+        raise ArgumentError, "unknown header symbol #{field}"
+      else
+        request[field] = value
+      end
+    end
   end
 
   def request_auth request, uri
@@ -420,23 +473,6 @@ class Mechanize::HTTP::Agent
 
     request.each_header do |k, v|
       log.debug("request-header: #{k} => #{v}")
-    end
-  end
-
-  def request_add_headers request, headers = {}
-    @request_headers.each do |k,v|
-      request[k] = v
-    end
-
-    headers.each do |field, value|
-      case field
-      when :etag              then request["ETag"] = value
-      when :if_modified_since then request["If-Modified-Since"] = value
-      when Symbol then
-        raise ArgumentError, "unknown header symbol #{field}"
-      else
-        request[field] = value
-      end
     end
   end
 
@@ -530,6 +566,80 @@ class Mechanize::HTTP::Agent
     return uri, parameters
   end
 
+  # :section: Response
+
+  def get_meta_refresh response, uri, page
+    return nil unless @follow_meta_refresh
+
+    if page.respond_to?(:meta_refresh) and
+       (redirect = page.meta_refresh.first) then
+      [redirect.delay, redirect.href] unless
+        not @follow_meta_refresh_self and redirect.link_self
+    elsif refresh = response['refresh']
+      delay, href, link_self = Mechanize::Page::MetaRefresh.parse refresh, uri
+      raise Mechanize::Error, 'Invalid refresh http header' unless delay
+      [delay.to_f, href] unless
+        not @follow_meta_refresh_self and link_self
+    end
+  end
+
+  def response_authenticate(response, page, uri, request, headers, params,
+                            referer)
+    raise Mechanize::UnauthorizedError, page unless @user || @password
+
+    challenges = @authenticate_parser.parse response['www-authenticate']
+
+    if challenge = challenges.find { |c| c.scheme =~ /^Digest$/i } then
+      realm = challenge.realm uri
+
+      auth_scheme = if response['server'] =~ /Microsoft-IIS/ then
+                      :iis_digest
+                    else
+                      :digest
+                    end
+
+      existing_realms = @authenticate_methods[realm.uri][auth_scheme]
+
+      raise Mechanize::UnauthorizedError, page if
+        existing_realms.include? realm
+
+      existing_realms << realm
+      @digest_challenges[realm] = challenge
+    elsif challenge = challenges.find { |c| c.scheme == 'NTLM' } then
+      existing_realms = @authenticate_methods[uri + '/'][:ntlm]
+
+      raise Mechanize::UnauthorizedError, page if
+        existing_realms.include?(realm) and not challenge.params
+
+      existing_realms << realm
+
+      if challenge.params then
+        type_2 = Net::NTLM::Message.decode64 challenge.params
+
+        type_3 = type_2.response({ :user => @user, :password => @password, },
+                                 { :ntlmv2 => true }).encode64
+
+        headers['Authorization'] = "NTLM #{type_3}"
+      else
+        type_1 = Net::NTLM::Message::Type1.new.encode64
+        headers['Authorization'] = "NTLM #{type_1}"
+      end
+    elsif challenge = challenges.find { |c| c.scheme == 'Basic' } then
+      realm = challenge.realm uri
+
+      existing_realms = @authenticate_methods[realm.uri][:basic]
+
+      raise Mechanize::UnauthorizedError, page if
+        existing_realms.include? realm
+
+      existing_realms << realm
+    else
+      raise Mechanize::UnauthorizedError, page
+    end
+
+    fetch uri, request.method.downcase.to_sym, headers, params, referer
+  end
+
   def response_content_encoding response, body_io
     length = response.content_length
 
@@ -597,12 +707,6 @@ class Mechanize::HTTP::Agent
     out_io
   end
 
-  def hook_content_encoding response, uri, response_body_io
-    @content_encoding_hooks.each do |hook|
-      hook.call self, uri, response, response_body_io
-    end
-  end
-
   def response_cookies response, uri, page
     if Mechanize::Page === page and page.body =~ /Set-Cookie/n
       page.search('//head/meta[@http-equiv="Set-Cookie"]').each do |meta|
@@ -636,21 +740,6 @@ class Mechanize::HTTP::Agent
     @history.push(page, page.uri)
     fetch new_url, :get, {}, [],
           Mechanize::Page.new(nil, {'content-type'=>'text/html'}), redirects
-  end
-
-  def get_meta_refresh response, uri, page
-    return nil unless @follow_meta_refresh
-
-    if page.respond_to?(:meta_refresh) and
-       (redirect = page.meta_refresh.first) then
-      [redirect.delay, redirect.href] unless
-        not @follow_meta_refresh_self and redirect.link_self
-    elsif refresh = response['refresh']
-      delay, href, link_self = Mechanize::Page::MetaRefresh.parse refresh, uri
-      raise Mechanize::Error, 'Invalid refresh http header' unless delay
-      [delay.to_f, href] unless
-        not @follow_meta_refresh_self and link_self
-    end
   end
 
   def response_log response
@@ -742,61 +831,13 @@ class Mechanize::HTTP::Agent
     fetch(new_uri, redirect_method, {}, [], referer, redirects + 1)
   end
 
-  def response_authenticate(response, page, uri, request, headers, params,
-                            referer)
-    raise Mechanize::UnauthorizedError, page unless @user || @password
+  # :section: Robots
 
-    challenges = @authenticate_parser.parse response['www-authenticate']
-
-    if challenge = challenges.find { |c| c.scheme =~ /^Digest$/i } then
-      realm = challenge.realm uri
-
-      auth_scheme = if response['server'] =~ /Microsoft-IIS/ then
-                      :iis_digest
-                    else
-                      :digest
-                    end
-
-      existing_realms = @authenticate_methods[realm.uri][auth_scheme]
-
-      raise Mechanize::UnauthorizedError, page if
-        existing_realms.include? realm
-
-      existing_realms << realm
-      @digest_challenges[realm] = challenge
-    elsif challenge = challenges.find { |c| c.scheme == 'NTLM' } then
-      existing_realms = @authenticate_methods[uri + '/'][:ntlm]
-
-      raise Mechanize::UnauthorizedError, page if
-        existing_realms.include?(realm) and not challenge.params
-
-      existing_realms << realm
-
-      if challenge.params then
-        type_2 = Net::NTLM::Message.decode64 challenge.params
-
-        type_3 = type_2.response({ :user => @user, :password => @password, },
-                                 { :ntlmv2 => true }).encode64
-
-        headers['Authorization'] = "NTLM #{type_3}"
-      else
-        type_1 = Net::NTLM::Message::Type1.new.encode64
-        headers['Authorization'] = "NTLM #{type_1}"
-      end
-    elsif challenge = challenges.find { |c| c.scheme == 'Basic' } then
-      realm = challenge.realm uri
-
-      existing_realms = @authenticate_methods[realm.uri][:basic]
-
-      raise Mechanize::UnauthorizedError, page if
-        existing_realms.include? realm
-
-      existing_realms << realm
-    else
-      raise Mechanize::UnauthorizedError, page
-    end
-
-    fetch uri, request.method.downcase.to_sym, headers, params, referer
+  def get_robots(uri) # :nodoc:
+    fetch(uri).body
+  rescue Mechanize::ResponseCodeError => e
+    return '' if e.response_code == '404'
+    raise e
   end
 
   def robots= value
@@ -838,6 +879,43 @@ class Mechanize::HTTP::Agent
     webrobots.reset(url)
   end
 
+  def webrobots
+    @webrobots ||= WebRobots.new(@user_agent, :http_get => method(:get_robots))
+  end
+
+  # :section: SSL
+
+  def certificate
+    @http.certificate
+  end
+
+  # :section: Timeouts
+
+  # Sets the conection idle timeout for persistent connections
+  def idle_timeout= timeout
+    @idle_timeout = timeout
+    @http.idle_timeout = timeout if @http
+  end
+
+  # :section: Utility
+
+  def inflate compressed, window_bits = nil
+    inflate = Zlib::Inflate.new window_bits
+    out_io = Tempfile.new 'mechanize-decode'
+
+    until compressed.eof? do
+      out_io.write inflate.inflate compressed.read 1024
+    end
+
+    out_io.write inflate.finish
+
+    out_io
+  end
+
+  def log
+    Mechanize.log
+  end
+
   def set_http
     @http = Net::HTTP::Persistent.new 'mechanize', @proxy_uri
 
@@ -876,27 +954,6 @@ class Mechanize::HTTP::Agent
     @proxy_uri.password = pass if pass
 
     @proxy_uri
-  end
-
-  def user_agent= user_agent
-    @webrobots = nil if user_agent != @user_agent
-    @user_agent = user_agent
-  end
-
-  # Returns a visited page for the url passed in, otherwise nil
-  def visited_page url
-    @history.visited_page resolve url
-  end
-
-  def get_robots(uri) # :nodoc:
-    fetch(uri).body
-  rescue Mechanize::ResponseCodeError => e
-    return '' if e.response_code == '404'
-    raise e
-  end
-
-  def webrobots
-    @webrobots ||= WebRobots.new(@user_agent, :http_get => method(:get_robots))
   end
 
 end

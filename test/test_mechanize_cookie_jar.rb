@@ -6,15 +6,6 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     super
 
     @jar = Mechanize::CookieJar.new
-    @tmpdir = Dir.mktmpdir
-
-    @orig_dir = Dir.pwd
-    Dir.chdir @tmpdir
-  end
-
-  def teardown
-    Dir.chdir @orig_dir
-    FileUtils.remove_entry_secure @tmpdir
   end
 
   def cookie_values(options = {})
@@ -276,11 +267,13 @@ class TestMechanizeCookieJar < Mechanize::TestCase
 
     assert_equal(3, @jar.cookies(url).length)
 
-    @jar.save_as("cookies.yml")
+    in_tmpdir do
+      @jar.save_as("cookies.yml")
 
-    jar = Mechanize::CookieJar.new
-    jar.load("cookies.yml")
-    assert_equal(2, jar.cookies(url).length)
+      jar = Mechanize::CookieJar.new
+      jar.load("cookies.yml")
+      assert_equal(2, jar.cookies(url).length)
+    end
 
     assert_equal(3, @jar.cookies(url).length)
   end
@@ -300,11 +293,13 @@ class TestMechanizeCookieJar < Mechanize::TestCase
 
     assert_equal(3, @jar.cookies(url).length)
 
-    @jar.save_as("cookies.txt", :cookiestxt)
+    in_tmpdir do
+      @jar.save_as("cookies.txt", :cookiestxt)
 
-    jar = Mechanize::CookieJar.new
-    jar.load("cookies.txt", :cookiestxt) # HACK test the format
-    assert_equal(2, jar.cookies(url).length)
+      jar = Mechanize::CookieJar.new
+      jar.load("cookies.txt", :cookiestxt) # HACK test the format
+      assert_equal(2, jar.cookies(url).length)
+    end
 
     assert_equal(3, @jar.cookies(url).length)
   end
@@ -407,10 +402,13 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     @jar.add(url, Mechanize::Cookie.new(cookie_values(:name => 'Baz')))
     assert_equal(2, @jar.cookies(url).length)
 
-    @jar.save_as("cookies.txt", :cookiestxt)
-    @jar.clear!
+    in_tmpdir do
+      @jar.save_as("cookies.txt", :cookiestxt)
+      @jar.clear!
 
-    @jar.load("cookies.txt", :cookiestxt)
+      @jar.load("cookies.txt", :cookiestxt)
+    end
+
     assert_equal(2, @jar.cookies(url).length)
   end
 
@@ -418,10 +416,14 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     url = URI 'http://rubyforge.org/'
 
     @jar.add(url, Mechanize::Cookie.new(cookie_values(:expires => nil)))
-    @jar.save_as("cookies.txt", :cookiestxt)
-    @jar.clear!
 
-    @jar.load("cookies.txt", :cookiestxt)
+    in_tmpdir do
+      @jar.save_as("cookies.txt", :cookiestxt)
+      @jar.clear!
+
+      @jar.load("cookies.txt", :cookiestxt)
+    end
+
     assert_equal(1, @jar.cookies(url).length)
     assert_nil @jar.cookies(url).first.expires
   end

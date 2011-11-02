@@ -1,6 +1,7 @@
 require "helper"
 
-class OptionTest < MiniTest::Unit::TestCase
+class MechanizeFormOptionTest < MiniTest::Unit::TestCase
+
   class FakeAttribute < Hash
     attr_reader :inner_text
     def initialize(inner_text)
@@ -15,4 +16,6 @@ class OptionTest < MiniTest::Unit::TestCase
     option = Mechanize::Form::Option.new(attribute, nil)
     assert_equal('blah', option.value)
   end
+
 end
+

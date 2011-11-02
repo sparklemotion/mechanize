@@ -156,6 +156,7 @@ test/test_mechanize_form_check_box.rb
 test/test_mechanize_form_encoding.rb
 test/test_mechanize_form_field.rb
 test/test_mechanize_form_image_button.rb
+test/test_mechanize_form_option.rb
 test/test_mechanize_form_textarea.rb
 test/test_mechanize_http_agent.rb
 test/test_mechanize_http_auth_challenge.rb
@@ -171,7 +172,6 @@ test/test_mechanize_subclass.rb
 test/test_mechanize_util.rb
 test/test_multi_select.rb
 test/test_no_attributes.rb
-test/test_option.rb
 test/test_pluggable_parser.rb
 test/test_post_form.rb
 test/test_pretty_print.rb

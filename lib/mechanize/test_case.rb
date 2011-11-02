@@ -17,10 +17,12 @@ require 'minitest/autorun'
 class Mechanize::TestCase < MiniTest::Unit::TestCase
 
   TEST_DIR = File.expand_path '../../../test', __FILE__
+  REQUESTS = []
 
   def setup
     super
 
+    REQUESTS.clear
     @mech = Mechanize.new
   end
 
@@ -39,6 +41,11 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
     Mechanize::Page.new uri, response, html, 200, agent
   end
 
+  def html_page body
+    uri = URI 'http://example/'
+    Mechanize::Page.new uri, { 'content-type' => 'text/html' }, body, 200, @mech
+  end
+
   def in_tmpdir
     Dir.mktmpdir do |dir|
       Dir.chdir dir do
@@ -47,9 +54,15 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
     end
   end
 
-  def html_page body
-    uri = URI 'http://example/'
-    Mechanize::Page.new uri, { 'content-type' => 'text/html' }, body, 200, @mech
+  def page uri, content_type = 'text/html', body = '', code = 200
+    uri = URI uri unless URI::Generic === URI
+
+    Mechanize::Page.new(uri, { 'content-type' => content_type }, body, code,
+                        @mech)
+  end
+
+  def requests
+    REQUESTS
   end
 
 end
@@ -370,30 +383,6 @@ class QuotedValueCookieServlet < WEBrick::HTTPServlet::AbstractServlet
   end
 end
 
-class RedirectOkServlet < WEBrick::HTTPServlet::AbstractServlet
-  def do_GET(req, res)
-    res['Content-Type'] = "text/plain"
-    res['X-Referer'] = req['referer']
-    case q = req.query['q']
-    when '1'..'2'
-      res.status = '301'
-      q.succ!
-    when '3'..'4'
-      res.status = '302'
-      q.succ!
-    when '5'
-      res.status = '200'
-      res.body = 'Finally OK.'
-      return
-    else
-      res.status = '301'
-      q = '1'
-    end
-    res['Location'] = "/redirect_ok?q=#{q}"
-  end
-  alias :do_POST :do_GET
-end
-
 class RedirectServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     res['Content-Type'] = req.query['ct'] || "text/html"
@@ -510,7 +499,6 @@ class Net::HTTP
     '/http_headers'           => HeaderServlet,
     '/infinite_redirect'      => InfiniteRedirectServlet,
     '/infinite_refresh'       => InfiniteRefreshServlet,
-    '/redirect_ok'            => RedirectOkServlet,
     '/redirect'               => RedirectServlet,
     '/refresh_without_url'    => RefreshWithoutUrl,
     '/refresh_with_empty_url' => RefreshWithEmptyUrl,
@@ -543,6 +531,8 @@ class Net::HTTP
                 end
 
     req.cookies = WEBrick::Cookie.parse(req['Cookie'])
+
+    Mechanize::TestCase::REQUESTS << req
 
     if servlet_klass = SERVLETS[path]
       servlet = servlet_klass.new({})

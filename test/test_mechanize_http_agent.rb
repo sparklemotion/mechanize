@@ -871,6 +871,53 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal res, e.page
   end
 
+  def test_response_redirect
+    @agent.redirect_ok = true
+    referer = page 'http://example/referer'
+
+    page = fake_page
+    page = @agent.response_redirect({ 'Location' => '/index.html' }, :get,
+                                    page, 0, referer)
+
+    assert_equal URI('http://fake.example/index.html'), page.uri
+
+    assert_equal 'http://example/referer', requests.first['Referer']
+  end
+
+  def test_response_redirect_not_ok
+    @agent.redirect_ok = false
+
+    page = fake_page
+    page = @agent.response_redirect({ 'Location' => '/other' }, :get, page, 0,
+                                    page)
+
+    assert_equal URI('http://fake.example'), page.uri
+  end
+
+  def test_response_redirect_permanent
+    @agent.redirect_ok = :permanent
+
+    response = Net::HTTPMovedPermanently.allocate
+    response.instance_variable_set :@header, { 'location' => %w[/index.html] }
+
+    page = fake_page
+    page = @agent.response_redirect response, :get, page, 0, page
+
+    assert_equal URI('http://fake.example/index.html'), page.uri
+  end
+
+  def test_response_redirect_permanent_temporary
+    @agent.redirect_ok = :permanent
+
+    response = Net::HTTPMovedTemporarily.allocate
+    response.instance_variable_set :@header, { 'location' => %w[/index.html] }
+
+    page = fake_page
+    page = @agent.response_redirect response, :get, page, 0, page
+
+    assert_equal URI('http://fake.example/'), page.uri
+  end
+
   def test_response_parse
     body = '<title>hi</title>'
     @res.instance_variable_set :@header, 'content-type' => %w[text/html]

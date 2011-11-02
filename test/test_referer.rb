@@ -76,15 +76,4 @@ class RefererTest < Mechanize::TestCase
     assert_equal("", page.body)
   end
 
-  def test_redirection_keeps_referer
-    referer = 'http://localhost/?test=1'
-    @mech.redirect_ok = :permanent
-    page = @mech.get('http://localhost/redirect_ok', nil, referer)
-    assert_equal(referer, page['X-Referer'])
-
-    referer = 'http://localhost/?test=2'
-    @mech.redirect_ok = true
-    page = @mech.get('http://localhost/redirect_ok', nil, referer)
-    assert_equal(referer, page['X-Referer'])
-  end
 end

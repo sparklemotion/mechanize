@@ -2,6 +2,40 @@ require 'mechanize/test_case'
 
 class TestMechanizeForm < Mechanize::TestCase
 
+  def setup
+    super
+
+    @form = Mechanize::Form.new node 'form'
+  end
+
+  def test_aset
+    assert_empty @form.keys
+
+    @form['intarweb'] = 'Aaron'
+
+    assert_equal 'Aaron', @form['intarweb']
+  end
+
+  def test_aset_exists
+    page = html_page <<-BODY
+<title>Page Title</title>
+<form name="post_form">
+  <input name="first" type="text" id="name_first">
+  <input name="first" type="text">
+  <input type="submit" value="Submit">
+</form>
+    BODY
+
+    form = page.form_with(:name => 'post_form')
+
+    assert_equal %w[first first], form.keys
+
+    form['first'] = 'Aaron'
+
+    assert_equal 'Aaron', form['first']
+    assert_equal ['Aaron', ''], form.values
+  end
+
   def test_build_query_blank_form
     page = @mech.get('http://localhost/tc_blank_form.html')
     form = page.forms.first
@@ -47,6 +81,30 @@ class TestMechanizeForm < Mechanize::TestCase
     assert_equal(0, form.radiobuttons.length)
   end
 
+  def test_has_field_eh
+    refute @form.has_field? 'name'
+
+    @form['name'] = 'Aaron'
+
+    assert @form.has_field?('name')
+  end
+
+  def test_has_value_eh
+    refute @form.has_value? 'Aaron'
+
+    @form['name'] = 'Aaron'
+
+    assert @form.has_value?('Aaron')
+  end
+
+  def test_keys
+    assert_empty @form.keys
+
+    @form['name'] = 'Aaron'
+
+    assert_equal %w[name], @form.keys
+  end
+
   def test_parse_textarea
     form = Nokogiri::HTML <<-FORM
 <form>
@@ -72,6 +130,14 @@ class TestMechanizeForm < Mechanize::TestCase
     form = page.form('post_form1')
     form.page.encoding = nil
     form.submit
+  end
+
+  def test_values
+    assert_empty @form.values
+
+    @form['name'] = 'Aaron'
+
+    assert_equal %w[Aaron], @form.values
   end
 
   def test_no_form_action

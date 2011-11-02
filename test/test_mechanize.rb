@@ -585,6 +585,16 @@ class TestMechanize < Mechanize::TestCase
     assert @mech.visited?(page.links.first)
   end
 
+  def test_history_added_gets_called
+    added_page = nil
+
+    @mech.history_added = lambda { |page|
+      added_page = page
+    }
+
+    assert_equal @mech.get('http://localhost/tc_blank_form.html'), added_page
+  end
+
   def test_history_order
     @mech.max_history = 2
     assert_equal(0, @mech.history.length)

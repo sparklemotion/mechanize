@@ -1,9 +1,6 @@
-class Mechanize
-  class Form
-    # This class represents a Submit button in a form.
-    class Button < Field ; end
-    class Submit < Button; end
-    class Reset  < Button; end
-  end
+##
+# A Submit button in a Form
+
+class Mechanize::Form::Button < Mechanize::Form::Field
 end
 

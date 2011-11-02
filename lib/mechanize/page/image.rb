@@ -1,30 +1,30 @@
-class Mechanize
-  class Page < Mechanize::File
-    class Image
-      attr_reader :node
-      attr_reader :page
+##
+# An image element on an HTML page
 
-      def initialize(node, page)
-        @node = node
-        @page = page
-      end
+class Mechanize::Page::Image
+  attr_reader :node
+  attr_reader :page
 
-      def src
-        @node['src']
-      end
+  def initialize(node, page)
+    @node = node
+    @page = page
+  end
 
-      def url
-        case src
-        when %r{^https?://}
-          src
-        else 
-          if page.bases[0]
-            (page.bases[0].href + src).to_s
-          else
-            (page.uri + src).to_s
-          end
-        end
+  def src
+    @node['src']
+  end
+
+  def url
+    case src
+    when %r{^https?://}
+      src
+    else 
+      if page.bases[0]
+        (page.bases[0].href + src).to_s
+      else
+        (page.uri + src).to_s
       end
     end
   end
 end
+

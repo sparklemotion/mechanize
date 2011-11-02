@@ -1,6 +1,501 @@
 require 'mechanize/element_matcher'
+
+# This class encapsulates a form parsed out of an HTML page.  Each type of
+# input fields available in a form can be accessed through this object.
+#
+# == Examples
+#
+# Find a form and print out its fields
+#
+#   form = page.forms.first # => Mechanize::Form
+#   form.fields.each { |f| puts f.name }
+#
+# Set the input field 'name' to "Aaron"
+#
+#   form['name'] = 'Aaron'
+#   puts form['name']
+
+class Mechanize::Form
+
+  extend Mechanize::ElementMatcher
+
+  attr_accessor :method, :action, :name
+
+  attr_reader :fields, :buttons, :file_uploads, :radiobuttons, :checkboxes
+
+  # Content-Type for form data (i.e. application/x-www-form-urlencoded)
+  attr_accessor :enctype
+
+  # Character encoding of form data (i.e. UTF-8)
+  attr_accessor :encoding
+
+  # When true, character encoding errors will never be never raised on form
+  # submission.  Default is false
+  attr_accessor :ignore_encoding_error
+
+  alias :elements :fields
+
+  attr_reader :form_node
+  attr_reader :page
+
+  def initialize(node, mech=nil, page=nil)
+    @enctype = node['enctype'] || 'application/x-www-form-urlencoded'
+    @form_node        = node
+    @action           = Mechanize::Util.html_unescape(node['action'])
+    @method           = (node['method'] || 'GET').upcase
+    @name             = node['name']
+    @clicked_buttons  = []
+    @page             = page
+    @mech             = mech
+
+    @encoding = node['accept-charset'] || (page && page.encoding) || nil
+    @ignore_encoding_error = false
+    parse
+  end
+
+  # Returns whether or not the form contains a field with +field_name+
+  def has_field?(field_name)
+    fields.find { |f| f.name == field_name }
+  end
+
+  alias :has_key? :has_field?
+
+  def has_value?(value)
+    fields.find { |f| f.value == value }
+  end
+
+  def keys; fields.map { |f| f.name }; end
+
+  def values; fields.map { |f| f.value }; end
+
+  def submits  ; @submits   ||= buttons.select { |f| f.class == Submit   }; end
+  def resets   ; @resets    ||= buttons.select { |f| f.class == Reset    }; end
+  def texts    ; @texts     ||=  fields.select { |f| f.class == Text     }; end
+  def hiddens  ; @hiddens   ||=  fields.select { |f| f.class == Hidden   }; end
+  def textareas; @textareas ||=  fields.select { |f| f.class == Textarea }; end
+  def keygens  ; @keygens   ||=  fields.select { |f| f.class == Keygen   }; end
+
+  def submit_button?(button_name)   submits.find{|f| f.name == button_name}; end
+  def reset_button?(button_name)     resets.find{|f| f.name == button_name}; end
+  def text_field?(field_name)         texts.find{|f| f.name == field_name}; end
+  def hidden_field?(field_name)     hiddens.find{|f| f.name == field_name}; end
+  def textarea_field?(field_name) textareas.find{|f| f.name == field_name}; end
+
+  # This method is a shortcut to get form's DOM id.
+  # Common usage:
+  #   page.form_with(:dom_id => "foorm")
+  # Note that you can also use +:id+ to get to this method:
+  #   page.form_with(:id => "foorm")
+  def dom_id
+    form_node['id']
+  end
+
+  # This method is a shortcut to get form's DOM class.
+  # Common usage:
+  #   page.form_with(:dom_class => "foorm")
+  # Note that you can also use +:class+ to get to this method:
+  #   page.form_with(:class => "foorm")
+  def dom_class
+    form_node['class']
+  end
+
+  # Add a field with +field_name+ and +value+
+  def add_field!(field_name, value = nil)
+    fields << Field.new({'name' => field_name}, value)
+  end
+
+  # This method sets multiple fields on the form.  It takes a list of field
+  # name, value pairs.  If there is more than one field found with the
+  # same name, this method will set the first one found.  If you want to
+  # set the value of a duplicate field, use a value which is a Hash with
+  # the key as the index in to the form.  The index
+  # is zero based.  For example, to set the second field named 'foo', you
+  # could do the following:
+  #  form.set_fields( :foo => { 1 => 'bar' } )
+  def set_fields(fields = {})
+    fields.each do |k,v|
+      case v
+      when Hash
+        v.each do |index, value|
+          self.fields_with(:name => k.to_s).[](index).value = value
+        end
+      else
+        value = nil
+        index = 0
+        [v].flatten.each do |val|
+          index = val.to_i if value
+          value = val unless value
+        end
+        self.fields_with(:name => k.to_s).[](index).value = value
+      end
+    end
+  end
+
+  # Fetch the value of the first input field with the name passed in
+  # ==Example
+  # Fetch the value set in the input field 'name'
+  #  puts form['name']
+  def [](field_name)
+    f = field(field_name)
+    f && f.value
+  end
+
+  # Set the value of the first input field with the name passed in
+  # ==Example
+  # Set the value in the input field 'name' to "Aaron"
+  #  form['name'] = 'Aaron'
+  def []=(field_name, value)
+    f = field(field_name)
+    if f
+      f.value = value
+    else
+      add_field!(field_name, value)
+    end
+  end
+
+  # Treat form fields like accessors.
+  def method_missing(meth, *args)
+    method = meth.to_s.gsub(/=$/, '')
+
+    if field(method)
+      return field(method).value if args.empty?
+      return field(method).value = args[0]
+    end
+
+    super
+  end
+
+  # Submit this form with the button passed in
+  def submit button=nil, headers = {}
+    @mech.submit(self, button, headers)
+  end
+
+  # Submit form using +button+. Defaults
+  # to the first button.
+  def click_button(button = buttons.first)
+    submit(button)
+  end
+
+  # This method is sub-method of build_query.
+  # It converts charset of query value of fields into expected one.
+  def proc_query(field)
+    return unless field.query_value
+    field.query_value.map{|(name, val)|
+      [from_native_charset(name), from_native_charset(val.to_s)]
+    }
+  end
+  private :proc_query
+
+  def from_native_charset str
+    Mechanize::Util.from_native_charset(str, encoding, @ignore_encoding_error,
+                                        @mech && @mech.log)
+  end
+  private :from_native_charset
+
+  # This method builds an array of arrays that represent the query
+  # parameters to be used with this form.  The return value can then
+  # be used to create a query string for this form.
+  def build_query(buttons = [])
+    query = []
+    @mech.log.info("form encoding: #{encoding}") if @mech && @mech.log
+
+    successful_controls = []
+
+    (fields + checkboxes).sort.each do |f|
+      case f
+      when Mechanize::Form::CheckBox
+        if f.checked
+          successful_controls << f
+        end
+      when Mechanize::Form::Field
+        successful_controls << f
+      end
+    end
+
+    radio_groups = {}
+    radiobuttons.each do |f|
+      fname = from_native_charset(f.name)
+      radio_groups[fname] ||= []
+      radio_groups[fname] << f
+    end
+
+    # take one radio button from each group
+    radio_groups.each_value do |g|
+      checked = g.select {|f| f.checked}
+
+      if checked.size == 1
+        f = checked.first
+        successful_controls << f
+      elsif checked.size > 1
+        raise Mechanize::Error,
+              "multiple radiobuttons are checked in the same group!"
+      end
+    end
+
+    @clicked_buttons.each { |b|
+      successful_controls << b
+    }
+
+    successful_controls.sort.each do |ctrl| # DOM order
+      qval = proc_query(ctrl)
+      query.push(*qval)
+    end
+
+    query
+  end
+
+  # This method adds a button to the query.  If the form needs to be
+  # submitted with multiple buttons, pass each button to this method.
+  def add_button_to_query(button)
+    @clicked_buttons << button
+  end
+
+  # This method calculates the request data to be sent back to the server
+  # for this form, depending on if this is a regular post, get, or a
+  # multi-part post,
+  def request_data
+    query_params = build_query()
+
+    case @enctype.downcase
+    when /^multipart\/form-data/
+      boundary = rand_string(20)
+      @enctype = "multipart/form-data; boundary=#{boundary}"
+
+      params = query_params.map do |k,v|
+        param_to_multipart(k, v) if k
+      end.compact
+
+      params.concat @file_uploads.map { |f| file_to_multipart(f) }
+
+      params.map do |part|
+        part.force_encoding('ASCII-8BIT') if part.respond_to? :force_encoding
+        "--#{boundary}\r\n#{part}"
+      end.join('') +
+        "--#{boundary}--\r\n"
+    else
+      Mechanize::Util.build_query_string(query_params)
+    end
+  end
+
+  # Removes all fields with name +field_name+.
+  def delete_field!(field_name)
+    @fields.delete_if{ |f| f.name == field_name}
+  end
+
+  ##
+  # :method: field_with(criteria)
+  #
+  # Find one field that matches +criteria+
+  # Example:
+  #   form.field_with(:id => "exact_field_id").value = 'hello'
+
+  ##
+  # :method: fields_with(criteria)
+  #
+  # Find all fields that match +criteria+
+  # Example:
+  #   form.fields_with(:value => /foo/).each do |field|
+  #     field.value = 'hello!'
+  #   end
+
+  elements_with :field
+
+  ##
+  # :method: button_with(criteria)
+  #
+  # Find one button that matches +criteria+
+  # Example:
+  #   form.button_with(:value => /submit/).value = 'hello'
+
+  ##
+  # :method: buttons_with(criteria)
+  #
+  # Find all buttons that match +criteria+
+  # Example:
+  #   form.buttons_with(:value => /submit/).each do |button|
+  #     button.value = 'hello!'
+  #   end
+
+  elements_with :button
+
+  ##
+  # :method: file_upload_with(criteria)
+  #
+  # Find one file upload field that matches +criteria+
+  # Example:
+  #   form.file_upload_with(:file_name => /picture/).value = 'foo'
+
+  ##
+  # :method: file_uploads_with(criteria)
+  #
+  # Find all file upload fields that match +criteria+
+  # Example:
+  #   form.file_uploads_with(:file_name => /picutre/).each do |field|
+  #     field.value = 'foo!'
+  #   end
+
+  elements_with :file_upload
+
+  ##
+  # :method: radiobutton_with(criteria)
+  #
+  # Find one radio button that matches +criteria+
+  # Example:
+  #   form.radiobutton_with(:name => /woo/).check
+
+  ##
+  # :method: radiobuttons_with(criteria)
+  #
+  # Find all radio buttons that match +criteria+
+  # Example:
+  #   form.radiobuttons_with(:name => /woo/).each do |field|
+  #     field.check
+  #   end
+
+  elements_with :radiobutton
+
+  ##
+  # :method: checkbox_with(criteria)
+  #
+  # Find one checkbox that matches +criteria+
+  # Example:
+  #   form.checkbox_with(:name => /woo/).check
+
+  ##
+  # :method: checkboxes_with(criteria)
+  #
+  # Find all checkboxes that match +criteria+
+  # Example:
+  #   form.checkboxes_with(:name => /woo/).each do |field|
+  #     field.check
+  #   end
+
+  elements_with :checkbox,   :checkboxes
+
+  private
+
+  def parse
+    @fields       = []
+    @buttons      = []
+    @file_uploads = []
+    @radiobuttons = []
+    @checkboxes   = []
+
+    # Find all input tags
+    form_node.search('input').each do |node|
+      type = (node['type'] || 'text').downcase
+      name = node['name']
+      next if name.nil? && !%w[submit button image].include?(type)
+      case type
+      when 'radio'
+        @radiobuttons << RadioButton.new(node, self)
+      when 'checkbox'
+        @checkboxes << CheckBox.new(node, self)
+      when 'file'
+        @file_uploads << FileUpload.new(node, nil)
+      when 'submit'
+        @buttons << Submit.new(node)
+      when 'button'
+        @buttons << Button.new(node)
+      when 'reset'
+        @buttons << Reset.new(node)
+      when 'image'
+        @buttons << ImageButton.new(node)
+      when 'hidden'
+        @fields << Hidden.new(node, node['value'] || '')
+      when 'text'
+        @fields << Text.new(node, node['value'] || '')
+      when 'textarea'
+        @fields << Textarea.new(node, node['value'] || '')
+      else
+        @fields << Field.new(node, node['value'] || '')
+      end
+    end
+
+    # Find all textarea tags
+    form_node.search('textarea').each do |node|
+      next unless node['name']
+      @fields << Textarea.new(node, node.inner_text)
+    end
+
+    # Find all select tags
+    form_node.search('select').each do |node|
+      next unless node['name']
+      if node.has_attribute? 'multiple'
+        @fields << MultiSelectList.new(node)
+      else
+        @fields << SelectList.new(node)
+      end
+    end
+
+    # Find all submit button tags
+    # FIXME: what can I do with the reset buttons?
+    form_node.search('button').each do |node|
+      type = (node['type'] || 'submit').downcase
+      next if type == 'reset'
+      @buttons << Button.new(node)
+    end
+    
+    # Find all keygen tags
+    form_node.search('keygen').each do |node|
+      @fields << Keygen.new(node, node['value'] || '')
+    end
+  end
+
+  def rand_string(len = 10)
+    chars = ("a".."z").to_a + ("A".."Z").to_a
+    string = ""
+    1.upto(len) { |i| string << chars[rand(chars.size-1)] }
+    string
+  end
+
+  def mime_value_quote(str)
+    str.gsub(/(["\r\\])/){|s| '\\' + s}
+  end
+
+  def param_to_multipart(name, value)
+    return "Content-Disposition: form-data; name=\"" +
+      "#{mime_value_quote(name)}\"\r\n" +
+      "\r\n#{value}\r\n"
+  end
+
+  def file_to_multipart(file)
+    file_name = file.file_name ? ::File.basename(file.file_name) : ''
+    body =  "Content-Disposition: form-data; name=\"" +
+      "#{mime_value_quote(file.name)}\"; " +
+      "filename=\"#{mime_value_quote(file_name)}\"\r\n" +
+      "Content-Transfer-Encoding: binary\r\n"
+
+    if file.file_data.nil? and file.file_name
+      file.file_data = open(file.file_name, "rb") { |f| f.read }
+      file.mime_type =
+        WEBrick::HTTPUtils.mime_type(file.file_name,
+                                     WEBrick::HTTPUtils::DefaultMimeTypes)
+    end
+
+    if file.mime_type
+      body << "Content-Type: #{file.mime_type}\r\n"
+    end
+
+    body <<
+      if file.file_data.respond_to? :read
+        "\r\n#{file.file_data.read}\r\n"
+      else
+        "\r\n#{file.file_data}\r\n"
+      end
+
+    body
+  end
+
+end
+
 require 'mechanize/form/field'
 require 'mechanize/form/button'
+require 'mechanize/form/hidden'
+require 'mechanize/form/text'
+require 'mechanize/form/textarea'
+require 'mechanize/form/submit'
+require 'mechanize/form/reset'
 require 'mechanize/form/file_upload'
 require 'mechanize/form/keygen'
 require 'mechanize/form/image_button'
@@ -10,489 +505,3 @@ require 'mechanize/form/radio_button'
 require 'mechanize/form/check_box'
 require 'mechanize/form/select_list'
 
-class Mechanize
-  # =Synopsis
-  # This class encapsulates a form parsed out of an HTML page.  Each type
-  # of input fields available in a form can be accessed through this object.
-  # See GlobalForm for more methods.
-  #
-  # ==Example
-  # Find a form and print out its fields
-  #  form = page.forms.first # => Mechanize::Form
-  #  form.fields.each { |f| puts f.name }
-  # Set the input field 'name' to "Aaron"
-  #  form['name'] = 'Aaron'
-  #  puts form['name']
-  class Form
-
-    extend Mechanize::ElementMatcher
-
-    attr_accessor :method, :action, :name
-
-    attr_reader :fields, :buttons, :file_uploads, :radiobuttons, :checkboxes
-
-    # Content-Type for form data (i.e. application/x-www-form-urlencoded)
-    attr_accessor :enctype
-
-    # Character encoding of form data (i.e. UTF-8)
-    attr_accessor :encoding
-
-    # When true, character encoding errors will never be never raised on form
-    # submission.  Default is false
-    attr_accessor :ignore_encoding_error
-
-    alias :elements :fields
-
-    attr_reader :form_node
-    attr_reader :page
-
-    def initialize(node, mech=nil, page=nil)
-      @enctype = node['enctype'] || 'application/x-www-form-urlencoded'
-      @form_node        = node
-      @action           = Util.html_unescape(node['action'])
-      @method           = (node['method'] || 'GET').upcase
-      @name             = node['name']
-      @clicked_buttons  = []
-      @page             = page
-      @mech             = mech
-
-      @encoding = node['accept-charset'] || (page && page.encoding) || nil
-      @ignore_encoding_error = false
-      parse
-    end
-
-    # Returns whether or not the form contains a field with +field_name+
-    def has_field?(field_name)
-      fields.find { |f| f.name == field_name }
-    end
-
-    alias :has_key? :has_field?
-
-    def has_value?(value)
-      fields.find { |f| f.value == value }
-    end
-
-    def keys; fields.map { |f| f.name }; end
-
-    def values; fields.map { |f| f.value }; end
-
-    def submits  ; @submits   ||= buttons.select { |f| f.class == Submit   }; end
-    def resets   ; @resets    ||= buttons.select { |f| f.class == Reset    }; end
-    def texts    ; @texts     ||=  fields.select { |f| f.class == Text     }; end
-    def hiddens  ; @hiddens   ||=  fields.select { |f| f.class == Hidden   }; end
-    def textareas; @textareas ||=  fields.select { |f| f.class == Textarea }; end
-    def keygens  ; @keygens   ||=  fields.select { |f| f.class == Keygen   }; end
-
-    def submit_button?(button_name)   submits.find{|f| f.name == button_name}; end
-    def reset_button?(button_name)     resets.find{|f| f.name == button_name}; end
-    def text_field?(field_name)         texts.find{|f| f.name == field_name}; end
-    def hidden_field?(field_name)     hiddens.find{|f| f.name == field_name}; end
-    def textarea_field?(field_name) textareas.find{|f| f.name == field_name}; end
-
-    # This method is a shortcut to get form's DOM id.
-    # Common usage:
-    #   page.form_with(:dom_id => "foorm")
-    # Note that you can also use +:id+ to get to this method:
-    #   page.form_with(:id => "foorm")
-    def dom_id
-      form_node['id']
-    end
-
-    # This method is a shortcut to get form's DOM class.
-    # Common usage:
-    #   page.form_with(:dom_class => "foorm")
-    # Note that you can also use +:class+ to get to this method:
-    #   page.form_with(:class => "foorm")
-    def dom_class
-      form_node['class']
-    end
-
-    # Add a field with +field_name+ and +value+
-    def add_field!(field_name, value = nil)
-      fields << Field.new({'name' => field_name}, value)
-    end
-
-    # This method sets multiple fields on the form.  It takes a list of field
-    # name, value pairs.  If there is more than one field found with the
-    # same name, this method will set the first one found.  If you want to
-    # set the value of a duplicate field, use a value which is a Hash with
-    # the key as the index in to the form.  The index
-    # is zero based.  For example, to set the second field named 'foo', you
-    # could do the following:
-    #  form.set_fields( :foo => { 1 => 'bar' } )
-    def set_fields(fields = {})
-      fields.each do |k,v|
-        case v
-        when Hash
-          v.each do |index, value|
-            self.fields_with(:name => k.to_s).[](index).value = value
-          end
-        else
-          value = nil
-          index = 0
-          [v].flatten.each do |val|
-            index = val.to_i if value
-            value = val unless value
-          end
-          self.fields_with(:name => k.to_s).[](index).value = value
-        end
-      end
-    end
-
-    # Fetch the value of the first input field with the name passed in
-    # ==Example
-    # Fetch the value set in the input field 'name'
-    #  puts form['name']
-    def [](field_name)
-      f = field(field_name)
-      f && f.value
-    end
-
-    # Set the value of the first input field with the name passed in
-    # ==Example
-    # Set the value in the input field 'name' to "Aaron"
-    #  form['name'] = 'Aaron'
-    def []=(field_name, value)
-      f = field(field_name)
-      if f
-        f.value = value
-      else
-        add_field!(field_name, value)
-      end
-    end
-
-    # Treat form fields like accessors.
-    def method_missing(meth, *args)
-      method = meth.to_s.gsub(/=$/, '')
-
-      if field(method)
-        return field(method).value if args.empty?
-        return field(method).value = args[0]
-      end
-
-      super
-    end
-
-    # Submit this form with the button passed in
-    def submit button=nil, headers = {}
-      @mech.submit(self, button, headers)
-    end
-
-    # Submit form using +button+. Defaults
-    # to the first button.
-    def click_button(button = buttons.first)
-      submit(button)
-    end
-
-    # This method is sub-method of build_query.
-    # It converts charset of query value of fields into expected one.
-    def proc_query(field)
-      return unless field.query_value
-      field.query_value.map{|(name, val)|
-        [from_native_charset(name), from_native_charset(val.to_s)]
-      }
-    end
-    private :proc_query
-
-    def from_native_charset str
-      Util.from_native_charset(str, encoding, @ignore_encoding_error, @mech && @mech.log)
-    end
-    private :from_native_charset
-
-    # This method builds an array of arrays that represent the query
-    # parameters to be used with this form.  The return value can then
-    # be used to create a query string for this form.
-    def build_query(buttons = [])
-      query = []
-      @mech.log.info("form encoding: #{encoding}") if @mech && @mech.log
-
-      successful_controls = []
-
-      (fields + checkboxes).sort.each do |f|
-        case f
-        when Form::CheckBox
-          if f.checked
-            successful_controls << f
-          end
-        when Form::Field
-          successful_controls << f
-        end
-      end
-
-      radio_groups = {}
-      radiobuttons.each do |f|
-        fname = from_native_charset(f.name)
-        radio_groups[fname] ||= []
-        radio_groups[fname] << f
-      end
-
-      # take one radio button from each group
-      radio_groups.each_value do |g|
-        checked = g.select {|f| f.checked}
-
-        if checked.size == 1
-          f = checked.first
-          successful_controls << f
-        elsif checked.size > 1
-          raise Mechanize::Error,
-                "multiple radiobuttons are checked in the same group!"
-        end
-      end
-
-      @clicked_buttons.each { |b|
-        successful_controls << b
-      }
-
-      successful_controls.sort.each do |ctrl| # DOM order
-        qval = proc_query(ctrl)
-        query.push(*qval)
-      end
-
-      query
-    end
-
-    # This method adds a button to the query.  If the form needs to be
-    # submitted with multiple buttons, pass each button to this method.
-    def add_button_to_query(button)
-      @clicked_buttons << button
-    end
-
-    # This method calculates the request data to be sent back to the server
-    # for this form, depending on if this is a regular post, get, or a
-    # multi-part post,
-    def request_data
-      query_params = build_query()
-
-      case @enctype.downcase
-      when /^multipart\/form-data/
-        boundary = rand_string(20)
-        @enctype = "multipart/form-data; boundary=#{boundary}"
-
-        params = query_params.map do |k,v|
-          param_to_multipart(k, v) if k
-        end.compact
-
-        params.concat @file_uploads.map { |f| file_to_multipart(f) }
-
-        params.map do |part|
-          part.force_encoding('ASCII-8BIT') if part.respond_to? :force_encoding
-          "--#{boundary}\r\n#{part}"
-        end.join('') +
-          "--#{boundary}--\r\n"
-      else
-        Mechanize::Util.build_query_string(query_params)
-      end
-    end
-
-    # Removes all fields with name +field_name+.
-    def delete_field!(field_name)
-      @fields.delete_if{ |f| f.name == field_name}
-    end
-
-    ##
-    # :method: field_with(criteria)
-    #
-    # Find one field that matches +criteria+
-    # Example:
-    #   form.field_with(:id => "exact_field_id").value = 'hello'
-
-    ##
-    # :method: fields_with(criteria)
-    #
-    # Find all fields that match +criteria+
-    # Example:
-    #   form.fields_with(:value => /foo/).each do |field|
-    #     field.value = 'hello!'
-    #   end
-
-    elements_with :field
-
-    ##
-    # :method: button_with(criteria)
-    #
-    # Find one button that matches +criteria+
-    # Example:
-    #   form.button_with(:value => /submit/).value = 'hello'
-
-    ##
-    # :method: buttons_with(criteria)
-    #
-    # Find all buttons that match +criteria+
-    # Example:
-    #   form.buttons_with(:value => /submit/).each do |button|
-    #     button.value = 'hello!'
-    #   end
-
-    elements_with :button
-
-    ##
-    # :method: file_upload_with(criteria)
-    #
-    # Find one file upload field that matches +criteria+
-    # Example:
-    #   form.file_upload_with(:file_name => /picture/).value = 'foo'
-
-    ##
-    # :method: file_uploads_with(criteria)
-    #
-    # Find all file upload fields that match +criteria+
-    # Example:
-    #   form.file_uploads_with(:file_name => /picutre/).each do |field|
-    #     field.value = 'foo!'
-    #   end
-
-    elements_with :file_upload
-
-    ##
-    # :method: radiobutton_with(criteria)
-    #
-    # Find one radio button that matches +criteria+
-    # Example:
-    #   form.radiobutton_with(:name => /woo/).check
-
-    ##
-    # :method: radiobuttons_with(criteria)
-    #
-    # Find all radio buttons that match +criteria+
-    # Example:
-    #   form.radiobuttons_with(:name => /woo/).each do |field|
-    #     field.check
-    #   end
-
-    elements_with :radiobutton
-
-    ##
-    # :method: checkbox_with(criteria)
-    #
-    # Find one checkbox that matches +criteria+
-    # Example:
-    #   form.checkbox_with(:name => /woo/).check
-
-    ##
-    # :method: checkboxes_with(criteria)
-    #
-    # Find all checkboxes that match +criteria+
-    # Example:
-    #   form.checkboxes_with(:name => /woo/).each do |field|
-    #     field.check
-    #   end
-
-    elements_with :checkbox,   :checkboxes
-
-    private
-
-    def parse
-      @fields       = []
-      @buttons      = []
-      @file_uploads = []
-      @radiobuttons = []
-      @checkboxes   = []
-
-      # Find all input tags
-      form_node.search('input').each do |node|
-        type = (node['type'] || 'text').downcase
-        name = node['name']
-        next if name.nil? && !%w[submit button image].include?(type)
-        case type
-        when 'radio'
-          @radiobuttons << RadioButton.new(node, self)
-        when 'checkbox'
-          @checkboxes << CheckBox.new(node, self)
-        when 'file'
-          @file_uploads << FileUpload.new(node, nil)
-        when 'submit'
-          @buttons << Submit.new(node)
-        when 'button'
-          @buttons << Button.new(node)
-        when 'reset'
-          @buttons << Reset.new(node)
-        when 'image'
-          @buttons << ImageButton.new(node)
-        when 'hidden'
-          @fields << Hidden.new(node, node['value'] || '')
-        when 'text'
-          @fields << Text.new(node, node['value'] || '')
-        when 'textarea'
-          @fields << Textarea.new(node, node['value'] || '')
-        else
-          @fields << Field.new(node, node['value'] || '')
-        end
-      end
-
-      # Find all textarea tags
-      form_node.search('textarea').each do |node|
-        next unless node['name']
-        @fields << Textarea.new(node, node.inner_text)
-      end
-
-      # Find all select tags
-      form_node.search('select').each do |node|
-        next unless node['name']
-        if node.has_attribute? 'multiple'
-          @fields << MultiSelectList.new(node)
-        else
-          @fields << SelectList.new(node)
-        end
-      end
-
-      # Find all submit button tags
-      # FIXME: what can I do with the reset buttons?
-      form_node.search('button').each do |node|
-        type = (node['type'] || 'submit').downcase
-        next if type == 'reset'
-        @buttons << Button.new(node)
-      end
-      
-      # Find all keygen tags
-      form_node.search('keygen').each do |node|
-        @fields << Keygen.new(node, node['value'] || '')
-      end
-    end
-
-    def rand_string(len = 10)
-      chars = ("a".."z").to_a + ("A".."Z").to_a
-      string = ""
-      1.upto(len) { |i| string << chars[rand(chars.size-1)] }
-      string
-    end
-
-    def mime_value_quote(str)
-      str.gsub(/(["\r\\])/){|s| '\\' + s}
-    end
-
-    def param_to_multipart(name, value)
-      return "Content-Disposition: form-data; name=\"" +
-        "#{mime_value_quote(name)}\"\r\n" +
-        "\r\n#{value}\r\n"
-    end
-
-    def file_to_multipart(file)
-      file_name = file.file_name ? ::File.basename(file.file_name) : ''
-      body =  "Content-Disposition: form-data; name=\"" +
-        "#{mime_value_quote(file.name)}\"; " +
-        "filename=\"#{mime_value_quote(file_name)}\"\r\n" +
-        "Content-Transfer-Encoding: binary\r\n"
-
-      if file.file_data.nil? and file.file_name
-        file.file_data = open(file.file_name, "rb") { |f| f.read }
-        file.mime_type =
-          WEBrick::HTTPUtils.mime_type(file.file_name,
-                                       WEBrick::HTTPUtils::DefaultMimeTypes)
-      end
-
-      if file.mime_type
-        body << "Content-Type: #{file.mime_type}\r\n"
-      end
-
-      body <<
-        if file.file_data.respond_to? :read
-          "\r\n#{file.file_data.read}\r\n"
-        else
-          "\r\n#{file.file_data}\r\n"
-        end
-
-      body
-    end
-
-  end
-end

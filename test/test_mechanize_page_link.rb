@@ -2,7 +2,7 @@
 
 require 'mechanize/test_case'
 
-class TestMechanizePage < Mechanize::TestCase
+class TestMechanizePageLink < Mechanize::TestCase
 
   WINDOWS_1255 = <<-HTML
 <meta http-equiv="content-type" content="text/html; charset=windows-1255">

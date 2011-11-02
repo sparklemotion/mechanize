@@ -28,12 +28,17 @@ lib/mechanize/form/button.rb
 lib/mechanize/form/check_box.rb
 lib/mechanize/form/field.rb
 lib/mechanize/form/file_upload.rb
+lib/mechanize/form/hidden.rb
 lib/mechanize/form/image_button.rb
 lib/mechanize/form/keygen.rb
 lib/mechanize/form/multi_select_list.rb
 lib/mechanize/form/option.rb
 lib/mechanize/form/radio_button.rb
+lib/mechanize/form/reset.rb
 lib/mechanize/form/select_list.rb
+lib/mechanize/form/submit.rb
+lib/mechanize/form/text.rb
+lib/mechanize/form/textarea.rb
 lib/mechanize/headers.rb
 lib/mechanize/history.rb
 lib/mechanize/http.rb
@@ -41,7 +46,6 @@ lib/mechanize/http/agent.rb
 lib/mechanize/http/auth_challenge.rb
 lib/mechanize/http/auth_realm.rb
 lib/mechanize/http/www_authenticate_parser.rb
-lib/mechanize/inspect.rb
 lib/mechanize/monkey_patch.rb
 lib/mechanize/page.rb
 lib/mechanize/page/base.rb

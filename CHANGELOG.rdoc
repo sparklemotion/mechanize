@@ -41,6 +41,7 @@
     * mechanize raises Mechanize::UnathorizedError for 401 responses which is
       a sublcass of Mechanize::ResponseCodeError.
     * Added support for NTLM authentication, but this has not been tested.
+  * Mechanize::Cookie.new accepts attributes in a hash.
 
 * Bug fixes
   * Mechanize#cookie_jar= works again.  Issue #126
@@ -54,8 +55,13 @@
       host name is TLD, and rejected otherwise.  To retain compatibility
       and convention, host/domain names starting with "local" are exempt
       from this rule.
+    * A cookie with no domain attribute is only sent to the original
+      host.
     * "Secure" cookies are not sent via non-https connection.
     * Subdomain match is not performed against an IP address.
+    * It is recommended that you clear out existing cookie jars for
+      regeneration because previously saved cookies may not have been
+      parsed correctly.
   * The original Referer value persists on redirection.  Issue #150
   * Do not send a referer on a Refresh header based redirection.
   * Fixed encoding error in tests when LANG=C.  Patch #142 by jinschoi.

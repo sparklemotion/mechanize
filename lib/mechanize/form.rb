@@ -487,6 +487,8 @@ class Mechanize::Form
     body
   end
 
+  public
+
   def pretty_print(q) # :nodoc:
     q.object_group(self) {
       q.breakable; q.group(1, '{name', '}') { q.breakable; q.pp name }

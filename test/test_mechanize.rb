@@ -209,10 +209,12 @@ class TestMechanize < Mechanize::TestCase
   #end
 
   def test_get
-    page = @mech.get('http://localhost', { :q => 'h' }, 'http://example',
-                      { 'X-H' => 'v' })
+    uri = URI 'http://localhost'
 
-    assert_equal 'http://localhost/?q=h', page.uri.to_s
+    page = @mech.get uri, { :q => 'h' }, 'http://example', { 'X-H' => 'v' }
+
+    assert_equal URI('http://localhost/?q=h'), page.uri
+    assert_equal URI('http://localhost'), uri
   end
 
   def test_get_HTTP
@@ -261,6 +263,7 @@ class TestMechanize < Mechanize::TestCase
     assert_equal 2, @mech.history.length
     assert_equal page.object_id, page2.object_id
   end
+
   def test_get_digest_auth
     block_called = false
 

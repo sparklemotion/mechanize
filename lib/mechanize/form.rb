@@ -487,6 +487,34 @@ class Mechanize::Form
     body
   end
 
+  def pretty_print(q) # :nodoc:
+    q.object_group(self) {
+      q.breakable; q.group(1, '{name', '}') { q.breakable; q.pp name }
+      q.breakable; q.group(1, '{method', '}') { q.breakable; q.pp method }
+      q.breakable; q.group(1, '{action', '}') { q.breakable; q.pp action }
+      q.breakable; q.group(1, '{fields', '}') {
+        fields.each do |field|
+          q.breakable
+          q.pp field
+        end
+      }
+      q.breakable; q.group(1, '{radiobuttons', '}') {
+        radiobuttons.each { |b| q.breakable; q.pp b }
+      }
+      q.breakable; q.group(1, '{checkboxes', '}') {
+        checkboxes.each { |b| q.breakable; q.pp b }
+      }
+      q.breakable; q.group(1, '{file_uploads', '}') {
+        file_uploads.each { |b| q.breakable; q.pp b }
+      }
+      q.breakable; q.group(1, '{buttons', '}') {
+        buttons.each { |b| q.breakable; q.pp b }
+      }
+    }
+  end
+
+  alias inspect pretty_inspect # :nodoc:
+
 end
 
 require 'mechanize/form/field'

@@ -36,12 +36,18 @@ class Mechanize::Form::RadioButton < Mechanize::Form::Field
     @node[key]
   end
 
+  def pretty_print_instance_variables # :nodoc:
+    [:@checked, :@name, :@value]
+  end
+
   private
+
   def uncheck_peers
     @form.radiobuttons_with(:name => name).each do |b|
       next if b.value == value
       b.uncheck
     end
   end
+
 end
 

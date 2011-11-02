@@ -7,6 +7,7 @@ require 'net/http/persistent'
 require 'nkf'
 require 'nokogiri'
 require 'openssl'
+require 'pp'
 require 'stringio'
 require 'uri'
 require 'webrick/httputils'
@@ -964,6 +965,15 @@ class Mechanize
       parser.watch_for_set = @watch_for_set if
         @watch_for_set and parser.respond_to?(:watch_for_set=)
     end
+  end
+
+  def pretty_print(q) # :nodoc:
+    q.object_group(self) {
+      q.breakable
+      q.pp cookie_jar
+      q.breakable
+      q.pp current_page
+    }
   end
 
   ##

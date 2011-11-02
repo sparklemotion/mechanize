@@ -44,6 +44,15 @@ class Mechanize::Page::Link
     node['class']
   end
 
+  def pretty_print(q) # :nodoc:
+    q.object_group(self) {
+      q.breakable; q.pp text
+      q.breakable; q.pp href
+    }
+  end
+
+  alias inspect pretty_print # :nodoc:
+
   # A list of words in the rel attribute, all lower-cased.
   def rel
     @rel ||= (val = attributes['rel']) ? val.downcase.split(' ') : []

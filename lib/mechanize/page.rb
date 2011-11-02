@@ -125,6 +125,37 @@ class Mechanize::Page < Mechanize::File
 
   alias :root :parser
 
+  def pretty_print(q) # :nodoc:
+    q.object_group(self) {
+      q.breakable
+      q.group(1, '{url', '}') {q.breakable; q.pp uri }
+      q.breakable
+      q.group(1, '{meta_refresh', '}') {
+        meta_refresh.each { |link| q.breakable; q.pp link }
+      }
+      q.breakable
+      q.group(1, '{title', '}') { q.breakable; q.pp title }
+      q.breakable
+      q.group(1, '{iframes', '}') {
+        iframes.each { |link| q.breakable; q.pp link }
+      }
+      q.breakable
+      q.group(1, '{frames', '}') {
+        frames.each { |link| q.breakable; q.pp link }
+      }
+      q.breakable
+      q.group(1, '{links', '}') {
+        links.each { |link| q.breakable; q.pp link }
+      }
+      q.breakable
+      q.group(1, '{forms', '}') {
+        forms.each { |form| q.breakable; q.pp form }
+      }
+    }
+  end
+
+  alias inspect pretty_print # :nodoc:
+
   def reset
     @bases = nil
     @forms = nil

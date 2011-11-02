@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class TestRobots < MiniTest::Unit::TestCase
+class TestRobots < Mechanize::TestCase
 
   def setup
     @mech = Mechanize.new

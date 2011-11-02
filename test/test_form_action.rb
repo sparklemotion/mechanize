@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class TestFormAction < MiniTest::Unit::TestCase
+class TestFormAction < Mechanize::TestCase
   def setup
     @agent = Mechanize.new
     @page  = @agent.get("http://localhost/tc_form_action.html")

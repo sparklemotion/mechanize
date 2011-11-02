@@ -1,7 +1,8 @@
 # coding: utf-8
-require 'helper'
 
-class TestMechanizeHttpAgent < MiniTest::Unit::TestCase
+require 'mechanize/test_case'
+
+class TestMechanizeHttpAgent < Mechanize::TestCase
 
   def setup
     @mech = Mechanize.new

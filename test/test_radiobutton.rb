@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class TestRadioButtons < MiniTest::Unit::TestCase
+class TestRadioButtons < Mechanize::TestCase
   def setup
     @agent = Mechanize.new
     @page  = @agent.get("http://localhost/tc_radiobuttons.html")

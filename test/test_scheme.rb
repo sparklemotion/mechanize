@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class SchemeTest < MiniTest::Unit::TestCase
+class SchemeTest < Mechanize::TestCase
   def setup
     @agent = Mechanize.new
     @agent.log = Class.new(Object) do

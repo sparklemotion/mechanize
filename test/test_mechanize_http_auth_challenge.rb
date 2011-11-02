@@ -1,6 +1,6 @@
-require 'helper'
+require 'mechanize/test_case'
 
-class TestMechanizeHttpAuthChallenge < MiniTest::Unit::TestCase
+class TestMechanizeHttpAuthChallenge < Mechanize::TestCase
 
   def setup
     @uri = URI 'http://example/'

@@ -1,6 +1,6 @@
-require 'helper'
+require 'mechanize/test_case'
 
-class TestMechanizeParser < MiniTest::Unit::TestCase
+class TestMechanizeParser < Mechanize::TestCase
 
   class P
     include Mechanize::Parser

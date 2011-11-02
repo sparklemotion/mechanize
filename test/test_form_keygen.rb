@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class TestFormKeygen < MiniTest::Unit::TestCase
+class TestFormKeygen < Mechanize::TestCase
   def setup
     @agent = Mechanize.new
     @page  = @agent.get("http://localhost/tc_keygen.html")

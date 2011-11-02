@@ -1,7 +1,7 @@
 # coding: utf-8
-require "helper"
+require 'mechanize/test_case'
 
-class TestMechanizeFormEncoding < MiniTest::Unit::TestCase
+class TestMechanizeFormEncoding < Mechanize::TestCase
 
   # See also: tests of Util.from_native_charset
   # Encoding test should do with non-utf-8 characters

@@ -1,7 +1,8 @@
 # coding: utf-8
-require 'helper'
 
-class TestMechanizeUtil < MiniTest::Unit::TestCase
+require 'mechanize/test_case'
+
+class TestMechanizeUtil < Mechanize::TestCase
 
   INPUTTED_VALUE = "テスト" # "test" in Japanese UTF-8 encoding
   CONTENT_ENCODING = 'Shift_JIS' # one of Japanese encoding

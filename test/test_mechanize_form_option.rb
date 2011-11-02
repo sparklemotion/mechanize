@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class MechanizeFormOptionTest < MiniTest::Unit::TestCase
+class MechanizeFormOptionTest < Mechanize::TestCase
 
   class FakeAttribute < Hash
     attr_reader :inner_text

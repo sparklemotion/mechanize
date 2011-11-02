@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class CookiesMechTest < MiniTest::Unit::TestCase
+class CookiesMechTest < Mechanize::TestCase
   def setup
     @agent = Mechanize.new
   end

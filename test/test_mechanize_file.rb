@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class TestMechanizeFile < MiniTest::Unit::TestCase
+class TestMechanizeFile < Mechanize::TestCase
 
   def setup
     @parser = Mechanize::File

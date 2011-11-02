@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class PostForm < MiniTest::Unit::TestCase
+class PostForm < Mechanize::TestCase
   def setup
     @agent = Mechanize.new
   end

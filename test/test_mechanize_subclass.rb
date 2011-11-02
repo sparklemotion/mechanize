@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class TestMechanizeSubclass < MiniTest::Unit::TestCase
+class TestMechanizeSubclass < Mechanize::TestCase
 
   class Parent < Mechanize
     @html_parser = :parser

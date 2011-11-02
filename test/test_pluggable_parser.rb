@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class PluggableParserTest < MiniTest::Unit::TestCase
+class PluggableParserTest < Mechanize::TestCase
   def setup
     @agent = Mechanize.new
   end

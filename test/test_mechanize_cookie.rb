@@ -1,4 +1,4 @@
-require "helper"
+require 'mechanize/test_case'
 
 module Enumerable
   def combine
@@ -17,7 +17,7 @@ module Enumerable
   end
 end
 
-class TestMechanizeCookie < MiniTest::Unit::TestCase
+class TestMechanizeCookie < Mechanize::TestCase
   def silently
     warn_level = $VERBOSE
     $VERBOSE = false

@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class TestIfModifiedSince < MiniTest::Unit::TestCase
+class TestIfModifiedSince < Mechanize::TestCase
   def setup
     @agent = Mechanize.new
   end

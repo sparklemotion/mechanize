@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class SSLServerTest < MiniTest::Unit::TestCase
+class SSLServerTest < Mechanize::TestCase
   def setup
     @agent = Mechanize.new
   end

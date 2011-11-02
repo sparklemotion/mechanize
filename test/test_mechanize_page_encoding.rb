@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-require 'helper'
-require 'cgi'
+require 'mechanize/test_case'
 
 # tests for Page encoding and charset and parsing
 
-class TestMechanizePageEncoding < MiniTest::Unit::TestCase
+class TestMechanizePageEncoding < Mechanize::TestCase
 
   MECH_ASCII_ENCODING = Mechanize::Util::NEW_RUBY_ENCODING ? 'US-ASCII' : 'ISO-8859-1'
 

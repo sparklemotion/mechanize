@@ -1,6 +1,6 @@
-require 'helper'
+require 'mechanize/test_case'
 
-class TestMechanizeFormCheckBox < MiniTest::Unit::TestCase
+class TestMechanizeFormCheckBox < Mechanize::TestCase
 
   def setup
     @agent = Mechanize.new

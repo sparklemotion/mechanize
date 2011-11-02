@@ -1,12 +1,12 @@
-require "helper"
+require 'mechanize/test_case'
 
-class TestRedirectLimitReached < MiniTest::Unit::TestCase
+class TestRedirectLimitReached < Mechanize::TestCase
   def setup
     @agent = Mechanize.new
   end
 
   def test_to_s
-    page = MechTestHelper.fake_page(@agent)
+    page = fake_page @agent
     error = Mechanize::RedirectLimitReachedError.new(page, 10)
     assert_match(/10/, error.to_s)
   end

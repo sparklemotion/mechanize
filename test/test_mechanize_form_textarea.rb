@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class TestMechanizeFormTextarea < MiniTest::Unit::TestCase
+class TestMechanizeFormTextarea < Mechanize::TestCase
   def setup
     @agent = Mechanize.new
     @page  = @agent.get("http://localhost/tc_textarea.html")

@@ -1,9 +1,8 @@
 # coding: utf-8
 
-require 'helper'
-require 'cgi'
+require 'mechanize/test_case'
 
-class TestMechanizePage < MiniTest::Unit::TestCase
+class TestMechanizePage < Mechanize::TestCase
 
   WINDOWS_1255 = <<-HTML
 <meta http-equiv="content-type" content="text/html; charset=windows-1255">

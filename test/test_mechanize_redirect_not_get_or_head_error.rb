@@ -1,13 +1,13 @@
-require 'helper'
+require 'mechanize/test_case'
 
-class TestMechanizeRedirectNotGetOrHead < MiniTest::Unit::TestCase
+class TestMechanizeRedirectNotGetOrHead < Mechanize::TestCase
 
   def setup
     @agent = Mechanize.new
   end
 
   def test_to_s
-    page = MechTestHelper.fake_page(@agent)
+    page = fake_page @agent
 
     error = Mechanize::RedirectNotGetOrHeadError.new(page, :put)
 

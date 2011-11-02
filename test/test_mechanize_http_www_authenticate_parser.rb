@@ -1,6 +1,6 @@
-require 'helper'
+require 'mechanize/test_case'
 
-class TestMechanizeHttpWwwAuthenticateParser < MiniTest::Unit::TestCase
+class TestMechanizeHttpWwwAuthenticateParser < Mechanize::TestCase
 
   def setup
     @parser = Mechanize::HTTP::WWWAuthenticateParser.new

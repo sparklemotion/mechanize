@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class TestFormHash < MiniTest::Unit::TestCase
+class TestFormHash < Mechanize::TestCase
   def setup
     @agent = Mechanize.new
     @page  = @agent.get('http://localhost/form_multival.html')

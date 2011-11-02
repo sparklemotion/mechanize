@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class TestHistory < MiniTest::Unit::TestCase
+class TestHistory < Mechanize::TestCase
 
   Node = Struct.new :href, :inner_text
 

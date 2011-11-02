@@ -61,6 +61,7 @@ lib/mechanize/redirect_not_get_or_head_error.rb
 lib/mechanize/response_code_error.rb
 lib/mechanize/response_read_error.rb
 lib/mechanize/robots_disallowed_error.rb
+lib/mechanize/test_case.rb
 lib/mechanize/unauthorized_error.rb
 lib/mechanize/unsupported_scheme_error.rb
 lib/mechanize/util.rb
@@ -69,7 +70,6 @@ test/data/server.crt
 test/data/server.csr
 test/data/server.key
 test/data/server.pem
-test/helper.rb
 test/htdocs/alt_text.html
 test/htdocs/bad_form_test.html
 test/htdocs/button.jpg
@@ -129,7 +129,6 @@ test/htdocs/tc_textarea.html
 test/htdocs/test_bad_encoding.html
 test/htdocs/test_click.html
 test/htdocs/unusual______.html
-test/servlets.rb
 test/ssl_server.rb
 test/test_cookies.rb
 test/test_form_action.rb

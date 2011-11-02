@@ -1,5 +1,6 @@
-require "helper"
-class SelectNoneTest < MiniTest::Unit::TestCase
+require 'mechanize/test_case'
+
+class SelectNoneTest < Mechanize::TestCase
   def setup
     @agent = Mechanize.new
     @page = @agent.get("http://localhost/form_select_none.html")

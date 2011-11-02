@@ -1,6 +1,6 @@
-require 'helper'
+require 'mechanize/test_case'
 
-class TestMechanizeFileRequest < MiniTest::Unit::TestCase
+class TestMechanizeFileRequest < Mechanize::TestCase
 
   def test_initialize
     uri = URI.parse 'http://example/'

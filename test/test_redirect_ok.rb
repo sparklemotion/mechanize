@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class TestRedirectOk < MiniTest::Unit::TestCase
+class TestRedirectOk < Mechanize::TestCase
   def setup
     @agent = Mechanize.new
   end

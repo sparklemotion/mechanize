@@ -1,8 +1,8 @@
 # coding: utf-8
 
-require 'helper'
+require 'mechanize/test_case'
 
-class TestMechanize < MiniTest::Unit::TestCase
+class TestMechanize < Mechanize::TestCase
 
   KEY = OpenSSL::PKey::RSA.new 512
   name = OpenSSL::X509::Name.parse 'CN=nobody/DC=example'
@@ -781,14 +781,16 @@ class TestMechanize < MiniTest::Unit::TestCase
     assert_equal('multipart/form-data', page.forms[0].enctype)
 
     form = page.forms.first
-    form.file_uploads.first.file_name = "#{BASE_DIR}/helper.rb"
+    form.file_uploads.first.file_name = __FILE__
     form.file_uploads.first.mime_type = "text/plain"
     form.file_uploads.first.file_data = "Hello World\n\n"
 
     page = @mech.submit(form)
 
+    basename = File.basename __FILE__
+
     assert_match(
-      "Content-Disposition: form-data; name=\"userfile1\"; filename=\"helper.rb\"",
+      "Content-Disposition: form-data; name=\"userfile1\"; filename=\"#{basename}\"",
       page.body
     )
     assert_match(
@@ -805,16 +807,19 @@ class TestMechanize < MiniTest::Unit::TestCase
     assert_equal('multipart/form-data', page.forms[1].enctype)
 
     form = page.forms[1]
-    form.file_uploads.first.file_name = "#{BASE_DIR}/helper.rb"
-    form.file_uploads.first.file_data = File.open("#{BASE_DIR}/helper.rb", 'rb')
+    form.file_uploads.first.file_name = __FILE__
+    form.file_uploads.first.file_data = File.read __FILE__
 
     page = @mech.submit(form)
 
-    contents = File.open("#{BASE_DIR}/helper.rb", 'rb') { |f| f.read }
+    contents = File.read __FILE__
+    basename = File.basename __FILE__
+
     assert_match(
-      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"helper.rb\"",
+      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"#{basename}\"",
       page.body
     )
+
     assert_match(contents, page.body)
   end
 
@@ -823,13 +828,14 @@ class TestMechanize < MiniTest::Unit::TestCase
     assert_equal('multipart/form-data', page.forms[1].enctype)
 
     form = page.forms[1]
-    form.file_uploads.first.file_name = "#{BASE_DIR}/helper.rb"
+    form.file_uploads.first.file_name = __FILE__
 
     page = @mech.submit(form)
 
-    contents = File.open("#{BASE_DIR}/helper.rb", 'rb') { |f| f.read }
+    contents = File.read __FILE__
+    basename = File.basename __FILE__
     assert_match(
-      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"helper.rb\"",
+      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"#{basename}\"",
       page.body
     )
     assert_match(contents, page.body)
@@ -855,14 +861,16 @@ class TestMechanize < MiniTest::Unit::TestCase
     assert_equal('multipart/form-data', page.forms[1].enctype)
 
     form = page.forms[1]
-    form.file_uploads.first.file_name = "#{BASE_DIR}/helper.rb"
+    form.file_uploads.first.file_name = __FILE__
     form.file_uploads.first.mime_type = "text/plain"
     form.file_uploads.first.file_data = "Hello World\n\n"
 
     page = @mech.submit(form)
 
+    basename = File.basename __FILE__
+
     assert_match(
-      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"helper.rb\"",
+      "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"#{basename}\"",
       page.body
     )
   end

@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class TestHeaders < MiniTest::Unit::TestCase
+class TestHeaders < Mechanize::TestCase
   def setup
     @headers = Mechanize::Headers.new
     @headers['content-type'] = 'text/html'

@@ -1,6 +1,6 @@
-require "helper"
+require 'mechanize/test_case'
 
-class TestMechanizeLink < MiniTest::Unit::TestCase
+class TestMechanizeLink < Mechanize::TestCase
 
   def setup
     @agent = Mechanize.new

@@ -1,6 +1,6 @@
-require 'helper'
+require 'mechanize/test_case'
 
-class TestMechanizeFileSaver < MiniTest::Unit::TestCase
+class TestMechanizeFileSaver < Mechanize::TestCase
 
   def setup
     super

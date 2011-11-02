@@ -1,6 +1,6 @@
-require 'helper'
+require 'mechanize/test_case'
 
-class TestMechanizeFormImageButton < MiniTest::Unit::TestCase
+class TestMechanizeFormImageButton < Mechanize::TestCase
 
   def test_query_value
     button = Mechanize::Form::ImageButton.new 'name' => 'image_button'

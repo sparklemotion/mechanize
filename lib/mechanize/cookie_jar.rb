@@ -16,13 +16,16 @@ class Mechanize::CookieJar
     @jar = Marshal.load Marshal.dump other.jar
   end
 
-  # Add a +cookie+ to the jar if it is considered acceptable from +uri+.
+  # Add a +cookie+ to the jar if it is considered acceptable from
+  # +uri+.  Return nil if the cookie was not added, otherwise return
+  # the cookie added.
   def add(uri, cookie)
     return nil unless cookie.acceptable_from_uri?(uri)
     add!(cookie)
+    cookie
   end
 
-  # Add a +cookie+ to the jar.
+  # Add a +cookie+ to the jar and return self.
   def add!(cookie)
     normal_domain = cookie.domain.downcase
 
@@ -31,7 +34,7 @@ class Mechanize::CookieJar
     @jar[normal_domain][cookie.path] ||= {}
     @jar[normal_domain][cookie.path][cookie.name] = cookie
 
-    cookie
+    self
   end
   alias << add!
 

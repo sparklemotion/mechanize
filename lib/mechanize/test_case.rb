@@ -54,6 +54,18 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
     end
   end
 
+  def node element, attributes = {}
+    doc = Nokogiri::HTML::Document.new
+
+    node = Nokogiri::XML::Node.new element, doc
+
+    attributes.each do |name, value|
+      node[name] = value
+    end
+
+    node
+  end
+
   def page uri, content_type = 'text/html', body = '', code = 200
     uri = URI uri unless URI::Generic === URI
 

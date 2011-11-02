@@ -44,6 +44,11 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
     end
   end
 
+  def html_page body
+    uri = URI 'http://example/'
+    Mechanize::Page.new uri, { 'content-type' => 'text/html' }, body, 200, @mech
+  end
+
 end
 
 class BadContentTypeServlet < WEBrick::HTTPServlet::AbstractServlet

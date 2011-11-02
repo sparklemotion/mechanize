@@ -105,6 +105,34 @@ class TestMechanizeForm < Mechanize::TestCase
     assert_equal 'bar', headers['foo']
   end
 
+  def test_submit_select_default
+    page = html_page <<-BODY
+<html>
+  <body>
+    <form name="form1" method="post" action="/form_post">
+      <select name="list">
+        <option value="1" selected>Option 1</option>
+        <option value="2" selected>Option 2</option>
+        <option value="3" selected>Option 3</option>
+        <option value="4" selected>Option 4</option>
+        <option value="5" selected>Option 5</option>
+        <option value="6" selected>Option 6</option>
+      </select>
+      <br />
+      <input type="submit" value="Submit" />
+    </form>
+  </body>
+</html>
+    BODY
+
+    form = page.forms.first
+    assert_equal "6", form.list
+
+    page = @mech.submit form
+    assert_equal 1, page.links.length
+    assert_equal 1, page.links_with(:text => 'list:6').length
+  end
+
   # Test submitting form with two fields of the same name
   def test_post_multival
     page = @mech.get("http://localhost/form_multival.html")

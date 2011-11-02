@@ -9,7 +9,7 @@ class TestMechanizePage < Mechanize::TestCase
   end
 
   def test_parser_no_attributes
-    body = <<-BODY
+    page = html_page <<-BODY
 <html>
   <meta>
   <head><title></title>
@@ -27,9 +27,6 @@ class TestMechanizePage < Mechanize::TestCase
   </body>
 </html>
     BODY
-
-    page = Mechanize::Page.new(@uri, { 'content-type' => 'text/html' }, body,
-                               200, @mech)
 
     # HACK weak assertion
     assert_kind_of Nokogiri::HTML::Document, page.root

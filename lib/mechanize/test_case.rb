@@ -25,6 +25,7 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
   end
 
   def fake_page agent = @mech
+    uri = URI 'http://fake.example/'
     html = <<-END
 <html>
 <body>
@@ -32,8 +33,10 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
 </body>
 </html>
     END
-    html_response = { 'content-type' => 'text/html' }
-    Mechanize::Page.new(nil, html_response, html, 200, agent)
+
+    response = { 'content-type' => 'text/html' }
+
+    Mechanize::Page.new uri, response, html, 200, agent
   end
 
   def in_tmpdir

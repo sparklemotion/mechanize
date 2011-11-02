@@ -5,65 +5,68 @@ class TestMechanizeFileSaver < Mechanize::TestCase
   def setup
     super
 
-    @tmpdir = Dir.mktmpdir
-    @pwd = Dir.pwd
-    Dir.chdir @tmpdir
-  end
-
-  def teardown
-    Dir.chdir @pwd
-    FileUtils.rm_rf @tmpdir
-
-    super
+    @url = URI 'http://example'
   end
 
   def test_initialize_long_path
-    url = URI 'http://example.com/one/two/'
+    @url += '/one/two/'
 
-    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
-    assert_equal('example.com/one/two/index.html', fs.filename)
+    in_tmpdir do
+      fs = Mechanize::FileSaver.new @url, nil, 'hello world', 200
+
+      assert_equal 'example/one/two/index.html', fs.filename
+    end
   end
 
   def test_initialize_long_path_file
-    url = URI 'http://example.com/one/two/foo.html'
+    @url += '/one/two/foo.html'
 
-    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
-    assert_equal('example.com/one/two/foo.html', fs.filename)
+    in_tmpdir do
+      fs = Mechanize::FileSaver.new @url, nil, 'hello world', 200
+
+      assert_equal 'example/one/two/foo.html', fs.filename
+    end
   end
 
   def test_initialize_multi_slash
-    url = URI 'http://example.com///foo.html'
+    @url += '///foo.html'
 
-    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
-    assert_equal('example.com/foo.html', fs.filename)
+    fs = Mechanize::FileSaver.new @url, nil, 'hello world', 200
+    assert_equal('example/foo.html', fs.filename)
   end
 
   def test_initialize_no_path
-    url = URI 'http://example.com'
-
-    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
-    assert_equal('example.com/index.html', fs.filename)
+    in_tmpdir do
+      fs = Mechanize::FileSaver.new @url, nil, 'hello world', 200
+      assert_equal 'example/index.html', fs.filename
+    end
   end
 
   def test_initialize_slash
-    url = URI 'http://example.com/'
+    @url += '/'
 
-    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
-    assert_equal('example.com/index.html', fs.filename)
+    in_tmpdir do
+      fs = Mechanize::FileSaver.new @url, nil, 'hello world', 200
+      assert_equal 'example/index.html', fs.filename
+    end
   end
 
   def test_initialize_slash_file
-    url = URI 'http://example.com/foo.html'
+    @url += '/foo.html'
 
-    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
-    assert_equal('example.com/foo.html', fs.filename)
+    in_tmpdir do
+      fs = Mechanize::FileSaver.new @url, nil, 'hello world', 200
+      assert_equal 'example/foo.html', fs.filename
+    end
   end
 
   def test_initialize_query
-    url = URI 'http://example.com/?id=5'
+    @url += '/?id=5'
 
-    fs = Mechanize::FileSaver.new(url, nil, 'hello world', 200)
-    assert_equal('example.com/index.html?id=5', fs.filename)
+    in_tmpdir do
+      fs = Mechanize::FileSaver.new @url, nil, 'hello world', 200
+      assert_equal 'example/index.html?id=5', fs.filename
+    end
   end
 
 end

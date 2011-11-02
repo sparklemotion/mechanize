@@ -14,12 +14,10 @@ class TestMechanizeDownload < Mechanize::TestCase
 
     download = @parser.new uri, nil, body_io
 
-    Dir.mktmpdir do |dir|
-      Dir.chdir dir do
-        download.save
+    in_tmpdir do
+      download.save
 
-        assert File.exist? 'foo.html'
-      end
+      assert File.exist? 'foo.html'
     end
   end
 
@@ -33,12 +31,10 @@ class TestMechanizeDownload < Mechanize::TestCase
 
       download = @parser.new uri, nil, body_io
 
-      Dir.mktmpdir do |dir|
-        Dir.chdir dir do
-          download.save
+      in_tmpdir do
+        download.save
 
-          assert File.exist? 'foo.html'
-        end
+        assert File.exist? 'foo.html'
       end
     end
   end

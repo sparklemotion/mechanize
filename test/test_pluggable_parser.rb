@@ -42,15 +42,14 @@ class PluggableParserTest < Mechanize::TestCase
 
   def test_file_saver
     @mech.pluggable_parser.html = Mechanize::FileSaver
-    page = @mech.get('http://localhost:2000/form_no_action.html')
-    length = page.response['Content-Length']
-    file_length = nil
-    File.open("localhost/form_no_action.html", "r") { |f|
-      file_length = f.read.length
-    }
 
-    FileUtils.rm_rf("localhost")
-    assert_equal(length.to_i, file_length)
+    in_tmpdir do
+      page = @mech.get('http://localhost:2000/form_no_action.html')
+      length = page.response['Content-Length']
+      file_length = File.stat('localhost/form_no_action.html').size
+
+      assert_equal length.to_i, file_length
+    end
   end
 
   def test_filter

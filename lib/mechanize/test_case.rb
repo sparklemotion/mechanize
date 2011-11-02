@@ -36,6 +36,14 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
     Mechanize::Page.new(nil, html_response, html, 200, agent)
   end
 
+  def in_tmpdir
+    Dir.mktmpdir do |dir|
+      Dir.chdir dir do
+        yield
+      end
+    end
+  end
+
 end
 
 class BadContentTypeServlet < WEBrick::HTTPServlet::AbstractServlet

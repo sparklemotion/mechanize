@@ -1,11 +1,15 @@
 require 'mechanize/test_case'
 
-class TestFormKeygen < Mechanize::TestCase
+class TestMechanizeFormKeygen < Mechanize::TestCase
+
   def setup
     super
 
-    @page  = @mech.get("http://localhost/tc_keygen.html")
-    @keygen = @page.forms.first.keygens.first
+    keygen = node('keygen',
+                  'name' => 'userkey',
+                  'challenge' => 'f4832e1d200df3df8c5c859edcabe52f')
+
+    @keygen = Mechanize::Form::Keygen.new keygen
   end
 
   def test_challenge
@@ -23,4 +27,6 @@ class TestFormKeygen < Mechanize::TestCase
     assert_equal @keygen.key.public_key.to_pem, spki.public_key.to_pem
     assert spki.verify(@keygen.key.public_key)
   end
+
 end
+

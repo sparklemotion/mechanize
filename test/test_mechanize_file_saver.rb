@@ -31,8 +31,10 @@ class TestMechanizeFileSaver < Mechanize::TestCase
   def test_initialize_multi_slash
     @url += '///foo.html'
 
-    fs = Mechanize::FileSaver.new @url, nil, 'hello world', 200
-    assert_equal('example/foo.html', fs.filename)
+    in_tmpdir do
+      fs = Mechanize::FileSaver.new @url, nil, 'hello world', 200
+      assert_equal('example/foo.html', fs.filename)
+    end
   end
 
   def test_initialize_no_path

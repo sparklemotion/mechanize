@@ -173,7 +173,6 @@ test/test_multi_select.rb
 test/test_no_attributes.rb
 test/test_pluggable_parser.rb
 test/test_post_form.rb
-test/test_pretty_print.rb
 test/test_radiobutton.rb
 test/test_redirect_limit_reached.rb
 test/test_redirect_ok.rb

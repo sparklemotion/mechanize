@@ -249,6 +249,18 @@ class TestMechanize < Mechanize::TestCase
     assert_equal("401", e.response_code)
   end
 
+  def test_get_conditional
+    assert_empty @mech.history
+
+    page = @mech.get 'http://localhost/if_modified_since'
+    assert_match(/You did not send/, page.body)
+
+    assert_equal 1, @mech.history.length
+    page2 = @mech.get 'http://localhost/if_modified_since'
+
+    assert_equal 2, @mech.history.length
+    assert_equal page.object_id, page2.object_id
+  end
   def test_get_digest_auth
     block_called = false
 

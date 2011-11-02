@@ -139,7 +139,6 @@ test/test_frames.rb
 test/test_headers.rb
 test/test_history.rb
 test/test_html_unscape_forms.rb
-test/test_if_modified_since.rb
 test/test_images.rb
 test/test_mechanize.rb
 test/test_mechanize_cookie.rb

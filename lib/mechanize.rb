@@ -52,447 +52,61 @@ class Mechanize
                  end
 
   ##
-  # HTTP/1.0 keep-alive time.  This is no longer supported by mechanize as it
-  # now uses net-http-persistent which only supports HTTP/1.1 persistent
-  # connections
-
-  attr_accessor :keep_alive_time
-
-  ##
-  # User Agent aliases
+  # Supported User-Agent aliases for use with user_agent_alias=.  The
+  # description in parenthesis is for informative purposes and is not part of
+  # the alias name.
+  #
+  # * Linux Firefox (3.6.1)
+  # * Linux Konqueror (3)
+  # * Linux Mozilla
+  # * Mac Firefox (3.6)
+  # * Mac Mozilla
+  # * Mac Safari (5)
+  # * Mac Safari 4
+  # * Mechanize (default)
+  # * Windows IE 6
+  # * Windows IE 7
+  # * Windows IE 8
+  # * Windows IE 9
+  # * Windows Mozilla
+  # * iPhone (3.0)
+  #
+  # Example:
+  #
+  #   agent = Mechanize.new
+  #   agent.user_agent_alias = 'Mac Safari'
 
   AGENT_ALIASES = {
+    'Mechanize' => "Mechanize/#{VERSION} Ruby/#{ruby_version} (http://github.com/tenderlove/mechanize/)",
+    'Linux Firefox' => 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.1) Gecko/20100122 firefox/3.6.1',
+    'Linux Konqueror' => 'Mozilla/5.0 (compatible; Konqueror/3; Linux)',
+    'Linux Mozilla' => 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.4) Gecko/20030624',
+    'Mac FireFox' => 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2) Gecko/20100115 Firefox/3.6',
+    'Mac Mozilla' => 'Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.4a) Gecko/20030401',
+    'Mac Safari 4' => 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_2; de-at) AppleWebKit/531.21.8 (KHTML, like Gecko) Version/4.0.4 Safari/531.21.10',
+    'Mac Safari' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/534.51.22 (KHTML, like Gecko) Version/5.1.1 Safari/534.51.22',
     'Windows IE 6' => 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)',
     'Windows IE 7' => 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
     'Windows IE 8' => 'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
     'Windows IE 9' => 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)',
     'Windows Mozilla' => 'Mozilla/5.0 (Windows; U; Windows NT 5.0; en-US; rv:1.4b) Gecko/20030516 Mozilla Firebird/0.6',
-    'Mac Safari' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/534.51.22 (KHTML, like Gecko) Version/5.1.1 Safari/534.51.22',
-    'Mac Safari 4' => 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_2; de-at) AppleWebKit/531.21.8 (KHTML, like Gecko) Version/4.0.4 Safari/531.21.10',
-    'Mac FireFox' => 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2) Gecko/20100115 Firefox/3.6',
-    'Mac Mozilla' => 'Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.4a) Gecko/20030401',
-    'Linux Mozilla' => 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.4) Gecko/20030624',
-    'Linux Firefox' => 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.1) Gecko/20100122 firefox/3.6.1',
-    'Linux Konqueror' => 'Mozilla/5.0 (compatible; Konqueror/3; Linux)',
     'iPhone' => 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1C28 Safari/419.3',
-    'Mechanize' => "Mechanize/#{VERSION} Ruby/#{ruby_version} (http://github.com/tenderlove/mechanize/)"
   }
 
-  ##
-  # A Mechanize::CookieJar which stores cookies
-
-  def cookie_jar
-    @agent.cookie_jar
+  def self.inherited(child) # :nodoc:
+    child.html_parser ||= html_parser
+    child.log ||= log
+    super
   end
 
   ##
-  # Replaces the cookie jar with +cookie_jar+
-
-  def cookie_jar= cookie_jar
-    @agent.cookie_jar = cookie_jar
-  end
-
-  ##
-  # Connections that have not been used in this many seconds will be reset.
-
-  def idle_timeout
-    @agent.idle_timeout
-  end
-
-  # Sets the idle timeout to +idle_timeout+.  The default timeout is 5
-  # seconds.  If you experience "too many connection resets", reducing this
-  # value may help.
-
-  def idle_timeout= idle_timeout
-    @agent.idle_timeout = idle_timeout
-  end
-
-  ##
-  # Length of time to wait until a connection is opened in seconds
-
-  def open_timeout
-    @agent.open_timeout
-  end
-
-  ##
-  # Sets the connection open timeout to +open_timeout+
-
-  def open_timeout= open_timeout
-    @agent.open_timeout = open_timeout
-  end
-
-  ##
-  # Length of time to wait for data from the server
-
-  def read_timeout
-    @agent.read_timeout
-  end
-
-  ##
-  # Sets the timeout for each chunk of data read from the server to
-  # +read_timeout+.  A single request may read many chunks of data.
-
-  def read_timeout= read_timeout
-    @agent.read_timeout = read_timeout
-  end
-
-  ##
-  # Retry POST and other non-idempotent requests.  See RFC 2616 9.1.2.
-
-  def retry_change_requests
-    @agent.retry_change_requests
-  end
-
-  ##
-  # When setting +retry_change_requests+ to true you are stating that, for all
-  # the URLs you access with mechanize, making POST and other non-idempotent
-  # requests is safe and will not cause data duplication or other harmful
-  # results.
+  # Creates a new mechanize instance.  If a block is given, the created
+  # instance is yielded to the block for setting up pre-connection state:
   #
-  # If you are experiencing "too many connection resets" errors you should
-  # instead investigate reducing the idle_timeout or disabling keep_alive
-  # connections.
-
-  def retry_change_requests= retry_change_requests
-    @agent.retry_change_requests = retry_change_requests
-  end
-
-  ##
-  # Are HTTP/1.1 keep-alive connections enabled?
-
-  def keep_alive
-    @agent.keep_alive
-  end
-
-  ##
-  # Disable HTTP/1.1 keep-alive connections if +enable+ is set to false.  If
-  # you are experiencing "too many connection resets" errors setting this to
-  # false will eliminate them.
-  #
-  # You should first investigate reducing idle_timeout.
-
-  def keep_alive= enable
-    @agent.keep_alive = enable
-  end
-
-  ##
-  # The identification string for the client initiating a web request
-
-  def user_agent
-    @agent.user_agent
-  end
-
-  ##
-  # The value of watch_for_set is passed to pluggable parsers for retrieved
-  # content
-
-  attr_accessor :watch_for_set
-
-  ##
-  # Path to an OpenSSL server certificate file
-
-  def ca_file
-    @agent.ca_file
-  end
-
-  ##
-  # Sets the certificate file used for SSL connections
-
-  def ca_file= ca_file
-    @agent.ca_file = ca_file
-  end
-
-  ##
-  # An OpenSSL private key or the path to a private key
-
-  def key
-    @agent.key
-  end
-
-  ##
-  # Sets the OpenSSL client +key+ to the given path or key instance
-
-  def key= key
-    @agent.key = key
-  end
-
-  ##
-  # An OpenSSL client certificate or the path to a certificate file.
-
-  def cert
-    @agent.cert
-  end
-
-  ##
-  # Sets the OpenSSL client certificate +cert+ to the given path or
-  # certificate instance
-
-  def cert= cert
-    @agent.cert = cert
-  end
-
-  ##
-  # What is this?
-  #
-  # Why is it different from #cert?
-
-  def certificate # :nodoc:
-    @agent.certificate
-  end
-
-  ##
-  # OpenSSL client key password
-
-  def pass
-    @agent.pass
-  end
-
-  ##
-  # Sets the client key password to +pass+
-
-  def pass= pass
-    @agent.pass = pass
-  end
-
-  ##
-  # Controls how mechanize deals with redirects.  The following values are
-  # allowed:
-  #
-  # :all, true:: All 3xx redirects are followed (default)
-  # :permanent:: Only 301 Moved Permanantly redirects are followed
-  # false:: No redirects are followed
-
-  def redirect_ok
-    @agent.redirect_ok
-  end
-
-  ##
-  # Sets the mechanize redirect handling policy.  See redirect_ok for allowed
-  # values
-
-  def redirect_ok= follow
-    @agent.redirect_ok = follow
-  end
-
-  ##
-  # Is gzip compression of responses enabled?
-
-  def gzip_enabled
-    @agent.gzip_enabled
-  end
-
-  ##
-  # Disables HTTP/1.1 gzip compression (enabled by default)
-
-  def gzip_enabled=enabled
-    @agent.gzip_enabled = enabled
-  end
-
-  ##
-  # Are If-Modified-Since conditional requests enabled?
-
-  def conditional_requests
-    @agent.conditional_requests
-  end
-
-  ##
-  # Disables If-Modified-Since conditional requests (enabled by default)
-
-  def conditional_requests= enabled
-    @agent.conditional_requests = enabled
-  end
-
-  ##
-  # Follow HTML meta refresh and HTTP Refresh headers.  If set to +:anywhere+
-  # meta refresh tags outside of the head element will be followed.
-
-  def follow_meta_refresh
-    @agent.follow_meta_refresh
-  end
-
-  ##
-  # Controls following of HTML meta refresh and HTTP Refresh headers in
-  # responses.
-
-  def follow_meta_refresh= follow
-    @agent.follow_meta_refresh = follow
-  end
-
-  ##
-  # Follow an HTML meta refresh and HTTP Refresh headers that have no "url="
-  # in the content attribute.
-  #
-  # Defaults to false to prevent infinite refresh loops.
-
-  def follow_meta_refresh_self
-    @agent.follow_meta_refresh_self
-  end
-
-  ##
-  # Alters the following of HTML meta refresh and HTTP Refresh headers that
-  # point to the same page.
-
-  def follow_meta_refresh_self= follow
-    @agent.follow_meta_refresh_self = follow
-  end
-
-  ##
-  # A callback for additional certificate verification.  See
-  # OpenSSL::SSL::SSLContext#verify_callback
-  #
-  # The callback can be used for debugging or to ignore errors by always
-  # returning +true+.  Specifying nil uses the default method that was valid
-  # when the SSLContext was created
-
-  def verify_callback
-    @agent.verify_callback
-  end
-
-  ##
-  # Sets the OpenSSL certificate verification callback
-
-  def verify_callback= verify_callback
-    @agent.verify_callback = verify_callback
-  end
-
-  ##
-  # Callback which is invoked with the page that was added to history.
-
-  attr_accessor :history_added
-
-  ##
-  # Maximum number of redirections to follow
-
-  def redirection_limit
-    @agent.redirection_limit
-  end
-
-  ##
-  # Sets the maximum number of redirections to follow to +limit+
-
-  def redirection_limit= limit
-    @agent.redirection_limit = limit
-  end
-
-  ##
-  # The handlers for HTTP and other URI protocols.
-
-  def scheme_handlers
-    @agent.scheme_handlers
-  end
-
-  ##
-  # Replaces the URI scheme handler table with +scheme_handlers+
-
-  def scheme_handlers= scheme_handlers
-    @agent.scheme_handlers = scheme_handlers
-  end
-
-  ##
-  # A hash of custom request headers that will be sent on every request
-
-  def request_headers
-    @agent.request_headers
-  end
-
-  ##
-  # Replaces the custom request headers that will be sent on every request
-  # with +request_headers+
-
-  def request_headers= request_headers
-    @agent.request_headers = request_headers
-  end
-
-  ##
-  # The HTTP proxy address
-
-  attr_reader :proxy_addr
-
-  ##
-  # The HTTP proxy password
-
-  attr_reader :proxy_pass
-
-  ##
-  # The HTTP proxy port
-
-  attr_reader :proxy_port
-
-  ##
-  # The HTTP proxy username
-
-  attr_reader :proxy_user
-
-  ##
-  # The HTML parser to be used when parsing documents
-
-  attr_accessor :html_parser
-
-  attr_reader :agent # :nodoc:
-
-  ##
-  # The history of this mechanize run
-
-  def history
-    @agent.history
-  end
-
-  attr_reader :pluggable_parser # :nodoc:
-
-  ##
-  # A list of hooks to call after retrieving a response.  Hooks are called with
-  # the agent and the response returned.
-
-  def post_connect_hooks
-    @agent.post_connect_hooks
-  end
-
-  ##
-  # A list of hooks to call before making a request.  Hooks are called with
-  # the agent and the request to be performed.
-
-  def pre_connect_hooks
-    @agent.pre_connect_hooks
-  end
-
-  ##
-  # An list of hooks to call before reading response header 'content-encoding'.
-  #
-  # The hook is called with the agent making the request, the URI of the
-  # request, the response an IO containing the response body.
-
-  def content_encoding_hooks
-    @agent.content_encoding_hooks
-  end
-
-  alias follow_redirect? redirect_ok
-
-  @html_parser = Nokogiri::HTML
-
-  class << self
-    attr_accessor :html_parser, :log
-
-    def inherited(child)
-      child.html_parser ||= html_parser
-      child.log ||= log
-      super
-    end
-  end
-
-  ##
-  # A default encoding name used when parsing HTML parsing.  When set it is
-  # used after any other encoding.  The default is nil.
-
-  attr_accessor :default_encoding
-
-  ##
-  # Overrides the encodings given by the HTTP server and the HTML page with
-  # the default_encoding when set to true.
-
-  attr_accessor :force_default_encoding
-
-  ##
-  # Creates a new mechanize instance
+  #   agent = Mechanize.new do |a|
+  #     a.proxy_host = 'proxy.example'
+  #     a.proxy_port = 8080
+  #   end
 
   def initialize
     @agent = Mechanize::HTTP::Agent.new
@@ -525,6 +139,33 @@ class Mechanize
     @agent.set_http
   end
 
+  # :section: History
+  #
+  # Methods for navigating and controlling history
+
+  ##
+  # Equivalent to the browser back button.  Returns the previous page visited.
+
+  def back
+    @agent.history.pop
+  end
+
+  ##
+  # Returns the latest page loaded by Mechanize
+
+  def current_page
+    @agent.current_page
+  end
+
+  alias page current_page
+
+  ##
+  # The history of this mechanize run
+
+  def history
+    @agent.history
+  end
+
   ##
   # Maximum number of items allowed in the history.
 
@@ -540,65 +181,108 @@ class Mechanize
   end
 
   ##
-  # Responses larger than this will be written to a Tempfile instead of stored
-  # in memory.  The default is 10240 bytes
+  # Returns a visited page for the +url+ passed in, otherwise nil
 
-  def max_file_buffer
-    @agent.max_file_buffer
+  def visited_page(url)
+    url = url.href if url.respond_to? :href
+
+    @agent.visited_page url
   end
 
   ##
-  # Sets the maximum size of a response body that will be stored in memory to
-  # +bytes+
+  # Returns whether or not a url has been visited
 
-  def max_file_buffer= bytes
-    @agent.max_file_buffer = bytes
-  end
+  alias visited? visited_page
 
-  ##
-  # Sets the logger used by mechanize to +l+
-
-  def log=(l); Mechanize.log = l end
-
-  ##
-  # The current logger
-
-  def log; Mechanize.log end
-
-  ##
-  # Sets the User-Agent used by mechanize to +user_agent+.  See also
-  # user_agent_alias
-
-  def user_agent= user_agent
-    @agent.user_agent = user_agent
-  end
-
-  ##
-  # Set the user agent for the Mechanize object based on the given +name+.
+  # :section: Hooks
   #
-  # See also AGENT_ALIASES
+  # Hooks into the operation of mechanize
 
-  def user_agent_alias= name
-    self.user_agent = AGENT_ALIASES[name] ||
-      raise(ArgumentError, "unknown agent alias #{name.inspect}")
+  ##
+  # A list of hooks to call before reading response header 'content-encoding'.
+  #
+  # The hook is called with the agent making the request, the URI of the
+  # request, the response an IO containing the response body.
+
+  def content_encoding_hooks
+    @agent.content_encoding_hooks
   end
 
   ##
-  # Returns a list of cookies stored in the cookie jar.
+  # Callback which is invoked with the page that was added to history.
 
-  def cookies
-    @agent.cookie_jar.to_a
+  attr_accessor :history_added
+
+  ##
+  # A list of hooks to call after retrieving a response.  Hooks are called with
+  # the agent and the response returned.
+
+  def post_connect_hooks
+    @agent.post_connect_hooks
   end
 
   ##
-  # Sets the user and password to be used for HTTP authentication.
+  # A list of hooks to call before making a request.  Hooks are called with
+  # the agent and the request to be performed.
 
-  def auth(user, password)
-    @agent.user     = user
-    @agent.password = password
+  def pre_connect_hooks
+    @agent.pre_connect_hooks
   end
 
-  alias :basic_auth :auth
+  # :section: Requests
+  #
+  # Methods for making HTTP requests
+
+  ##
+  # If the parameter is a string, finds the button or link with the
+  # value of the string on the current page and clicks it.  Otherwise, clicks
+  # the Mechanize::Page::Link object passed in.  Returns the page fetched.
+
+  def click(link)
+    case link
+    when Page::Link
+      referer = link.page || current_page()
+      if @agent.robots
+        if (referer.is_a?(Page) && referer.parser.nofollow?) || link.rel?('nofollow')
+          raise RobotsDisallowedError.new(link.href)
+        end
+      end
+      if link.rel?('noreferrer')
+        href = @agent.resolve(link.href, link.page || current_page)
+        referer = Page.new(nil, {'content-type'=>'text/html'})
+      else
+        href = link.href
+      end
+      get href, [], referer
+    when String, Regexp
+      if real_link = page.link_with(:text => link)
+        click real_link
+      else
+        button = nil
+        form = page.forms.find do |f|
+          button = f.button_with(:value => link)
+          button.is_a? Form::Submit
+        end
+        submit form, button if form
+      end
+    else
+      referer = current_page()
+      href = link.respond_to?(:href) ? link.href :
+        (link['href'] || link['src'])
+      get href, [], referer
+    end
+  end
+
+  ##
+  # DELETE +uri+ with +query_params+, and setting +headers+:
+  #
+  #   delete('http://example/', {'q' => 'foo'}, {})
+
+  def delete(uri, query_params = {}, headers = {})
+    page = @agent.fetch(uri, :delete, headers, query_params)
+    add_to_history(page)
+    page
+  end
 
   ##
   # GET the +uri+ with the given request +parameters+, +referer+ and
@@ -646,23 +330,10 @@ class Mechanize
   end
 
   ##
-  # PUT to +uri+ with +entity+, and setting +headers+:
-  #
-  #   put('http://example/', 'new content', {'Content-Type' => 'text/plain'})
+  # GET +url+ and return only its contents
 
-  def put(uri, entity, headers = {})
-    request_with_entity(:put, uri, entity, headers)
-  end
-
-  ##
-  # DELETE +uri+ with +query_params+, and setting +headers+:
-  #
-  #   delete('http://example/', {'q' => 'foo'}, {})
-
-  def delete(uri, query_params = {}, headers = {})
-    page = @agent.fetch(uri, :delete, headers, query_params)
-    add_to_history(page)
-    page
+  def get_file(url)
+    get(url).body
   end
 
   ##
@@ -675,60 +346,6 @@ class Mechanize
     page = @agent.fetch(uri, :head, headers, query_params)
     yield page if block_given?
     page
-  end
-
-  ##
-  # Fetch +url+ and return its contents
-
-  def get_file(url)
-    get(url).body
-  end
-
-  ##
-  # If the parameter is a string, finds the button or link with the
-  # value of the string on the current page and clicks it.  Otherwise, clicks
-  # the Mechanize::Page::Link object passed in.  Returns the page fetched.
-
-  def click(link)
-    case link
-    when Page::Link
-      referer = link.page || current_page()
-      if @agent.robots
-        if (referer.is_a?(Page) && referer.parser.nofollow?) || link.rel?('nofollow')
-          raise RobotsDisallowedError.new(link.href)
-        end
-      end
-      if link.rel?('noreferrer')
-        href = @agent.resolve(link.href, link.page || current_page)
-        referer = Page.new(nil, {'content-type'=>'text/html'})
-      else
-        href = link.href
-      end
-      get href, [], referer
-    when String, Regexp
-      if real_link = page.link_with(:text => link)
-        click real_link
-      else
-        button = nil
-        form = page.forms.find do |f|
-          button = f.button_with(:value => link)
-          button.is_a? Form::Submit
-        end
-        submit form, button if form
-      end
-    else
-      referer = current_page()
-      href = link.respond_to?(:href) ? link.href :
-        (link['href'] || link['src'])
-      get href, [], referer
-    end
-  end
-
-  ##
-  # Equivalent to the browser back button.  Returns the previous page visited.
-
-  def back
-    @agent.history.pop
   end
 
   ##
@@ -771,6 +388,32 @@ class Mechanize
   end
 
   ##
+  # PUT to +uri+ with +entity+, and setting +headers+:
+  #
+  #   put('http://example/', 'new content', {'Content-Type' => 'text/plain'})
+
+  def put(uri, entity, headers = {})
+    request_with_entity(:put, uri, entity, headers)
+  end
+
+  ##
+  # Makes an HTTP request to +url+ using HTTP method +verb+.  +entity+ is used
+  # as the request body, if allowed.
+
+  def request_with_entity(verb, uri, entity, headers = {})
+    cur_page = current_page || Page.new(nil, {'content-type'=>'text/html'})
+
+    headers = {
+      'Content-Type' => 'application/octet-stream',
+      'Content-Length' => entity.size.to_s,
+    }.update headers
+
+    page = @agent.fetch uri, verb, headers, [entity], cur_page
+    add_to_history(page)
+    page
+  end
+
+  ##
   # Submits +form+ with an optional +button+.
   #
   # Without a button:
@@ -798,42 +441,498 @@ class Mechanize
   end
 
   ##
-  # Makes an HTTP request to +url+ using HTTP method +verb+.  +entity+ is used
-  # as the request body, if allowed.
+  # Runs given block, then resets the page history as it was before. self is
+  # given as a parameter to the block.  Returns the value of the block.
 
-  def request_with_entity(verb, uri, entity, headers = {})
-    cur_page = current_page || Page.new(nil, {'content-type'=>'text/html'})
+  def transact
+    history_backup = @agent.history.dup
+    begin
+      yield self
+    ensure
+      @agent.history = history_backup
+    end
+  end
 
-    headers = {
-      'Content-Type' => 'application/octet-stream',
-      'Content-Length' => entity.size.to_s,
-    }.update headers
+  # :section: Settings
+  #
+  # Settings that adjust how mechanize makes HTTP requests including timeouts,
+  # keep-alives, compression, redirects and headers.
 
-    page = @agent.fetch uri, verb, headers, [entity], cur_page
-    add_to_history(page)
-    page
+  @html_parser = Nokogiri::HTML
+
+  class << self
+
+    ##
+    # Default HTML parser for all mechanize instances
+    #
+    #   Mechanize.html_parser = Nokogiri::XML
+
+    attr_accessor :html_parser
+
+    ##
+    # Default logger for all mechanize instances
+    #
+    #   Mechanize.log = Logger.new $stderr
+
+    attr_accessor :log
+
   end
 
   ##
-  # Returns the latest page loaded by Mechanize
+  # A default encoding name used when parsing HTML parsing.  When set it is
+  # used after any other encoding.  The default is nil.
 
-  def current_page
-    @agent.current_page
+  attr_accessor :default_encoding
+
+  ##
+  # Overrides the encodings given by the HTTP server and the HTML page with
+  # the default_encoding when set to true.
+
+  attr_accessor :force_default_encoding
+
+  ##
+  # The HTML parser to be used when parsing documents
+
+  attr_accessor :html_parser
+
+  ##
+  # HTTP/1.0 keep-alive time.  This is no longer supported by mechanize as it
+  # now uses net-http-persistent which only supports HTTP/1.1 persistent
+  # connections
+
+  attr_accessor :keep_alive_time
+
+  ##
+  # The HTTP proxy address
+
+  attr_reader :proxy_addr
+
+  ##
+  # The HTTP proxy password
+
+  attr_reader :proxy_pass
+
+  ##
+  # The HTTP proxy port
+
+  attr_reader :proxy_port
+
+  ##
+  # The HTTP proxy username
+
+  attr_reader :proxy_user
+
+  ##
+  # Sets the user and password to be used for HTTP authentication.
+
+  def auth(user, password)
+    @agent.user     = user
+    @agent.password = password
+  end
+
+  alias basic_auth auth
+
+  ##
+  # Are If-Modified-Since conditional requests enabled?
+
+  def conditional_requests
+    @agent.conditional_requests
   end
 
   ##
-  # Returns a visited page for the +url+ passed in, otherwise nil
+  # Disables If-Modified-Since conditional requests (enabled by default)
 
-  def visited_page(url)
-    url = url.href if url.respond_to? :href
-
-    @agent.visited_page url
+  def conditional_requests= enabled
+    @agent.conditional_requests = enabled
   end
 
   ##
-  # Returns whether or not a url has been visited
+  # A Mechanize::CookieJar which stores cookies
 
-  alias visited? visited_page
+  def cookie_jar
+    @agent.cookie_jar
+  end
+
+  ##
+  # Replaces the cookie jar with +cookie_jar+
+
+  def cookie_jar= cookie_jar
+    @agent.cookie_jar = cookie_jar
+  end
+
+  ##
+  # Returns a list of cookies stored in the cookie jar.
+
+  def cookies
+    @agent.cookie_jar.to_a
+  end
+
+  ##
+  # Follow HTML meta refresh and HTTP Refresh headers.  If set to +:anywhere+
+  # meta refresh tags outside of the head element will be followed.
+
+  def follow_meta_refresh
+    @agent.follow_meta_refresh
+  end
+
+  ##
+  # Controls following of HTML meta refresh and HTTP Refresh headers in
+  # responses.
+
+  def follow_meta_refresh= follow
+    @agent.follow_meta_refresh = follow
+  end
+
+  ##
+  # Follow an HTML meta refresh and HTTP Refresh headers that have no "url="
+  # in the content attribute.
+  #
+  # Defaults to false to prevent infinite refresh loops.
+
+  def follow_meta_refresh_self
+    @agent.follow_meta_refresh_self
+  end
+
+  ##
+  # Alters the following of HTML meta refresh and HTTP Refresh headers that
+  # point to the same page.
+
+  def follow_meta_refresh_self= follow
+    @agent.follow_meta_refresh_self = follow
+  end
+
+  ##
+  # Is gzip compression of responses enabled?
+
+  def gzip_enabled
+    @agent.gzip_enabled
+  end
+
+  ##
+  # Disables HTTP/1.1 gzip compression (enabled by default)
+
+  def gzip_enabled=enabled
+    @agent.gzip_enabled = enabled
+  end
+
+  ##
+  # Connections that have not been used in this many seconds will be reset.
+
+  def idle_timeout
+    @agent.idle_timeout
+  end
+
+  # Sets the idle timeout to +idle_timeout+.  The default timeout is 5
+  # seconds.  If you experience "too many connection resets", reducing this
+  # value may help.
+
+  def idle_timeout= idle_timeout
+    @agent.idle_timeout = idle_timeout
+  end
+
+  ##
+  # Are HTTP/1.1 keep-alive connections enabled?
+
+  def keep_alive
+    @agent.keep_alive
+  end
+
+  ##
+  # Disable HTTP/1.1 keep-alive connections if +enable+ is set to false.  If
+  # you are experiencing "too many connection resets" errors setting this to
+  # false will eliminate them.
+  #
+  # You should first investigate reducing idle_timeout.
+
+  def keep_alive= enable
+    @agent.keep_alive = enable
+  end
+
+  ##
+  # The current logger
+
+  def log
+    Mechanize.log
+  end
+
+  ##
+  # Sets the logger used by mechanize to +l+
+
+  def log=(l)
+    Mechanize.log = l
+  end
+
+  ##
+  # Responses larger than this will be written to a Tempfile instead of stored
+  # in memory.  The default is 10240 bytes
+
+  def max_file_buffer
+    @agent.max_file_buffer
+  end
+
+  ##
+  # Sets the maximum size of a response body that will be stored in memory to
+  # +bytes+
+
+  def max_file_buffer= bytes
+    @agent.max_file_buffer = bytes
+  end
+
+  ##
+  # Length of time to wait until a connection is opened in seconds
+
+  def open_timeout
+    @agent.open_timeout
+  end
+
+  ##
+  # Sets the connection open timeout to +open_timeout+
+
+  def open_timeout= open_timeout
+    @agent.open_timeout = open_timeout
+  end
+
+  ##
+  # Length of time to wait for data from the server
+
+  def read_timeout
+    @agent.read_timeout
+  end
+
+  ##
+  # Sets the timeout for each chunk of data read from the server to
+  # +read_timeout+.  A single request may read many chunks of data.
+
+  def read_timeout= read_timeout
+    @agent.read_timeout = read_timeout
+  end
+
+  ##
+  # Controls how mechanize deals with redirects.  The following values are
+  # allowed:
+  #
+  # :all, true:: All 3xx redirects are followed (default)
+  # :permanent:: Only 301 Moved Permanantly redirects are followed
+  # false:: No redirects are followed
+
+  def redirect_ok
+    @agent.redirect_ok
+  end
+
+  alias follow_redirect? redirect_ok
+
+  ##
+  # Sets the mechanize redirect handling policy.  See redirect_ok for allowed
+  # values
+
+  def redirect_ok= follow
+    @agent.redirect_ok = follow
+  end
+
+  ##
+  # Maximum number of redirections to follow
+
+  def redirection_limit
+    @agent.redirection_limit
+  end
+
+  ##
+  # Sets the maximum number of redirections to follow to +limit+
+
+  def redirection_limit= limit
+    @agent.redirection_limit = limit
+  end
+
+  ##
+  # A hash of custom request headers that will be sent on every request
+
+  def request_headers
+    @agent.request_headers
+  end
+
+  ##
+  # Replaces the custom request headers that will be sent on every request
+  # with +request_headers+
+
+  def request_headers= request_headers
+    @agent.request_headers = request_headers
+  end
+
+  ##
+  # Retry POST and other non-idempotent requests.  See RFC 2616 9.1.2.
+
+  def retry_change_requests
+    @agent.retry_change_requests
+  end
+
+  ##
+  # When setting +retry_change_requests+ to true you are stating that, for all
+  # the URLs you access with mechanize, making POST and other non-idempotent
+  # requests is safe and will not cause data duplication or other harmful
+  # results.
+  #
+  # If you are experiencing "too many connection resets" errors you should
+  # instead investigate reducing the idle_timeout or disabling keep_alive
+  # connections.
+
+  def retry_change_requests= retry_change_requests
+    @agent.retry_change_requests = retry_change_requests
+  end
+
+  ##
+  # Will <code>/robots.txt</code> files be obeyed?
+
+  def robots
+    @agent.robots
+  end
+
+  ##
+  # When +enabled+ mechanize will retrieve and obey <code>robots.txt</code>
+  # files
+
+  def robots= enabled
+    @agent.robots = enabled
+  end
+
+  ##
+  # The handlers for HTTP and other URI protocols.
+
+  def scheme_handlers
+    @agent.scheme_handlers
+  end
+
+  ##
+  # Replaces the URI scheme handler table with +scheme_handlers+
+
+  def scheme_handlers= scheme_handlers
+    @agent.scheme_handlers = scheme_handlers
+  end
+
+  ##
+  # The identification string for the client initiating a web request
+
+  def user_agent
+    @agent.user_agent
+  end
+
+  ##
+  # Sets the User-Agent used by mechanize to +user_agent+.  See also
+  # user_agent_alias
+
+  def user_agent= user_agent
+    @agent.user_agent = user_agent
+  end
+
+  ##
+  # Set the user agent for the Mechanize object based on the given +name+.
+  #
+  # See also AGENT_ALIASES
+
+  def user_agent_alias= name
+    self.user_agent = AGENT_ALIASES[name] ||
+      raise(ArgumentError, "unknown agent alias #{name.inspect}")
+  end
+
+  ##
+  # The value of watch_for_set is passed to pluggable parsers for retrieved
+  # content
+
+  attr_accessor :watch_for_set
+
+  # :section: SSL
+  #
+  # SSL settings for mechanize
+
+  ##
+  # Path to an OpenSSL server certificate file
+
+  def ca_file
+    @agent.ca_file
+  end
+
+  ##
+  # Sets the certificate file used for SSL connections
+
+  def ca_file= ca_file
+    @agent.ca_file = ca_file
+  end
+
+  ##
+  # An OpenSSL client certificate or the path to a certificate file.
+
+  def cert
+    @agent.cert
+  end
+
+  ##
+  # Sets the OpenSSL client certificate +cert+ to the given path or
+  # certificate instance
+
+  def cert= cert
+    @agent.cert = cert
+  end
+
+  ##
+  # What is this?
+  #
+  # Why is it different from #cert?
+
+  def certificate # :nodoc:
+    @agent.certificate
+  end
+
+  ##
+  # An OpenSSL private key or the path to a private key
+
+  def key
+    @agent.key
+  end
+
+  ##
+  # Sets the OpenSSL client +key+ to the given path or key instance
+
+  def key= key
+    @agent.key = key
+  end
+
+  ##
+  # OpenSSL client key password
+
+  def pass
+    @agent.pass
+  end
+
+  ##
+  # Sets the client key password to +pass+
+
+  def pass= pass
+    @agent.pass = pass
+  end
+
+  ##
+  # A callback for additional certificate verification.  See
+  # OpenSSL::SSL::SSLContext#verify_callback
+  #
+  # The callback can be used for debugging or to ignore errors by always
+  # returning +true+.  Specifying nil uses the default method that was valid
+  # when the SSLContext was created
+
+  def verify_callback
+    @agent.verify_callback
+  end
+
+  ##
+  # Sets the OpenSSL certificate verification callback
+
+  def verify_callback= verify_callback
+    @agent.verify_callback = verify_callback
+  end
+
+  # :section: Utilities
+
+  attr_reader :agent # :nodoc:
+
+  attr_reader :pluggable_parser # :nodoc:
 
   ##
   # Parses the +body+ of the +response+ from +uri+ using the pluggable parser
@@ -862,8 +961,8 @@ class Mechanize
     parser_klass.new uri, response, body, response.code do |parser|
       parser.mech = self if parser.respond_to? :mech=
 
-        parser.watch_for_set = @watch_for_set if
-      @watch_for_set and parser.respond_to?(:watch_for_set=)
+      parser.watch_for_set = @watch_for_set if
+        @watch_for_set and parser.respond_to?(:watch_for_set=)
     end
   end
 
@@ -879,36 +978,6 @@ class Mechanize
     @agent.set_proxy address, port, user, password
     @agent.set_http
   end
-
-  ##
-  # Runs given block, then resets the page history as it was before. self is
-  # given as a parameter to the block.  Returns the value of the block.
-
-  def transact
-    history_backup = @agent.history.dup
-    begin
-      yield self
-    ensure
-      @agent.history = history_backup
-    end
-  end
-
-  ##
-  # Will <code>/robots.txt</code> files be obeyed?
-
-  def robots
-    @agent.robots
-  end
-
-  ##
-  # When +enabled+ mechanize will retrieve and obey <code>robots.txt</code>
-  # files
-
-  def robots= enabled
-    @agent.robots = enabled
-  end
-
-  alias :page :current_page
 
   private
 

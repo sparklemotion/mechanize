@@ -40,7 +40,8 @@ class TestMechanizePage < Mechanize::TestCase
   ENCODING_ERROR_CLASS = Nokogiri::XML::SyntaxError
 
   def setup
-    @agent = Mechanize.new
+    super
+
     @uri = URI('http://example')
     @res = { 'content-type' => 'text/html' }
     @body = '<title>hi</title>'
@@ -48,7 +49,7 @@ class TestMechanizePage < Mechanize::TestCase
 
   def util_page body = @body, res = @res
     body.force_encoding Encoding::BINARY if body.respond_to? :force_encoding
-    Mechanize::Page.new @uri, res, body, 200, @agent
+    Mechanize::Page.new @uri, res, body, 200, @mech
   end
 
   def test_initialize_supported_content_type
@@ -90,10 +91,10 @@ class TestMechanizePage < Mechanize::TestCase
   end
 
   def test_canonical_uri
-    page = @agent.get("http://localhost/canonical_uri.html")
+    page = @mech.get("http://localhost/canonical_uri.html")
     assert_equal(URI("http://localhost/canonical_uri"), page.canonical_uri)
 
-    page = @agent.get("http://localhost/file_upload.html")
+    page = @mech.get("http://localhost/file_upload.html")
     assert_equal(nil, page.canonical_uri)
   end
 
@@ -253,7 +254,7 @@ class TestMechanizePage < Mechanize::TestCase
   end
 
   def test_frames_with
-    page = @agent.get("http://localhost/frame_test.html")
+    page = @mech.get("http://localhost/frame_test.html")
     assert_equal(3, page.frames.size)
 
     find_orig = page.frames.find_all { |f| f.name == 'frame1' }
@@ -266,7 +267,7 @@ class TestMechanizePage < Mechanize::TestCase
   end
 
   def test_links_with_dom_id
-    page = @agent.get("http://localhost/tc_links.html")
+    page = @mech.get("http://localhost/tc_links.html")
     link = page.links_with(:dom_id => 'bold_aaron_link')
     link_by_id = page.links_with(:id => 'bold_aaron_link')
     assert_equal(1, link.length)
@@ -275,7 +276,7 @@ class TestMechanizePage < Mechanize::TestCase
   end
 
   def test_links_with_dom_class
-    page = @agent.get("http://localhost/tc_links.html")
+    page = @mech.get("http://localhost/tc_links.html")
     link = page.links_with(:dom_class => 'thing_link')
     link_by_class = page.links_with(:class => 'thing_link')
     assert_equal(1, link.length)
@@ -283,33 +284,33 @@ class TestMechanizePage < Mechanize::TestCase
   end
 
   def test_link_with_encoded_space
-    page = @agent.get("http://localhost/tc_links.html")
+    page = @mech.get("http://localhost/tc_links.html")
     link = page.link_with(:text => 'encoded space')
-    page = @agent.click link
+    page = @mech.click link
   end
 
   def test_link_with_space
-    page = @agent.get("http://localhost/tc_links.html")
+    page = @mech.get("http://localhost/tc_links.html")
     link = page.link_with(:text => 'not encoded space')
-    page = @agent.click link
+    page = @mech.click link
   end
 
   def test_link_with_unusual_characters
-    page = @agent.get("http://localhost/tc_links.html")
+    page = @mech.get("http://localhost/tc_links.html")
     link = page.link_with(:text => 'unusual characters')
 
-    @agent.click link
+    @mech.click link
 
     # HACK no assertion
   end
 
   def test_links
-    page = @agent.get("http://localhost/find_link.html")
+    page = @mech.get("http://localhost/find_link.html")
     assert_equal(18, page.links.length)
   end
 
   def test_links_with_bold
-    page = @agent.get("http://localhost/tc_links.html")
+    page = @mech.get("http://localhost/tc_links.html")
     link = page.links_with(:text => /Bold Dude/)
     assert_equal(1, link.length)
     assert_equal('Bold Dude', link.first.text)
@@ -337,7 +338,7 @@ class TestMechanizePage < Mechanize::TestCase
   end
 
   def test_meta_refresh
-    page = @agent.get("http://localhost/find_link.html")
+    page = @mech.get("http://localhost/find_link.html")
     assert_equal(3, page.meta_refresh.length)
     assert_equal(%w{
       http://www.drphil.com/
@@ -366,7 +367,7 @@ class TestMechanizePage < Mechanize::TestCase
   end
 
   def test_form
-    page  = @agent.get("http://localhost/tc_form_action.html")
+    page  = @mech.get("http://localhost/tc_form_action.html")
 
     form = page.form(:name => 'post_form1')
     assert form

@@ -2,8 +2,9 @@ require 'mechanize/test_case'
 
 class SelectNoOptionsTest < Mechanize::TestCase
   def setup
-    @agent = Mechanize.new
-    @page = @agent.get("http://localhost/form_select_noopts.html")
+    super
+
+    @page = @mech.get("http://localhost/form_select_noopts.html")
     @form = @page.forms.first
   end
 
@@ -11,7 +12,7 @@ class SelectNoOptionsTest < Mechanize::TestCase
     assert @form.field('list')
     assert_nil @form.list
 
-    page = @agent.submit(@form)
+    page = @mech.submit(@form)
 
     assert_equal(0, page.links.length)
   end

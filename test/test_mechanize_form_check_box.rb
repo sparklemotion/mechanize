@@ -3,8 +3,9 @@ require 'mechanize/test_case'
 class TestMechanizeFormCheckBox < Mechanize::TestCase
 
   def setup
-    @agent = Mechanize.new
-    @page = @agent.get('http://localhost/tc_checkboxes.html')
+    super
+
+    @page = @mech.get('http://localhost/tc_checkboxes.html')
   end
 
   def test_check

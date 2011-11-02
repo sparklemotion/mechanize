@@ -2,6 +2,8 @@ require 'mechanize/test_case'
 
 class TestHeaders < Mechanize::TestCase
   def setup
+    super
+
     @headers = Mechanize::Headers.new
     @headers['content-type'] = 'text/html'
     @headers['Content-encoding'] = 'gzip'

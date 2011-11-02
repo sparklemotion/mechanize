@@ -3,7 +3,8 @@ require 'mechanize/test_case'
 class TestRobots < Mechanize::TestCase
 
   def setup
-    @mech = Mechanize.new
+    super
+
     @robot = Mechanize.new { |a|
       a.robots = true
     }

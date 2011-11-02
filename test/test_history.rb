@@ -5,7 +5,8 @@ class TestHistory < Mechanize::TestCase
   Node = Struct.new :href, :inner_text
 
   def setup
-    @mech    = Mechanize.new
+    super
+
     @history = Mechanize::History.new
     @uri = URI 'http://example'
   end

@@ -15,6 +15,8 @@ class TestMechanizeParser < Mechanize::TestCase
   end
 
   def setup
+    super
+
     @parser = P.new
   end
 

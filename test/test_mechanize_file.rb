@@ -3,6 +3,8 @@ require 'mechanize/test_case'
 class TestMechanizeFile < Mechanize::TestCase
 
   def setup
+    super
+
     @parser = Mechanize::File
   end
 

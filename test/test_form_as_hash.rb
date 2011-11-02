@@ -2,8 +2,9 @@ require 'mechanize/test_case'
 
 class TestFormHash < Mechanize::TestCase
   def setup
-    @agent = Mechanize.new
-    @page  = @agent.get('http://localhost/form_multival.html')
+    super
+
+    @page  = @mech.get('http://localhost/form_multival.html')
   end
 
   def test_form_hash
@@ -39,7 +40,7 @@ class TestFormHash < Mechanize::TestCase
   end
 
   def test_keys
-    @page = @agent.get('http://localhost/empty_form.html')
+    @page = @mech.get('http://localhost/empty_form.html')
     form = @page.forms.first
 
     assert(!form.has_field?('name'))

@@ -2,12 +2,8 @@ require 'mechanize/test_case'
 
 class TestMechanizeRedirectNotGetOrHead < Mechanize::TestCase
 
-  def setup
-    @agent = Mechanize.new
-  end
-
   def test_to_s
-    page = fake_page @agent
+    page = fake_page
 
     error = Mechanize::RedirectNotGetOrHeadError.new(page, :put)
 

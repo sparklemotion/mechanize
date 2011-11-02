@@ -3,6 +3,8 @@ require 'mechanize/test_case'
 class TestMechanizeCookieJar < Mechanize::TestCase
 
   def setup
+    super
+
     @jar = Mechanize::CookieJar.new
     @tmpdir = Dir.mktmpdir
 

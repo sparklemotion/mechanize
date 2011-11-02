@@ -8,7 +8,8 @@ class TestMechanizePageEncoding < Mechanize::TestCase
   MECH_ASCII_ENCODING = Mechanize::Util::NEW_RUBY_ENCODING ? 'US-ASCII' : 'ISO-8859-1'
 
   def setup
-    @agent = Mechanize.new
+    super
+
     @uri = URI('http://localhost/')
     @response_headers = { 'content-type' => 'text/html' }
     @body = '<title>hi</title>'
@@ -16,7 +17,7 @@ class TestMechanizePageEncoding < Mechanize::TestCase
 
   def util_page body = @body, headers = @response_headers
     body.force_encoding Encoding::BINARY if body.respond_to? :force_encoding
-    Mechanize::Page.new @uri, headers, body, 200, @agent
+    Mechanize::Page.new @uri, headers, body, 200, @mech
   end
 
   def test_page_charset
@@ -127,7 +128,7 @@ class TestMechanizePageEncoding < Mechanize::TestCase
   def test_encodings
     response = {'content-type' => 'text/html;charset=HEADER'}
     body = '<meta http-equiv="content-type" content="text/html;charset=META">'
-    @agent.default_encoding = 'DEFAULT'
+    @mech.default_encoding = 'DEFAULT'
     page = util_page body, response
 
     assert_equal true, page.encodings.include?('HEADER')
@@ -140,23 +141,23 @@ class TestMechanizePageEncoding < Mechanize::TestCase
     # pre test
     assert_equal false, util_page.encodings.include?('Windows-1252')
 
-    @agent.default_encoding = 'Windows-1252'
+    @mech.default_encoding = 'Windows-1252'
     page = util_page
 
     assert_equal true, page.encodings.include?('Windows-1252')
   end
 
   def test_parser_force_default_encoding
-    @agent.default_encoding = 'Windows-1252'
-    @agent.force_default_encoding = true
+    @mech.default_encoding = 'Windows-1252'
+    @mech.force_default_encoding = true
     page = util_page
 
     assert page.encodings.include? 'Windows-1252'
   end
 
   def test_parser_encoding_equals_overwrites_force_default_encoding
-    @agent.default_encoding = 'Windows-1252'
-    @agent.force_default_encoding = true
+    @mech.default_encoding = 'Windows-1252'
+    @mech.force_default_encoding = true
     page = util_page
 
     assert_equal 'Windows-1252', page.encoding

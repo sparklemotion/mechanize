@@ -2,8 +2,9 @@ require 'mechanize/test_case'
 
 class SelectTest < Mechanize::TestCase
   def setup
-    @agent = Mechanize.new
-    @page = @agent.get("http://localhost/form_select.html")
+    super
+
+    @page = @mech.get("http://localhost/form_select.html")
     @form = @page.forms.first
   end
 
@@ -40,7 +41,7 @@ class SelectTest < Mechanize::TestCase
     assert_equal(6, option_list.length)
     assert_equal(option_list.last.value, @form.list)
 
-    page = @agent.submit(@form)
+    page = @mech.submit(@form)
 
     assert_equal(1, page.links.length)
     assert_equal(1, page.links_with(:text => "list:#{option_list.last}").length)
@@ -48,7 +49,7 @@ class SelectTest < Mechanize::TestCase
 
   def test_select_default
     assert_equal("2", @form.list)
-    page = @agent.submit(@form)
+    page = @mech.submit(@form)
     assert_equal(1, page.links.length)
     assert_equal(1, page.links_with(:text => 'list:2').length)
   end
@@ -56,7 +57,7 @@ class SelectTest < Mechanize::TestCase
   def test_select_one
     @form.list = 'Aaron'
     assert_equal('Aaron', @form.list)
-    page = @agent.submit(@form)
+    page = @mech.submit(@form)
     assert_equal(1, page.links.length)
     assert_equal('list:Aaron', page.links.first.text)
   end
@@ -64,7 +65,7 @@ class SelectTest < Mechanize::TestCase
   def test_select_two
     @form.list = ['1', 'Aaron']
     assert_equal('1', @form.list)
-    page = @agent.submit(@form)
+    page = @mech.submit(@form)
     assert_equal(1, page.links.length)
     assert_equal(1, page.links_with(:text => 'list:1').length)
   end
@@ -72,7 +73,7 @@ class SelectTest < Mechanize::TestCase
   def test_select_three
     @form.list = ['1', '2', '3']
     assert_equal('1', @form.list)
-    page = @agent.submit(@form)
+    page = @mech.submit(@form)
     assert_equal(1, page.links.length)
     assert_equal(1, page.links_with(:text => 'list:1').length)
   end
@@ -81,7 +82,7 @@ class SelectTest < Mechanize::TestCase
     @form.list = ['1', '2', '3']
     @form.list = ['1', '2', '3']
     assert_equal('1', @form.list)
-    page = @agent.submit(@form)
+    page = @mech.submit(@form)
     assert_equal(1, page.links.length)
     assert_equal(1, page.links_with(:text => 'list:1').length)
   end
@@ -90,7 +91,7 @@ class SelectTest < Mechanize::TestCase
     list = @form.field_with(:name => 'list')
     list.options.last.instance_variable_set(:@value, '')
     list.options.last.tick
-    page = @agent.submit(@form)
+    page = @mech.submit(@form)
     assert_equal(1, page.links.length)
     assert_equal(1, page.links_with(:text => 'list:').length)
   end
@@ -99,7 +100,7 @@ class SelectTest < Mechanize::TestCase
     @form.list = ['1', 'Aaron']
     @form.field_with(:name => 'list').options[3].tick
     assert_equal('4', @form.list)
-    page = @agent.submit(@form)
+    page = @mech.submit(@form)
     assert_equal(1, page.links.length)
     assert_equal(1, page.links_with(:text => 'list:4').length)
   end

@@ -3,9 +3,10 @@ require 'mechanize/test_case'
 class TestMechanizePageMetaRefresh < Mechanize::TestCase
 
   def setup
+    super
+
     @MR = Mechanize::Page::MetaRefresh
 
-    @agent = Mechanize.new
     @uri = URI 'http://example/here/'
   end
 
@@ -15,7 +16,7 @@ class TestMechanizePageMetaRefresh < Mechanize::TestCase
     BODY
 
     Mechanize::Page.new(@uri, { 'content-type' => 'text/html' }, body, 200,
-                        @agent)
+                        @mech)
   end
 
   def util_meta_refresh page
@@ -106,7 +107,7 @@ class TestMechanizePageMetaRefresh < Mechanize::TestCase
     BODY
 
     page = Mechanize::Page.new(@uri, { 'content-type' => 'text/html' }, body,
-                               200, @agent)
+                               200, @mech)
 
     assert_nil util_meta_refresh page
   end
@@ -117,7 +118,7 @@ class TestMechanizePageMetaRefresh < Mechanize::TestCase
     BODY
 
     page = Mechanize::Page.new(@uri, { 'content-type' => 'text/html' }, body,
-                               200, @agent)
+                               200, @mech)
 
     assert_nil util_meta_refresh page
   end

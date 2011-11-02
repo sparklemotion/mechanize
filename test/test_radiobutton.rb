@@ -2,8 +2,9 @@ require 'mechanize/test_case'
 
 class TestRadioButtons < Mechanize::TestCase
   def setup
-    @agent = Mechanize.new
-    @page  = @agent.get("http://localhost/tc_radiobuttons.html")
+    super
+
+    @page = @mech.get("http://localhost/tc_radiobuttons.html")
   end
 
   def test_select_all

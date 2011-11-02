@@ -3,6 +3,8 @@ require 'mechanize/test_case'
 class TestMechanizeHttpAuthRealm < Mechanize::TestCase
 
   def setup
+    super
+
     @uri = URI 'http://example/'
     @AR = Mechanize::HTTP::AuthRealm
     @realm = @AR.new 'Digest', @uri, 'r'

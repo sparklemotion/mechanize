@@ -2,34 +2,30 @@ require 'mechanize/test_case'
 
 class TestMechanizeLink < Mechanize::TestCase
 
-  def setup
-    @agent = Mechanize.new
-  end
-
   def test_click
-    page = @agent.get("http://localhost/frame_test.html")
+    page = @mech.get("http://localhost/frame_test.html")
     link = page.link_with(:text => "Form Test")
 
     assert_equal('Form Test', link.text)
     page = link.click
     assert_equal("http://localhost/form_test.html",
-      @agent.history.last.uri.to_s)
+      @mech.history.last.uri.to_s)
   end
 
   def test_click_base
-    page = @agent.get("http://google.com/tc_base_link.html")
+    page = @mech.get("http://google.com/tc_base_link.html")
     page = page.links.first.click
-    assert @agent.visited?("http://localhost/index.html")
+    assert @mech.visited?("http://localhost/index.html")
   end
 
   def test_click_unsupported_scheme
-    page = @agent.get("http://google.com/tc_links.html")
+    page = @mech.get("http://google.com/tc_links.html")
     link = page.link_with(:text => 'javascript link')
     assert_raises Mechanize::UnsupportedSchemeError do
       link.click
     end
 
-    @agent.scheme_handlers['javascript'] = lambda { |my_link, my_page|
+    @mech.scheme_handlers['javascript'] = lambda { |my_link, my_page|
       URI.parse('http://localhost/tc_links.html')
     }
 
@@ -39,7 +35,7 @@ class TestMechanizeLink < Mechanize::TestCase
   end
 
   def test_text_alt_text
-    page = @agent.get("http://localhost/alt_text.html")
+    page = @mech.get("http://localhost/alt_text.html")
     assert_equal(5, page.links.length)
     assert_equal(1, page.meta_refresh.length)
 
@@ -63,7 +59,7 @@ class TestMechanizeLink < Mechanize::TestCase
   end
 
   def test_uri_no_path
-    page = @agent.get("http://localhost/relative/tc_relative_links.html")
+    page = @mech.get("http://localhost/relative/tc_relative_links.html")
     page = page.link_with(:text => 'just the query string').click
     assert_equal('http://localhost/relative/tc_relative_links.html?a=b',
                  page.uri.to_s)

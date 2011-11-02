@@ -18,7 +18,13 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
 
   TEST_DIR = File.expand_path '../../../test', __FILE__
 
-  def fake_page agent
+  def setup
+    super
+
+    @mech = Mechanize.new
+  end
+
+  def fake_page agent = @mech
     html = <<-END
 <html>
 <body>

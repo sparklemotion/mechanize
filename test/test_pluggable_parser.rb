@@ -1,12 +1,9 @@
 require 'mechanize/test_case'
 
 class PluggableParserTest < Mechanize::TestCase
-  def setup
-    @agent = Mechanize.new
-  end
 
   def test_content_type_error
-    page = @agent.get("http://localhost/bad_content_type")
+    page = @mech.get("http://localhost/bad_content_type")
 
     e = assert_raises Mechanize::ContentTypeError do
       page = Mechanize::Page.new(page.uri,
@@ -19,7 +16,7 @@ class PluggableParserTest < Mechanize::TestCase
   end
 
   def test_content_type
-    page = @agent.get("http://localhost/content_type_test")
+    page = @mech.get("http://localhost/content_type_test")
     assert_kind_of(Mechanize::Page, page)
   end
 
@@ -44,8 +41,8 @@ class PluggableParserTest < Mechanize::TestCase
   end
 
   def test_file_saver
-    @agent.pluggable_parser.html = Mechanize::FileSaver
-    page = @agent.get('http://localhost:2000/form_no_action.html')
+    @mech.pluggable_parser.html = Mechanize::FileSaver
+    page = @mech.get('http://localhost:2000/form_no_action.html')
     length = page.response['Content-Length']
     file_length = nil
     File.open("localhost/form_no_action.html", "r") { |f|
@@ -57,8 +54,8 @@ class PluggableParserTest < Mechanize::TestCase
   end
 
   def test_filter
-    @agent.pluggable_parser.html = Filter
-    page = @agent.get("http://localhost/find_link.html")
+    @mech.pluggable_parser.html = Filter
+    page = @mech.get("http://localhost/find_link.html")
 
     assert_kind_of(Filter, page)
 
@@ -67,36 +64,36 @@ class PluggableParserTest < Mechanize::TestCase
   end
 
   def test_filter_hash
-    @agent.pluggable_parser['text/html'] = Filter
-    page = @agent.get("http://localhost/find_link.html")
-    assert_kind_of(Class, @agent.pluggable_parser['text/html'])
-    assert_equal(Filter, @agent.pluggable_parser['text/html'])
+    @mech.pluggable_parser['text/html'] = Filter
+    page = @mech.get("http://localhost/find_link.html")
+    assert_kind_of(Class, @mech.pluggable_parser['text/html'])
+    assert_equal(Filter, @mech.pluggable_parser['text/html'])
     assert_kind_of(Filter, page)
     assert_equal(19, page.links.length)
     assert_equal(1, page.links_with(:text => 'Net::DAAP::Client').length)
   end
 
   def test_content_type_pdf
-    @agent.pluggable_parser.pdf = FileFilter
-    page = @agent.get("http://localhost/content_type_test?ct=application/pdf")
-    assert_kind_of(Class, @agent.pluggable_parser['application/pdf'])
-    assert_equal(FileFilter, @agent.pluggable_parser['application/pdf'])
+    @mech.pluggable_parser.pdf = FileFilter
+    page = @mech.get("http://localhost/content_type_test?ct=application/pdf")
+    assert_kind_of(Class, @mech.pluggable_parser['application/pdf'])
+    assert_equal(FileFilter, @mech.pluggable_parser['application/pdf'])
     assert_kind_of(FileFilter, page)
   end
 
   def test_content_type_csv
-    @agent.pluggable_parser.csv = FileFilter
-    page = @agent.get("http://localhost/content_type_test?ct=text/csv")
-    assert_kind_of(Class, @agent.pluggable_parser['text/csv'])
-    assert_equal(FileFilter, @agent.pluggable_parser['text/csv'])
+    @mech.pluggable_parser.csv = FileFilter
+    page = @mech.get("http://localhost/content_type_test?ct=text/csv")
+    assert_kind_of(Class, @mech.pluggable_parser['text/csv'])
+    assert_equal(FileFilter, @mech.pluggable_parser['text/csv'])
     assert_kind_of(FileFilter, page)
   end
 
   def test_content_type_xml
-    @agent.pluggable_parser.xml = FileFilter
-    page = @agent.get("http://localhost/content_type_test?ct=text/xml")
-    assert_kind_of(Class, @agent.pluggable_parser['text/xml'])
-    assert_equal(FileFilter, @agent.pluggable_parser['text/xml'])
+    @mech.pluggable_parser.xml = FileFilter
+    page = @mech.get("http://localhost/content_type_test?ct=text/xml")
+    assert_kind_of(Class, @mech.pluggable_parser['text/xml'])
+    assert_equal(FileFilter, @mech.pluggable_parser['text/xml'])
     assert_kind_of(FileFilter, page)
   end
 

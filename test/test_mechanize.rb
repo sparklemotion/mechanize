@@ -17,7 +17,8 @@ class TestMechanize < Mechanize::TestCase
   CERT.sign KEY, OpenSSL::Digest::SHA1.new
 
   def setup
-    @mech = Mechanize.new
+    super
+
     @mech.log = nil
     @uri = URI 'http://example/'
     @req = Net::HTTP::Get.new '/'

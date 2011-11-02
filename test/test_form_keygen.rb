@@ -2,15 +2,16 @@ require 'mechanize/test_case'
 
 class TestFormKeygen < Mechanize::TestCase
   def setup
-    @agent = Mechanize.new
-    @page  = @agent.get("http://localhost/tc_keygen.html")
+    super
+
+    @page  = @mech.get("http://localhost/tc_keygen.html")
     @keygen = @page.forms.first.keygens.first
   end
 
   def test_challenge
     assert_equal "f4832e1d200df3df8c5c859edcabe52f", @keygen.challenge
   end
-  
+
   def test_key
     assert @keygen.key.kind_of?(OpenSSL::PKey::PKey), "Not an OpenSSL key"
     assert @keygen.key.private?, "Not a private key"

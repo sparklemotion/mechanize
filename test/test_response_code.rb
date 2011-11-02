@@ -1,10 +1,6 @@
 require 'mechanize/test_case'
 
 class ResponseCodeMechTest < Mechanize::TestCase
-  def setup
-    @mech = Mechanize.new
-  end
-
   def test_eof_error_loop
     assert_raises(Net::HTTP::Persistent::Error) {
       @mech.get("http://localhost/http_headers?Content-Length=300")

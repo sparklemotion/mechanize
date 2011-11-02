@@ -21,21 +21,16 @@ class TestMechanizeFormEncoding < Mechanize::TestCase
   ENCODING_LOG_MESSAGE = /INFO -- : form encoding: Shift_JIS/
   INVALID_ENCODING = 'UTF-eight'
 
-  def setup
-    @agent = Mechanize.new
-  end
-
   def set_form_with_encoding(enc)
-    page = @agent.get("http://localhost/form_set_fields.html")
+    page = @mech.get("http://localhost/form_set_fields.html")
     form = page.forms.first
     form.encoding = enc
     form['first_name'] = INPUTTED_VALUE
     form
   end
 
-
   def test_form_encoding_returns_accept_charset
-    page = @agent.get("http://localhost/rails_3_encoding_hack_form_test.html")
+    page = @mech.get("http://localhost/rails_3_encoding_hack_form_test.html")
     form = page.forms.first
     accept_charset = form.form_node['accept-charset']
 
@@ -45,7 +40,7 @@ class TestMechanizeFormEncoding < Mechanize::TestCase
   end
 
   def test_form_encoding_returns_page_encoding_when_no_accept_charset
-    page = @agent.get("http://localhost/form_set_fields.html")
+    page = @mech.get("http://localhost/form_set_fields.html")
     form = page.forms.first
     accept_charset = form.form_node['accept-charset']
 
@@ -55,7 +50,7 @@ class TestMechanizeFormEncoding < Mechanize::TestCase
   end
 
   def test_form_encoding_equals_sets_new_encoding
-    page = @agent.get("http://localhost/form_set_fields.html")
+    page = @mech.get("http://localhost/form_set_fields.html")
     form = page.forms.first
 
     refute_equal CONTENT_ENCODING, form.encoding
@@ -80,14 +75,13 @@ class TestMechanizeFormEncoding < Mechanize::TestCase
     assert_equal nil, form.encoding
   end
 
-
   def test_post_form_with_form_encoding
     form = set_form_with_encoding CONTENT_ENCODING
     form.submit
 
     # we can not use "links.find{|l| l.text == 'key:val'}" assertion here
     # because the link text encoding is always UTF-8 regaredless of html encoding
-    assert EXPECTED_QUERY, @agent.page.at('div#query').inner_text
+    assert EXPECTED_QUERY, @mech.page.at('div#query').inner_text
   end
 
   def test_post_form_with_problematic_encoding
@@ -107,14 +101,14 @@ class TestMechanizeFormEncoding < Mechanize::TestCase
 
   def test_post_form_logs_form_encoding
     sio = StringIO.new
-    @agent.log = Logger.new(sio)
-    @agent.log.level = Logger::INFO
+    @mech.log = Logger.new(sio)
+    @mech.log.level = Logger::INFO
 
     form = set_form_with_encoding CONTENT_ENCODING
     form.submit
 
     assert_match ENCODING_LOG_MESSAGE, sio.string
 
-    @agent.log = nil
+    @mech.log = nil
   end
 end

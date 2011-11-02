@@ -3,6 +3,8 @@ require 'mechanize/test_case'
 class TestMechanizeHttpWwwAuthenticateParser < Mechanize::TestCase
 
   def setup
+    super
+
     @parser = Mechanize::HTTP::WWWAuthenticateParser.new
   end
 

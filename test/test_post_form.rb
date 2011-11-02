@@ -1,12 +1,8 @@
 require 'mechanize/test_case'
 
 class PostForm < Mechanize::TestCase
-  def setup
-    @agent = Mechanize.new
-  end
-
   def test_post_form
-    page = @agent.post("http://localhost/form_post",
+    page = @mech.post("http://localhost/form_post",
                         'gender' => 'female'
                       )
     assert(page.links.find { |l| l.text == "gender:female" },
@@ -14,14 +10,14 @@ class PostForm < Mechanize::TestCase
   end
 
   def test_post_form_json
-    page = @agent.post "http://localhost/form_post",
+    page = @mech.post "http://localhost/form_post",
                        'json' => '["&quot;"]'
 
     assert page.links.find { |l| l.text == 'json:["""]' }
   end
 
   def test_post_form_multival
-    page = @agent.post("http://localhost/form_post",
+    page = @mech.post("http://localhost/form_post",
                        [ ['gender', 'female'],
                          ['gender', 'male']
                        ]

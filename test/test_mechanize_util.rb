@@ -20,6 +20,8 @@ class TestMechanizeUtil < Mechanize::TestCase
   INVALID_ENCODING = 'UTF-eight'
 
   def setup
+    super
+
     @result = "not set"
   end
 

@@ -2,8 +2,9 @@ require 'mechanize/test_case'
 
 class TestSetFields < Mechanize::TestCase
   def setup
-    @agent = Mechanize.new
-    @page = @agent.get("http://localhost/form_set_fields.html")
+    super
+
+    @page = @mech.get("http://localhost/form_set_fields.html")
     @form = @page.forms.first
   end
 
@@ -30,7 +31,7 @@ class TestSetFields < Mechanize::TestCase
   end
 
   def test_set_multiple_duplicate_fields
-    page = @agent.get("http://localhost/form_multival.html")
+    page = @mech.get("http://localhost/form_multival.html")
     form = page.form('post_form')
     form.set_fields( :first => { 0 => 'a', 1 => 'b' } )
     assert_equal('a', form.fields_with(:name => 'first')[0].value)

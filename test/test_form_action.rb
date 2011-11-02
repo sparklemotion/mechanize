@@ -2,12 +2,13 @@ require 'mechanize/test_case'
 
 class TestFormAction < Mechanize::TestCase
   def setup
-    @agent = Mechanize.new
-    @page  = @agent.get("http://localhost/tc_form_action.html")
+    super
+
+    @page  = @mech.get("http://localhost/tc_form_action.html")
   end
 
   def test_post_with_bad_encoding_does_not_raise_exception
-    @page  = @agent.get("http://localhost/test_bad_encoding.html")
+    @page  = @mech.get("http://localhost/test_bad_encoding.html")
     form = @page.form(:name => 'post_form1') { |f|
       f.first_name = "Aaron"
     }

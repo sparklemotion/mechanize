@@ -6,8 +6,6 @@ class Mechanize::CookieJar
 
   # add_cookie wants something resembling a URI.
 
-  FakeURI = Struct.new(:host) # :nodoc:
-
   attr_reader :jar
 
   def initialize
@@ -18,10 +16,14 @@ class Mechanize::CookieJar
     @jar = Marshal.load Marshal.dump other.jar
   end
 
-  # Add a cookie to the Jar.
+  # Add a +cookie+ to the jar if it is considered acceptable from +uri+.
   def add(uri, cookie)
-    return unless cookie.acceptable_from_uri?(uri)
+    return nil unless cookie.acceptable_from_uri?(uri)
+    add!(cookie)
+  end
 
+  # Add a +cookie+ to the jar.
+  def add!(cookie)
     normal_domain = cookie.domain.downcase
 
     @jar[normal_domain] ||= {} unless @jar.has_key?(normal_domain)
@@ -31,6 +33,7 @@ class Mechanize::CookieJar
 
     cookie
   end
+  alias << add!
 
   # Fetch the cookies that should be used for the URI object passed in.
   def cookies(url)
@@ -149,7 +152,7 @@ class Mechanize::CookieJar
       c.expires = expires             # Time the cookie expires.
       c.version = 0                   # Conforms to Netscape cookie spec.
 
-      add(FakeURI.new(c.domain), c)
+      add!(c)
     end
 
     @jar

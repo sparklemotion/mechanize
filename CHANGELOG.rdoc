@@ -42,6 +42,7 @@
       a sublcass of Mechanize::ResponseCodeError.
     * Added support for NTLM authentication, but this has not been tested.
   * Mechanize::Cookie.new accepts attributes in a hash.
+  * Mechanize::CookieJar#<<(cookie) (alias: add!) is added.  Issue #139
 
 * Bug fixes
   * Mechanize#cookie_jar= works again.  Issue #126

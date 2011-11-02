@@ -1,6 +1,6 @@
 require 'mechanize/test_case'
 
-class TestHeaders < Mechanize::TestCase
+class TestMechanizeHeaders < Mechanize::TestCase
   def setup
     super
 

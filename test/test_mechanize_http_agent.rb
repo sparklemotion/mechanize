@@ -117,6 +117,14 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert response
   end
 
+  def test_fetch_server_error
+    e = assert_raises Mechanize::ResponseCodeError do
+      @mech.get 'http://localhost/response_code?code=500'
+    end
+
+    assert_equal '500', e.response_code
+  end
+
   def test_get_robots
     robotstxt = @agent.get_robots 'http://localhost/robots.txt'
     refute_equal '', robotstxt

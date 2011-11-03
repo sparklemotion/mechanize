@@ -114,7 +114,6 @@ test/htdocs/tc_form_action.html
 test/htdocs/tc_links.html
 test/htdocs/tc_meta_in_body.html
 test/htdocs/tc_pretty_print.html
-test/htdocs/tc_radiobuttons.html
 test/htdocs/tc_referer.html
 test/htdocs/tc_relative_links.html
 test/htdocs/tc_textarea.html
@@ -139,6 +138,7 @@ test/test_mechanize_form_file_upload.rb
 test/test_mechanize_form_image_button.rb
 test/test_mechanize_form_keygen.rb
 test/test_mechanize_form_option.rb
+test/test_mechanize_form_radio_button.rb
 test/test_mechanize_form_textarea.rb
 test/test_mechanize_headers.rb
 test/test_mechanize_http_agent.rb
@@ -157,7 +157,6 @@ test/test_mechanize_subclass.rb
 test/test_mechanize_util.rb
 test/test_multi_select.rb
 test/test_pluggable_parser.rb
-test/test_radiobutton.rb
 test/test_redirect_limit_reached.rb
 test/test_referer.rb
 test/test_relative_links.rb

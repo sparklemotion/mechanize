@@ -16,6 +16,8 @@ class Mechanize::Form::RadioButton < Mechanize::Form::Field
     @checked = true
   end
 
+  alias checked? checked
+
   def uncheck
     @checked = false
   end

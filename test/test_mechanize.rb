@@ -695,7 +695,7 @@ class TestMechanize < Mechanize::TestCase
   end
 
   def test_post
-    page = @mech.post "http://example", 'gender' => 'female'
+    @mech.post "http://example", 'gender' => 'female'
 
     assert_equal "gender=female", requests.first.body
   end
@@ -717,13 +717,13 @@ class TestMechanize < Mechanize::TestCase
   end
 
   def test_post_entity
-    page = @mech.post "http://localhost/form_post", 'json' => '["&quot;"]'
+    @mech.post "http://localhost/form_post", 'json' => '["&quot;"]'
 
     assert_equal "json=%5B%22%22%22%5D", requests.first.body
   end
 
   def test_post_multiple_values
-    page = @mech.post "http://localhost/form_post",
+    @mech.post "http://localhost/form_post",
                       [%w[gender female], %w[gender male]]
 
     assert_equal "gender=female&gender=male", requests.first.body

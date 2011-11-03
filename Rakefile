@@ -38,6 +38,7 @@ end
 
 desc 'Install deps for travis to work around Hoe/RubyGems bug'
 task 'travis_deps' do
+  hoe.spec.add_dependency 'rdoc', '~> 3.11' if ENV['TRAVIS']
   hoe.spec.dependencies.each do |dep|
     first_requirement = dep.requirement.requirements.first.join ' '
     system('gem', 'install', dep.name, '-v', first_requirement,

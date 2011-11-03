@@ -73,6 +73,14 @@ class TestMechanizePage < Mechanize::TestCase
     assert_equal page.images.first.url, "http://other.example/a.jpg"
   end
 
+  def test_links
+    page = html_page <<-BODY
+<a href="foo.html">
+    BODY
+
+    assert_equal page.links.first.href, "foo.html"
+  end
+
   def test_parser_no_attributes
     page = html_page <<-BODY
 <html>

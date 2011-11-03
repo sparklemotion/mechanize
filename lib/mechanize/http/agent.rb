@@ -270,11 +270,11 @@ class Mechanize::HTTP::Agent
 
     hook_content_encoding response, uri, response_body_io
 
-    response_body = response_content_encoding response, response_body_io
+    response_body_io = response_content_encoding response, response_body_io
 
-    post_connect uri, response, response_body
+    post_connect uri, response, response_body_io
 
-    page = response_parse response, response_body, uri
+    page = response_parse response, response_body_io, uri
 
     response_cookies response, uri, page
 
@@ -360,9 +360,10 @@ class Mechanize::HTTP::Agent
   # Yields the +context+, the +uri+ for the request, the +response+ and the
   # response +body+.
 
-  def post_connect uri, response, body # :yields: agent, uri, response, body
+  def post_connect uri, response, body_io # :yields: agent, uri, response, body
     @post_connect_hooks.each do |hook|
-      hook.call self, uri, response, body
+      hook.call self, uri, response, body_io.read
+      body_io.rewind
     end
   end
 

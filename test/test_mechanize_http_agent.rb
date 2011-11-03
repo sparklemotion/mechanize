@@ -72,6 +72,22 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'identity', @req['accept-encoding']
   end
 
+  def test_fetch_hooks
+    @agent.pre_connect_hooks << proc do |agent, request|
+      assert_equal '/index.html', request.path
+      assert_equal @agent, agent
+    end
+
+    @agent.post_connect_hooks << proc do |agent, uri, response, body|
+      assert_equal @agent, agent
+      assert_equal URI('http://example/index.html'), uri
+      assert_equal '200', response.code
+      assert_kind_of String, body
+    end
+
+    @agent.fetch URI 'http://example/index.html'
+  end
+
   def test_fetch_file_plus
     Tempfile.open '++plus++' do |io|
       content = 'plusses +++'

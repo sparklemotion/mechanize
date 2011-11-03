@@ -2,6 +2,10 @@
 
 === 2.1 / ??
 
+* Deprecations
+  * Mechanize#get no longer accepts an options hash.
+  * Mechanize::Util::to_native_charset has been removed.
+
 * Minor enhancements
   * Mechanize now depends on net-http-persistent 2.3+.  This new version
     brings idle timeouts to help with the dreaded "too many connection resets"

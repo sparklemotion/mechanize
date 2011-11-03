@@ -296,18 +296,6 @@ class Mechanize
   def get(uri, parameters = [], referer = nil, headers = {})
     method = :get
 
-    if Hash === uri then
-      options = uri
-      location = Gem.location_of_caller.join ':'
-      warn "#{location}: Mechanize#get with options hash is deprecated and will be removed October 2011"
-
-      raise ArgumentError, "url must be specified" unless uri = options[:url]
-      parameters = options[:params] || []
-      referer    = options[:referer]
-      headers    = options[:headers]
-      method     = options[:verb] || method
-    end
-
     referer ||=
       if uri.to_s =~ %r{\Ahttps?://}
         Page.new(nil, {'content-type'=>'text/html'})

@@ -24,18 +24,6 @@ class Mechanize::Util
     }.compact.join('&')
   end
 
-  def self.to_native_charset(s, code=nil)
-    location = Gem.location_of_caller.join ':'
-    warn "#{location}: Mechanize::Util::to_native_charset is deprecated and will be removed October 2011"
-    if Mechanize.html_parser == Nokogiri::HTML
-      return unless s
-      code ||= detect_charset(s)
-      Iconv.iconv("UTF-8", code, s).join("")
-    else
-      s
-    end
-  end
-
   # Converts string +s+ from +code+ to UTF-8.
   def self.from_native_charset(s, code, ignore_encoding_error=false, log=nil)
     return s unless s && code

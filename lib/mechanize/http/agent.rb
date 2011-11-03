@@ -362,8 +362,11 @@ class Mechanize::HTTP::Agent
 
   def post_connect uri, response, body_io # :yields: agent, uri, response, body
     @post_connect_hooks.each do |hook|
-      hook.call self, uri, response, body_io.read
-      body_io.rewind
+      begin
+        hook.call self, uri, response, body_io.read
+      ensure
+        body_io.rewind
+      end
     end
   end
 

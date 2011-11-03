@@ -186,9 +186,13 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
       throw :called
     }
 
+    io = StringIO.new 'body'
+
     assert_throws :called do
-      @agent.post_connect @uri, @res, 'body'
+      @agent.post_connect @uri, @res, io
     end
+
+    assert_equal 0, io.pos
   end
 
   def test_pre_connect

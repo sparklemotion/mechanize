@@ -22,21 +22,22 @@ class TestMechanizeUtil < Mechanize::TestCase
   def setup
     super
 
+    @MU = Mechanize::Util
     @result = "not set"
   end
 
   def test_from_native_charset
-    @result = Mechanize::Util.from_native_charset(INPUTTED_VALUE, CONTENT_ENCODING)
+    @result = @MU.from_native_charset(INPUTTED_VALUE, CONTENT_ENCODING)
     assert_equal ENCODED_VALUE, @result
   end
 
   def test_from_native_charset_returns_nil_when_no_string
-    @result = Mechanize::Util.from_native_charset(nil, CONTENT_ENCODING)
+    @result = @MU.from_native_charset(nil, CONTENT_ENCODING)
     assert_equal nil, @result
   end
 
   def test_from_native_charset_doesnot_convert_when_no_encoding
-    @result = Mechanize::Util.from_native_charset(INPUTTED_VALUE, nil)
+    @result = @MU.from_native_charset(INPUTTED_VALUE, nil)
     refute_equal ENCODED_VALUE, @result
     assert_equal INPUTTED_VALUE, @result
   end
@@ -45,7 +46,7 @@ class TestMechanizeUtil < Mechanize::TestCase
     parser = Mechanize.html_parser
     Mechanize.html_parser = 'Another HTML Parser'
 
-    @result = Mechanize::Util.from_native_charset(INPUTTED_VALUE, CONTENT_ENCODING)
+    @result = @MU.from_native_charset(INPUTTED_VALUE, CONTENT_ENCODING)
     refute_equal ENCODED_VALUE, @result
     assert_equal INPUTTED_VALUE, @result
   ensure
@@ -54,18 +55,18 @@ class TestMechanizeUtil < Mechanize::TestCase
 
   def test_from_native_charset_raises_error_with_bad_encoding
     assert_raises(*ENCODING_ERRORS) do
-      Mechanize::Util.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING)
+      @MU.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING)
     end
   end
 
   def test_from_native_charset_suppress_encoding_error_when_3rd_arg_is_true
-    Mechanize::Util.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, true)
+    @MU.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, true)
 
     # HACK no assertion
   end
 
   def test_from_native_charset_doesnot_convert_when_encoding_error_raised_and_ignored
-    @result = Mechanize::Util.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, true)
+    @result = @MU.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, true)
 
     refute_equal ENCODED_VALUE, @result
     assert_equal INPUTTED_VALUE, @result
@@ -77,7 +78,7 @@ class TestMechanizeUtil < Mechanize::TestCase
     log.level = Logger::DEBUG
 
     assert_raises(*ENCODING_ERRORS) do
-      Mechanize::Util.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, nil, log)
+      @MU.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, nil, log)
     end
 
     assert_match ERROR_LOG_MESSAGE, sio.string
@@ -88,8 +89,15 @@ class TestMechanizeUtil < Mechanize::TestCase
     log = Logger.new(sio)
     log.level = Logger::DEBUG
 
-    Mechanize::Util.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, true, log)
+    @MU.from_native_charset(INPUTTED_VALUE, INVALID_ENCODING, true, log)
 
     assert_match ERROR_LOG_MESSAGE, sio.string
   end
+
+  def test_self_html_unescape_entity
+    assert_equal '&', @MU::html_unescape('&')
+    assert_equal '&', @MU::html_unescape('&amp;')
+  end
+
 end
+

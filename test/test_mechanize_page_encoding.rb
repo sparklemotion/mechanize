@@ -30,7 +30,7 @@ class TestMechanizePageEncoding < Mechanize::TestCase
     assert_equal 'UTF-8', charset
   end
 
-  def test_page_semicolon
+  def test_page_charset_semicolon
     charset = Mechanize::Page.charset 'text/html;charset=UTF-8;'
     assert_equal 'UTF-8', charset
   end

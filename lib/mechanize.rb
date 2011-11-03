@@ -419,6 +419,7 @@ class Mechanize
 
   def submit(form, button=nil, headers={})
     form.add_button_to_query(button) if button
+
     case form.method.upcase
     when 'POST'
       post_form(form.action, form, headers)

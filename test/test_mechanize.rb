@@ -888,6 +888,15 @@ class TestMechanize < Mechanize::TestCase
     assert_match(contents, page.body)
   end
 
+  def test_submit_get
+    form = node 'form', 'method' => 'GET', 'action' => '/?a=b'
+    form = Mechanize::Form.new form, @mech, fake_page
+
+    @mech.submit form
+
+    assert_equal '/', requests.first.path
+  end
+
   def test_submit_headers
     page = @mech.get 'http://localhost:2000/form_no_action.html'
 
@@ -932,6 +941,24 @@ class TestMechanize < Mechanize::TestCase
       "Content-Disposition: form-data; name=\"userfile1\"; filename=\"\"",
       @page.body
     )
+  end
+
+  def test_submit_post
+    form = node 'form', 'method' => 'POST', 'action' => '/?a=b'
+    form = Mechanize::Form.new form, @mech, fake_page
+
+    @mech.submit form
+
+    assert_equal '/?a=b', requests.first.path
+  end
+
+  def test_submit_post_pound
+    form = node 'form', 'method' => 'POST', 'action' => '/#1'
+    form = Mechanize::Form.new form, @mech, fake_page
+
+    @mech.submit form
+
+    assert_equal '/', requests.first.path
   end
 
   def test_submit_too_many_radiobuttons

@@ -118,11 +118,9 @@ test/htdocs/tc_radiobuttons.html
 test/htdocs/tc_referer.html
 test/htdocs/tc_relative_links.html
 test/htdocs/tc_textarea.html
-test/htdocs/test_bad_encoding.html
 test/htdocs/test_click.html
 test/htdocs/unusual______.html
 test/test_cookies.rb
-test/test_form_action.rb
 test/test_form_button.rb
 test/test_history.rb
 test/test_mechanize.rb
@@ -164,6 +162,5 @@ test/test_redirect_limit_reached.rb
 test/test_referer.rb
 test/test_relative_links.rb
 test/test_robots.rb
-test/test_scheme.rb
 test/test_select.rb
 test/test_set_fields.rb

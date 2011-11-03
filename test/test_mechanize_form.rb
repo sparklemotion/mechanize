@@ -8,6 +8,12 @@ class TestMechanizeForm < Mechanize::TestCase
     @form = Mechanize::Form.new node 'form'
   end
 
+  def test_action
+    form = Mechanize::Form.new node('form', 'action' => '?a=b&amp;b=c')
+
+    assert_equal '?a=b&b=c', form.action
+  end
+
   def test_aset
     assert_empty @form.keys
 

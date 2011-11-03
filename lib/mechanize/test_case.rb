@@ -24,6 +24,8 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
 
     REQUESTS.clear
     @mech = Mechanize.new
+    @ssl_private_key = nil
+    @ssl_certificate = nil
   end
 
   def fake_page agent = @mech
@@ -75,6 +77,31 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
 
   def requests
     REQUESTS
+  end
+
+  def ssl_private_key
+    @ssl_private_key ||= OpenSSL::PKey::RSA.new <<-KEY
+-----BEGIN RSA PRIVATE KEY-----
+MIG7AgEAAkEA8pmEfmP0Ibir91x6pbts4JmmsVZd3xvD5p347EFvBCbhBW1nv1Gs
+bCBEFlSiT1q2qvxGb5IlbrfdhdgyqdTXUQIBAQIBAQIhAPumXslvf6YasXa1hni3
+p80joKOug2UUgqOLD2GUSO//AiEA9ssY6AFxjHWuwo/+/rkLmkfO2s1Lz3OeUEWq
+6DiHOK8CAQECAQECIQDt8bc4vS6wh9VXApNSKIpVygtxSFe/IwLeX26n77j6Qg==
+-----END RSA PRIVATE KEY-----
+    KEY
+  end
+
+  def ssl_certificate
+    @ssl_certificate ||= OpenSSL::X509::Certificate.new <<-CERT
+-----BEGIN CERTIFICATE-----
+MIIBQjCB7aADAgECAgEAMA0GCSqGSIb3DQEBBQUAMCoxDzANBgNVBAMMBm5vYm9k
+eTEXMBUGCgmSJomT8ixkARkWB2V4YW1wbGUwIBcNMTExMTAzMjEwODU5WhgPOTk5
+OTEyMzExMjU5NTlaMCoxDzANBgNVBAMMBm5vYm9keTEXMBUGCgmSJomT8ixkARkW
+B2V4YW1wbGUwWjANBgkqhkiG9w0BAQEFAANJADBGAkEA8pmEfmP0Ibir91x6pbts
+4JmmsVZd3xvD5p347EFvBCbhBW1nv1GsbCBEFlSiT1q2qvxGb5IlbrfdhdgyqdTX
+UQIBATANBgkqhkiG9w0BAQUFAANBAAAB////////////////////////////////
+//8AMCEwCQYFKw4DAhoFAAQUePiv+QrJxyjtEJNnH5pB9OTWIqA=
+-----END CERTIFICATE-----
+    CERT
   end
 
 end

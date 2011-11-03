@@ -13,6 +13,7 @@ require 'uri'
 require 'webrick/httputils'
 require 'zlib'
 
+##
 # The Mechanize library is used for automating interactions with a website.  It
 # can follow links and submit forms.  Form fields can be populated and
 # submitted.  A history of URL's is maintained and can be queried.
@@ -102,7 +103,8 @@ class Mechanize
 
   ##
   # Creates a new mechanize instance.  If a block is given, the created
-  # instance is yielded to the block for setting up pre-connection state:
+  # instance is yielded to the block for setting up pre-connection state such
+  # as SSL parameters or proxies:
   #
   #   agent = Mechanize.new do |a|
   #     a.proxy_host = 'proxy.example'
@@ -842,7 +844,8 @@ class Mechanize
 
   # :section: SSL
   #
-  # SSL settings for mechanize
+  # SSL settings for mechanize.  These must be set in the block given to
+  # Mechanize.new
 
   ##
   # Path to an OpenSSL server certificate file
@@ -871,6 +874,21 @@ class Mechanize
 
   def cert= cert
     @agent.cert = cert
+  end
+
+  ##
+  # An OpenSSL certificate store for verifying server certificates.  This
+  # defaults to the default certificate store.
+
+  def cert_store
+    @agent.cert_store
+  end
+
+  ##
+  # Sets the OpenSSL certificate store to +store+.
+
+  def cert_store= cert_store
+    @agent.cert_store = cert_store
   end
 
   ##
@@ -927,6 +945,22 @@ class Mechanize
 
   def verify_callback= verify_callback
     @agent.verify_callback = verify_callback
+  end
+
+  ##
+  # the OpenSSL server certificate verification method.  The default is
+  # OpenSSL::SSL::VERIFY_PEER and certificate verification uses the default
+  # system certificates.  See also cert_store
+
+  def verify_mode
+    @agent.verify_mode
+  end
+
+  ##
+  # Sets the OpenSSL server certificate verification method.
+
+  def verify_mode= verify_mode
+    @agent.verify_mode = verify_mode
   end
 
   # :section: Utilities

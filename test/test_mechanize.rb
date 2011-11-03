@@ -4,18 +4,6 @@ require 'mechanize/test_case'
 
 class TestMechanize < Mechanize::TestCase
 
-  KEY = OpenSSL::PKey::RSA.new 512
-  name = OpenSSL::X509::Name.parse 'CN=nobody/DC=example'
-  CERT = OpenSSL::X509::Certificate.new
-  CERT.version = 2
-  CERT.serial = 0
-  CERT.not_before = Time.now
-  CERT.not_after = Time.now + 60
-  CERT.public_key = KEY.public_key
-  CERT.subject = name
-  CERT.issuer = name
-  CERT.sign KEY, OpenSSL::Digest::SHA1.new
-
   def setup
     super
 
@@ -60,32 +48,36 @@ class TestMechanize < Mechanize::TestCase
   end
 
   def test_cert_key_file
-    Tempfile.open 'key' do |key|
-      Tempfile.open 'cert' do |cert|
-        key.write KEY.to_pem
-        key.rewind
+    in_tmpdir do
+      open 'key.pem', 'w'  do |io| io.write ssl_private_key.to_pem end
+      open 'cert.pem', 'w' do |io| io.write ssl_certificate.to_pem end
 
-        cert.write CERT.to_pem
-        cert.rewind
-
-        mech = Mechanize.new do |a|
-          a.cert = cert.path
-          a.key  = key.path
-        end
-
-        # Certificate#== seems broken
-        assert_equal CERT.to_pem, mech.certificate.to_pem
+      mech = Mechanize.new do |a|
+        a.cert = 'cert.pem'
+        a.key  = 'key.pem'
       end
+
+      # Certificate#== seems broken
+      assert_equal ssl_certificate.to_pem, mech.certificate.to_pem
     end
   end
 
   def test_cert_key_object
     mech = Mechanize.new do |a|
-      a.cert = CERT
-      a.key  = KEY
+      a.cert = ssl_certificate
+      a.key  = ssl_private_key
     end
 
-    assert_equal CERT, mech.certificate
+    assert_equal ssl_certificate, mech.certificate
+  end
+
+  def test_cert_store
+    assert_nil @mech.cert_store
+
+    store = OpenSSL::X509::Store.new
+    @mech.cert_store = store
+
+    assert_equal store, @mech.cert_store
   end
 
   def test_click
@@ -958,6 +950,14 @@ class TestMechanize < Mechanize::TestCase
     assert_raises ArgumentError do
       @mech.user_agent_alias = "Aaron's Browser"
     end
+  end
+
+  def test_verify_mode
+    assert_equal OpenSSL::SSL::VERIFY_PEER, @mech.verify_mode
+
+    @mech.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+    assert_equal OpenSSL::SSL::VERIFY_NONE, @mech.verify_mode
   end
 
   def test_visited_eh

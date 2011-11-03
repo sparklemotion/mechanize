@@ -1027,6 +1027,40 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 1, @agent.http.idle_timeout
   end
 
+  def test_set_http_ssl
+    in_tmpdir do
+      store = OpenSSL::X509::Store.new
+      @agent.cert = ssl_certificate
+      @agent.key  = ssl_private_key
+      @agent.cert_store = store
+      @agent.ca_file = '.'
+      @agent.verify_callback = proc { |ok, context| }
+
+      @agent.set_http
+
+      http = @agent.http
+
+      assert_equal ssl_certificate,           http.certificate
+      assert_equal ssl_private_key,           http.private_key
+      assert_equal store,                     http.cert_store
+      assert_equal '.',                       http.ca_file
+      assert_equal OpenSSL::SSL::VERIFY_PEER, http.verify_mode
+      assert http.verify_callback
+    end
+  end
+
+  def test_set_http_ssl_verify_none
+    in_tmpdir do
+      @agent.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+      @agent.set_http
+
+      http = @agent.http
+
+      assert_equal OpenSSL::SSL::VERIFY_NONE, http.verify_mode
+    end
+  end
+
   def test_set_http_retry_change_request
     @agent.retry_change_requests = true
     @agent.set_http

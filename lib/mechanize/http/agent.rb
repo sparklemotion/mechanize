@@ -3,7 +3,8 @@ require 'net/ntlm'
 require 'kconv'
 
 ##
-# An HTTP (and local disk access) user agent
+# An HTTP (and local disk access) user agent.  This class is an implementation
+# detail and is subject to change at any time.
 
 class Mechanize::HTTP::Agent
 
@@ -84,6 +85,9 @@ class Mechanize::HTTP::Agent
   # An OpenSSL client certificate or the path to a certificate file.
   attr_accessor :cert
 
+  # An SSL certificate store
+  attr_accessor :cert_store
+
   # OpenSSL key password
   attr_accessor :pass
 
@@ -94,6 +98,9 @@ class Mechanize::HTTP::Agent
   # returning +true+.  Specifying nil uses the default method that was valid
   # when the SSLContext was created
   attr_accessor :verify_callback
+
+  # How to verify SSL connections.  Defaults to VERIFY_PEER
+  attr_accessor :verify_mode
 
   # :section: Timeouts
 
@@ -177,11 +184,14 @@ class Mechanize::HTTP::Agent
     @password             = nil # HTTP auth password
     @user                 = nil # HTTP auth user
 
-    @ca_file         = nil # OpenSSL server certificate file
-    @cert            = nil # OpenSSL Certificate
-    @key             = nil # OpenSSL Private Key
-    @pass            = nil # OpenSSL Password
+    # SSL
+    @ca_file         = nil
+    @cert            = nil
+    @cert_store      = nil
+    @key             = nil
+    @pass            = nil
     @verify_callback = nil
+    @verify_mode     = nil
 
     @scheme_handlers = Hash.new { |h, scheme|
       h[scheme] = lambda { |link, page|
@@ -925,7 +935,13 @@ class Mechanize::HTTP::Agent
     @http.retry_change_requests = @retry_change_requests
 
     @http.ca_file         = @ca_file
+    @http.cert_store      = @cert_store if @cert_store
     @http.verify_callback = @verify_callback
+    @http.verify_mode     = @verify_mode if @verify_mode
+
+    # update our cached value
+    @verify_mode = @http.verify_mode
+    @cert_store  = @http.cert_store
 
     if @cert and @key then
       cert = if OpenSSL::X509::Certificate === @cert then

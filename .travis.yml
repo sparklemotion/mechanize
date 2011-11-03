@@ -1,6 +1,6 @@
 before_script:
   - gem install hoe
-  - rake check_extra_deps
+  - rake travis_deps
 rvm:
   - 1.8.7
   - 1.9.2

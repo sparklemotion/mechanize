@@ -4,7 +4,7 @@ require 'hoe'
 Hoe.plugin :git
 Hoe.plugin :minitest
 
-Hoe.spec 'mechanize' do
+hoe = Hoe.spec 'mechanize' do
   developer 'Eric Hodel',      'drbrain@segment7.net'
   developer 'Aaron Patterson', 'aaronp@rubyforge.org'
   developer 'Mike Dalessio',   'mike.dalessio@gmail.com'
@@ -35,3 +35,13 @@ task('ssl_cert') do |p|
   sh "mv server.key server.csr server.crt server.pem test/data/"
   sh "rm server.key.org"
 end
+
+desc 'Install deps for travis to work around Hoe/RubyGems bug'
+task 'travis_deps' do
+  hoe.spec.dependencies.each do |dep|
+    first_requirement = dep.requirement.requirements.first.join ' '
+    system('gem', 'install', dep.name, '-v', first_requirement,
+           '--no-rdoc', '--no-ri')
+  end
+end
+

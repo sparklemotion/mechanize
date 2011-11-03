@@ -928,7 +928,7 @@ class Mechanize::HTTP::Agent
   end
 
   def log
-    Mechanize.log
+    @context.log
   end
 
   def set_http

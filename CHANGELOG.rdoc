@@ -47,6 +47,7 @@
     * Added support for NTLM authentication, but this has not been tested.
   * Mechanize::Cookie.new accepts attributes in a hash.
   * Mechanize::CookieJar#<<(cookie) (alias: add!) is added.  Issue #139
+  * Different mechanize instances may now have different loggers.  Issue #122
 
 * Bug fixes
   * Mechanize#cookie_jar= works again.  Issue #126

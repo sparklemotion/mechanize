@@ -7,7 +7,6 @@ class TestMechanize < Mechanize::TestCase
   def setup
     super
 
-    @mech.log = nil
     @uri = URI 'http://example/'
     @req = Net::HTTP::Get.new '/'
 
@@ -646,6 +645,17 @@ class TestMechanize < Mechanize::TestCase
     @mech.keep_alive_time = 1
 
     assert_equal 1, @mech.keep_alive_time
+  end
+
+  def test_log
+    assert_nil @mech.log
+  end
+
+  def test_log_equals
+    @mech.log = Logger.new $stderr
+
+    refute_nil @mech.log
+    assert_nil Mechanize.log
   end
 
   def test_max_file_buffer_equals

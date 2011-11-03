@@ -114,6 +114,7 @@ class Mechanize
   def initialize
     @agent = Mechanize::HTTP::Agent.new
     @agent.context = self
+    @log = nil
 
     # attr_accessors
     @agent.user_agent = AGENT_ALIASES['Mechanize']
@@ -640,17 +641,17 @@ class Mechanize
   end
 
   ##
-  # The current logger
+  # The current logger.  If no logger has been set Mechanize.log is used.
 
   def log
-    Mechanize.log
+    @log || Mechanize.log
   end
 
   ##
-  # Sets the logger used by mechanize to +l+
+  # Sets the +logger+ used by this instance of mechanize
 
-  def log=(l)
-    Mechanize.log = l
+  def log= logger
+    @log = logger
   end
 
   ##

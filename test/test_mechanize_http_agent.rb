@@ -770,6 +770,26 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal uri, page.uri
   end
 
+  def test_response_follow_meta_refresh_limit
+    uri = URI.parse 'http://example/#id+1'
+
+    body = <<-BODY
+<title></title>
+<meta http-equiv="refresh" content="0">
+    BODY
+
+    page = Mechanize::Page.new(uri, {'content-type' => 'text/html'}, body,
+                               200, @mech)
+
+    @agent.follow_meta_refresh = true
+    @agent.follow_meta_refresh_self = true
+
+    assert_raises Mechanize::RedirectLimitReachedError do
+      @agent.response_follow_meta_refresh(@res, uri, page,
+                                          @agent.redirection_limit)
+    end
+  end
+
   def test_response_read
     def @res.read_body() yield 'part' end
     def @res.content_length() 4 end
@@ -910,6 +930,16 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal URI('http://fake.example/index.html'), page.uri
 
     assert_equal 'http://example/referer', requests.first['Referer']
+  end
+
+  def test_response_redirect_limit
+    @agent.redirect_ok = true
+    referer = page 'http://example/referer'
+
+    assert_raises Mechanize::RedirectLimitReachedError do
+      @agent.response_redirect({ 'Location' => '/index.html' }, :get,
+                               fake_page, @agent.redirection_limit, referer)
+    end
   end
 
   def test_response_redirect_not_ok

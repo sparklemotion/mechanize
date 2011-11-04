@@ -192,7 +192,7 @@ class Mechanize::Cookie < WEBrick::Cookie
   def yaml_initialize(tag, map)
     @for_domain = true    # for forward compatibility
     map.each { |key, value|
-      case value
+      case key
       when 'domain'
         self.domain = value # ditto
       else

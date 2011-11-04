@@ -63,6 +63,8 @@
       from this rule.
     * A cookie with no domain attribute is only sent to the original
       host.
+    * A cookie with an Effective TLD is rejected based on the public
+      suffix list. (cf. http://publicsuffix.org/)
     * "Secure" cookies are not sent via non-https connection.
     * Subdomain match is not performed against an IP address.
     * It is recommended that you clear out existing cookie jars for

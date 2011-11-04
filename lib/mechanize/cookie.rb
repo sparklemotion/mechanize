@@ -25,6 +25,7 @@ class Mechanize::Cookie < WEBrick::Cookie
     case args.size
     when 2
       super(*args)
+      @for_domain = false
       return
     when 3
       name, value, attr_hash = *args

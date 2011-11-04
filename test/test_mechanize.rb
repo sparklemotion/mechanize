@@ -126,6 +126,7 @@ class TestMechanize < Mechanize::TestCase
     @mech.click link
 
     assert_equal '/index.html', requests.first.path
+    assert_equal 'http://fake.example.com/', requests.first['Referer']
   end
 
   def test_click_link_nofollow
@@ -147,6 +148,15 @@ class TestMechanize < Mechanize::TestCase
     assert_raises Mechanize::RobotsDisallowedError do
       page.links[1].click
     end
+  end
+
+  def test_click_link_noreferrer
+    link = node 'a', 'href' => '/index.html', 'rel' => 'noreferrer'
+    link = Mechanize::Page::Link.new link, @mech, fake_page
+
+    @mech.click link
+
+    assert_nil requests.first['referer']
   end
 
   def test_click_link_rel_nofollow

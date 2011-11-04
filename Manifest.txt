@@ -7,6 +7,7 @@ LICENSE.rdoc
 Manifest.txt
 README.rdoc
 Rakefile
+digest.htpasswd
 examples/flickr_upload.rb
 examples/mech-dump.rb
 examples/proxy_req.rb
@@ -154,5 +155,4 @@ test/test_mechanize_redirect_not_get_or_head_error.rb
 test/test_mechanize_subclass.rb
 test/test_mechanize_util.rb
 test/test_multi_select.rb
-test/test_referer.rb
 test/test_select.rb

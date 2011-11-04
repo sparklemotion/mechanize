@@ -242,9 +242,9 @@ class Mechanize
   # value of the string on the current page and clicks it.  Otherwise, clicks
   # the Mechanize::Page::Link object passed in.  Returns the page fetched.
 
-  def click(link)
+  def click link
     case link
-    when Page::Link
+    when Page::Link then
       referer = link.page || current_page()
       if @agent.robots
         if (referer.is_a?(Page) and referer.parser.nofollow?) or
@@ -259,7 +259,7 @@ class Mechanize
         href = link.href
       end
       get href, [], referer
-    when String, Regexp
+    when String, Regexp then
       if real_link = page.link_with(:text => link)
         click real_link
       else

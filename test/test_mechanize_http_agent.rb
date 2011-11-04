@@ -387,6 +387,15 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_nil @req['referer']
   end
 
+  def test_request_referer_https_upgrade
+    uri = URI.parse 'https://example'
+    referer = URI.parse 'http://old.example'
+
+    @agent.request_referer @req, uri, referer
+
+    assert_equal 'http://old.example', @req['referer']
+  end
+
   def test_request_referer_none
     @agent.request_referer @req, @uri, nil
 

@@ -138,6 +138,64 @@ class TestMechanizeForm < Mechanize::TestCase
     form.submit
   end
 
+  def test_set_fields_duplicate
+    page = html_page '<form><input name="a" value="b"><input name="a"></form>'
+    form = page.forms.first
+
+    form.set_fields :a => 'c'
+
+    assert_equal 'c', form.fields.first.value
+    assert_equal '', form.fields.last.value
+  end
+
+  def test_set_fields_none
+    page = html_page '<form><input name="a" value="b"></form>'
+    form = page.forms.first
+
+    form.set_fields
+
+    assert_equal 'b', form.fields.first.value
+  end
+
+  def test_set_fields_many
+    page = html_page '<form><input name="a" value="b"><input name="b"></form>'
+    form = page.forms.first
+
+    form.set_fields :a => 'c', :b => 'd'
+
+    assert_equal 'c', form.fields.first.value
+    assert_equal 'd', form.fields.last.value
+  end
+
+  def test_set_fields_one
+    page = html_page '<form><input name="a" value="b"></form>'
+    form = page.forms.first
+
+    form.set_fields :a => 'c'
+
+    assert_equal 'c', form.fields.first.value
+  end
+
+  def test_set_fields_position
+    page = html_page '<form><input name="a" value="b"><input name="a"></form>'
+    form = page.forms.first
+
+    form.set_fields :a => { 0 => 'c', 1 => 'd' }
+
+    assert_equal 'c', form.fields.first.value
+    assert_equal 'd', form.fields.last.value
+  end
+
+  def test_set_fields_position_crappily
+    page = html_page '<form><input name="a" value="b"><input name="a"></form>'
+    form = page.forms.first
+
+    form.set_fields :a => ['c', 1] 
+
+    assert_equal 'b', form.fields.first.value
+    assert_equal 'c', form.fields.last.value
+  end
+
   def test_values
     assert_empty @form.values
 

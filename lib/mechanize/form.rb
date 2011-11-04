@@ -104,29 +104,37 @@ class Mechanize::Form
     fields << Field.new({'name' => field_name}, value)
   end
 
-  # This method sets multiple fields on the form.  It takes a list of field
-  # name, value pairs.  If there is more than one field found with the
-  # same name, this method will set the first one found.  If you want to
-  # set the value of a duplicate field, use a value which is a Hash with
-  # the key as the index in to the form.  The index
-  # is zero based.  For example, to set the second field named 'foo', you
-  # could do the following:
-  #  form.set_fields( :foo => { 1 => 'bar' } )
-  def set_fields(fields = {})
-    fields.each do |k,v|
+  ##
+  # This method sets multiple fields on the form.  It takes a list of +fields+
+  # which are name, value pairs.
+  #
+  # If there is more than one field found with the same name, this method will
+  # set the first one found.  If you want to set the value of a duplicate
+  # field, use a value which is a Hash with the key as the index in to the
+  # form.  The index is zero based.
+  #
+  # For example, to set the second field named 'foo', you could do the
+  # following:
+  #
+  #   form.set_fields :foo => { 1 => 'bar' }
+
+  def set_fields fields = {}
+    fields.each do |name, v|
       case v
       when Hash
         v.each do |index, value|
-          self.fields_with(:name => k.to_s).[](index).value = value
+          self.fields_with(:name => name.to_s)[index].value = value
         end
       else
         value = nil
         index = 0
+
         [v].flatten.each do |val|
           index = val.to_i if value
           value = val unless value
         end
-        self.fields_with(:name => k.to_s).[](index).value = value
+
+        self.fields_with(:name => name.to_s)[index].value = value
       end
     end
   end

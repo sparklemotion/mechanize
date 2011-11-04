@@ -117,8 +117,6 @@ test/htdocs/tc_textarea.html
 test/htdocs/test_click.html
 test/htdocs/unusual______.html
 test/test_cookies.rb
-test/test_form_button.rb
-test/test_history.rb
 test/test_mechanize.rb
 test/test_mechanize_cookie.rb
 test/test_mechanize_cookie_jar.rb
@@ -138,6 +136,7 @@ test/test_mechanize_form_option.rb
 test/test_mechanize_form_radio_button.rb
 test/test_mechanize_form_textarea.rb
 test/test_mechanize_headers.rb
+test/test_mechanize_history.rb
 test/test_mechanize_http_agent.rb
 test/test_mechanize_http_auth_challenge.rb
 test/test_mechanize_http_auth_realm.rb
@@ -149,11 +148,11 @@ test/test_mechanize_page_frame.rb
 test/test_mechanize_page_link.rb
 test/test_mechanize_page_meta_refresh.rb
 test/test_mechanize_parser.rb
+test/test_mechanize_pluggable_parser.rb
+test/test_mechanize_redirect_limit_reached_error.rb
 test/test_mechanize_redirect_not_get_or_head_error.rb
 test/test_mechanize_subclass.rb
 test/test_mechanize_util.rb
 test/test_multi_select.rb
-test/test_pluggable_parser.rb
-test/test_redirect_limit_reached.rb
 test/test_referer.rb
 test/test_select.rb

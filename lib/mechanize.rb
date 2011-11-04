@@ -187,7 +187,7 @@ class Mechanize
   ##
   # Returns a visited page for the +url+ passed in, otherwise nil
 
-  def visited_page(url)
+  def visited? url
     url = url.href if url.respond_to? :href
 
     @agent.visited_page url
@@ -196,7 +196,7 @@ class Mechanize
   ##
   # Returns whether or not a url has been visited
 
-  alias visited? visited_page
+  alias visited_page visited?
 
   # :section: Hooks
   #

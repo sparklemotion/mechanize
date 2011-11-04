@@ -22,21 +22,19 @@ class Mechanize::History < Array
   end
 
   def push(page, uri = nil)
-    super(page)
+    super page
 
-    @history_index[(uri ? uri : page.uri).to_s] = page
+    index = uri ? uri : page.uri
+    @history_index[index.to_s] = page
 
-    if @max_size && self.length > @max_size
-      while self.length > @max_size
-        self.shift
-      end
-    end
+    shift while length > @max_size if @max_size
 
     self
   end
+
   alias :<< :push
 
-  def visited_page(uri)
+  def visited? uri
     page = @history_index[uri.to_s]
 
     return page if page # HACK
@@ -47,7 +45,7 @@ class Mechanize::History < Array
     @history_index[uri.to_s]
   end
 
-  alias visited? visited_page
+  alias visited_page visited?
 
   def clear
     @history_index.clear

@@ -1094,6 +1094,16 @@ but not <a href="/" rel="me nofollow">this</a>!
       !@mech.visited?("http://localhost/content_type_test?ct=text/html")
   end
 
+  def test_visited_eh_link
+    @mech.get("http://example/index.html")
+
+    page = page URI 'http://example'
+    link = node 'a', 'href' => '/index.html'
+    link = Mechanize::Page::Link.new link, page, @mech
+
+    assert @mech.visited? link
+  end
+
   def test_visited_eh_redirect
     @mech.get("http://localhost/response_code?code=302")
 

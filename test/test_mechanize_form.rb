@@ -50,6 +50,33 @@ class TestMechanizeForm < Mechanize::TestCase
     assert query.all? { |x| x[1] == '' }
   end
 
+  def test_parse_buttons
+    page = html_page <<-BODY
+<form>
+  <input type="submit" value="submit">
+  <input type="button" value="submit">
+  <button type="submit" value="submit">
+  <button type="button" value="submit">
+  <input type="image" name="submit" src="/button.jpeg">
+  <input type="image" src="/button.jpeg">
+</form>
+    BODY
+
+    form = page.forms.first
+    buttons = form.buttons.sort
+
+    assert buttons.all? { |b| Mechanize::Form::Button === b }
+
+    assert_equal 'submit', buttons.shift.type
+    assert_equal 'button', buttons.shift.type
+    assert_equal 'submit', buttons.shift.type
+    assert_equal 'button', buttons.shift.type
+    assert_equal 'image',  buttons.shift.type
+    assert_equal 'image',  buttons.shift.type
+
+    assert_empty buttons
+  end
+
   def test_checkboxes_no_input_name
     page = @mech.get('http://localhost/form_no_input_name.html')
     form = page.forms.first

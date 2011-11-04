@@ -126,7 +126,7 @@ class TestMechanize < Mechanize::TestCase
     @mech.click link
 
     assert_equal '/index.html', requests.first.path
-    assert_equal 'http://fake.example.com/', requests.first['Referer']
+    assert_equal 'http://fake.example/', requests.first['Referer']
   end
 
   def test_click_link_nofollow

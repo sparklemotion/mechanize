@@ -8,6 +8,15 @@ class TestMechanizePage < Mechanize::TestCase
     @uri = URI 'http://example/'
   end
 
+  def test_initialize_bad_content_type
+    e = assert_raises Mechanize::ContentTypeError do
+      Mechanize::Page.new(URI('http://example/'),
+                          { 'content-type' => 'text/xml' }, 'hello', '200')
+    end
+
+    assert_equal('text/xml', e.content_type)
+  end
+
   def test_frames
     page = html_page <<-BODY
 <TITLE>A simple frameset document</TITLE>

@@ -758,15 +758,26 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert_equal 5, @mech.open_timeout
   end
 
-  def test_parser_download
+  def test_parse_download
     @mech.pluggable_parser['application/octet-stream'] = Mechanize::Download
 
-    response = { 'Content-Type' => 'application/octet-stream' }
-    def response.code() 200 end
+    response = Net::HTTPOK.allocate
+    response.instance_variable_set(:@header,
+                                   'content-type' =>
+                                     ['application/octet-stream'])
 
     download = @mech.parse @uri, response, StringIO.new('raw')
 
     assert_kind_of Mechanize::Download, download
+  end
+
+  def test_parse_html
+    response = Net::HTTPOK.allocate
+    response.instance_variable_set :@header, 'content-type' => ['text/html']
+
+    page = @mech.parse URI('http://example/'), response, ''
+
+    assert_kind_of Mechanize::Page, page
   end
 
   def test_post

@@ -106,13 +106,6 @@ UQIBATANBgkqhkiG9w0BAQUFAANBAAAB////////////////////////////////
 
 end
 
-class BadContentTypeServlet < WEBrick::HTTPServlet::AbstractServlet
-  def do_GET(req, res)
-    res['Content-Type'] = "text/xml"
-    res.body = "Hello World"
-  end
-end
-
 class BasicAuthServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req,res)
     htpd = WEBrick::HTTPAuth::Htpasswd.new('dot.htpasswd')
@@ -523,7 +516,6 @@ class Net::HTTP
     '/form post'              => FormServlet,
     '/response_code'          => ResponseCodeServlet,
     '/http_refresh'           => HttpRefreshServlet,
-    '/bad_content_type'       => BadContentTypeServlet,
     '/content_type_test'      => ContentTypeServlet,
     '/referer'                => RefererServlet,
     '/file_upload'            => FileUploadServlet,

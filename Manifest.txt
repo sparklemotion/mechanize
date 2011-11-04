@@ -93,11 +93,8 @@ test/htdocs/index.html
 test/htdocs/link with space.html
 test/htdocs/meta_cookie.html
 test/htdocs/no_title_test.html
-test/htdocs/nofollow.html
 test/htdocs/noindex.html
-test/htdocs/norobots.html
 test/htdocs/rails_3_encoding_hack_form_test.html
-test/htdocs/rel_nofollow.html
 test/htdocs/relative/tc_relative_links.html
 test/htdocs/robots.html
 test/htdocs/robots.txt
@@ -159,5 +156,4 @@ test/test_multi_select.rb
 test/test_pluggable_parser.rb
 test/test_redirect_limit_reached.rb
 test/test_referer.rb
-test/test_robots.rb
 test/test_select.rb

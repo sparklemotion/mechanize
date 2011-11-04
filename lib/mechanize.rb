@@ -247,7 +247,8 @@ class Mechanize
     when Page::Link
       referer = link.page || current_page()
       if @agent.robots
-        if (referer.is_a?(Page) && referer.parser.nofollow?) || link.rel?('nofollow')
+        if (referer.is_a?(Page) and referer.parser.nofollow?) or
+           link.rel?('nofollow') then
           raise RobotsDisallowedError.new(link.href)
         end
       end

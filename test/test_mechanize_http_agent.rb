@@ -1032,6 +1032,29 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'UTF-8', page.encoding
   end
 
+  def test_robots_allowed_eh
+    allowed    = URI 'http://localhost/index.html'
+    disallowed = URI 'http://localhost/norobots.html'
+
+    assert @agent.robots_allowed? allowed
+    refute @agent.robots_allowed? disallowed
+
+    refute @agent.robots_disallowed? allowed
+    assert @agent.robots_disallowed? disallowed
+  end
+
+  def test_robots_allowed_eh_noindex
+    @agent.robots = true
+
+    noindex = URI 'http://localhost/noindex.html'
+
+    assert @agent.robots_allowed? noindex
+
+    assert_raises Mechanize::RobotsDisallowedError do
+      @agent.fetch noindex
+    end
+  end
+
   def test_set_http
     @agent.set_http
 

@@ -1,6 +1,7 @@
 require 'tempfile'
 require 'net/ntlm'
 require 'kconv'
+require 'webrobots'
 
 ##
 # An HTTP (and local disk access) user agent.  This class is an implementation

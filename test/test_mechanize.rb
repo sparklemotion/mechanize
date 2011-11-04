@@ -128,6 +128,45 @@ class TestMechanize < Mechanize::TestCase
     assert_equal '/index.html', requests.first.path
   end
 
+  def test_click_link_nofollow
+    page = html_page <<-BODY
+<meta name="ROBOTS" content="nofollow">
+
+<p>Do not follow <a href="/index.html">this</a> or <a href="/">this</a>!
+    BODY
+
+    page.links[0].click
+    page.links[1].click
+
+    @mech.robots = true
+
+    assert_raises Mechanize::RobotsDisallowedError do
+      page.links[0].click
+    end
+
+    assert_raises Mechanize::RobotsDisallowedError do
+      page.links[1].click
+    end
+  end
+
+  def test_click_link_rel_nofollow
+    page = html_page <<-BODY
+<p>You can follow <a href="/index.html">this link</a>
+but not <a href="/" rel="me nofollow">this</a>!
+    BODY
+
+    page.links[0].click
+    page.links[1].click
+
+    @mech.robots = true
+
+    page.links[0].click
+
+    assert_raises Mechanize::RobotsDisallowedError do
+      page.links[1].click
+    end
+  end
+
   def test_click_link_parent
     page = page URI 'http://example/a/index.html'
     link = node 'a', 'href' => '../index.html'
@@ -389,6 +428,16 @@ class TestMechanize < Mechanize::TestCase
 
     assert_equal 2, @mech.history.length
     assert_nil requests.last['referer']
+  end
+
+  def test_get_robots
+    @mech.robots = true
+
+    assert_equal "Page Title", @mech.get("http://localhost/index.html").title
+
+    assert_raises Mechanize::RobotsDisallowedError do
+      @mech.get "http://localhost/norobots.html"
+    end
   end
 
   def test_follow_meta_refresh_self

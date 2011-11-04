@@ -1,5 +1,6 @@
 require 'time'
 require 'webrick/cookie'
+require 'domain_name'
 
 # This class is used to represent an HTTP Cookie.
 class Mechanize::Cookie < WEBrick::Cookie
@@ -128,15 +129,6 @@ class Mechanize::Cookie < WEBrick::Cookie
         cookie
       }
     end
-
-    def normalize_domain(domain)
-      # RFC 6265 #4.1.2.3
-      return nil if domain.end_with?('.')
-      domain.downcase.tap { |dom|
-        dom.sub!(/:[0-9]+$/, '')
-        dom.sub!(/\A\./, '')
-      }
-    end
   end
 
   alias set_domain domain=
@@ -144,8 +136,16 @@ class Mechanize::Cookie < WEBrick::Cookie
   # Sets the domain attribute.  A leading dot in +domain+ implies
   # turning the +for_domain?+ flag on.
   def domain=(domain)
-    @for_domain = true if domain.start_with?('.')
-    set_domain(self.class.normalize_domain(domain))
+    if domain.start_with?('.')
+      @for_domain = true
+      domain = domain[1..-1]
+    end
+    # Do we really need to support this?
+    if domain.match(/\A([^:]+):[0-9]+\z/)
+      domain = $1
+    end
+    @domain_name = DomainName.new(domain)
+    set_domain(@domain_name.hostname)
   end
 
   def expired?
@@ -156,24 +156,11 @@ class Mechanize::Cookie < WEBrick::Cookie
   alias secure? secure
 
   def acceptable_from_uri?(uri)
-    dom = domain or return false
-    host = self.class.normalize_domain(uri.host)
-
-    return true if host == dom
-
-    # RFC 6265 #4.1.2.3
-    return false unless for_domain?
-
-    # RFC 6265 #5.1.3
-    # Do not perform subdomain matching against IP addresses.
-    return false if host.match(/^(?:[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+|\[[0-9a-fA-F:]+\])$/)
-
-    # RFC 6265 #4.1.1
-    # Domain-value must be a subdomain.
-    return false if dom.match(/^(?!local)[^.]+$/)
-    # We exempt local* from this rule for testing purposes for now.
-
-    return host.end_with?('.' << dom)
+    if @for_domain
+      DomainName.new(uri.host).cookie_domain?(@domain_name)
+    else
+      DomainName.new(uri.host).hostname == domain
+    end
   end
 
   def valid_for_uri?(uri)

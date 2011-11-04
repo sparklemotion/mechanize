@@ -20,6 +20,7 @@ hoe = Hoe.spec 'mechanize' do
   self.extra_deps << ['nokogiri',             '~> 1.4']
   self.extra_deps << ['ntlm-http',            '~> 0.1', '>= 0.1.1']
   self.extra_deps << ['webrobots',            '~> 0.0', '>= 0.0.9']
+  self.extra_deps << ['domain_name',          '~> 0.5', '>= 0.5.0']
 
   self.spec_extras[:required_ruby_version] = '>= 1.8.7'
 end

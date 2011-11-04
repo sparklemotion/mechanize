@@ -123,11 +123,16 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     assert_equal(0, @jar.cookies(url).length)
   end
 
-  def test_add_makes_exception_for_local_tld
-    url = URI 'http://example.local'
+  def test_fall_back_rules_for_local_domains
+    url = URI 'http://www.example.local'
 
     tld_cookie = Mechanize::Cookie.new(cookie_values(:domain => '.local'))
     @jar.add(url, tld_cookie)
+
+    assert_equal(0, @jar.cookies(url).length)
+
+    sld_cookie = Mechanize::Cookie.new(cookie_values(:domain => '.example.local'))
+    @jar.add(url, sld_cookie)
 
     assert_equal(1, @jar.cookies(url).length)
   end

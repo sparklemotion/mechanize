@@ -90,6 +90,15 @@ class TestMechanize < Mechanize::TestCase
                  @mech.history.last.uri.to_s)
   end
 
+  def test_click_frame
+    frame = node 'frame', 'src' => '/index.html'
+    frame = Mechanize::Page::Frame.new frame, @mech, fake_page
+
+    @mech.click frame
+
+    assert_equal '/index.html', requests.first.path
+  end
+
   def test_click_frame_hpricot_style
     page = @mech.get("http://localhost/frame_test.html")
     link = (page/"//frame[@name='frame2']").first
@@ -111,15 +120,32 @@ class TestMechanize < Mechanize::TestCase
   end
 
   def test_click_link
-    agent = Mechanize.new
-    agent.user_agent_alias = 'Mac Safari'
-    page = agent.get("http://localhost/frame_test.html")
-    link = page.link_with(:text => "Form Test")
+    link = node 'a', 'href' => '/index.html'
+    link = Mechanize::Page::Link.new link, @mech, fake_page
 
-    agent.click link
+    @mech.click link
 
-    assert_equal("http://localhost/form_test.html",
-      agent.history.last.uri.to_s)
+    assert_equal '/index.html', requests.first.path
+  end
+
+  def test_click_link_parent
+    page = page URI 'http://example/a/index.html'
+    link = node 'a', 'href' => '../index.html'
+    link = Mechanize::Page::Link.new link, @mech, page
+
+    @mech.click link
+
+    assert_equal '/index.html', requests.first.path
+  end
+
+  def test_click_link_parent_extra
+    page = page URI 'http://example/a/index.html'
+    link = node 'a', 'href' => '../../index.html'
+    link = Mechanize::Page::Link.new link, @mech, page
+
+    @mech.click link
+
+    assert_equal '/index.html', requests.first.path
   end
 
   def test_click_link_hpricot_style # HACK move to test_search in Page

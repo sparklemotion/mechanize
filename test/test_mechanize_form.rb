@@ -50,6 +50,32 @@ class TestMechanizeForm < Mechanize::TestCase
     assert query.all? { |x| x[1] == '' }
   end
 
+  def test_method_missing_get
+    page = html_page <<-BODY
+<form>
+  <input name="not_a_method" value="some value">
+</form>
+    BODY
+
+    form = page.forms.first
+
+    assert_equal 'some value', form.not_a_method
+  end
+
+  def test_method_missing_set
+    page = html_page <<-BODY
+<form>
+  <input name="not_a_method">
+</form>
+    BODY
+
+    form = page.forms.first
+
+    form.not_a_method = 'some value'
+
+    assert_equal [%w[not_a_method some\ value]], form.build_query
+  end
+
   def test_parse_buttons
     page = html_page <<-BODY
 <form>
@@ -75,6 +101,26 @@ class TestMechanizeForm < Mechanize::TestCase
     assert_equal 'image',  buttons.shift.type
 
     assert_empty buttons
+  end
+
+  def test_parse_select
+    page = html_page <<-BODY
+<form>
+  <select name="multi" multiple></select>
+  <select name="single"></select>
+</form>
+    BODY
+
+    form = page.forms.first
+    selects = form.fields.sort
+
+    multi = selects.shift
+    assert_kind_of Mechanize::Form::MultiSelectList, multi
+
+    single = selects.shift
+    assert_kind_of Mechanize::Form::SelectList, single
+
+    assert_empty selects
   end
 
   def test_checkboxes_no_input_name

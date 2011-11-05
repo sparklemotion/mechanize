@@ -42,9 +42,9 @@ class Mechanize::Form::Option
 
   private
   def unselect_peers
-    if @select_list.instance_of? Mechanize::Form::SelectList
-      @select_list.select_none
-    end
+    return unless Mechanize::Form::SelectList === @select_list
+
+    @select_list.select_none
   end
 end
 

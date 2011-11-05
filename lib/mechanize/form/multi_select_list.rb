@@ -1,15 +1,18 @@
+##
 # This class represents a select list where multiple values can be selected.
 # MultiSelectList#value= accepts an array, and those values are used as
 # values for the select list.  For example, to select multiple values,
 # simply do this:
 #
-#  list.value = ['one', 'two']
+#   list.value = ['one', 'two']
 #
 # Single values are still supported, so these two are the same:
 #
-#  list.value = ['one']
-#  list.value = 'one'
+#   list.value = ['one']
+#   list.value = 'one'
+
 class Mechanize::Form::MultiSelectList < Mechanize::Form::Field
+
   extend Mechanize::ElementMatcher
 
   attr_accessor :options
@@ -20,20 +23,28 @@ class Mechanize::Form::MultiSelectList < Mechanize::Form::Field
 
     # parse
     node.search('option').each do |n|
-      option = Mechanize::Form::Option.new(n, self)
-      @options << option
+      @options << Mechanize::Form::Option.new(n, self)
     end
-    super(node, value)
+
+    super node, value
   end
 
   ##
+  # :method: option_with
+  #
   # Find one option on this select list with +criteria+
+  #
   # Example:
+  #
   #   select_list.option_with(:value => '1').value = 'foo'
 
   ##
+  # :method: options_with
+  #
   # Find all options on this select list with +criteria+
+  #
   # Example:
+  #
   #   select_list.options_with(:value => /1|2/).each do |field|
   #     field.value = '20'
   #   end
@@ -41,7 +52,7 @@ class Mechanize::Form::MultiSelectList < Mechanize::Form::Field
   elements_with :option
 
   def query_value
-    value ? value.collect { |v| [name, v] } : ''
+    value ? value.map { |v| [name, v] } : ''
   end
 
   # Select no options
@@ -75,8 +86,8 @@ class Mechanize::Form::MultiSelectList < Mechanize::Form::Field
 
   def value
     value = []
-    value.push(*@value)
-    value.push(*selected_options.collect { |o| o.value })
+    value.concat @value
+    value.concat selected_options.map { |o| o.value }
     value
   end
 

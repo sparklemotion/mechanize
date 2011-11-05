@@ -70,6 +70,31 @@ class TestMechanizeCookie < Mechanize::TestCase
     end
   end
 
+  def test_parse_no_space
+    cookie_str = "foo=bar;Expires=Sun, 06 Nov 2011 00:28:06 GMT;Path=/"
+
+    uri = URI.parse 'http://example'
+
+    Mechanize::Cookie.parse uri, cookie_str do |cookie|
+      assert_equal 'foo', cookie.name
+      assert_equal 'bar', cookie.value
+      assert_equal '/', cookie.path
+      assert_operator Time.now, :<, cookie.expires
+    end
+  end
+
+  def test_parse_quoted
+    cookie_str =
+      "quoted=\"value\"; Expires=Sun, 06 Nov 2011 00:11:18 GMT; Path=/"
+
+    uri = URI.parse 'http://example'
+
+    Mechanize::Cookie.parse uri, cookie_str do |cookie|
+      assert_equal 'quoted', cookie.name
+      assert_equal '"value"', cookie.value
+    end
+  end
+
   def test_parse_weird_cookie
     cookie = 'n/a, ASPSESSIONIDCSRRQDQR=FBLDGHPBNDJCPCGNCPAENELB; path=/'
     url = URI.parse('http://www.searchinnovation.com/')
@@ -162,6 +187,43 @@ class TestMechanizeCookie < Mechanize::TestCase
     cookie = Mechanize::Cookie.parse(url, cookie).first
 
     assert cookie.session
+  end
+
+  def test_parse_many
+    url = URI 'http://example/'
+    cookie_str =
+      "name=Aaron; Domain=localhost; Expires=Sun, 06 Nov 2011 00:29:51 GMT; Path=/, " \
+      "name=Aaron; Domain=localhost; Expires=Sun, 06 Nov 2011 00:29:51 GMT; Path=/, " \
+      "name=Aaron; Domain=localhost; Expires=Sun, 06 Nov 2011 00:29:51 GMT; Path=/, " \
+      "name=Aaron; Domain=localhost; Expires=Sun, 06 Nov 2011 00:29:51 GMT; Path=/; HttpOnly, " \
+      "expired=doh; Expires=Fri, 04 Nov 2011 00:29:51 GMT; Path=/, " \
+      "a_path=some_path; Expires=Sun, 06 Nov 2011 00:29:51 GMT; Path=/some_path, " \
+      "no_path=no_path; Expires=Sun, 06 Nov 2011 00:29:51 GMT, no_expires=nope; Path=/"
+
+    cookies = Mechanize::Cookie.parse url, cookie_str
+    assert_equal 8, cookies.length
+
+    name = cookies.find { |c| c.name == 'name' }
+    assert_equal "Aaron",         name.value
+    assert_equal "/",             name.path
+    assert_operator Time.now, :<, name.expires
+
+    a_path = cookies.find { |c| c.name == 'a_path' }
+    assert_equal "some_path",     a_path.value
+    assert_equal "/some_path",    a_path.path
+    assert_operator Time.now, :<, a_path.expires
+
+    no_expires = cookies.find { |c| c.name == 'no_expires' }
+    assert_equal "nope", no_expires.value
+    assert_equal "/",    no_expires.path
+    assert_nil           no_expires.expires
+
+    no_path = cookies.find { |c| c.name == 'no_path' }
+    assert_equal "no_path",       no_path.value
+    assert_equal "/",             no_path.path
+    assert_operator Time.now, :<, no_path.expires
+
+    assert cookies.find { |c| c.name == 'expired' }
   end
 
   def test_parse_valid_cookie

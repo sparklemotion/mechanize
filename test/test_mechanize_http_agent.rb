@@ -740,6 +740,21 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
                  @agent.cookie_jar.cookies(uri).map { |c| c.to_s }
   end
 
+  def test_response_cookies_many
+    uri = URI.parse 'http://host.example.com'
+    cookie1 = 'a=b domain=.example.com'
+    cookie2 = 'c=d domain=.example.com'
+    @res.instance_variable_set(:@header,
+                               'set-cookie' => [cookie1, cookie2],
+                               'content-type' => %w[text/html])
+    page = Mechanize::Page.new uri, @res, '', 200, @mech
+
+    @agent.response_cookies @res, uri, page
+
+    assert_equal ['a=b domain=.example.com', 'c=d domain=.example.com'],
+                 @agent.cookie_jar.cookies(uri).map { |c| c.to_s }
+  end
+
   def test_response_cookies_meta
     uri = URI.parse 'http://host.example.com'
     cookie_str = 'a=b domain=.example.com'

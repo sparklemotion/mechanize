@@ -239,6 +239,18 @@ but not <a href="/" rel="me nofollow">this</a>!
       @mech.page.uri.to_s
   end
 
+  def test_cookies
+    uri = URI 'http://example'
+    jar = Mechanize::CookieJar.new
+    Mechanize::Cookie.parse uri, 'a=b' do |cookie|
+      jar.add uri, cookie
+    end
+
+    @mech.cookie_jar = jar
+
+    refute_empty @mech.cookies
+  end
+
   def test_cookie_jar
     assert_kind_of Mechanize::CookieJar, @mech.cookie_jar
 

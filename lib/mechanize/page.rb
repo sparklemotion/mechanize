@@ -154,7 +154,7 @@ class Mechanize::Page < Mechanize::File
     }
   end
 
-  alias inspect pretty_print # :nodoc:
+  alias inspect pretty_inspect # :nodoc:
 
   def reset
     @bases = nil

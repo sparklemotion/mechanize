@@ -51,7 +51,7 @@ class Mechanize::Page::Link
     }
   end
 
-  alias inspect pretty_print # :nodoc:
+  alias inspect pretty_inspect # :nodoc:
 
   # A list of words in the rel attribute, all lower-cased.
   def rel

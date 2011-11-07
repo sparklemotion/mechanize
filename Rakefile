@@ -8,6 +8,7 @@ hoe = Hoe.spec 'mechanize' do
   developer 'Eric Hodel',      'drbrain@segment7.net'
   developer 'Aaron Patterson', 'aaronp@rubyforge.org'
   developer 'Mike Dalessio',   'mike.dalessio@gmail.com'
+  developer 'Akinori MUSHA',   'knu@idaemons.org'
 
   self.readme_file      = 'README.rdoc'
   self.history_file     = 'CHANGELOG.rdoc'

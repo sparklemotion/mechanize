@@ -43,6 +43,7 @@ Copyright (c) 2006-2011:
 Copyright (c) 2011:
 
 * {Eric Hodel}[http://blog.segment7.net] (drbrain@segment7.net)
+* {Akinori MUSHA}[http://blog.akinori.org] (knu@idaemons.org)
 
 This library comes with a shameless plug for employing me
 (Aaron[http://tenderlovemaking.com/]) programming Ruby, my favorite language!

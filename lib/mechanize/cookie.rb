@@ -3,7 +3,11 @@ require 'webrick/cookie'
 require 'domain_name'
 
 # This class is used to represent an HTTP Cookie.
-class Mechanize::Cookie < WEBrick::Cookie
+class Mechanize::Cookie
+  attr_reader :name
+  attr_accessor :value, :version
+  attr_accessor :domain, :path, :secure
+  attr_accessor :comment, :max_age
 
   attr_accessor :session
 
@@ -23,17 +27,20 @@ class Mechanize::Cookie < WEBrick::Cookie
   #     new("name" => "uid", "value" => "a12345", "Domain" => 'www.example.org')
   #
   def initialize(*args)
+    @version = 0     # Netscape Cookie
+
+    @domain = @path = @secure = @comment = @max_age =
+      @expires = @comment_url = @discard = @port = nil
+
     case args.size
     when 2
-      super(*args)
+      @name, @value = *args
       @for_domain = false
       return
     when 3
-      name, value, attr_hash = *args
-      super(name, value)
+      @name, @value, attr_hash = *args
     when 1
       attr_hash = args.first
-      super(nil, nil)
     else
       raise ArgumentError, "wrong number of arguments (#{args.size} for 1-3)"
     end
@@ -146,6 +153,14 @@ class Mechanize::Cookie < WEBrick::Cookie
     end
     @domain_name = DomainName.new(domain)
     set_domain(@domain_name.hostname)
+  end
+
+  def expires=(t)
+    @expires = t && (t.is_a?(Time) ? t.httpdate : t.to_s)
+  end
+
+  def expires
+    @expires && Time.parse(@expires)
   end
 
   def expired?

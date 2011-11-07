@@ -727,8 +727,11 @@ class Mechanize::HTTP::Agent
     if Mechanize::Page === page and page.body =~ /Set-Cookie/n
       page.search('//head/meta[@http-equiv="Set-Cookie"]').each do |meta|
         Mechanize::Cookie.parse(uri, meta['content'], log) { |c|
-          log.debug("saved cookie: #{c}") if log
-          @cookie_jar.add(uri, c)
+          if @cookie_jar.add(uri, c)
+            log.debug("saved cookie: #{c}") if log
+          else
+            log.debug("rejected cookie: #{c}") if log
+          end
         }
       end
     end
@@ -739,8 +742,11 @@ class Mechanize::HTTP::Agent
 
     header_cookies.each do |cookie|
       Mechanize::Cookie.parse(uri, cookie, log) { |c|
-        log.debug("saved cookie: #{c}") if log
-        @cookie_jar.add(uri, c)
+        if @cookie_jar.add(uri, c)
+          log.debug("saved cookie: #{c}") if log
+        else
+          log.debug("rejected cookie: #{c}") if log
+        end
       }
     end
   end

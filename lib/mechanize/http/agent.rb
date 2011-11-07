@@ -723,9 +723,10 @@ class Mechanize::HTTP::Agent
   end
 
   def response_cookies response, uri, page
+    log = log()	 # reduce method calls
     if Mechanize::Page === page and page.body =~ /Set-Cookie/n
       page.search('//head/meta[@http-equiv="Set-Cookie"]').each do |meta|
-        Mechanize::Cookie.parse(uri, meta['content']) { |c|
+        Mechanize::Cookie.parse(uri, meta['content'], log) { |c|
           log.debug("saved cookie: #{c}") if log
           @cookie_jar.add(uri, c)
         }
@@ -737,7 +738,7 @@ class Mechanize::HTTP::Agent
     return unless header_cookies
 
     header_cookies.each do |cookie|
-      Mechanize::Cookie.parse(uri, cookie) { |c|
+      Mechanize::Cookie.parse(uri, cookie, log) { |c|
         log.debug("saved cookie: #{c}") if log
         @cookie_jar.add(uri, c)
       }

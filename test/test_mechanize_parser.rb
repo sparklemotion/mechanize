@@ -162,15 +162,49 @@ class TestMechanizeParser < Mechanize::TestCase
     assert_equal 'example/index.html', @parser.extract_filename(true)
   end
 
+  def test_extract_filename_special_character
+    @parser.response = {}
+
+    invisible = "\t\n\v\f\r"
+
+    invisible.chars.each do |char|
+      @parser.uri = URI "http://example/#{char}"
+
+      assert_equal 'index.html', @parser.extract_filename, char.inspect
+    end
+
+    escaped = "<>\"\\|"
+
+    escaped.chars.each do |char|
+      escaped_char = CGI.escape char
+
+      @parser.uri = URI "http://example/#{escaped_char}"
+
+      assert_equal "#{escaped_char}.html", @parser.extract_filename, char
+    end
+
+    @parser.uri = URI "http://example/?"
+
+    assert_equal 'index.html_', @parser.extract_filename, 'empty query'
+
+    @parser.uri = URI "http://example/:"
+
+    assert_equal '_.html', @parser.extract_filename, 'colon'
+
+    @parser.uri = URI "http://example/*"
+
+    assert_equal '_.html', @parser.extract_filename, 'asterisk'
+  end
+
   def test_extract_filename_uri_query
     @parser.response = {}
     @parser.uri = URI 'http://example/?id=5'
 
-    assert_equal 'index.html?id=5', @parser.extract_filename
+    assert_equal 'index.html_id=5', @parser.extract_filename
 
     @parser.uri += '/foo.html?id=5'
 
-    assert_equal 'foo.html?id=5', @parser.extract_filename
+    assert_equal 'foo.html_id=5', @parser.extract_filename
   end
 
   def test_extract_filename_uri_slash

@@ -123,6 +123,8 @@ module Mechanize::Parser
       filename = "_#{filename}"
     end
 
+    filename = filename.tr '<>:"\/\\|?*', '_'
+
     @filename = if full_path then
                   File.join @uri.host, path, filename
                 else

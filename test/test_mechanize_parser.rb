@@ -48,6 +48,16 @@ class TestMechanizeParser < Mechanize::TestCase
     assert_equal 'genome.jpeg', @parser.extract_filename
   end
 
+  def test_extract_filename_content_disposition_bad
+    @parser.uri = URI 'http://example/foo'
+
+    @parser.response = {
+      'content-disposition' => 'attachment;; filename=genome.jpeg'
+    }
+
+    assert_equal 'genome.jpeg', @parser.extract_filename
+  end
+
   def test_extract_filename_content_disposition_path
     @parser.uri = URI 'http://example'
 
@@ -86,14 +96,41 @@ class TestMechanizeParser < Mechanize::TestCase
     assert_equal 'example/genome.jpeg', @parser.extract_filename(true)
   end
 
-  def test_extract_filename_content_disposition_bad
-    @parser.uri = URI 'http://example/foo'
+  def test_extract_filename_content_disposition_windows_special
+    @parser.uri = URI 'http://example'
 
-    @parser.response = {
-      'content-disposition' => 'attachment;; filename=genome.jpeg'
-    }
+    windows_special = %w[
+      AUX
+      COM1
+      COM2
+      COM3
+      COM4
+      COM5
+      COM6
+      COM7
+      COM8
+      COM9
+      CON
+      LPT1
+      LPT2
+      LPT3
+      LPT4
+      LPT5
+      LPT6
+      LPT7
+      LPT8
+      LPT9
+      NUL
+      PRN
+    ]
 
-    assert_equal 'genome.jpeg', @parser.extract_filename
+    windows_special.each do |special|
+      @parser.response = {
+        'content-disposition' => "attachment; filename=#{special}"
+      }
+
+      assert_equal "_#{special}", @parser.extract_filename
+    end
   end
 
   def test_extract_filename_uri

@@ -6,6 +6,31 @@ module Mechanize::Parser
 
   extend Forwardable
 
+  SPECIAL_FILENAME = %w[
+    AUX
+    COM1
+    COM2
+    COM3
+    COM4
+    COM5
+    COM6
+    COM7
+    COM8
+    COM9
+    CON
+    LPT1
+    LPT2
+    LPT3
+    LPT4
+    LPT5
+    LPT6
+    LPT7
+    LPT8
+    LPT9
+    NUL
+    PRN
+  ]
+
   ##
   # The URI this file was retrieved from
 
@@ -87,6 +112,10 @@ module Mechanize::Parser
     elsif @uri then
       filename << '.html' unless filename =~ /\./
       filename << "?#{@uri.query}" if @uri.query
+    end
+
+    if SPECIAL_FILENAME.include? filename then
+      filename = "_#{filename}"
     end
 
     @filename = if full_path then

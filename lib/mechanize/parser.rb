@@ -6,7 +6,7 @@ module Mechanize::Parser
 
   extend Forwardable
 
-  SPECIAL_FILENAME = %w[
+  special_filenames = Regexp.union %w[
     AUX
     COM1
     COM2
@@ -30,6 +30,11 @@ module Mechanize::Parser
     NUL
     PRN
   ]
+
+  ##
+  # Special filenames that must be escaped
+
+  SPECIAL_FILENAMES = /\A#{special_filenames}/i
 
   ##
   # The URI this file was retrieved from
@@ -114,7 +119,7 @@ module Mechanize::Parser
       filename << "?#{@uri.query}" if @uri.query
     end
 
-    if SPECIAL_FILENAME.include? filename then
+    if SPECIAL_FILENAMES =~ filename then
       filename = "_#{filename}"
     end
 

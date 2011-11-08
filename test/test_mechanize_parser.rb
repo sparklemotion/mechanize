@@ -184,6 +184,42 @@ class TestMechanizeParser < Mechanize::TestCase
     assert_equal 'example/foo/index.html', @parser.extract_filename(true)
   end
 
+  def test_extract_filename_windows_special
+    @parser.uri = URI 'http://example'
+    @parser.response = {}
+
+    windows_special = %w[
+      AUX
+      COM1
+      COM2
+      COM3
+      COM4
+      COM5
+      COM6
+      COM7
+      COM8
+      COM9
+      CON
+      LPT1
+      LPT2
+      LPT3
+      LPT4
+      LPT5
+      LPT6
+      LPT7
+      LPT8
+      LPT9
+      NUL
+      PRN
+    ]
+
+    windows_special.each do |special|
+      @parser.uri += "/#{special}"
+
+      assert_equal "_#{special}.html", @parser.extract_filename
+    end
+  end
+
   def test_fill_header
     @parser.fill_header 'a' => 'b'
 

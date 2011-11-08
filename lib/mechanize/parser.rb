@@ -82,6 +82,8 @@ module Mechanize::Parser
         k, v = pair.split(/=/, 2)
         filename = v if k && k.downcase == 'filename'
       end
+
+      filename = File.split(filename).last
     elsif @uri then
       filename << '.html' unless filename =~ /\./
       filename << "?#{@uri.query}" if @uri.query

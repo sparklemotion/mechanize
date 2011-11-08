@@ -48,6 +48,22 @@ class TestMechanizeParser < Mechanize::TestCase
     assert_equal 'genome.jpeg', @parser.extract_filename
   end
 
+  def test_extract_filename_content_disposition_path
+    @parser.uri = URI 'http://example'
+
+    @parser.response = {
+      'content-disposition' => 'attachment; filename=../genome.jpeg'
+    }
+
+    assert_equal 'example/genome.jpeg', @parser.extract_filename(true)
+
+    @parser.response = {
+      'content-disposition' => 'attachment; filename=foo/genome.jpeg'
+    }
+
+    assert_equal 'example/genome.jpeg', @parser.extract_filename(true)
+  end
+
   def test_extract_filename_content_disposition_full_path
     @parser.uri = URI 'http://example/foo'
 

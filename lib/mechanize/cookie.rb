@@ -11,6 +11,9 @@ class Mechanize::Cookie
 
   attr_accessor :session
 
+  attr_accessor :created_at
+  attr_accessor :accessed_at
+
   # :call-seq:
   #     new(name, value)
   #     new(name, value, attr_hash)
@@ -32,6 +35,7 @@ class Mechanize::Cookie
     @domain = @path = @secure = @comment = @max_age =
       @expires = @comment_url = @discard = @port = nil
 
+    @created_at = @accessed_at = Time.now
     case args.size
     when 2
       @name, @value = *args

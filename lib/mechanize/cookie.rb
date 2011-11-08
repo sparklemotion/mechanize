@@ -175,10 +175,19 @@ class Mechanize::Cookie
   alias secure? secure
 
   def acceptable_from_uri?(uri)
-    if @for_domain
-      DomainName.new(uri.host).cookie_domain?(@domain_name)
+    host = DomainName.new(uri.host)
+
+    # RFC 6265 5.3
+    # When the user agent "receives a cookie":
+    return host.hostname == domain unless @for_domain
+
+    if host.cookie_domain?(@domain_name)
+      true
+    elsif host.hostname == domain
+      @for_domain = false
+      true
     else
-      DomainName.new(uri.host).hostname == domain
+      false
     end
   end
 

@@ -3,6 +3,7 @@
 # any particular website.
 
 class Mechanize::CookieJar
+  include Enumerable
 
   # add_cookie wants something resembling a URI.
 
@@ -43,15 +44,8 @@ class Mechanize::CookieJar
     cleanup
     url.path = '/' if url.path.empty?
 
-    [].tap { |cookies|
-      @jar.each { |domain, paths|
-        paths.each { |path, hash|
-          hash.each_value { |cookie|
-            next if cookie.expired? || !cookie.valid_for_uri?(url)
-            cookies << cookie
-          }
-        }
-      }
+    select { |cookie|
+      !cookie.expired? && cookie.valid_for_uri?(url)
     }
   end
 
@@ -59,14 +53,16 @@ class Mechanize::CookieJar
     cookies(url).length > 0 ? false : true
   end
 
-  def to_a
+  def each
+    block_given? or return enum_for(__method__)
     cleanup
-
-    @jar.map do |domain, paths|
-      paths.map do |path, names|
-        names.values
-      end
-    end.flatten
+    @jar.each { |domain, paths|
+      paths.each { |path, hash|
+        hash.each_value { |cookie|
+          yield cookie
+        }
+      }
+    }
   end
 
   # Save the cookie jar to a file in the format specified.

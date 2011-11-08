@@ -48,6 +48,28 @@ class TestMechanizeParser < Mechanize::TestCase
     assert_equal 'genome.jpeg', @parser.extract_filename
   end
 
+  def test_extract_filename_content_disposition_full_path
+    @parser.uri = URI 'http://example/foo'
+
+    @parser.response = {
+      'content-disposition' => 'attachment; filename=genome.jpeg; modification-date="Wed, 12 Feb 1997 16:29:51 -0500"'
+    }
+
+    assert_equal 'example/genome.jpeg', @parser.extract_filename(true)
+
+    @parser.response = {
+      'content-disposition' => 'filename=genome.jpeg; modification-date="Wed, 12 Feb 1997 16:29:51 -0500"'
+    }
+
+    assert_equal 'example/genome.jpeg', @parser.extract_filename(true)
+
+    @parser.response = {
+      'content-disposition' => 'filename=genome.jpeg'
+    }
+
+    assert_equal 'example/genome.jpeg', @parser.extract_filename(true)
+  end
+
   def test_extract_filename_content_disposition_bad
     @parser.uri = URI 'http://example/foo'
 
@@ -67,6 +89,46 @@ class TestMechanizeParser < Mechanize::TestCase
     @parser.uri += '/foo.jpg'
 
     assert_equal 'foo.jpg', @parser.extract_filename
+  end
+
+  def test_extract_filename_uri_full_path
+    @parser.response = {}
+    @parser.uri = URI 'http://example/foo'
+
+    assert_equal 'example/foo.html', @parser.extract_filename(true)
+
+    @parser.uri += '/foo.jpg'
+
+    assert_equal 'example/foo.jpg', @parser.extract_filename(true)
+  end
+
+  def test_extract_filename_host
+    @parser.response = {}
+    @parser.uri = URI 'http://example'
+
+    assert_equal 'example/index.html', @parser.extract_filename(true)
+  end
+
+  def test_extract_filename_uri_query
+    @parser.response = {}
+    @parser.uri = URI 'http://example/?id=5'
+
+    assert_equal 'index.html?id=5', @parser.extract_filename
+
+    @parser.uri += '/foo.html?id=5'
+
+    assert_equal 'foo.html?id=5', @parser.extract_filename
+  end
+
+  def test_extract_filename_uri_slash
+    @parser.response = {}
+    @parser.uri = URI 'http://example/foo/'
+
+    assert_equal 'example/foo/index.html', @parser.extract_filename(true)
+
+    @parser.uri += '/foo///'
+
+    assert_equal 'example/foo/index.html', @parser.extract_filename(true)
   end
 
   def test_fill_header

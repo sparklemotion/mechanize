@@ -76,10 +76,10 @@ class TestMechanizeCookie < Mechanize::TestCase
     uri = URI.parse 'http://example'
 
     Mechanize::Cookie.parse uri, cookie_str do |cookie|
-      assert_equal 'foo', cookie.name
-      assert_equal 'bar', cookie.value
-      assert_equal '/', cookie.path
-      assert_operator Time.now, :<, cookie.expires
+      assert_equal 'foo',               cookie.name
+      assert_equal 'bar',               cookie.value
+      assert_equal '/',                 cookie.path
+      assert_equal Time.at(1320539286), cookie.expires
     end
   end
 
@@ -204,14 +204,14 @@ class TestMechanizeCookie < Mechanize::TestCase
     assert_equal 8, cookies.length
 
     name = cookies.find { |c| c.name == 'name' }
-    assert_equal "Aaron",         name.value
-    assert_equal "/",             name.path
-    assert_operator Time.now, :<, name.expires
+    assert_equal "Aaron",             name.value
+    assert_equal "/",                 name.path
+    assert_equal Time.at(1320539391), name.expires
 
     a_path = cookies.find { |c| c.name == 'a_path' }
-    assert_equal "some_path",     a_path.value
-    assert_equal "/some_path",    a_path.path
-    assert_operator Time.now, :<, a_path.expires
+    assert_equal "some_path",         a_path.value
+    assert_equal "/some_path",        a_path.path
+    assert_equal Time.at(1320539391), a_path.expires
 
     no_expires = cookies.find { |c| c.name == 'no_expires' }
     assert_equal "nope", no_expires.value
@@ -219,9 +219,9 @@ class TestMechanizeCookie < Mechanize::TestCase
     assert_nil           no_expires.expires
 
     no_path = cookies.find { |c| c.name == 'no_path' }
-    assert_equal "no_path",       no_path.value
-    assert_equal "/",             no_path.path
-    assert_operator Time.now, :<, no_path.expires
+    assert_equal "no_path",           no_path.value
+    assert_equal "/",                 no_path.path
+    assert_equal Time.at(1320539391), no_path.expires
 
     assert cookies.find { |c| c.name == 'expired' }
   end

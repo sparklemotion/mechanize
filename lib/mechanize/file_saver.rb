@@ -15,24 +15,25 @@
 #
 #   Dir['example.com/*'] # => foo.pdf
 
-class Mechanize::FileSaver < Mechanize::File
+class Mechanize::FileSaver < Mechanize::Download
 
   attr_reader :filename
 
-  def initialize uri = nil, response = nil, body = nil, code = nil
+  def initialize uri = nil, response = nil, body_io = nil, code = nil
+    @full_path = true
+
     super
 
-    # ensure the path does not end in /
-    path = uri.path.empty? ? 'index.html' : uri.path
-    path += 'index.html' if path.end_with? '/'
-
-    path = File.join uri.host, path
-    path = path.gsub %r%//+%, '/' # make the path pretty
-    @filename = [path, uri.query].compact.join '?'
-
-    FileUtils.mkdir_p File.dirname @filename
-    save_as @filename
+    save @filename
   end
+
+  ##
+  # The save_as alias is provided for backwards compatibility with mechanize
+  # 2.0.  It will be removed in mechanize 3.
+  #--
+  # TODO remove in mechanize 3
+
+  alias save_as save
 
 end
 

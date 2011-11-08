@@ -26,6 +26,8 @@ class Mechanize::Download
     @body_io  = body_io
     @code     = code
 
+    @full_path = false unless defined? @full_path
+
     fill_header response
     extract_filename
 
@@ -37,6 +39,9 @@ class Mechanize::Download
 
   def save filename = nil
     filename = find_free_name filename
+
+    dirname = File.dirname filename
+    FileUtils.mkdir_p dirname
 
     # Ruby 1.8.7 implements StringIO#path, can't use respond_to? :path
     if StringIO === @body_io then

@@ -60,25 +60,38 @@ module Mechanize::Parser
 
   ##
   # Extracts the filename from a Content-Disposition header in the #response
-  # or from the URI.
+  # or from the URI.  If +full_path+ is true the filename will include the
+  # host name and path to the resource, otherwise a filename in the current
+  # directory is given.
 
-  def extract_filename
-    @filename = 'index.html'
+  def extract_filename full_path = @full_path
+    if @uri then
+      uri = @uri
+      uri += 'index.html' if uri.path.end_with? '/'
 
-    # Set the filename
-    if disposition = @response['content-disposition']
-      disposition.split(/;\s*/).each do |pair|
-        k, v = pair.split(/=/, 2)
-        @filename = v if k && k.downcase == 'filename'
-      end
+      path     = uri.path.split(/\//)
+      filename = path.pop || 'index.html'
     else
-      if @uri then
-        @filename = @uri.path.split(/\//).last || 'index.html'
-        @filename << ".html" unless @filename =~ /\./
-      end
+      path     = []
+      filename = 'index.html'
     end
 
-    @filename
+    # Set the filename
+    if disposition = @response['content-disposition'] then
+      disposition.split(/;\s*/).each do |pair|
+        k, v = pair.split(/=/, 2)
+        filename = v if k && k.downcase == 'filename'
+      end
+    elsif @uri then
+      filename << '.html' unless filename =~ /\./
+      filename << "?#{@uri.query}" if @uri.query
+    end
+
+    @filename = if full_path then
+                  File.join @uri.host, path, filename
+                else
+                  filename
+                end
   end
 
   ##

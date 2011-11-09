@@ -69,7 +69,7 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
   end
 
   def page uri, content_type = 'text/html', body = '', code = 200
-    uri = URI uri unless URI::Generic === URI
+    uri = URI uri unless URI::Generic === uri
 
     Mechanize::Page.new(uri, { 'content-type' => content_type }, body, code,
                         @mech)

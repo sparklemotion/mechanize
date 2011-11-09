@@ -978,7 +978,7 @@ class Mechanize::HTTP::Agent
   def set_proxy(addr, port, user = nil, pass = nil)
     return unless addr and port
     @proxy_uri = URI "http://#{addr}"
-    @proxy_uri.port = port
+    @proxy_uri.port = port.to_i
     @proxy_uri.user     = user if user
     @proxy_uri.password = pass if pass
 

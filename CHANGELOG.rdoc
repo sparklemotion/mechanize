@@ -50,6 +50,9 @@
   * Different mechanize instances may now have different loggers.  Issue #122
 
 * Bug fixes
+  * Mechanize takes more care to avoid saving files with certain unsafe names.
+    You should still take care not to use mechanize to save files into your
+    home directory.  Issue #163.
   * Mechanize#cookie_jar= works again.  Issue #126
   * Mechanize now handles cookies just as most modern browsers do,
     roughly based on RFC 6265.

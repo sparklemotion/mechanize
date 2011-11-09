@@ -159,9 +159,13 @@ class TestMechanizeParser < Mechanize::TestCase
     invisible = "\t\n\v\f\r"
 
     invisible.chars.each do |char|
-      @parser.uri = URI "http://example/#{char}"
+      begin
+        @parser.uri = URI "http://example/#{char}"
 
-      assert_equal 'index.html', @parser.extract_filename, char.inspect
+        assert_equal 'index.html', @parser.extract_filename, char.inspect
+      rescue URI::InvalidURIError
+        # ignore
+      end
     end
 
     escaped = "<>\"\\|"

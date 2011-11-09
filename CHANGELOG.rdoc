@@ -48,6 +48,8 @@
   * Mechanize::Cookie.new accepts attributes in a hash.
   * Mechanize::CookieJar#<<(cookie) (alias: add!) is added.  Issue #139
   * Different mechanize instances may now have different loggers.  Issue #122
+  * Mechanize now accepts a proxy port as a service name or number string.
+    Issue #167
 
 * Bug fixes
   * Mechanize takes more care to avoid saving files with certain unsafe names.

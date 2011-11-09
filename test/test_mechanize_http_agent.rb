@@ -1167,12 +1167,38 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_set_proxy
-    @agent.set_proxy('www.example.com', 9001, 'joe', 'lol')
+    @agent.set_proxy 'www.example.com', 9001, 'joe', 'lol'
 
-    assert_equal(@agent.proxy_uri.host,     'www.example.com')
-    assert_equal(@agent.proxy_uri.port,     9001)
-    assert_equal(@agent.proxy_uri.user,     'joe')
-    assert_equal(@agent.proxy_uri.password, 'lol')
+    assert_equal @agent.proxy_uri.host,     'www.example.com'
+    assert_equal @agent.proxy_uri.port,     9001
+    assert_equal @agent.proxy_uri.user,     'joe'
+    assert_equal @agent.proxy_uri.password, 'lol'
+  end
+
+  def test_set_proxy_port_string
+    @agent.set_proxy 'www.example.com', '9001', 'joe', 'lol'
+
+    assert_equal @agent.proxy_uri.host,     'www.example.com'
+    assert_equal @agent.proxy_uri.port,     9001
+    assert_equal @agent.proxy_uri.user,     'joe'
+    assert_equal @agent.proxy_uri.password, 'lol'
+  end
+
+  def test_set_proxy_service_name
+    @agent.set_proxy 'www.example.com', 'http', 'joe', 'lol'
+
+    assert_equal @agent.proxy_uri.host,     'www.example.com'
+    assert_equal @agent.proxy_uri.port,     80
+    assert_equal @agent.proxy_uri.user,     'joe'
+    assert_equal @agent.proxy_uri.password, 'lol'
+  end
+
+  def test_set_proxy_service_name_bad
+    e = assert_raises ArgumentError do
+      @agent.set_proxy 'www.example.com', 'nonexistent service', 'joe', 'lol'
+    end
+
+    assert_equal 'invalid value for port: "nonexistent service"', e.message
   end
 
 end

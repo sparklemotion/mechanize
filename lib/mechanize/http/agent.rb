@@ -973,10 +973,26 @@ class Mechanize::HTTP::Agent
     end
   end
 
+  ##
   # Sets the proxy address, port, user, and password +addr+ should be a host,
-  # with no "http://"
+  # with no "http://", +port+ may be a port number, service name or port
+  # number string.
+
   def set_proxy(addr, port, user = nil, pass = nil)
     return unless addr and port
+
+    unless Integer === port then
+      begin
+        port = Socket.getservbyname port
+      rescue SocketError
+        begin
+          port = Integer port
+        rescue ArgumentError
+          raise ArgumentError, "invalid value for port: #{port.inspect}"
+        end
+      end
+    end
+
     @proxy_uri = URI "http://#{addr}"
     @proxy_uri.port = port
     @proxy_uri.user     = user if user

@@ -40,6 +40,8 @@ class Mechanize::File
     @body = body
     @code = code
 
+    @full_path = false unless defined? @full_path
+
     fill_header response
     extract_filename
 

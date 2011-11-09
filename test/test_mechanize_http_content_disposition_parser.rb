@@ -23,50 +23,30 @@ class TestMechanizeHttpContentDispositionParser < Mechanize::TestCase
     assert_equal 'attachment', content_disposition.type
     assert_equal 'value',      content_disposition.filename
     assert_equal now,          content_disposition.creation_date
-    assert_equal (now + 1),    content_disposition.modification_date
-    assert_equal (now + 2),    content_disposition.read_date
+    assert_equal((now + 1),    content_disposition.modification_date)
+    assert_equal((now + 2),    content_disposition.read_date)
     assert_equal 5,            content_disposition.size
     expected = { 'arbitrary' => 'value' }
     assert_equal expected,     content_disposition.parameters
   end
 
   def test_parse_header
-    now = Time.at Time.now.to_i
-
     content_disposition = @parser.parse \
-      'content-disposition: attachment;' \
-      'filename=value;' \
-      "creation-date=\"#{now.rfc822}\";" \
-      "modification-date=\"#{(now + 1).rfc822}\";" \
-      "read-date=\"#{(now + 2).rfc822}\";" \
-      'size=5;' \
-      'arbitrary=value', true
+      'content-disposition: attachment;filename=value', true
 
     assert_equal 'attachment', content_disposition.type
     assert_equal 'value',      content_disposition.filename
-    assert_equal now,          content_disposition.creation_date
-    assert_equal (now + 1),    content_disposition.modification_date
-    assert_equal (now + 2),    content_disposition.read_date
-    assert_equal 5,            content_disposition.size
-    expected = { 'arbitrary' => 'value' }
-    assert_equal expected,     content_disposition.parameters
   end
 
   def test_parse_no_type
-    now = Time.at Time.now.to_i
-
-    content_disposition = @parser.parse \
-      'filename=value'
+    content_disposition = @parser.parse 'filename=value'
 
     assert_nil            content_disposition.type
     assert_equal 'value', content_disposition.filename
   end
 
   def test_parse_semicolons
-    now = Time.at Time.now.to_i
-
-    content_disposition = @parser.parse \
-      'attachment;;filename=value'
+    content_disposition = @parser.parse 'attachment;;filename=value'
 
     assert_equal 'attachment', content_disposition.type
     assert_equal 'value',      content_disposition.filename

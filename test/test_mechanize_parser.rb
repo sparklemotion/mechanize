@@ -11,6 +11,7 @@ class TestMechanizeParser < Mechanize::TestCase
 
     def initialize
       @uri = URI 'http://example'
+      @full_path = false
     end
   end
 

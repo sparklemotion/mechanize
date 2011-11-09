@@ -95,6 +95,8 @@ module Mechanize::Parser
   # directory is given.
 
   def extract_filename full_path = @full_path
+    handled = false
+
     if @uri then
       uri = @uri
       uri += 'index.html' if uri.path.end_with? '/'
@@ -108,13 +110,17 @@ module Mechanize::Parser
 
     # Set the filename
     if disposition = @response['content-disposition'] then
-      disposition.split(/;\s*/).each do |pair|
-        k, v = pair.split(/=/, 2)
-        filename = v if k && k.downcase == 'filename'
-      end
+      content_disposition =
+        Mechanize::HTTP::ContentDispositionParser.parse disposition
 
-      filename = filename.split(/[\\\/]/).last
-    elsif @uri then
+      if content_disposition then
+        filename = content_disposition.filename
+        filename = filename.split(/[\\\/]/).last
+        handled = true
+      end
+    end
+
+    if not handled and @uri then
       filename << '.html' unless filename =~ /\./
       filename << "?#{@uri.query}" if @uri.query
     end
@@ -123,7 +129,7 @@ module Mechanize::Parser
       filename = "_#{filename}"
     end
 
-    filename = filename.tr "\x00-\x1f<>:\"/\\|?*", '_'
+    filename = filename.tr "\x00-\x20<>:\"/\\|?*", '_'
 
     @filename = if full_path then
                   File.join @uri.host, path, filename

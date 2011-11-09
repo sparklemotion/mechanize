@@ -45,6 +45,7 @@ lib/mechanize/http.rb
 lib/mechanize/http/agent.rb
 lib/mechanize/http/auth_challenge.rb
 lib/mechanize/http/auth_realm.rb
+lib/mechanize/http/content_disposition_parser.rb
 lib/mechanize/http/www_authenticate_parser.rb
 lib/mechanize/monkey_patch.rb
 lib/mechanize/page.rb
@@ -131,14 +132,17 @@ test/test_mechanize_form_field.rb
 test/test_mechanize_form_file_upload.rb
 test/test_mechanize_form_image_button.rb
 test/test_mechanize_form_keygen.rb
+test/test_mechanize_form_multi_select_list.rb
 test/test_mechanize_form_option.rb
 test/test_mechanize_form_radio_button.rb
+test/test_mechanize_form_select_list.rb
 test/test_mechanize_form_textarea.rb
 test/test_mechanize_headers.rb
 test/test_mechanize_history.rb
 test/test_mechanize_http_agent.rb
 test/test_mechanize_http_auth_challenge.rb
 test/test_mechanize_http_auth_realm.rb
+test/test_mechanize_http_content_disposition_parser.rb
 test/test_mechanize_http_www_authenticate_parser.rb
 test/test_mechanize_link.rb
 test/test_mechanize_page.rb

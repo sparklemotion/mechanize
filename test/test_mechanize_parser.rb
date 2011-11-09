@@ -30,29 +30,7 @@ class TestMechanizeParser < Mechanize::TestCase
     @parser.uri = URI 'http://example/foo'
 
     @parser.response = {
-      'content-disposition' => 'attachment; filename=genome.jpeg; modification-date="Wed, 12 Feb 1997 16:29:51 -0500"'
-    }
-
-    assert_equal 'genome.jpeg', @parser.extract_filename
-
-    @parser.response = {
-      'content-disposition' => 'filename=genome.jpeg; modification-date="Wed, 12 Feb 1997 16:29:51 -0500"'
-    }
-
-    assert_equal 'genome.jpeg', @parser.extract_filename
-
-    @parser.response = {
-      'content-disposition' => 'filename=genome.jpeg'
-    }
-
-    assert_equal 'genome.jpeg', @parser.extract_filename
-  end
-
-  def test_extract_filename_content_disposition_bad
-    @parser.uri = URI 'http://example/foo'
-
-    @parser.response = {
-      'content-disposition' => 'attachment;; filename=genome.jpeg'
+      'content-disposition' => 'attachment; filename=genome.jpeg'
     }
 
     assert_equal 'genome.jpeg', @parser.extract_filename
@@ -62,13 +40,13 @@ class TestMechanizeParser < Mechanize::TestCase
     @parser.uri = URI 'http://example'
 
     @parser.response = {
-      'content-disposition' => 'attachment; filename=../genome.jpeg'
+      'content-disposition' => 'attachment; filename="../genome.jpeg"'
     }
 
     assert_equal 'example/genome.jpeg', @parser.extract_filename(true)
 
     @parser.response = {
-      'content-disposition' => 'attachment; filename=foo/genome.jpeg'
+      'content-disposition' => 'attachment; filename="foo/genome.jpeg"'
     }
 
     assert_equal 'example/genome.jpeg', @parser.extract_filename(true)
@@ -78,13 +56,13 @@ class TestMechanizeParser < Mechanize::TestCase
     @parser.uri = URI 'http://example'
 
     @parser.response = {
-      'content-disposition' => 'attachment; filename=..\\genome.jpeg'
+      'content-disposition' => 'attachment; filename="..\\\\genome.jpeg"'
     }
 
     assert_equal 'example/genome.jpeg', @parser.extract_filename(true)
 
     @parser.response = {
-      'content-disposition' => 'attachment; filename=foo\\genome.jpeg'
+      'content-disposition' => 'attachment; filename="foo\\\\genome.jpeg"'
     }
 
     assert_equal 'example/genome.jpeg', @parser.extract_filename(true)
@@ -94,37 +72,37 @@ class TestMechanizeParser < Mechanize::TestCase
     @parser.uri = URI 'http://example/foo'
 
     @parser.response = {
-      'content-disposition' => 'attachment; filename=genome.jpeg; modification-date="Wed, 12 Feb 1997 16:29:51 -0500"'
+      'content-disposition' => 'attachment; filename=genome.jpeg'
     }
 
     assert_equal 'example/genome.jpeg', @parser.extract_filename(true)
+  end
+
+  def test_extract_filename_content_disposition_quoted
+    @parser.uri = URI 'http://example'
 
     @parser.response = {
-      'content-disposition' => 'filename=genome.jpeg; modification-date="Wed, 12 Feb 1997 16:29:51 -0500"'
+      'content-disposition' => 'attachment; filename="some \"file\""'
     }
 
-    assert_equal 'example/genome.jpeg', @parser.extract_filename(true)
-
-    @parser.response = {
-      'content-disposition' => 'filename=genome.jpeg'
-    }
-
-    assert_equal 'example/genome.jpeg', @parser.extract_filename(true)
+    assert_equal 'some__file_', @parser.extract_filename
   end
 
   def test_extract_filename_content_disposition_special
     @parser.uri = URI 'http://example/foo'
 
     @parser.response = {
-      'content-disposition' => 'attachment; filename=/\\<>:"|?*'
+      'content-disposition' => 'attachment; filename="/\\\\<>:\\"|?*"'
     }
 
     assert_equal '_______', @parser.extract_filename
 
-    chars = (0..31).map { |c| c.chr }.join
+    chars = (0..12).map { |c| c.chr }.join
+    chars += "\\\r"
+    chars += (14..31).map { |c| c.chr }.join
 
     @parser.response = {
-      'content-disposition' => "attachment; filename=#{chars}"
+      'content-disposition' => "attachment; filename=\"#{chars}\""
     }
 
     assert_equal '_' * 32, @parser.extract_filename
@@ -167,28 +145,6 @@ class TestMechanizeParser < Mechanize::TestCase
     end
   end
 
-  def test_extract_filename_uri
-    @parser.response = {}
-    @parser.uri = URI 'http://example/foo'
-
-    assert_equal 'foo.html', @parser.extract_filename
-
-    @parser.uri += '/foo.jpg'
-
-    assert_equal 'foo.jpg', @parser.extract_filename
-  end
-
-  def test_extract_filename_uri_full_path
-    @parser.response = {}
-    @parser.uri = URI 'http://example/foo'
-
-    assert_equal 'example/foo.html', @parser.extract_filename(true)
-
-    @parser.uri += '/foo.jpg'
-
-    assert_equal 'example/foo.jpg', @parser.extract_filename(true)
-  end
-
   def test_extract_filename_host
     @parser.response = {}
     @parser.uri = URI 'http://example'
@@ -228,6 +184,28 @@ class TestMechanizeParser < Mechanize::TestCase
     @parser.uri = URI "http://example/*"
 
     assert_equal '_.html', @parser.extract_filename, 'asterisk'
+  end
+
+  def test_extract_filename_uri
+    @parser.response = {}
+    @parser.uri = URI 'http://example/foo'
+
+    assert_equal 'foo.html', @parser.extract_filename
+
+    @parser.uri += '/foo.jpg'
+
+    assert_equal 'foo.jpg', @parser.extract_filename
+  end
+
+  def test_extract_filename_uri_full_path
+    @parser.response = {}
+    @parser.uri = URI 'http://example/foo'
+
+    assert_equal 'example/foo.html', @parser.extract_filename(true)
+
+    @parser.uri += '/foo.jpg'
+
+    assert_equal 'example/foo.jpg', @parser.extract_filename(true)
   end
 
   def test_extract_filename_uri_query

@@ -99,8 +99,12 @@ class Mechanize::Cookie
 
           case key.downcase
           when 'domain'
-            cookie.domain = value
-            cookie.for_domain = true
+            begin
+              cookie.domain = value
+              cookie.for_domain = true
+            rescue
+              log.warn("Couldn't parse domain: #{value}") if log
+            end
           when 'path'
             cookie.path = value
           when 'expires'

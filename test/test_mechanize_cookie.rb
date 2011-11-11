@@ -406,5 +406,25 @@ class TestMechanizeCookie < Mechanize::TestCase
       end
     end
   end
+
+  def test_new
+    cookie = Mechanize::Cookie.new('key', 'value')
+    assert_equal 'key', cookie.name
+    assert_equal 'value', cookie.value
+    assert_equal nil, cookie.expires
+
+    # Minimum unit for the expires attribute is second
+    expires = Time.at((Time.now + 3600).to_i)
+
+    cookie = Mechanize::Cookie.new('key', 'value', :expires => expires.dup)
+    assert_equal 'key', cookie.name
+    assert_equal 'value', cookie.value
+    assert_equal expires, cookie.expires
+
+    cookie = Mechanize::Cookie.new(:value => 'value', :name => 'key', :expires => expires.dup)
+    assert_equal 'key', cookie.name
+    assert_equal 'value', cookie.value
+    assert_equal expires, cookie.expires
+  end
 end
 

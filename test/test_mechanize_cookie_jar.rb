@@ -47,13 +47,19 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     assert_equal(2, @jar.cookies(url2).length)
   end
 
-  def test_no_domain_case
-    url = URI.parse('http://www.rubyforge.org/')
+  def test_host_only
+    url = URI.parse('http://rubyforge.org/')
 
     @jar.add(url, Mechanize::Cookie.new(
         cookie_values(:domain => 'rubyforge.org', :for_domain => false)))
 
-    assert_equal(0, @jar.cookies(url).length)
+    assert_equal(1, @jar.cookies(url).length)
+
+    assert_equal(1, @jar.cookies(URI('http://RubyForge.org/')).length)
+
+    assert_equal(1, @jar.cookies(URI('https://RubyForge.org/')).length)
+
+    assert_equal(0, @jar.cookies(URI('http://www.rubyforge.org/')).length)
   end
 
   def test_empty_value

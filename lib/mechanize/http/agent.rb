@@ -723,16 +723,9 @@ class Mechanize::HTTP::Agent
   end
 
   def response_cookies response, uri, page
-    log = log()	 # reduce method calls
     if Mechanize::Page === page and page.body =~ /Set-Cookie/n
       page.search('//head/meta[@http-equiv="Set-Cookie"]').each do |meta|
-        Mechanize::Cookie.parse(uri, meta['content'], log) { |c|
-          if @cookie_jar.add(uri, c)
-            log.debug("saved cookie: #{c}") if log
-          else
-            log.debug("rejected cookie: #{c}") if log
-          end
-        }
+        save_cookies(uri, meta['content'])
       end
     end
 
@@ -740,15 +733,20 @@ class Mechanize::HTTP::Agent
 
     return unless header_cookies
 
-    header_cookies.each do |cookie|
-      Mechanize::Cookie.parse(uri, cookie, log) { |c|
-        if @cookie_jar.add(uri, c)
-          log.debug("saved cookie: #{c}") if log
-        else
-          log.debug("rejected cookie: #{c}") if log
-        end
-      }
+    header_cookies.each do |set_cookie|
+      save_cookies(uri, set_cookie)
     end
+  end
+
+  def save_cookies(uri, set_cookie)
+    log = log()	 # reduce method calls
+    Mechanize::Cookie.parse(uri, set_cookie, log) { |c|
+      if @cookie_jar.add(uri, c)
+        log.debug("saved cookie: #{c}") if log
+      else
+        log.debug("rejected cookie: #{c}") if log
+      end
+    }
   end
 
   def response_follow_meta_refresh response, uri, page, redirects

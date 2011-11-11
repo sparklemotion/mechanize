@@ -426,5 +426,26 @@ class TestMechanizeCookie < Mechanize::TestCase
     assert_equal 'value', cookie.value
     assert_equal expires, cookie.expires
   end
+
+  def test_domain=
+    url = URI.parse('http://host.dom.example.com:8080/')
+
+    cookie_str = 'a=b; domain=Example.Com'
+    cookie = Mechanize::Cookie.parse(url, cookie_str).first
+    assert 'example.com', cookie.domain
+
+    cookie.domain = DomainName(url.host)
+    assert 'host.dom.example.com', cookie.domain
+
+    cookie.domain = 'Dom.example.com'
+    assert 'dom.example.com', cookie.domain
+
+    cookie.domain = Object.new.tap { |o|
+      def o.to_str
+        'Example.com'
+      end
+    }
+    assert 'example.com', cookie.domain
+  end
 end
 

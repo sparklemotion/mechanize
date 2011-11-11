@@ -147,15 +147,22 @@ class Mechanize::Cookie
   # Sets the domain attribute.  A leading dot in +domain+ implies
   # turning the +for_domain?+ flag on.
   def domain=(domain)
-    if domain.start_with?('.')
-      @for_domain = true
-      domain = domain[1..-1]
+    if DomainName === domain
+      @domain_name = domain
+    else
+      domain.is_a?(String) or
+        (domain.respond_to?(:to_str) && (domain = domain.to_str).is_a?(String)) or
+        raise TypeError, "#{domain.class} is not a String"
+      if domain.start_with?('.')
+        @for_domain = true
+        domain = domain[1..-1]
+      end
+      # Do we really need to support this?
+      if domain.match(/\A([^:]+):[0-9]+\z/)
+        domain = $1
+      end
+      @domain_name = DomainName.new(domain)
     end
-    # Do we really need to support this?
-    if domain.match(/\A([^:]+):[0-9]+\z/)
-      domain = $1
-    end
-    @domain_name = DomainName.new(domain)
     set_domain(@domain_name.hostname)
   end
 

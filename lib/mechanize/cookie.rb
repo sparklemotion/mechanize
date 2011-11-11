@@ -74,6 +74,9 @@ class Mechanize::Cookie
   alias for_domain? for_domain
 
   class << self
+    # Parses a Set-Cookie header line +str+ sent from +uri+ into an
+    # array of Cookie objects.  Note that this array may contain
+    # nil's when some of the cookie-pairs are malformed.
     def parse(uri, str, log = Mechanize.log)
       return str.split(/,(?=[^;,]*=)|,$/).map { |c|
         cookie_elem = c.split(/;+/)

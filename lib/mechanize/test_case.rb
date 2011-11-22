@@ -43,6 +43,10 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
     Mechanize::Page.new uri, response, html, 200, agent
   end
 
+  def have_encoding?
+    Object.const_defined? :Encoding
+  end
+
   def html_page body
     uri = URI 'http://example/'
     Mechanize::Page.new uri, { 'content-type' => 'text/html' }, body, 200, @mech

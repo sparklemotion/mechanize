@@ -601,6 +601,26 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'part', body.read
   end
 
+  def test_response_content_encoding_gzip_encoding_bad
+    def @res.content_length() 24 end
+    @res.instance_variable_set(:@header,
+                               'content-encoding' => %w[gzip],
+                               'content-type' => 'text/html; charset=UTF-8')
+
+    # "test\xB2"
+    body_io = StringIO.new \
+      "\037\213\b\000*+\314N\000\003+I-.\331\004\000x\016\003\376\005\000\000\000"
+
+    body = @agent.response_content_encoding @res, body_io
+
+    expected = "test\xB2"
+    expected.force_encoding Encoding::BINARY if have_encoding?
+
+    content = body.read
+    assert_equal expected, content
+    assert_equal Encoding::BINARY, content.encoding if have_encoding?
+  end
+
   def test_response_content_encoding_none
     def @res.content_length() 4 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[none]

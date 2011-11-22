@@ -695,6 +695,7 @@ class Mechanize::HTTP::Agent
       begin
         zio = Zlib::GzipReader.new body_io
         out_io = Tempfile.new 'mechanize-decode'
+        out_io.binmode
 
         until zio.eof? do
           out_io.write zio.read 16384

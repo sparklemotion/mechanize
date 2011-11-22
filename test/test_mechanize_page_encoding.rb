@@ -168,8 +168,8 @@ class TestMechanizePageEncoding < Mechanize::TestCase
   end
 
   def test_parser_encoding_when_searching_elements
-    skip "Encoding not implemented" unless Object.const_defined? :Encoding
-    
+    skip "Encoding not implemented" unless have_encoding?
+
     body = '<span id="latin1">hi</span>'
     page = util_page body, 'content-type' => 'text/html,charset=ISO-8859-1'
 

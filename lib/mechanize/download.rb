@@ -51,7 +51,7 @@ class Mechanize::Download
         end
       end
     else
-      FileUtils.cp @body_io.path, filename
+      FileUtils.mv @body_io.path, filename
     end
   end
 

@@ -452,6 +452,19 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert_nil requests.last['referer']
   end
 
+  def test_get_referer_download
+    download = Mechanize::Download.new URI 'http://example/prev'
+
+    uri = URI 'http://example'
+
+    page = @mech.get uri, { :q => 'h' }, download, { 'X-H' => 'v' }
+
+    assert_equal URI('http://example/?q=h'), page.uri
+    assert_equal URI('http://example'), uri
+
+    assert_equal 'http://example/prev', requests.first['referer']
+  end
+
   def test_get_robots
     @mech.robots = true
 
@@ -791,6 +804,7 @@ but not <a href="/" rel="me nofollow">this</a>!
     download = @mech.parse @uri, response, StringIO.new('raw')
 
     assert_kind_of Mechanize::Download, download
+    assert_kind_of StringIO, download.content
   end
 
   def test_parse_html

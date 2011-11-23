@@ -308,7 +308,7 @@ class Mechanize
     # FIXME: Huge hack so that using a URI as a referer works.  I need to
     # refactor everything to pass around URIs but still support
     # Mechanize::Page#base
-    unless referer.is_a?(Mechanize::File)
+    unless Mechanize::Parser === referer then
       referer = referer.is_a?(String) ?
       Page.new(URI.parse(referer), {'content-type' => 'text/html'}) :
         Page.new(referer, {'content-type' => 'text/html'})
@@ -975,7 +975,7 @@ class Mechanize
     # Find our pluggable parser
     parser_klass = @pluggable_parser.parser content_type
 
-    unless Mechanize::Download === parser_klass then
+    unless parser_klass <= Mechanize::Download then
       body = case body
              when IO, Tempfile, StringIO then
                body.read

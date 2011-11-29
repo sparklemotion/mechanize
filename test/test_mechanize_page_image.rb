@@ -77,6 +77,55 @@ class TestMechanizePageImage < Mechanize::TestCase
     assert_equal "http://other.example/a.jpg", page.images.first.url
   end
 
+  def test_image_extname
+    page = html_page <<-BODY
+<img src="a.jpg">
+    BODY
+    assert_equal ".jpg", page.images.first.extname
+
+    page = html_page <<-BODY
+<img src="a.PNG">
+    BODY
+    assert_equal ".PNG", page.images.first.extname
+
+    page = html_page <<-BODY
+<img src="unknown.aaa">
+    BODY
+    assert_equal ".aaa", page.images.first.extname
+
+    page = html_page <<-BODY
+<img src="nosuffiximage">
+    BODY
+    assert_equal "", page.images.first.extname
+
+    page = html_page <<-BODY
+<img width="1" height="1">
+    BODY
+    assert_nil page.images.first.extname
+  end
+
+  def test_image_mime_type
+    page = html_page <<-BODY
+<img src="a.jpg">
+    BODY
+    assert_equal "image/jpeg", page.images.first.mime_type
+
+    page = html_page <<-BODY
+<img src="a.PNG">
+    BODY
+    assert_equal "image/png", page.images.first.mime_type
+
+    page = html_page <<-BODY
+<img src="unknown.aaa">
+    BODY
+    assert_nil page.images.first.mime_type
+
+    page = html_page <<-BODY
+<img src="nosuffiximage">
+    BODY
+    assert_nil page.images.first.mime_type
+  end
+
   def test_image_with
     page = html_page <<-BODY
 <img src="a.jpg">

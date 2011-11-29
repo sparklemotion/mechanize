@@ -54,6 +54,29 @@ class Mechanize::Page::Image
 
   alias :text :caption
 
+  # suffix of url. dot is a part of suffix, not a delimiter
+  #   p page.images[0].url #=> "http://example/test.jpg"
+  #   p page.images[0].extname #=> ".jpg"
+  # returns "" if url has no suffix
+  #   p page.images[1].url #=> "http://example/sampleimage"
+  #   p page.images[1].extname #=> ""
+  def extname
+    # Image#src returns nil when no src attribute
+    src ? ::File.extname(src) : nil
+  end
+
+  # mime type guessed with image url suffix
+  #   p page.images[0].extname #=> ".jpg"
+  #   p page.images[0].mime_type #=> "image/jpeg"
+  #   page.images_with(:mime_type => /gif|jpeg|png/).each do ...
+  # retruns nil if url has no (well-known) suffix
+  #   p page.images[1].url #=> "http://example/sampleimage"
+  #   p page.images[1].mime_type #=> nil
+  def mime_type
+    suffix_without_dot = extname ? extname.sub(/\A\./){''}.downcase : nil
+    Mechanize::Util::DefaultMimeTypes[suffix_without_dot]
+  end
+
   def url
     case src
     when %r{^https?://}

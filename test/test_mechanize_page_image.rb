@@ -6,6 +6,7 @@ class TestMechanizePageImage < Mechanize::TestCase
     super
 
     @uri = URI 'http://example/'
+    @empty_page = Mechanize::Page.new(nil, {'content-type' => 'text/html'})
   end
 
   def test_image_attributes
@@ -124,6 +125,181 @@ class TestMechanizePageImage < Mechanize::TestCase
 <img src="nosuffiximage">
     BODY
     assert_nil page.images.first.mime_type
+  end
+
+  def test_image_fetch
+    page = html_page <<-BODY
+<img src="http://localhost/button.jpg">
+    BODY
+
+    agent = Mechanize.new
+    page.mech = agent
+    fetched = page.images.first.fetch
+
+    assert_equal fetched, agent.page
+    assert_equal "http://localhost/button.jpg", fetched.uri.to_s
+    assert_equal "http://example/", requests.first['Referer']
+  end
+
+  def relative?(image)
+    image.__send__(:relative?)
+  end
+
+  def test_image_fetch_referer_http_page_rel_src
+    #            | rel-src http-src https-src
+    # http page  | *page*    page     page
+    # https page |  page     empty    empty
+    agent = Mechanize.new
+    page = html_page '<img src="./button.jpg">'
+    page.mech = agent
+    page.images.first.fetch
+
+    assert_equal 'http', page.uri.scheme
+    assert_equal true, relative?(page.images.first)
+    assert_equal "http://example/", requests.first['Referer']
+  end
+
+  def test_image_fetch_referer_http_page_abs_src
+    #            | rel-src http-src https-src
+    # http page  |  page    *page*    *page*
+    # https page |  page     empty    empty
+    agent = Mechanize.new
+    page = html_page '<img src="http://localhost/button.jpg">'
+    page.mech = agent
+    page.images.first.fetch
+
+    assert_equal 'http', page.uri.scheme
+    assert_equal false, relative?(page.images.first)
+    assert_equal "http://example/", requests.first['Referer']
+  end
+
+  def test_image_fetch_referer_https_page_rel_src
+    #            | rel-src http-src https-src
+    # http page  |  page     page     page
+    # https page | *page*    empty    empty
+    agent = Mechanize.new
+    page = html_page '<img src="./button.jpg">'
+    page.uri = URI 'https://example/'
+    page.mech = agent
+    page.images.first.fetch
+
+    assert_equal 'https', page.uri.scheme
+    assert_equal true, relative?(page.images.first)
+    assert_equal "https://example/", requests.first['Referer']
+  end
+
+  def test_image_fetch_referer_https_page_abs_src
+    #            | rel-src http-src https-src
+    # http page  |  page     page     page
+    # https page |  page    *empty*  *empty*
+    agent = Mechanize.new
+    page = html_page '<img src="http://localhost/button.jpg">'
+    page.uri = URI 'https://example/'
+    page.mech = agent
+    page.images.first.fetch
+
+    assert_equal 'https', page.uri.scheme
+    assert_equal false, relative?(page.images.first)
+    assert_equal nil, requests.first['Referer']
+  end
+
+  def image_referer_uri(page)
+    page.images.first.__send__(:image_referer).uri
+  end
+
+  def test_image_referer_http_page_abs_src
+    page = html_page '<img src="http://localhost/button.jpg">'
+
+    assert_equal 'http', page.uri.scheme
+    assert_equal @uri, image_referer_uri(page)
+  end
+
+  def test_image_referer_http_page_rel_src
+    page = html_page '<img src="./button.jpg">'
+
+    assert_equal 'http', page.uri.scheme
+    assert_equal @uri, image_referer_uri(page)
+  end
+
+  def test_image_referer_https_page_abs_src
+    page = html_page '<img src="http://localhost/button.jpg">'
+    page.uri = URI 'https://example/'
+
+    assert_equal 'https', page.uri.scheme
+    assert_nil image_referer_uri(page)
+  end
+
+  def test_image_referer_https_page_rel_src
+    page = html_page '<img src="./button.jpg">'
+    page.uri = URI 'https://example/'
+
+    assert_equal 'https', page.uri.scheme
+    assert_equal URI('https://example/'), image_referer_uri(page)
+  end
+
+  def test_image_referer_when_no_initpage
+    agent = Mechanize.new
+    image = Mechanize::Page::Image.new({'src'=>'http://localhost/button.jpg'}, nil)
+
+    assert_nil image.page
+    assert_nil image.__send__(:image_referer).uri
+  end
+
+  # test Tempfile.open{|tmp| page.save(tmp.path) } does not work
+  #   because tmp.path already exists when Parser.find_free_name starts check
+  class TestMechanizePageImageWithTempfile < Mechanize::TestCase
+
+    def setup
+      super
+
+      @uri = URI 'http://example/'
+
+      @tmp_save = Tempfile.open('mech_test__mechanize_page_image_save')
+      @save_path = @tmp_save.path
+      @tmp_save.close(true)
+
+      @tmp_download = Tempfile.open('mech_test__mechanize_page_image_download')
+      @download_path = @tmp_download.path
+      @tmp_download.close(true)
+    end
+
+    def teardown
+      super
+      File.unlink @save_path if File.exist? @save_path
+      File.unlink @download_path if File.exist? @download_path
+    end
+
+    def test_image_save
+      page = html_page <<-BODY
+<img src="http://localhost/button.jpg">
+    BODY
+
+      agent = Mechanize.new
+      page.mech = agent
+      agent.__send__(:add_to_history, page)
+      page.images.first.save(@save_path)
+
+      assert_equal 983, File.size(@save_path)
+      assert_equal ["http://example/", "http://localhost/button.jpg"], agent.history.map{|p| p.uri.to_s}
+      # visited? does not returns Boolean
+      assert agent.visited?("http://localhost/button.jpg")
+    end
+
+    def test_image_download
+      page = html_page <<-BODY
+<img src="http://localhost/button.jpg">
+    BODY
+
+      agent = Mechanize.new
+      page.mech = agent
+      agent.__send__(:add_to_history, page)
+      page.images.first.download(@download_path)
+
+      assert_equal 983, File.size(@download_path)
+      assert_equal ["http://example/"], agent.history.map{|p| p.uri.to_s}
+      # visited? does not returns Boolean
+      assert_nil agent.visited?("http://localhost/button.jpg")
+    end
   end
 
   def test_image_with

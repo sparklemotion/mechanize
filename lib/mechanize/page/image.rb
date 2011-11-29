@@ -3,13 +3,13 @@
 
 class Mechanize::Page::Image
   attr_reader :node
-  attr_reader :page
-  attr_reader :mech
+  attr_accessor :page
+  attr_accessor :mech
 
   def initialize(node, page)
     @node = node
     @page = page
-    @mech = page.mech
+    @mech = page && page.mech
   end
 
   def src
@@ -77,20 +77,63 @@ class Mechanize::Page::Image
     Mechanize::Util::DefaultMimeTypes[suffix_without_dot]
   end
 
+  # url String of self for Page#image_urls
   def url
-    case src
-    when %r{^https?://}
-      src
-    else 
+    if relative?
       if page.bases[0]
         (page.bases[0].href + src).to_s
       else
         (page.uri + src).to_s
       end
+    else
+      src
     end
   end
 
   alias :to_s :url
+
+  # get #src with Mechanize#get. returns Mechanize#get result.
+  #   agent.page.image_with(:src => /logo/).fetch.save
+  # The referer is:
+  # #page("parent") : all images on http html, relative #src images on https html
+  # (no referer)    : absolute #src images on https html
+  # user specified  : img.fetch(nil, my_referer_uri_or_page)
+  def fetch(parameters = [], referer = nil, headers = {})
+    mech.get(src, parameters, referer || image_referer, headers)
+  end
+
+  def image_referer
+    http_page = page && page.uri && page.uri.scheme == 'http'
+    https_page = page && page.uri && page.uri.scheme == 'https'
+    empty_referer = Mechanize::Page.new(nil, {'content-type'=>'text/html'})
+    case
+    when http_page then page
+    when https_page && relative? then page
+    else empty_referer end
+  end
+
+  def relative?
+    %r{^https?://} !~ src
+  end
+
+  private :image_referer, :relative?
+
+  # #fetch and File#save(or, Download#save)
+  #   page.images_with(:src => /img/).each{|img| img.save}
+  #   page.images_with(src: /img/).map(&:save) # Ruby 1.9.x
+  def save(path = nil, parameters = [], referer = nil, headers = {})
+    fetch(parameters, referer, headers).save(path)
+  end
+
+  alias :save_as :save
+
+  # #save self with Mechanize#transact. self is not added to history.
+  #   p agent.page.uri.to_s => "http://example/images.html"
+  #   agent.page.images[0].download
+  #   p agent.page.uri.to_s #=> "http://example/images.html"
+  def download(path = nil, parameters = [], referer = nil, headers = {})
+    mech.transact{ save(path, parameters, referer, headers) }
+  end
 
   def pretty_print(q) # :nodoc:
     q.object_group(self) {

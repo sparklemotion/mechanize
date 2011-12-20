@@ -1,6 +1,6 @@
 = Mechanize CHANGELOG
 
-=== 2.1 / ??
+=== 2.1 / 2011-12-20
 
 * Deprecations
   * Mechanize#get no longer accepts an options hash.
@@ -9,8 +9,9 @@
 * Minor enhancements
   * Mechanize now depends on net-http-persistent 2.3+.  This new version
     brings idle timeouts to help with the dreaded "too many connection resets"
-    issue when POSTing to a closed connection.  Also, SSL connections will be
-    verified against the system certificate store by default.  Issue #123
+    issue when POSTing to a closed connection.  Issue #123
+  * SSL connections will be verified against the system certificate store by
+    default.
   * Added Mechanize#retry_change_requests to allow mechanize to retry POST and
     other non-idempotent requests when you know it is safe to do so.  Issue
     #123
@@ -39,8 +40,8 @@
     by Jo Hund.
   * Updated 'Mac Safari' User-Agent alias to Safari 5.1.1.  'Mac Safari 4' can
     be used for the old 'Mac Safari' alias.
-  * When given multiple HTTP authentication options mechanize can better pick
-    the strongest method.
+  * When given multiple HTTP authentication options mechanize now picks the
+    strongest method.
   * Improvements to HTTP authorization:
     * mechanize raises Mechanize::UnathorizedError for 401 responses which is
       a sublcass of Mechanize::ResponseCodeError.
@@ -52,10 +53,6 @@
     Issue #167
 
 * Bug fixes
-  * Mechanize takes more care to avoid saving files with certain unsafe names.
-    You should still take care not to use mechanize to save files into your
-    home directory.  Issue #163.
-  * Mechanize#cookie_jar= works again.  Issue #126
   * Mechanize now handles cookies just as most modern browsers do,
     roughly based on RFC 6265.
     * domain=.example.com (which is invalid) is considered identical to
@@ -75,6 +72,10 @@
     * It is recommended that you clear out existing cookie jars for
       regeneration because previously saved cookies may not have been
       parsed correctly.
+  * Mechanize takes more care to avoid saving files with certain unsafe names.
+    You should still take care not to use mechanize to save files directly
+    into your home directory ($HOME).  Issue #163.
+  * Mechanize#cookie_jar= works again.  Issue #126
   * The original Referer value persists on redirection.  Issue #150
   * Do not send a referer on a Refresh header based redirection.
   * Fixed encoding error in tests when LANG=C.  Patch #142 by jinschoi.

@@ -99,5 +99,10 @@ class TestMechanizeUtil < Mechanize::TestCase
     assert_equal '&', @MU::html_unescape('&amp;')
   end
 
+  def test_uri_escape
+    assert_equal "%25", @MU.uri_escape("%")
+    assert_equal "%",   @MU.uri_escape("%", /[^%]/)
+  end
+
 end
 

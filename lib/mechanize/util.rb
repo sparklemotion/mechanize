@@ -78,14 +78,16 @@ class Mechanize::Util
     enc || "ISO-8859-1"
   end
 
-  def self.uri_escape str
+  def self.uri_escape str, unsafe = nil
     @parser ||= begin
                   URI::Parser.new
                 rescue NameError
                   URI
                 end
 
-    @parser.escape str
+    unsafe ||= @parser.regexp[:UNSAFE]
+
+    @parser.escape str, unsafe
   end
 
   def self.uri_unescape str

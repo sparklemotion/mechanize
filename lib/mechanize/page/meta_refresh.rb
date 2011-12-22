@@ -25,6 +25,11 @@ class Mechanize::Page::MetaRefresh < Mechanize::Page::Link
   CONTENT_REGEXP = /^\s*(\d+\.?\d*)(;|;\s*url=\s*['"]?(\S*?)['"]?)?\s*$/i
 
   ##
+  # Regexp of unsafe URI characters that excludes % for Issue #177
+
+  UNSAFE = /[^\-_.!~*'()a-zA-Z\d;\/?:@&%=+$,\[\]]/
+
+  ##
   # Parses the delay and url from the content attribute of a meta refresh
   # element.  Parse requires the uri of the current page to infer a url when
   # no url is specified.
@@ -37,7 +42,9 @@ class Mechanize::Page::MetaRefresh < Mechanize::Page::Link
     return unless content =~ CONTENT_REGEXP
 
     link_self = $3.nil? || $3.empty?
-    delay, refresh_uri = $1, $3
+    delay = $1
+    refresh_uri = $3
+    refresh_uri = Mechanize::Util.uri_escape refresh_uri, UNSAFE if refresh_uri
 
     dest = base_uri
     dest += refresh_uri if refresh_uri

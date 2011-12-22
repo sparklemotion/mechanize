@@ -69,6 +69,16 @@ class TestMechanizePageMetaRefresh < Mechanize::TestCase
     refute link_self
   end
 
+  def test_class_parse_funky
+    delay, uri, link_self = @MR.parse "0; url=/funky?<b>Welcome<%2Fb>", @uri
+
+    assert_equal "0", delay
+    assert_equal "http://example/funky?%3Cb%3EWelcome%3C%2Fb%3E",
+                 uri.to_s
+
+    refute link_self
+  end
+
   def test_class_from_node
     page = util_page 5, 'http://b.example'
     link = util_meta_refresh page

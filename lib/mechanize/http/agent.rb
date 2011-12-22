@@ -797,7 +797,7 @@ class Mechanize::HTTP::Agent
 
         if StringIO === body_io and total > @max_file_buffer then
           new_io = Tempfile.new 'mechanize-raw'
-          new_io.binmode if defined? binmode
+          new_io.binmode
 
           new_io.write body_io.string
 

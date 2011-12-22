@@ -85,7 +85,11 @@ class Mechanize::Util
                   URI
                 end
 
-    unsafe ||= @parser.regexp[:UNSAFE]
+    if URI == @parser then
+      unsafe ||= URI::UNSAFE
+    else
+      unsafe ||= @parser.regexp[:UNSAFE]
+    end
 
     @parser.escape str, unsafe
   end

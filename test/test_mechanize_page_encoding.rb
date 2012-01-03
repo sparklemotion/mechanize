@@ -23,6 +23,12 @@ class TestMechanizePageEncoding < Mechanize::TestCase
   def test_page_charset
     charset = Mechanize::Page.charset 'text/html;charset=vAlue'
     assert_equal 'vAlue', charset
+
+    charset = Mechanize::Page.charset 'text/html;charset=vaLue, text/html'
+    assert_equal 'vaLue', charset
+
+    charset = Mechanize::Page.charset 'text/html ; charset = valUe, text/html'
+    assert_equal 'valUe', charset
   end
 
   def test_page_charset_upcase

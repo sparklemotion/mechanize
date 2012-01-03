@@ -4,6 +4,7 @@
 
 * Bug fixes
   * Meta refresh URIs are now escaped (excluding %).  Issue #177
+  * Fix charset name extraction.  Issue #180
 
 === 2.1 / 2011-12-20
 

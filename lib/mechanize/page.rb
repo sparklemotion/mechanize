@@ -364,10 +364,14 @@ class Mechanize::Page < Mechanize::File
     return @labels_hash
   end
 
-  def self.charset content_type
-    charset = content_type[/;\s*charset\s*=\s*([^()<>@,;:\\\"\/\[\]?={}\s]+)/i, 1]
-    return nil if charset == 'none'
-    charset
+  class << self
+    def charset content_type
+      charset = content_type[/;(?:\s*,)?\s*charset\s*=\s*([^()<>@,;:\\\"\/\[\]?={}\s]+)/i, 1]
+      return nil if charset == 'none'
+      charset
+    end
+
+    alias charset_from_content_type charset
   end
 
   def self.response_header_charset response
@@ -421,12 +425,6 @@ class Mechanize::Page < Mechanize::File
     else
       ''
     end
-  end
-
-  def self.charset_from_content_type content_type
-    charset = content_type[/charset=([^; ]+)/i, 1]
-    return nil if charset == 'none'
-    charset
   end
 end
 

@@ -402,6 +402,31 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_nil @req['referer']
   end
 
+  def test_request_referer_strip
+    uri = URI.parse 'http://example.com/index.html'
+
+    host_path = "old.example/page.html?q=x"
+    referer = "http://#{host_path}"
+
+    [
+      "",
+      "@",
+      "user1@",
+      ":@",
+      "user1:@",
+      ":password1@",
+      "user1:password1@",
+    ].each { |userinfo|
+      ['', '#frag'].each { |frag|
+        url = URI.parse "http://#{userinfo}#{host_path}#{frag}"
+
+        @agent.request_referer @req, uri, url
+
+        assert_equal referer, @req['referer'], url
+      }
+    }
+  end
+
   def test_request_user_agent
     @agent.request_user_agent @req
 

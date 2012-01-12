@@ -893,6 +893,42 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert_equal 5, @mech.read_timeout
   end
 
+  def test_referer
+    host_path = "localhost/tc_referer.html?t=1"
+    ['http', 'https'].each { |proto|
+      referer = "#{proto}://#{host_path}"
+      [
+        "",
+	"@",
+	"user1@",
+	":@",
+	"user1:@",
+	":password1@",
+	"user1:password1@",
+      ].each { |userinfo|
+        url = "#{proto}://#{userinfo}#{host_path}"
+        [url, url + "#foo"].each { |furl|
+          [
+            ['relative',		true],
+            ['insecure',		proto == 'http'],
+            ['secure',			true],
+            ['relative noreferrer',	false],
+            ['insecure noreferrer',	false],
+            ['secure noreferrer',	false],
+          ].each_with_index { |(type, bool), i|
+            rpage = @mech.get(furl)
+            page = rpage.links[i].click
+            assert_equal bool ? referer : '', page.body, "%s link from %s" % [type, furl]
+          }
+
+          rpage = @mech.get(furl)
+          page = rpage.forms.first.submit
+          assert_equal referer, page.body, "post from %s" % furl
+        }
+      }
+    }
+  end
+
   def test_retry_change_requests_equals
     refute @mech.retry_change_requests
 

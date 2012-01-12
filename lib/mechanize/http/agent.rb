@@ -491,11 +491,17 @@ class Mechanize::HTTP::Agent
     end
   end
 
+  # Sets a Referer header.  Fragment part is removed as demanded by
+  # RFC 2616 14.36, and user information part is removed just like
+  # major browsers do.
   def request_referer request, uri, referer
     return unless referer
     return if 'https' == referer.scheme.downcase and
               'https' != uri.scheme.downcase
-
+    if referer.fragment || referer.user || referer.password
+      referer = referer.dup
+      referer.fragment = referer.user = referer.password = nil
+    end
     request['Referer'] = referer
   end
 

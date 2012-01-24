@@ -74,6 +74,12 @@ class WikipediaLinksToPhilosophy
 
     link = links.first
 
+    unless link then
+      # disambiguation page? try the first item in the list
+      link =
+        @page.root.css('.mw-content-ltr > ul > li > a[href^="/wiki/"]').first
+    end
+
     # convert a Nokogiri HTML element back to a mechanize link
     link = Mechanize::Page::Link.new link, @agent, @page
 

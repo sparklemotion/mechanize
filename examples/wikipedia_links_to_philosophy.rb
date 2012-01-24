@@ -120,7 +120,8 @@ class WikipediaLinksToPhilosophy
       puts @title
     end
     puts
-    puts "After #{@agent.history.length} pages"
+    # subtract initial search or Special:Random
+    puts "After #{@agent.history.length - 1} pages"
   end
 
   ##

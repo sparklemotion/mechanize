@@ -729,7 +729,8 @@ class Mechanize::HTTP::Agent
 
     out_io
   ensure
-    body_io.close! if Tempfile === body_io and out_io != body_io
+    body_io.close! if
+      Tempfile === body_io and out_io != body_io and not body_io.closed?
   end
 
   def response_cookies response, uri, page

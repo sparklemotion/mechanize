@@ -108,6 +108,16 @@ UQIBATANBgkqhkiG9w0BAQUFAANBAAAB////////////////////////////////
     CERT
   end
 
+  def tempfile content
+    body_io = Tempfile.new @__name__
+    body_io.unlink
+    body_io.write content
+    body_io.flush
+    body_io.rewind
+
+    body_io
+  end
+
 end
 
 class BasicAuthServlet < WEBrick::HTTPServlet::AbstractServlet

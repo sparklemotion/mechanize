@@ -701,6 +701,7 @@ class Mechanize::HTTP::Agent
       begin
         zio = Zlib::GzipReader.new body_io
         out_io = Tempfile.new 'mechanize-decode'
+        out_io.unlink
         out_io.binmode
 
         until zio.eof? do
@@ -727,6 +728,8 @@ class Mechanize::HTTP::Agent
     out_io.rewind
 
     out_io
+  ensure
+    body_io.close! if Tempfile === body_io and out_io != body_io
   end
 
   def response_cookies response, uri, page
@@ -789,6 +792,7 @@ class Mechanize::HTTP::Agent
 
     if content_length and content_length > @max_file_buffer then
       body_io = Tempfile.new 'mechanize-raw'
+      body_io.unlink
       body_io.binmode if defined? body_io.binmode
     else
       body_io = StringIO.new
@@ -803,6 +807,7 @@ class Mechanize::HTTP::Agent
 
         if StringIO === body_io and total > @max_file_buffer then
           new_io = Tempfile.new 'mechanize-raw'
+          new_io.unlink
           new_io.binmode
 
           new_io.write body_io.string

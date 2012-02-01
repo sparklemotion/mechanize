@@ -659,6 +659,33 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'part', body.read
   end
 
+  def test_response_content_encoding_tempfile_7_bit
+    body_io = tempfile 'part'
+
+    def @res.content_length() 4 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[7bit]
+
+    body = @agent.response_content_encoding @res, body_io
+
+    assert_equal 'part', body.read
+    refute body_io.closed?
+  ensure
+    body_io.close!
+  end
+
+  def test_response_content_encoding_tempfile_gzip
+    body_io = tempfile "x\x9C+H,*\x01\x00\x04?\x01\xB8"
+    def @res.content_length() 12 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
+
+    body = @agent.response_content_encoding @res, body_io
+
+    assert_equal 'part', body.read
+    assert body_io.closed?
+  ensure
+    body_io.close!
+  end
+
   def test_response_content_encoding_x_gzip
     def @res.content_length() 24 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[x-gzip]

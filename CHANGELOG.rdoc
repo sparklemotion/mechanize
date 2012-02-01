@@ -7,6 +7,8 @@
   * Fix charset name extraction.  Issue #180
   * A Referer URI sent on request no longer includes user information
     or fragment part.
+  * Tempfiles for storing response bodies are unlinked upon creation to avoid
+    possible lack of finalization.  Issue #183
 
 === 2.1 / 2011-12-20
 

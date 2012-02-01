@@ -57,5 +57,12 @@ class TestMechanizeFile < Mechanize::TestCase
     end
   end
 
+  def test_filename
+    uri = URI 'http://localhost/test.html'
+    page = Mechanize::File.new uri, nil, ''
+
+    assert_equal "test.html", page.filename
+  end
+
 end
 

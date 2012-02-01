@@ -115,13 +115,17 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_fetch_file_nonexistent
-    uri = URI.parse 'file:///nonexistent'
+    in_tmpdir do
+      nonexistent = File.join Dir.pwd, 'nonexistent'
 
-    e = assert_raises Mechanize::ResponseCodeError do
-      @agent.fetch uri
+      uri = URI.parse "file://#{nonexistent}"
+
+      e = assert_raises Mechanize::ResponseCodeError do
+        @agent.fetch uri
+      end
+
+      assert_equal '404 => Net::HTTPNotFound', e.message
     end
-
-    assert_equal '404 => Net::HTTPNotFound', e.message
   end
 
   def test_fetch_post_connect_hook

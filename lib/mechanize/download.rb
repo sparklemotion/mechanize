@@ -10,6 +10,12 @@ class Mechanize::Download
   include Mechanize::Parser
 
   ##
+  # The filename for this file based on the content-disposition of the
+  # response or the basename of the URL
+
+  attr_accessor :filename
+
+  ##
   # Accessor for the IO-like that contains the body
 
   attr_reader :body_io

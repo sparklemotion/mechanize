@@ -271,11 +271,21 @@ class Mechanize::HTTP::Agent
 
     hook_content_encoding response, uri, response_body_io
 
+    old_body_io = response_body_io
+
     response_body_io = response_content_encoding response, response_body_io
+
+    # explicitly clean up in case GC misses the tempfile
+    if old_body_io != response_body_io && old_body_io.class == Tempfile
+      old_body_io.close!
+    end
 
     post_connect uri, response, response_body_io
 
     page = response_parse response, response_body_io, uri
+
+    # explicitly clean up in case GC misses the tempfile
+    response_body_io.close! if response_body_io.class == Tempfile
 
     response_cookies response, uri, page
 

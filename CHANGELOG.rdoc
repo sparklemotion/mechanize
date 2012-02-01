@@ -9,6 +9,8 @@
     or fragment part.
   * Tempfiles for storing response bodies are unlinked upon creation to avoid
     possible lack of finalization.  Issue #183
+  * The default maximum history size is now 50 pages to avoid filling up a
+    disk with tempfiles accidentally.  Related to Issue #183
 
 === 2.1 / 2011-12-20
 

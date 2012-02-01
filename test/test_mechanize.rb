@@ -728,6 +728,12 @@ but not <a href="/" rel="me nofollow">this</a>!
                  @mech.history[1].uri.to_s)
   end
 
+  def test_initialize
+    mech = Mechanize.new
+
+    assert_equal 50, mech.max_history
+  end
+
   def test_html_parser_equals
     @mech.html_parser = {}
     assert_raises(NoMethodError) {

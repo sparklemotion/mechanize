@@ -137,6 +137,9 @@ class Mechanize
     @default_encoding = nil
     @force_default_encoding = false
 
+    # defaults
+    @agent.max_history = 50
+
     yield self if block_given?
 
     @agent.set_proxy @proxy_addr, @proxy_port, @proxy_user, @proxy_pass

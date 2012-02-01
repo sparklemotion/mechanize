@@ -598,6 +598,19 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'part', body.read
   end
 
+  def test_response_content_encoding_deflate_corrupt
+    def @res.content_length() 11 end # missing one byte
+    @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
+    body_io = StringIO.new "x\x9C+H,*\x01\x00\x04?\x01"
+
+    e = assert_raises Mechanize::Error do
+      @agent.response_content_encoding @res, body_io
+    end
+
+    assert_match %r%error handling content-encoding deflate:%, e.message
+    assert_match %r%Zlib%, e.message
+  end
+
   # IIS/6.0 ASP.NET/2.0.50727 does not wrap deflate with zlib, WTF?
   def test_response_content_encoding_deflate_no_zlib
     def @res.content_length() 6 end
@@ -628,6 +641,20 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     body = @agent.response_content_encoding @res, body_io
 
     assert_equal 'part', body.read
+  end
+
+  def test_response_content_encoding_gzip_corrupt
+    def @res.content_length() 23 end
+    @res.instance_variable_set :@header, 'content-encoding' => %w[gzip]
+    body_io = StringIO.new \
+      "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017I\004\000\000"
+
+    e = assert_raises Mechanize::Error do
+      @agent.response_content_encoding @res, body_io
+    end
+
+    assert_match %r%error handling content-encoding gzip:%, e.message
+    assert_match %r%Zlib%, e.message
   end
 
   def test_response_content_encoding_gzip_encoding_bad

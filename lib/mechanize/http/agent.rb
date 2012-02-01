@@ -683,14 +683,14 @@ class Mechanize::HTTP::Agent
 
       begin
         out_io = inflate body_io
-      rescue Zlib::BufError, Zlib::DataError
+      rescue Zlib::Error
         log.error('Unable to inflate page, retrying with raw deflate') if log
         body_io.rewind
         begin
           out_io = inflate body_io, -Zlib::MAX_WBITS
-        rescue Zlib::BufError, Zlib::DataError
-          log.error("unable to inflate page: #{$!}") if log
-          nil
+        rescue Zlib::Error => e
+          log.error("unable to inflate page: #{e}") if log
+          raise
         end
       end
     when 'gzip', 'x-gzip' then
@@ -707,14 +707,14 @@ class Mechanize::HTTP::Agent
         until zio.eof? do
           out_io.write zio.read 16384
         end
-      rescue Zlib::BufError, Zlib::GzipFile::Error
+      rescue Zlib::Error
         log.error('Unable to gunzip body, trying raw inflate') if log
         body_io.rewind
         body_io.read 10
 
         out_io = inflate body_io, -Zlib::MAX_WBITS
-      rescue Zlib::DataError
-        log.error("unable to gunzip page: #{$!}") if log
+      rescue Zlib::Error => e
+        log.error("unable to gunzip page: #{e}") if log
         ''
       ensure
         zio.close if zio and not zio.closed?
@@ -728,6 +728,10 @@ class Mechanize::HTTP::Agent
     out_io.rewind
 
     out_io
+  rescue Zlib::Error => e
+    message = "error handling content-encoding #{response['Content-Encoding']}:"
+    message << " #{e.message} (#{e.class})"
+    raise Mechanize::Error, message
   ensure
     body_io.close! if
       Tempfile === body_io and out_io != body_io and not body_io.closed?

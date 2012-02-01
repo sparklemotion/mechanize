@@ -11,6 +11,9 @@
     possible lack of finalization.  Issue #183
   * The default maximum history size is now 50 pages to avoid filling up a
     disk with tempfiles accidentally.  Related to Issue #183
+  * Errors in bodies with deflate and gzip responses now result in a
+    Mechanize::Error instead of silently being ignored and causing future
+    errors.  Issue #185
 
 === 2.1 / 2011-12-20
 

@@ -608,7 +608,11 @@ class Mechanize::HTTP::Agent
                             referer)
     raise Mechanize::UnauthorizedError, page unless @user || @password
 
-    challenges = @authenticate_parser.parse response['www-authenticate']
+    www_authenticate = response['www-authenticate']
+
+    raise Mechanize::UnauthorizedError, page unless www_authenticate
+
+    challenges = @authenticate_parser.parse www_authenticate
 
     if challenge = challenges.find { |c| c.scheme =~ /^Digest$/i } then
       realm = challenge.realm uri

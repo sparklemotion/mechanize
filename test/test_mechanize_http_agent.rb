@@ -545,6 +545,18 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_empty @agent.authenticate_methods[base_uri][:basic]
   end
 
+  def test_response_authenticate_no_www_authenticate
+    denied = page URI('http://example/denied'), 'text/html', '', 403
+    @agent.user = 'user'
+    @agent.password = 'password'
+
+    e = assert_raises Mechanize::UnauthorizedError do
+      @agent.response_authenticate @res, denied, @uri, @req, {}, nil, nil
+    end
+
+    assert_equal '403 => Net::HTTPForbidden', e.message
+  end
+
   def test_response_authenticate_ntlm
     @uri += '/ntlm'
     @res.instance_variable_set(:@header,

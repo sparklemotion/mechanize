@@ -709,7 +709,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'part', body.read
     refute body_io.closed?
   ensure
-    body_io.close!
+    body_io.close! unless body_io.closed?
   end
 
   def test_response_content_encoding_tempfile_gzip
@@ -722,7 +722,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'part', body.read
     assert body_io.closed?
   ensure
-    body_io.close!
+    body_io.close! unless body_io.closed?
   end
 
   def test_response_content_encoding_x_gzip

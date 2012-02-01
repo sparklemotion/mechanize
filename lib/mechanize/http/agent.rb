@@ -737,8 +737,11 @@ class Mechanize::HTTP::Agent
     message << " #{e.message} (#{e.class})"
     raise Mechanize::Error, message
   ensure
-    body_io.close! if
-      Tempfile === body_io and out_io != body_io and not body_io.closed?
+    begin
+      body_io.close! if Tempfile === body_io and out_io != body_io
+    rescue IOError
+      # HACK ruby 1.8 raises IOError when closing the stream
+    end
   end
 
   def response_cookies response, uri, page

@@ -738,7 +738,7 @@ class Mechanize::HTTP::Agent
     raise Mechanize::Error, message
   ensure
     begin
-      body_io.close! if Tempfile === body_io and out_io != body_io
+      body_io.close! if Tempfile === body_io and out_io.path != body_io.path
     rescue IOError
       # HACK ruby 1.8 raises IOError when closing the stream
     end

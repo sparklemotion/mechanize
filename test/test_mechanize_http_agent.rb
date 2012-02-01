@@ -709,7 +709,11 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'part', body.read
     refute body_io.closed?
   ensure
-    body_io.close! unless body_io.closed?
+    begin
+      body_io.close! unless body_io.closed?
+    rescue IOError
+      # HACK for ruby 1.8
+    end
   end
 
   def test_response_content_encoding_tempfile_gzip

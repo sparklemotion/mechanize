@@ -582,7 +582,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_content_encoding_7_bit
-    def @res.content_length() 4 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[7bit]
 
     body = @agent.response_content_encoding @res, StringIO.new('part')
@@ -591,7 +590,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_content_encoding_deflate
-    def @res.content_length() 12 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
     body_io = StringIO.new "x\x9C+H,*\x01\x00\x04?\x01\xB8"
 
@@ -601,7 +599,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_content_encoding_deflate_chunked
-    def @res.content_length() nil end
     @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
     body_io = StringIO.new "x\x9C+H,*\x01\x00\x04?\x01\xB8"
 
@@ -611,9 +608,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_content_encoding_deflate_corrupt
-    def @res.content_length() 11 end # missing one byte
     @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
-    body_io = StringIO.new "x\x9C+H,*\x01\x00\x04?\x01"
+    body_io = StringIO.new "x\x9C+H,*\x01\x00\x04?\x01" # missing 1 byte
 
     e = assert_raises Mechanize::Error do
       @agent.response_content_encoding @res, body_io
@@ -623,9 +619,16 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_match %r%Zlib%, e.message
   end
 
+  def test_response_content_encoding_deflate_empty
+    @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
+
+    body = @agent.response_content_encoding @res, StringIO.new
+
+    assert_equal '', body.read
+  end
+
   # IIS/6.0 ASP.NET/2.0.50727 does not wrap deflate with zlib, WTF?
   def test_response_content_encoding_deflate_no_zlib
-    def @res.content_length() 6 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
 
     body = @agent.response_content_encoding @res, StringIO.new("+H,*\001\000")
@@ -634,7 +637,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_content_encoding_gzip
-    def @res.content_length() 24 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[gzip]
     body_io = StringIO.new \
       "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017I\004\000\000\000"
@@ -656,7 +658,30 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_content_encoding_gzip_corrupt
-    def @res.content_length() 23 end
+    log = StringIO.new
+    logger = Logger.new log
+    @agent.context.log = logger
+
+    @res.instance_variable_set :@header, 'content-encoding' => %w[gzip]
+    body_io = StringIO.new \
+      "\037\213\b\0002\002\225M\000\003+H,*\001"
+
+    e = assert_raises Mechanize::Error do
+      @agent.response_content_encoding @res, body_io
+    end
+
+    assert_match %r%error handling content-encoding gzip:%, e.message
+    assert_match %r%Zlib%, e.message
+
+    assert_match %r%unable to gunzip response, trying raw inflate%, log.string
+    assert_match %r%unable to gunzip response:%, log.string
+  end
+
+  def test_response_content_encoding_gzip_corrupt_checksum
+    log = StringIO.new
+    logger = Logger.new log
+    @agent.context.log = logger
+
     @res.instance_variable_set :@header, 'content-encoding' => %w[gzip]
     body_io = StringIO.new \
       "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017I\004\000\000"
@@ -667,10 +692,19 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     assert_match %r%error handling content-encoding gzip:%, e.message
     assert_match %r%Zlib%, e.message
+
+    assert_match %r%unable to gunzip response, trying raw inflate%, log.string
+  end
+
+  def test_response_content_encoding_gzip_empty
+    @res.instance_variable_set :@header, 'content-encoding' => %w[gzip]
+
+    body = @agent.response_content_encoding @res, StringIO.new
+
+    assert_equal '', body.read
   end
 
   def test_response_content_encoding_gzip_encoding_bad
-    def @res.content_length() 24 end
     @res.instance_variable_set(:@header,
                                'content-encoding' => %w[gzip],
                                'content-type' => 'text/html; charset=UTF-8')
@@ -690,7 +724,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_content_encoding_none
-    def @res.content_length() 4 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[none]
 
     body = @agent.response_content_encoding @res, StringIO.new('part')
@@ -701,7 +734,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   def test_response_content_encoding_tempfile_7_bit
     body_io = tempfile 'part'
 
-    def @res.content_length() 4 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[7bit]
 
     body = @agent.response_content_encoding @res, body_io
@@ -718,7 +750,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
   def test_response_content_encoding_tempfile_gzip
     body_io = tempfile "x\x9C+H,*\x01\x00\x04?\x01\xB8"
-    def @res.content_length() 12 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[deflate]
 
     body = @agent.response_content_encoding @res, body_io
@@ -730,7 +761,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_content_encoding_x_gzip
-    def @res.content_length() 24 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[x-gzip]
     body_io = StringIO.new \
       "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017I\004\000\000\000"
@@ -741,7 +771,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_content_encoding_unknown
-    def @res.content_length() 4 end
     @res.instance_variable_set :@header, 'content-encoding' => %w[unknown]
     body = StringIO.new 'part'
 
@@ -749,7 +778,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
       @agent.response_content_encoding @res, body
     end
 
-    assert_equal 'Unsupported Content-Encoding: unknown', e.message
+    assert_equal 'unsupported content-encoding: unknown', e.message
   end
 
   def test_get_meta_refresh_header_follow_self

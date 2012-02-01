@@ -392,6 +392,62 @@ class Mechanize::HTTP::Agent
     end
   end
 
+  ##
+  # Decodes a gzip-encoded +body_io+.  If it cannot be decoded, inflate is
+  # tried followed by raising an error.
+
+  def content_encoding_gunzip body_io
+    log.debug('gzip response') if log
+
+    zio = Zlib::GzipReader.new body_io
+    out_io = Tempfile.new 'mechanize-decode'
+    out_io.unlink
+    out_io.binmode
+
+    until zio.eof? do
+      out_io.write zio.read 16384
+    end
+
+    zio.finish
+
+    return out_io
+  rescue Zlib::Error
+    log.error('unable to gunzip response, trying raw inflate') if log
+
+    body_io.rewind
+    body_io.read 10
+
+    begin
+      return inflate body_io, -Zlib::MAX_WBITS
+    rescue Zlib::Error => e
+      log.error("unable to gunzip response: #{e}") if log
+      raise
+    end
+  ensure
+    zio.close if zio and not zio.closed?
+  end
+
+  ##
+  # Decodes a deflate-encoded +body_io+.  If it cannot be decoded, raw inflate
+  # is tried followed by raising an error.
+
+  def content_encoding_inflate body_io
+    log.debug('deflate body') if log
+
+    return inflate body_io
+  rescue Zlib::Error
+    log.error('unable to inflate response, trying raw deflate') if log
+
+    body_io.rewind
+
+    begin
+      return inflate body_io, -Zlib::MAX_WBITS
+    rescue Zlib::Error => e
+      log.error("unable to inflate response: #{e}") if log
+      raise
+    end
+  end
+
   def disable_keep_alive request
     request['connection'] = 'close' unless @keep_alive
   end
@@ -669,64 +725,25 @@ class Mechanize::HTTP::Agent
     length = response.content_length
 
     length = case body_io
-             when IO, Tempfile then
+             when Tempfile, IO then
                body_io.stat.size
              else
                body_io.length
              end unless length
 
-    out_io = nil
+    return body_io if length.zero?
 
-    case response['Content-Encoding']
-    when nil, 'none', '7bit' then
-      out_io = body_io
-    when 'deflate' then
-      log.debug('deflate body') if log
-
-      return if length.zero?
-
-      begin
-        out_io = inflate body_io
-      rescue Zlib::Error
-        log.error('Unable to inflate page, retrying with raw deflate') if log
-        body_io.rewind
-        begin
-          out_io = inflate body_io, -Zlib::MAX_WBITS
-        rescue Zlib::Error => e
-          log.error("unable to inflate page: #{e}") if log
-          raise
-        end
-      end
-    when 'gzip', 'x-gzip' then
-      log.debug('gzip body') if log
-
-      return if length.zero?
-
-      begin
-        zio = Zlib::GzipReader.new body_io
-        out_io = Tempfile.new 'mechanize-decode'
-        out_io.unlink
-        out_io.binmode
-
-        until zio.eof? do
-          out_io.write zio.read 16384
-        end
-      rescue Zlib::Error
-        log.error('Unable to gunzip body, trying raw inflate') if log
-        body_io.rewind
-        body_io.read 10
-
-        out_io = inflate body_io, -Zlib::MAX_WBITS
-      rescue Zlib::Error => e
-        log.error("unable to gunzip page: #{e}") if log
-        ''
-      ensure
-        zio.close if zio and not zio.closed?
-      end
-    else
-      raise Mechanize::Error,
-            "Unsupported Content-Encoding: #{response['Content-Encoding']}"
-    end
+    out_io = case response['Content-Encoding']
+             when nil, 'none', '7bit' then
+               body_io
+             when 'deflate' then
+               content_encoding_inflate body_io
+             when 'gzip', 'x-gzip' then
+               content_encoding_gunzip body_io
+             else
+               raise Mechanize::Error,
+                 "unsupported content-encoding: #{response['Content-Encoding']}"
+             end
 
     out_io.flush
     out_io.rewind

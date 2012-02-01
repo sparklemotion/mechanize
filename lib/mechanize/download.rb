@@ -49,15 +49,10 @@ class Mechanize::Download
     dirname = File.dirname filename
     FileUtils.mkdir_p dirname
 
-    # Ruby 1.8.7 implements StringIO#path, can't use respond_to? :path
-    if StringIO === @body_io then
-      open filename, 'wb' do |io|
-        until @body_io.eof? do
-          io.write @body_io.read 16384
-        end
+    open filename, 'wb' do |io|
+      until @body_io.eof? do
+        io.write @body_io.read 16384
       end
-    else
-      FileUtils.mv @body_io.path, filename
     end
   end
 

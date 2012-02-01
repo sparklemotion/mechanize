@@ -182,6 +182,11 @@ class Mechanize
 
   ##
   # Sets the maximum number of items allowed in the history to +length+.
+  #
+  # Setting the maximum history length to nil will make the history size
+  # unlimited.  Take care when doing this, mechanize stores page bodies in the
+  # temporary files directory for pages in the history.  For a long-running
+  # mechanize program this can be quite large.
 
   def max_history= length
     @agent.history.max_size = length

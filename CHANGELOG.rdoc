@@ -20,6 +20,7 @@
     pages.  Issue #186
   * Added note to Mechanize#cert_store describing how to add certificates in
     case your system does not come with a default set.  Issue #179
+  * Invalid content-disposition headers are now ignored.  Issue #191
 
 === 2.1 / 2011-12-20
 

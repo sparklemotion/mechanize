@@ -44,7 +44,7 @@ class TestMechanizeParser < Mechanize::TestCase
       'content-disposition' => "inline; filename*=UTF-8''X%20Y.jpg"
     }
 
-    assert_equal 'genome.jpeg', @parser.extract_filename
+    assert_equal 'foo.html', @parser.extract_filename
   end
 
   def test_extract_filename_content_disposition_path

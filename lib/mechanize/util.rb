@@ -1,11 +1,15 @@
 require 'cgi'
+require 'nkf'
 
 class Mechanize::Util
   CODE_DIC = {
-    :JIS => "ISO-2022-JP",
-    :EUC => "EUC-JP",
-    :SJIS => "SHIFT_JIS",
-    :UTF8 => "UTF-8", :UTF16 => "UTF-16", :UTF32 => "UTF-32"}
+    NKF::JIS => "ISO-2022-JP",
+    NKF::EUC => "EUC-JP",
+    NKF::SJIS => "SHIFT_JIS",
+    NKF::UTF8 => "UTF-8",
+    NKF::UTF16 => "UTF-16",
+    NKF::UTF32 => "UTF-32",
+  }
 
   # true if RUBY_VERSION is 1.9.0 or later
   NEW_RUBY_ENCODING = RUBY_VERSION >= '1.9.0'
@@ -66,16 +70,14 @@ class Mechanize::Util
   end
 
   def self.detect_charset(src)
-    tmp = NKF.guess(src || "<html></html>")
-    if RUBY_VERSION >= "1.9.0"
-      enc = tmp.to_s.upcase
+    case enc = src && NKF.guess(src)
+    when Integer
+      # Ruby <= 1.8
+      CODE_DIC[enc]
     else
-      enc = NKF.constants.find{|c|
-        NKF.const_get(c) == tmp
-      }
-      enc = CODE_DIC[enc.intern]
-    end
-    enc || "ISO-8859-1"
+      # Ruby >= 1.9
+      enc && enc.to_s.upcase
+    end || "ISO-8859-1"
   end
 
   def self.uri_escape str, unsafe = nil

@@ -722,14 +722,13 @@ class Mechanize::HTTP::Agent
   end
 
   def response_content_encoding response, body_io
-    length = response.content_length
-
-    length = case body_io
-             when Tempfile, IO then
-               body_io.stat.size
-             else
-               body_io.length
-             end unless length
+    length = response.content_length ||
+      case body_io
+      when Tempfile, IO then
+        body_io.stat.size
+      else
+        body_io.length
+      end
 
     return body_io if length.zero?
 

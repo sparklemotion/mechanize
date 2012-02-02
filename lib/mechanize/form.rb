@@ -255,6 +255,14 @@ class Mechanize::Form
   # This method adds a button to the query.  If the form needs to be
   # submitted with multiple buttons, pass each button to this method.
   def add_button_to_query(button)
+    unless button.node.document == @form_node.document then
+      message =
+        "#{button.inspect} does not belong to the same page as " \
+        "the form #{@name.inspect} in #{@page.uri}"
+
+      raise ArgumentError, message
+    end
+
     @clicked_buttons << button
   end
 

@@ -5,13 +5,28 @@ class TestMechanizeForm < Mechanize::TestCase
   def setup
     super
 
-    @form = Mechanize::Form.new node 'form'
+    @uri = URI 'http://example'
+    @page = page @uri
+
+    @form = Mechanize::Form.new node('form', 'name' => __name__), @mech, @page
   end
 
   def test_action
     form = Mechanize::Form.new node('form', 'action' => '?a=b&amp;b=c')
 
     assert_equal '?a=b&b=c', form.action
+  end
+
+  def test_add_button_to_query
+    button = Mechanize::Form::Button.new node('input', 'type' => 'submit')
+
+    e = assert_raises ArgumentError do
+      @form.add_button_to_query button
+    end
+
+    assert_equal "#{button.inspect} does not belong to the same page " \
+                 "as the form \"#{@__name__}\" in #{@uri}",
+                 e.message
   end
 
   def test_aset

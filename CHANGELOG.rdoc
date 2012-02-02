@@ -16,6 +16,8 @@
     errors.  Issue #185
   * Mechanize now raises an UnathorizedError instead of crashing when a 403
     response does not contain a www-authenticate header.  Issue #181
+  * Mechanize gives a useful exception when attempting to click buttons across
+    pages.  Issue #186
 
 === 2.1 / 2011-12-20
 

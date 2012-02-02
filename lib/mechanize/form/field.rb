@@ -50,5 +50,13 @@ class Mechanize::Form::Field
   def dom_class
     node['class']
   end
+
+  def inspect # :nodoc:
+    "[%s:0x%x type: %s name: %s value: %s]" % [
+      self.class.name.sub(/Mechanize::Form::/, '').downcase,
+      object_id, @type, @name, @value
+    ]
+  end
+
 end
 

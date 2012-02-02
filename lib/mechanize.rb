@@ -877,7 +877,25 @@ class Mechanize
 
   ##
   # An OpenSSL certificate store for verifying server certificates.  This
-  # defaults to the default certificate store.
+  # defaults to the default certificate store for your system.
+  #
+  # If your system does not ship with a default set of certificates you can
+  # retrieve a copy of the set from Mozilla here:
+  # http://curl.haxx.se/docs/caextract.html
+  #
+  # (Note that this set does not have an HTTPS download option so you may
+  # wish to use the firefox-db2pem.sh script to extract the certificates
+  # from a local install to avoid man-in-the-middle attacks.)
+  #
+  # After downloading or generating a cacert.pem from the above link you
+  # can create a certificate store from the pem file like this:
+  #
+  #   cert_store = OpenSSL::X509::Store.new
+  #   cert_store.add_file 'cacert.pem'
+  #
+  # And have mechanize use it with:
+  #
+  #   agent.cert_store = cert_store
 
   def cert_store
     @agent.cert_store
@@ -885,6 +903,8 @@ class Mechanize
 
   ##
   # Sets the OpenSSL certificate store to +store+.
+  #
+  # See also #cert_store
 
   def cert_store= cert_store
     @agent.cert_store = cert_store

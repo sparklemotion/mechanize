@@ -18,6 +18,8 @@
     response does not contain a www-authenticate header.  Issue #181
   * Mechanize gives a useful exception when attempting to click buttons across
     pages.  Issue #186
+  * Added note to Mechanize#cert_store describing how to add certificates in
+    case your system does not come with a default set.  Issue #179
 
 === 2.1 / 2011-12-20
 

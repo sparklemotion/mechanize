@@ -113,7 +113,7 @@ module Mechanize::Parser
       content_disposition =
         Mechanize::HTTP::ContentDispositionParser.parse disposition
 
-      if content_disposition then
+      if content_disposition && content_disposition.filename then
         filename = content_disposition.filename
         filename = filename.split(/[\\\/]/).last
         handled = true

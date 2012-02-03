@@ -1,7 +1,6 @@
 .autotest
 CHANGELOG.rdoc
 EXAMPLES.rdoc
-FAQ.rdoc
 GUIDE.rdoc
 LICENSE.rdoc
 Manifest.txt
@@ -12,6 +11,7 @@ examples/mech-dump.rb
 examples/proxy_req.rb
 examples/rubyforge.rb
 examples/spider.rb
+examples/wikipedia_links_to_philosophy.rb
 lib/mechanize.rb
 lib/mechanize/content_type_error.rb
 lib/mechanize/cookie.rb

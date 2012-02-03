@@ -47,6 +47,7 @@ class Mechanize::HTTP::Agent
   attr_reader :digest_challenges # :nodoc:
   attr_accessor :user
   attr_accessor :password
+  attr_accessor :domain
 
   # :section: Redirection
 
@@ -184,6 +185,7 @@ class Mechanize::HTTP::Agent
     @digest_challenges    = {}
     @password             = nil # HTTP auth password
     @user                 = nil # HTTP auth user
+    @domain               = nil # NTLM HTTP domain
 
     # SSL
     @ca_file         = nil
@@ -697,7 +699,7 @@ class Mechanize::HTTP::Agent
       if challenge.params then
         type_2 = Net::NTLM::Message.decode64 challenge.params
 
-        type_3 = type_2.response({ :user => @user, :password => @password, },
+        type_3 = type_2.response({ :user => @user, :password => @password, :domain => @domain },
                                  { :ntlmv2 => true }).encode64
 
         headers['Authorization'] = "NTLM #{type_3}"

@@ -557,16 +557,19 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal '403 => Net::HTTPForbidden', e.message
   end
 
-  def test_response_authenticate_ntlm
+  def test_response_authenticate_ntlm_
     @uri += '/ntlm'
     @res.instance_variable_set(:@header,
                                'www-authenticate' => ['Negotiate, NTLM'])
     @agent.user = 'user'
     @agent.password = 'password'
+    @agent.domain = 'domain'
 
     page = @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
+    
 
     assert_equal 'ok', page.body # lame test
+    
   end
 
   def test_response_authenticate_unknown

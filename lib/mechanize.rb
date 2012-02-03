@@ -525,10 +525,12 @@ class Mechanize
 
   ##
   # Sets the user and password to be used for HTTP authentication.
+  # sets the optional domain for NTLM authentication
 
-  def auth(user, password)
+  def auth(user, password, domain = nil)
     @agent.user     = user
     @agent.password = password
+    @agent.domain = domain
   end
 
   alias basic_auth auth

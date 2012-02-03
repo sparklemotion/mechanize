@@ -560,7 +560,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   def test_response_authenticate_ntlm
     @uri += '/ntlm'
     @res.instance_variable_set(:@header,
-                               'www-authenticate' => ['NTLM'])
+                               'www-authenticate' => ['Negotiate, NTLM'])
     @agent.user = 'user'
     @agent.password = 'password'
 

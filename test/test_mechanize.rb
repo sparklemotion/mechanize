@@ -947,6 +947,7 @@ but not <a href="/" rel="me nofollow">this</a>!
     http = @mech.agent.http
 
     @mech.set_proxy 'localhost', 8080, 'user', 'pass'
+    @mech.get 'http://www.example.com'  # trigger the fetch
 
     assert_equal 'localhost', @mech.proxy_addr
     assert_equal 8080,        @mech.proxy_port
@@ -954,6 +955,27 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert_equal 'pass',      @mech.proxy_pass
 
     refute_same http, @mech.agent.http
+  end
+
+  def test_set_http_ssl
+    in_tmpdir do
+      http = @mech.agent.http
+      store = OpenSSL::X509::Store.new
+      @mech.cert = ssl_certificate
+      @mech.key  = ssl_private_key
+      @mech.cert_store = store
+      @mech.ca_file = '.'
+      @mech.verify_callback = proc { |ok, context| }
+
+      @mech.get('http://www.example.com')    
+
+      assert_equal ssl_certificate,           @mech.agent.http.certificate
+      assert_equal ssl_private_key,           @mech.agent.http.private_key
+      assert_equal store,                     @mech.agent.http.cert_store
+      assert_equal '.',                       @mech.agent.http.ca_file
+      assert_equal OpenSSL::SSL::VERIFY_PEER, @mech.agent.http.verify_mode
+      refute_same http, @mech.agent.http
+    end
   end
 
   def test_submit_bad_form_method

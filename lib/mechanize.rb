@@ -140,6 +140,7 @@ class Mechanize
     @agent.max_history = 50
 
     yield self if block_given?
+    @set_http_needed = false
 
     @agent.set_proxy @proxy_addr, @proxy_port, @proxy_user, @proxy_pass
     @agent.set_http
@@ -859,7 +860,10 @@ class Mechanize
 
   def ca_file= ca_file
     @agent.ca_file = ca_file
+    reset_http
   end
+
+  
 
   ##
   # An OpenSSL client certificate or the path to a certificate file.
@@ -874,6 +878,7 @@ class Mechanize
 
   def cert= cert
     @agent.cert = cert
+    reset_http
   end
 
   ##
@@ -909,6 +914,7 @@ class Mechanize
 
   def cert_store= cert_store
     @agent.cert_store = cert_store
+    reset_http
   end
 
   ##
@@ -932,6 +938,7 @@ class Mechanize
 
   def key= key
     @agent.key = key
+    reset_http
   end
 
   ##
@@ -946,6 +953,7 @@ class Mechanize
 
   def pass= pass
     @agent.pass = pass
+    reset_http
   end
 
   ##
@@ -965,6 +973,7 @@ class Mechanize
 
   def verify_callback= verify_callback
     @agent.verify_callback = verify_callback
+    reset_http
   end
 
   ##
@@ -981,6 +990,7 @@ class Mechanize
 
   def verify_mode= verify_mode
     @agent.verify_mode = verify_mode
+    reset_http
   end
 
   # :section: Utilities
@@ -1031,6 +1041,13 @@ class Mechanize
   end
 
   ##
+  # tells the agent that a reset of http is needed
+
+  def reset_http
+    @agent.reset_http
+  end  
+
+  ##
   # Sets the proxy +address+ at +port+ with an optional +user+ and +password+
 
   def set_proxy address, port, user = nil, password = nil
@@ -1040,7 +1057,7 @@ class Mechanize
     @proxy_pass = password
 
     @agent.set_proxy address, port, user, password
-    @agent.set_http
+    reset_http
   end
 
   private

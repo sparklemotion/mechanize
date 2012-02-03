@@ -266,7 +266,7 @@ class Mechanize::HTTP::Agent
     response = connection.request(uri, request) { |res|
       response_log res
 
-      response_body_io = response_read res, request
+      response_body_io = response_read res, request, uri
 
       res
     }
@@ -817,7 +817,7 @@ class Mechanize::HTTP::Agent
     @context.parse uri, response, body_io
   end
 
-  def response_read response, request
+  def response_read response, request, uri
     content_length = response.content_length
 
     if content_length and content_length > @max_file_buffer then
@@ -850,7 +850,8 @@ class Mechanize::HTTP::Agent
       }
     rescue Net::HTTP::Persistent::Error => e
       body_io.rewind
-      raise Mechanize::ResponseReadError.new(e, response, body_io)
+      raise Mechanize::ResponseReadError.new(e, response, body_io, uri,
+                                             @context)
     end
 
     body_io.flush

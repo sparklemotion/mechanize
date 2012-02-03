@@ -7,16 +7,27 @@ class Mechanize::ResponseReadError < Mechanize::Error
 
   attr_reader :body_io
   attr_reader :error
+  attr_reader :mechanize
   attr_reader :response
+  attr_reader :uri
 
   ##
   # Creates a new ResponseReadError with the +error+ raised, the +response+
   # and the +body_io+ for content read so far.
 
-  def initialize error, response, body_io
-    @error = error
-    @response = response
-    @body_io = body_io
+  def initialize error, response, body_io, uri, mechanize
+    @body_io   = body_io
+    @error     = error
+    @mechanize = mechanize
+    @response  = response
+    @uri       = uri
+  end
+
+  ##
+  # Converts this error into a Page, File, etc. based on the content-type
+
+  def force_parse
+    @mechanize.parse @uri, @response, @body_io
   end
 
   def message # :nodoc:

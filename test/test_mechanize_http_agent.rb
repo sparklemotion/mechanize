@@ -967,7 +967,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     def @res.read_body() yield 'part' end
     def @res.content_length() 4 end
 
-    io = @agent.response_read @res, @req
+    io = @agent.response_read @res, @req, @uri
 
     body = io.read
 
@@ -979,7 +979,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     def @res.read_body() yield 'a' * 10241 end
     def @res.content_length() 10241 end
 
-    io = @agent.response_read @res, @req
+    io = @agent.response_read @res, @req, @uri
 
     assert_kind_of Tempfile, io
     assert_equal 10241, io.stat.size
@@ -991,7 +991,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     end
     def @res.content_length() end
 
-    io = @agent.response_read @res, @req
+    io = @agent.response_read @res, @req, @uri
 
     assert_kind_of Tempfile, io
     assert_equal 11264, io.stat.size
@@ -1003,7 +1003,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     def @res.content_length() end
     def @res.read_body() end
 
-    io = @agent.response_read @res, req
+    io = @agent.response_read @res, req, @uri
 
     assert_equal '', io.read
   end
@@ -1013,7 +1013,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     def @res.read_body() yield 'part' end
 
     e = assert_raises EOFError do
-      @agent.response_read @res, @req
+      @agent.response_read @res, @req, @uri
     end
 
     assert_equal 'Content-Length (5) does not match response body length (4)',
@@ -1027,7 +1027,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     def res.read_body() yield 'part' end
     res.instance_variable_set :@header, {}
 
-    io = @agent.response_read res, @req
+    io = @agent.response_read res, @req, @uri
 
     assert_equal 'part', io.read
   end
@@ -1039,7 +1039,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     end
 
     e = assert_raises Mechanize::ResponseReadError do
-      @agent.response_read @res, @req
+      @agent.response_read @res, @req, @uri
     end
 
     assert_equal @res, e.response
@@ -1057,7 +1057,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
       req = Mechanize::FileRequest.new uri
       res = Mechanize::FileResponse.new tempfile.path
 
-      io = @agent.response_read res, req
+      io = @agent.response_read res, req, uri
 
       expected = "π\n"
       expected.force_encoding Encoding::BINARY if expected.respond_to? :encoding
@@ -1074,7 +1074,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     def @res.content_length() end
     def @res.read_body() end
 
-    io = @agent.response_read @res, req
+    io = @agent.response_read @res, req, @uri
 
     assert_equal '', io.read
   end
@@ -1086,7 +1086,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     def res.read_body() yield 'part' end
 
     e = assert_raises Mechanize::ResponseCodeError do
-      @agent.response_read res, @req
+      @agent.response_read res, @req, @uri
     end
 
     assert_equal res, e.page

@@ -14,7 +14,7 @@
   * Errors in bodies with deflate and gzip responses now result in a
     Mechanize::Error instead of silently being ignored and causing future
     errors.  Issue #185
-  * Mechanize now raises an UnathorizedError instead of crashing when a 403
+  * Mechanize now raises an UnauthorizedError instead of crashing when a 403
     response does not contain a www-authenticate header.  Issue #181
   * Mechanize gives a useful exception when attempting to click buttons across
     pages.  Issue #186
@@ -24,6 +24,8 @@
   * Fix NTLM by recognizing the "Negotiation" challenge instead of endlessly
     looping.  Issue #192
   * Allow specification of the NTLM domain through Mechanize#auth.  Issue #193
+  * Documented how to convert a Mechanize::ResponseReadError into a File or
+    Page, along with a new method #force_parse.  Issue #176
 
 === 2.1 / 2011-12-20
 

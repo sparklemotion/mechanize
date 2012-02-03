@@ -15,7 +15,7 @@ require 'zlib'
 ##
 # The Mechanize library is used for automating interactions with a website.  It
 # can follow links and submit forms.  Form fields can be populated and
-# submitted.  A history of URL's is maintained and can be queried.
+# submitted.  A history of URLs is maintained and can be queried.
 #
 # == Example
 #
@@ -32,6 +32,40 @@ require 'zlib'
 #
 #   search_results = agent.submit search_form
 #   puts search_results.body
+#
+# == Issues with mechanize
+#
+# If you think you have a bug with mechanize, but aren't sure, please file a
+# ticket at https://github.com/tenderlove/mechanize/issues
+#
+# Here are some common problems you may experience with mechanize
+#
+# === Problems connecting to SSL sites
+#
+# Mechanize defaults to validating SSL certificates using the default CA
+# certificates for your platform.  At this time, Windows users do not have
+# integration between the OS default CA certificates and OpenSSL.  #cert_store
+# explains how to download and use Mozilla's CA certificates to allow SSL
+# sites to work.
+#
+# === Problems with content-length
+#
+# Some sites return an incorrect content-length value.  Unlike a browser,
+# mechanize raises an error when the content-length header does not match the
+# response length since it does not know if there was a connection problem or
+# if the mismatch is a server bug.
+#
+# The error raised, Mechanize::ResponseReadError, can be converted to a parsed
+# Page, File, etc. depending upon the content-type:
+#
+#   agent = Mechanize.new
+#   uri = URI 'http://example/invalid_content_length'
+#
+#   begin
+#     page = agent.get uri
+#   rescue Mechanize::ResponseReadError => e
+#     page = e.force_parse
+#   end
 
 class Mechanize
 

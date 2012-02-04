@@ -3,6 +3,7 @@
 === 2.1.1 / 2010-02-03
 
 * Bug fixes
+  * Set missing idle_timeout default.  Issue #196
   * Meta refresh URIs are now escaped (excluding %).  Issue #177
   * Fix charset name extraction.  Issue #180
   * A Referer URI sent on request no longer includes user information

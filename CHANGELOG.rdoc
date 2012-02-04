@@ -1,6 +1,6 @@
 = Mechanize CHANGELOG
 
-=== 2.1.1 / ??
+=== 2.1.1 / 2010-02-03
 
 * Bug fixes
   * Meta refresh URIs are now escaped (excluding %).  Issue #177

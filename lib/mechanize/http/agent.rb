@@ -157,7 +157,7 @@ class Mechanize::HTTP::Agent
     @follow_meta_refresh_self = false
     @gzip_enabled             = true
     @history                  = Mechanize::History.new
-    @idle_timeout             = nil
+    @idle_timeout             = 5
     @keep_alive               = true
     @keep_alive_time          = 300
     @max_file_buffer          = 10240

@@ -741,10 +741,14 @@ but not <a href="/" rel="me nofollow">this</a>!
     }
   end
 
-  def test_idle_timeout_equals
-    @mech.idle_timeout = 5
+  def test_idle_timeout_default
+    assert_equal 5, Mechanize.new.idle_timeout
+  end
 
-    assert_equal 5, @mech.idle_timeout
+  def test_idle_timeout_equals
+    @mech.idle_timeout = 15
+
+    assert_equal 15, @mech.idle_timeout
   end
 
   def test_keep_alive_equals

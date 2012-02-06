@@ -983,6 +983,20 @@ class Mechanize
   end
 
   ##
+  # SSL version to use
+
+  def ssl_version
+    @agent.ssl_version
+  end
+
+  ##
+  # Sets the SSL version to use to +version+ without client/server negotiation
+
+  def ssl_version= ssl_version
+    @agent.ssl_version = ssl_version
+  end
+
+  ##
   # A callback for additional certificate verification.  See
   # OpenSSL::SSL::SSLContext#verify_callback
   #

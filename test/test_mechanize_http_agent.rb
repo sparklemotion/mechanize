@@ -1276,21 +1276,23 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   def test_set_http_ssl
     in_tmpdir do
       store = OpenSSL::X509::Store.new
-      @agent.cert = ssl_certificate
-      @agent.key  = ssl_private_key
-      @agent.cert_store = store
       @agent.ca_file = '.'
+      @agent.cert = ssl_certificate
+      @agent.cert_store = store
+      @agent.key  = ssl_private_key
+      @agent.ssl_version = 'SSLv3'
       @agent.verify_callback = proc { |ok, context| }
 
       @agent.set_http
 
       http = @agent.http
 
+      assert_equal '.',                       http.ca_file
+      assert_equal 'SSLv3',                   http.ssl_version
+      assert_equal OpenSSL::SSL::VERIFY_PEER, http.verify_mode
       assert_equal ssl_certificate,           http.certificate
       assert_equal ssl_private_key,           http.private_key
       assert_equal store,                     http.cert_store
-      assert_equal '.',                       http.ca_file
-      assert_equal OpenSSL::SSL::VERIFY_PEER, http.verify_mode
       assert http.verify_callback
     end
   end

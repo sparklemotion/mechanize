@@ -1,6 +1,11 @@
 = Mechanize CHANGELOG
 
-=== 2.1.1 / 2010-02-03
+=== 2.1.2
+
+* Bug fixes
+  * Expose ssl_version from net-http-persistent.  Patch by astera.
+
+=== 2.1.1 / 2012-02-03
 
 * Bug fixes
   * Set missing idle_timeout default.  Issue #196

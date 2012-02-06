@@ -93,6 +93,9 @@ class Mechanize::HTTP::Agent
   # OpenSSL key password
   attr_accessor :pass
 
+  # SSL version to use
+  attr_accessor :ssl_version
+
   # A callback for additional certificate verification.  See
   # OpenSSL::SSL::SSLContext#verify_callback
   #
@@ -193,6 +196,7 @@ class Mechanize::HTTP::Agent
     @cert_store      = nil
     @key             = nil
     @pass            = nil
+    @ssl_version     = nil
     @verify_callback = nil
     @verify_mode     = nil
 
@@ -989,6 +993,7 @@ class Mechanize::HTTP::Agent
 
     @http.ca_file         = @ca_file
     @http.cert_store      = @cert_store if @cert_store
+    @http.ssl_version     = @ssl_version
     @http.verify_callback = @verify_callback
     @http.verify_mode     = @verify_mode if @verify_mode
 

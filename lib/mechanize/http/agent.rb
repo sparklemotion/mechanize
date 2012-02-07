@@ -176,6 +176,7 @@ class Mechanize::HTTP::Agent
     @robots                   = false
     @user_agent               = nil
     @webrobots                = nil
+    @http_reset_needed        = false
 
     # HTTP Authentication
     @authenticate_parser  = Mechanize::HTTP::WWWAuthenticateParser.new
@@ -220,6 +221,14 @@ class Mechanize::HTTP::Agent
   # +redirects+ tracks the number of redirects experienced when retrieving the
   # page.  If it is over the redirection_limit an error will be raised.
 
+  def reset_http
+    @http_reset_needed = true
+  end
+  
+  def http_reset_needed?
+    @http_reset_needed
+  end
+
   def fetch uri, method = :get, headers = {}, params = [],
             referer = current_page, redirects = 0
     referer_uri = referer ? referer.uri : nil
@@ -228,7 +237,9 @@ class Mechanize::HTTP::Agent
 
     uri, params = resolve_parameters uri, method, params
 
-    request = http_request uri, method, params
+    request = http_request uri, method, params   
+   
+    set_http if http_reset_needed?    
 
     connection = connection_for uri
 
@@ -1016,7 +1027,9 @@ class Mechanize::HTTP::Agent
 
       @http.certificate = cert
       @http.private_key = key
+      
     end
+    @http_reset_needed = false
   end
 
   ##

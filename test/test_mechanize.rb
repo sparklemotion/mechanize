@@ -957,7 +957,7 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert_equal 'user',      @mech.proxy_user
     assert_equal 'pass',      @mech.proxy_pass
 
-    refute_same http, @mech.agent.http
+    assert_equal URI('http://user:pass@localhost:8080'), http.proxy_uri
   end
 
   def test_submit_bad_form_method

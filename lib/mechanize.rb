@@ -176,7 +176,6 @@ class Mechanize
     yield self if block_given?
 
     @agent.set_proxy @proxy_addr, @proxy_port, @proxy_user, @proxy_pass
-    @agent.set_http
   end
 
   # :section: History
@@ -907,7 +906,7 @@ class Mechanize
   # certificate instance
 
   def cert= cert
-    @agent.cert = cert
+    @agent.certificate = cert
   end
 
   ##
@@ -962,10 +961,11 @@ class Mechanize
   end
 
   ##
-  # Sets the OpenSSL client +key+ to the given path or key instance
+  # Sets the OpenSSL client +key+ to the given path or key instance.  If a
+  # path is given, the path must contain an RSA key file.
 
   def key= key
-    @agent.key = key
+    @agent.private_key = key
   end
 
   ##
@@ -983,18 +983,19 @@ class Mechanize
   end
 
   ##
-  # SSL version to use
+  # SSL version to use.  Ruby 1.9 and newer only.
 
   def ssl_version
     @agent.ssl_version
-  end
+  end if RUBY_VERSION > '1.9'
 
   ##
-  # Sets the SSL version to use to +version+ without client/server negotiation
+  # Sets the SSL version to use to +version+ without client/server
+  # negotiation.  Ruby 1.9 and newer only.
 
   def ssl_version= ssl_version
     @agent.ssl_version = ssl_version
-  end
+  end if RUBY_VERSION > '1.9'
 
   ##
   # A callback for additional certificate verification.  See
@@ -1088,7 +1089,6 @@ class Mechanize
     @proxy_pass = password
 
     @agent.set_proxy address, port, user, password
-    @agent.set_http
   end
 
   private

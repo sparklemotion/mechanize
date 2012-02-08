@@ -31,6 +31,25 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     realm
   end
 
+  def test_certificate_equals
+    cert_path = File.expand_path '../data/server.crt', __FILE__
+    cert = OpenSSL::X509::Certificate.new File.read cert_path
+
+    @agent.certificate = cert
+
+    assert_equal cert.to_pem, @agent.certificate.to_pem
+  end
+
+  def test_certificate_equals_file
+    cert_path = File.expand_path '../data/server.crt', __FILE__
+
+    cert = OpenSSL::X509::Certificate.new File.read cert_path
+
+    @agent.certificate = cert_path
+
+    assert_equal cert.to_pem, @agent.certificate.to_pem
+  end
+
   def test_connection_for_file
     uri = URI.parse 'file:///nonexistent'
     conn = @agent.connection_for uri
@@ -176,7 +195,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_idle_timeout_equals
-    @agent.set_http
     @agent.idle_timeout = 1
 
     assert_equal 1, @agent.http.idle_timeout
@@ -782,6 +800,29 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'unsupported content-encoding: unknown', e.message
   end
 
+  def test_ssl
+    in_tmpdir do
+      store = OpenSSL::X509::Store.new
+      @agent.ca_file = '.'
+      @agent.cert_store = store
+      @agent.certificate = ssl_certificate
+      @agent.private_key = ssl_private_key
+      @agent.ssl_version = 'SSLv3' if RUBY_VERSION > '1.9'
+      @agent.verify_callback = proc { |ok, context| }
+
+      http = @agent.http
+
+      assert_equal '.',                       http.ca_file
+      assert_equal store,                     http.cert_store
+      assert_equal ssl_certificate,           http.certificate
+      assert_equal ssl_private_key,           http.private_key
+      assert_equal 'SSLv3',                   http.ssl_version if
+        RUBY_VERSION > '1.9'
+      assert_equal OpenSSL::SSL::VERIFY_PEER, http.verify_mode
+      assert http.verify_callback
+    end
+  end
+
   def test_get_meta_refresh_header_follow_self
     @agent.follow_meta_refresh = true
     @agent.follow_meta_refresh_self = true
@@ -1235,6 +1276,14 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'UTF-8', page.encoding
   end
 
+  def test_retry_change_request_equals
+    refute @agent.http.retry_change_requests
+
+    @agent.retry_change_requests = true
+
+    assert @agent.http.retry_change_requests
+  end
+
   def test_robots_allowed_eh
     allowed    = URI 'http://localhost/index.html'
     disallowed = URI 'http://localhost/norobots.html'
@@ -1256,65 +1305,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_raises Mechanize::RobotsDisallowedError do
       @agent.fetch noindex
     end
-  end
-
-  def test_set_http
-    @agent.set_http
-
-    assert_equal 'mechanize', @agent.http.name
-    refute @agent.http.retry_change_requests
-  end
-
-  def test_set_http_idle_timeout
-    @agent.idle_timeout = 1
-    @agent.set_http
-
-    assert_equal 'mechanize', @agent.http.name
-    assert_equal 1, @agent.http.idle_timeout
-  end
-
-  def test_set_http_ssl
-    in_tmpdir do
-      store = OpenSSL::X509::Store.new
-      @agent.ca_file = '.'
-      @agent.cert = ssl_certificate
-      @agent.cert_store = store
-      @agent.key  = ssl_private_key
-      @agent.ssl_version = 'SSLv3'
-      @agent.verify_callback = proc { |ok, context| }
-
-      @agent.set_http
-
-      http = @agent.http
-
-      assert_equal '.',                       http.ca_file
-      assert_equal 'SSLv3',                   http.ssl_version
-      assert_equal OpenSSL::SSL::VERIFY_PEER, http.verify_mode
-      assert_equal ssl_certificate,           http.certificate
-      assert_equal ssl_private_key,           http.private_key
-      assert_equal store,                     http.cert_store
-      assert http.verify_callback
-    end
-  end
-
-  def test_set_http_ssl_verify_none
-    in_tmpdir do
-      @agent.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
-      @agent.set_http
-
-      http = @agent.http
-
-      assert_equal OpenSSL::SSL::VERIFY_NONE, http.verify_mode
-    end
-  end
-
-  def test_set_http_retry_change_request
-    @agent.retry_change_requests = true
-    @agent.set_http
-
-    assert_equal 'mechanize', @agent.http.name
-    assert @agent.http.retry_change_requests
   end
 
   def test_set_proxy
@@ -1350,6 +1340,14 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     end
 
     assert_equal 'invalid value for port: "nonexistent service"', e.message
+  end
+
+  def test_verify_none_equals
+    @agent.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+    http = @agent.http
+
+    assert_equal OpenSSL::SSL::VERIFY_NONE, http.verify_mode
   end
 
 end

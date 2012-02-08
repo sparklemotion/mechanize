@@ -78,39 +78,10 @@ class Mechanize::HTTP::Agent
 
   # :section: SSL
 
-  # Path to an OpenSSL server certificate file
-  attr_accessor :ca_file
-
-  # An OpenSSL private key or the path to a private key
-  attr_accessor :key
-
-  # An OpenSSL client certificate or the path to a certificate file.
-  attr_accessor :cert
-
-  # An SSL certificate store
-  attr_accessor :cert_store
-
   # OpenSSL key password
   attr_accessor :pass
 
-  # SSL version to use
-  attr_accessor :ssl_version
-
-  # A callback for additional certificate verification.  See
-  # OpenSSL::SSL::SSLContext#verify_callback
-  #
-  # The callback can be used for debugging or to ignore errors by always
-  # returning +true+.  Specifying nil uses the default method that was valid
-  # when the SSLContext was created
-  attr_accessor :verify_callback
-
-  # How to verify SSL connections.  Defaults to VERIFY_PEER
-  attr_accessor :verify_mode
-
   # :section: Timeouts
-
-  # Reset connections that have not been used in this many seconds
-  attr_reader   :idle_timeout
 
   # Set to false to disable HTTP/1.1 keep-alive requests
   attr_accessor :keep_alive
@@ -125,12 +96,6 @@ class Mechanize::HTTP::Agent
 
   # The cookies for this agent
   attr_accessor :cookie_jar
-
-  # URI for a proxy connection
-  attr_reader :proxy_uri
-
-  # Retry non-idempotent requests?
-  attr_reader :retry_change_requests
 
   # Responses larger than this will be written to a Tempfile instead of stored
   # in memory.
@@ -160,19 +125,15 @@ class Mechanize::HTTP::Agent
     @follow_meta_refresh_self = false
     @gzip_enabled             = true
     @history                  = Mechanize::History.new
-    @idle_timeout             = 5
     @keep_alive               = true
-    @keep_alive_time          = 300
     @max_file_buffer          = 10240
     @open_timeout             = nil
     @post_connect_hooks       = []
     @pre_connect_hooks        = []
-    @proxy_uri                = nil
     @read_timeout             = nil
     @redirect_ok              = true
     @redirection_limit        = 20
     @request_headers          = {}
-    @retry_change_requests    = false
     @robots                   = false
     @user_agent               = nil
     @webrobots                = nil
@@ -191,14 +152,7 @@ class Mechanize::HTTP::Agent
     @domain               = nil # NTLM HTTP domain
 
     # SSL
-    @ca_file         = nil
-    @cert            = nil
-    @cert_store      = nil
-    @key             = nil
-    @pass            = nil
-    @ssl_version     = nil
-    @verify_callback = nil
-    @verify_mode     = nil
+    @pass = nil
 
     @scheme_handlers = Hash.new { |h, scheme|
       h[scheme] = lambda { |link, page|
@@ -210,6 +164,10 @@ class Mechanize::HTTP::Agent
     @scheme_handlers['https']     = @scheme_handlers['http']
     @scheme_handlers['relative']  = @scheme_handlers['http']
     @scheme_handlers['file']      = @scheme_handlers['http']
+
+    @http = Net::HTTP::Persistent.new 'mechanize'
+    @http.idle_timeout = 5
+    @http.keep_alive   = 300
   end
 
   # Retrieves +uri+ and parses it into a page or other object according to
@@ -310,11 +268,21 @@ class Mechanize::HTTP::Agent
     end
   end
 
+  # URI for a proxy connection
+
+  def proxy_uri
+    @http.proxy_uri
+  end
+
+  # Retry non-idempotent requests?
+  def retry_change_requests
+    @http.retry_change_requests
+  end
+
   # Retry non-idempotent requests
 
   def retry_change_requests= retri
-    @retry_change_requests = retri
-    @http.retry_change_requests = retri if @http
+    @http.retry_change_requests = retri
   end
 
   # :section: Headers
@@ -953,16 +921,104 @@ class Mechanize::HTTP::Agent
 
   # :section: SSL
 
+  # Path to an OpenSSL CA certificate file
+  def ca_file
+    @http.ca_file
+  end
+
+  # Sets the path to an OpenSSL CA certificate file
+  def ca_file= ca_file
+    @http.ca_file = ca_file
+  end
+
+  # The SSL certificate store used for validating connections
+  def cert_store
+    @http.cert_store
+  end
+
+  # Sets the SSL certificate store used for validating connections
+  def cert_store= cert_store
+    @http.cert_store = cert_store
+  end
+
+  # The client X509 certificate
   def certificate
     @http.certificate
   end
 
+  # Sets the client certificate to given X509 certificate.  If a path is given
+  # the certificate will be loaded and set.
+  def certificate= certificate
+    certificate = if OpenSSL::X509::Certificate === certificate then
+                    certificate
+                  else
+                    OpenSSL::X509::Certificate.new File.read certificate
+                  end
+
+    @http.certificate = certificate
+  end
+
+  # An OpenSSL private key or the path to a private key
+  def private_key
+    @http.private_key
+  end
+
+  # Sets the client's private key
+  def private_key= private_key
+    private_key = if OpenSSL::PKey::PKey === private_key then
+                    private_key
+                  else
+                    OpenSSL::PKey::RSA.new File.read(private_key), @pass
+                  end
+
+    @http.private_key = private_key
+  end
+
+  # SSL version to use
+  def ssl_version
+    @http.ssl_version
+  end if RUBY_VERSION > '1.9'
+
+  # Sets the SSL version to use
+  def ssl_version= ssl_version
+    @http.ssl_version = ssl_version
+  end if RUBY_VERSION > '1.9'
+
+  # A callback for additional certificate verification.  See
+  # OpenSSL::SSL::SSLContext#verify_callback
+  #
+  # The callback can be used for debugging or to ignore errors by always
+  # returning +true+.  Specifying nil uses the default method that was valid
+  # when the SSLContext was created
+  def verify_callback
+    @http.verify_callback
+  end
+
+  # Sets the certificate verify callback
+  def verify_callback= verify_callback
+    @http.verify_callback = verify_callback
+  end
+
+  # How to verify SSL connections.  Defaults to VERIFY_PEER
+  def verify_mode
+    @http.verify_mode
+  end
+
+  # Sets the mode for verifying SSL connections
+  def verify_mode= verify_mode
+    @http.verify_mode = verify_mode
+  end
+
   # :section: Timeouts
 
-  # Sets the conection idle timeout for persistent connections
+  # Reset connections that have not been used in this many seconds
+  def idle_timeout
+    @http.idle_timeout
+  end
+
+  # Sets the connection idle timeout for persistent connections
   def idle_timeout= timeout
-    @idle_timeout = timeout
-    @http.idle_timeout = timeout if @http
+    @http.idle_timeout = timeout
   end
 
   # :section: Utility
@@ -984,48 +1040,17 @@ class Mechanize::HTTP::Agent
     @context.log
   end
 
-  def set_http
-    @http = Net::HTTP::Persistent.new 'mechanize', @proxy_uri
-
-    @http.keep_alive = @keep_alive_time
-    @http.idle_timeout = @idle_timeout if @idle_timeout
-    @http.retry_change_requests = @retry_change_requests
-
-    @http.ca_file         = @ca_file
-    @http.cert_store      = @cert_store if @cert_store
-    @http.ssl_version     = @ssl_version
-    @http.verify_callback = @verify_callback
-    @http.verify_mode     = @verify_mode if @verify_mode
-
-    # update our cached value
-    @verify_mode = @http.verify_mode
-    @cert_store  = @http.cert_store
-
-    if @cert and @key then
-      cert = if OpenSSL::X509::Certificate === @cert then
-               @cert
-             else
-               OpenSSL::X509::Certificate.new ::File.read @cert
-             end
-
-      key = if OpenSSL::PKey::PKey === @key then
-              @key
-            else
-              OpenSSL::PKey::RSA.new ::File.read(@key), @pass
-            end
-
-      @http.certificate = cert
-      @http.private_key = key
-    end
-  end
-
   ##
   # Sets the proxy address, port, user, and password +addr+ should be a host,
   # with no "http://", +port+ may be a port number, service name or port
   # number string.
 
-  def set_proxy(addr, port, user = nil, pass = nil)
-    return unless addr and port
+  def set_proxy addr, port, user = nil, pass = nil
+    unless addr and port then
+      @http.proxy = nil
+
+      return
+    end
 
     unless Integer === port then
       begin
@@ -1039,12 +1064,12 @@ class Mechanize::HTTP::Agent
       end
     end
 
-    @proxy_uri = URI "http://#{addr}"
-    @proxy_uri.port = port
-    @proxy_uri.user     = user if user
-    @proxy_uri.password = pass if pass
+    proxy_uri = URI "http://#{addr}"
+    proxy_uri.port = port
+    proxy_uri.user     = user if user
+    proxy_uri.password = pass if pass
 
-    @proxy_uri
+    @http.proxy = proxy_uri
   end
 
 end

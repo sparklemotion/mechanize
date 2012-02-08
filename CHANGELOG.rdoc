@@ -1,9 +1,11 @@
 = Mechanize CHANGELOG
 
-=== 2.1.2
+=== 2.2
 
-* Bug fixes
+* Minor enhancements
   * Expose ssl_version from net-http-persistent.  Patch by astera.
+  * SSL parameters and proxy may now be set at any time.  Issue #194 by
+    dsisnero.
 
 === 2.1.1 / 2012-02-03
 

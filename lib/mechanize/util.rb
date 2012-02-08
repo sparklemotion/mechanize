@@ -21,6 +21,12 @@ class Mechanize::Util
                       [Iconv::InvalidEncoding, Iconv::IllegalSequence]
                     end
 
+  # default mime type data for Page::Image#mime_type.
+  # You can use another Apache-compatible mimetab.
+  #   mimetab = WEBrick::HTTPUtils.load_mime_types('/etc/mime.types')
+  #   Mechanize::Util::DefaultMimeTypes.replace(mimetab)
+  DefaultMimeTypes = WEBrick::HTTPUtils::DefaultMimeTypes
+
   def self.build_query_string(parameters, enc=nil)
     parameters.map { |k,v|
       # WEBrick::HTTP.escape* has some problems about m17n on ruby-1.9.*.

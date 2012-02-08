@@ -91,20 +91,18 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'identity', @req['accept-encoding']
   end
 
-  def test_fetch_hooks
-    @agent.pre_connect_hooks << proc do |agent, request|
-      assert_equal '/index.html', request.path
-      assert_equal @agent, agent
-    end
+  def test_fetch_file_nonexistent
+    in_tmpdir do
+      nonexistent = File.join Dir.pwd, 'nonexistent'
 
-    @agent.post_connect_hooks << proc do |agent, uri, response, body|
-      assert_equal @agent, agent
-      assert_equal URI('http://example/index.html'), uri
-      assert_equal '200', response.code
-      assert_kind_of String, body
-    end
+      uri = URI.parse "file://#{nonexistent}"
 
-    @agent.fetch URI 'http://example/index.html'
+      e = assert_raises Mechanize::ResponseCodeError do
+        @agent.fetch uri
+      end
+
+      assert_equal '404 => Net::HTTPNotFound', e.message
+    end
   end
 
   def test_fetch_file_plus
@@ -133,18 +131,20 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_kind_of Mechanize::Page, page
   end
 
-  def test_fetch_file_nonexistent
-    in_tmpdir do
-      nonexistent = File.join Dir.pwd, 'nonexistent'
-
-      uri = URI.parse "file://#{nonexistent}"
-
-      e = assert_raises Mechanize::ResponseCodeError do
-        @agent.fetch uri
-      end
-
-      assert_equal '404 => Net::HTTPNotFound', e.message
+  def test_fetch_hooks
+    @agent.pre_connect_hooks << proc do |agent, request|
+      assert_equal '/index.html', request.path
+      assert_equal @agent, agent
     end
+
+    @agent.post_connect_hooks << proc do |agent, uri, response, body|
+      assert_equal @agent, agent
+      assert_equal URI('http://example/index.html'), uri
+      assert_equal '200', response.code
+      assert_kind_of String, body
+    end
+
+    @agent.fetch URI 'http://example/index.html'
   end
 
   def test_fetch_post_connect_hook
@@ -164,12 +164,105 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal '500', e.response_code
   end
 
+  def test_get_meta_refresh_header_follow_self
+    @agent.follow_meta_refresh = true
+    @agent.follow_meta_refresh_self = true
+
+    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, '',
+                               200, @mech)
+    @res.instance_variable_set :@header, 'refresh' => ['0']
+
+    refresh = @agent.get_meta_refresh @res, @uri, page
+
+    assert_equal [0.0, URI('http://example/')], refresh
+  end
+
+  def test_get_meta_refresh_header_no_follow
+    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, '',
+                               200, @mech)
+    @res.instance_variable_set :@header, 'refresh' => ['0']
+
+    refresh = @agent.get_meta_refresh @res, @uri, page
+
+    assert_nil refresh
+  end
+
+  def test_get_meta_refresh_header_no_follow_self
+    @agent.follow_meta_refresh = true
+
+    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, '',
+                               200, @mech)
+    @res.instance_variable_set :@header, 'refresh' => ['0']
+
+    refresh = @agent.get_meta_refresh @res, @uri, page
+
+    assert_nil refresh
+  end
+
+  def test_get_meta_refresh_meta_follow_self
+    @agent.follow_meta_refresh = true
+    @agent.follow_meta_refresh_self = true
+
+    body = <<-BODY
+<title></title>
+<meta http-equiv="refresh" content="0">
+    BODY
+
+    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, body,
+                               200, @mech)
+
+    refresh = @agent.get_meta_refresh @res, @uri, page
+
+    assert_equal [0, 'http://example/'], refresh
+  end
+
+  def test_get_meta_refresh_meta_no_follow
+    body = <<-BODY
+<title></title>
+<meta http-equiv="refresh" content="0">
+    BODY
+
+    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, body,
+                               200, @mech)
+
+    refresh = @agent.get_meta_refresh @res, @uri, page
+
+    assert_nil refresh
+  end
+
+  def test_get_meta_refresh_meta_no_follow_self
+    @agent.follow_meta_refresh = true
+
+    body = <<-BODY
+<title></title>
+<meta http-equiv="refresh" content="0">
+    BODY
+
+    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, body,
+                               200, @mech)
+
+    refresh = @agent.get_meta_refresh @res, @uri, page
+
+    assert_nil refresh
+  end
+
   def test_get_robots
     robotstxt = @agent.get_robots 'http://localhost/robots.txt'
     refute_equal '', robotstxt
 
     robotstxt = @agent.get_robots 'http://localhost/response_code?code=404'
     assert_equal '', robotstxt
+  end
+
+  def test_hook_content_encoding_response
+    @mech.content_encoding_hooks << lambda{|agent, uri, response, response_body_io|
+      response['content-encoding'] = 'gzip' if response['content-encoding'] == 'agzip'}
+
+    @res.instance_variable_set :@header, 'content-encoding' => %w[agzip]
+    body_io = StringIO.new 'part'
+    @agent.hook_content_encoding @res, @uri, body_io
+
+    assert_equal 'gzip', @res['content-encoding']
   end
 
   def test_http_request_file
@@ -229,69 +322,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     end
   end
 
-  def test_request_cookies
-    uri = URI.parse 'http://host.example.com'
-    Mechanize::Cookie.parse uri, 'hello=world domain=.example.com' do |cookie|
-      @agent.cookie_jar.add uri, cookie
-    end
-
-    @agent.request_cookies @req, uri
-
-    assert_equal 'hello=world domain=.example.com', @req['Cookie']
-  end
-
-  def test_request_cookies_none
-    @agent.request_cookies @req, @uri
-
-    assert_nil @req['Cookie']
-  end
-
-  def test_request_cookies_many
-    uri = URI.parse 'http://host.example.com'
-    cookie_str = 'a=b domain=.example.com, c=d domain=.example.com'
-    Mechanize::Cookie.parse uri, cookie_str do |cookie|
-      @agent.cookie_jar.add uri, cookie
-    end
-
-    @agent.request_cookies @req, uri
-
-    expected = cookie_str.sub ', ', '; '
-
-    assert_equal expected, @req['Cookie']
-  end
-
-  def test_request_cookies_wrong_domain
-    uri = URI.parse 'http://host.example.com'
-    Mechanize::Cookie.parse uri, 'hello=world domain=.example.com' do |cookie|
-      @agent.cookie_jar.add uri, cookie
-    end
-
-    @agent.request_cookies @req, @uri
-
-    assert_nil @req['Cookie']
-  end
-
-  def test_request_host
-    @agent.request_host @req, @uri
-
-    assert_equal 'example', @req['host']
-  end
-
-  def test_request_host_nonstandard
-    @uri.port = 81
-
-    @agent.request_host @req, @uri
-
-    assert_equal 'example:81', @req['host']
-  end
-
-  def test_request_language_charset
-    @agent.request_language_charset @req
-
-    assert_equal 'en-us,en;q=0.5', @req['accept-language']
-    assert_equal 'ISO-8859-1,utf-8;q=0.7,*;q=0.7', @req['accept-charset']
-  end
-
   def test_request_add_headers
     @agent.request_add_headers @req, 'Content-Length' => 300
 
@@ -332,12 +362,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'unknown header symbol content_length', e.message
   end
 
-  def test_request_auth_none
-    @agent.request_auth @req, @uri
-
-    assert_nil @req['Authorization']
-  end
-
   def test_request_auth_basic
     @agent.user = 'user'
     @agent.password = 'password'
@@ -373,6 +397,75 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     assert_match %r%^Digest %, @req['Authorization']
     assert_match %r%qop=auth%, @req['Authorization']
+  end
+
+  def test_request_auth_none
+    @agent.request_auth @req, @uri
+
+    assert_nil @req['Authorization']
+  end
+
+  def test_request_cookies
+    uri = URI.parse 'http://host.example.com'
+    Mechanize::Cookie.parse uri, 'hello=world domain=.example.com' do |cookie|
+      @agent.cookie_jar.add uri, cookie
+    end
+
+    @agent.request_cookies @req, uri
+
+    assert_equal 'hello=world domain=.example.com', @req['Cookie']
+  end
+
+  def test_request_cookies_many
+    uri = URI.parse 'http://host.example.com'
+    cookie_str = 'a=b domain=.example.com, c=d domain=.example.com'
+    Mechanize::Cookie.parse uri, cookie_str do |cookie|
+      @agent.cookie_jar.add uri, cookie
+    end
+
+    @agent.request_cookies @req, uri
+
+    expected = cookie_str.sub ', ', '; '
+
+    assert_equal expected, @req['Cookie']
+  end
+
+  def test_request_cookies_none
+    @agent.request_cookies @req, @uri
+
+    assert_nil @req['Cookie']
+  end
+
+  def test_request_cookies_wrong_domain
+    uri = URI.parse 'http://host.example.com'
+    Mechanize::Cookie.parse uri, 'hello=world domain=.example.com' do |cookie|
+      @agent.cookie_jar.add uri, cookie
+    end
+
+    @agent.request_cookies @req, @uri
+
+    assert_nil @req['Cookie']
+  end
+
+  def test_request_host
+    @agent.request_host @req, @uri
+
+    assert_equal 'example', @req['host']
+  end
+
+  def test_request_host_nonstandard
+    @uri.port = 81
+
+    @agent.request_host @req, @uri
+
+    assert_equal 'example:81', @req['host']
+  end
+
+  def test_request_language_charset
+    @agent.request_language_charset @req
+
+    assert_equal 'en-us,en;q=0.5', @req['accept-language']
+    assert_equal 'ISO-8859-1,utf-8;q=0.7,*;q=0.7', @req['accept-charset']
   end
 
   def test_request_referer
@@ -779,16 +872,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     body_io.close! unless body_io.closed?
   end
 
-  def test_response_content_encoding_x_gzip
-    @res.instance_variable_set :@header, 'content-encoding' => %w[x-gzip]
-    body_io = StringIO.new \
-      "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017I\004\000\000\000"
-
-    body = @agent.response_content_encoding @res, body_io
-
-    assert_equal 'part', body.read
-  end
-
   def test_response_content_encoding_unknown
     @res.instance_variable_set :@header, 'content-encoding' => %w[unknown]
     body = StringIO.new 'part'
@@ -800,120 +883,14 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'unsupported content-encoding: unknown', e.message
   end
 
-  def test_ssl
-    in_tmpdir do
-      store = OpenSSL::X509::Store.new
-      @agent.ca_file = '.'
-      @agent.cert_store = store
-      @agent.certificate = ssl_certificate
-      @agent.private_key = ssl_private_key
-      @agent.ssl_version = 'SSLv3' if RUBY_VERSION > '1.9'
-      @agent.verify_callback = proc { |ok, context| }
+  def test_response_content_encoding_x_gzip
+    @res.instance_variable_set :@header, 'content-encoding' => %w[x-gzip]
+    body_io = StringIO.new \
+      "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017I\004\000\000\000"
 
-      http = @agent.http
+    body = @agent.response_content_encoding @res, body_io
 
-      assert_equal '.',                       http.ca_file
-      assert_equal store,                     http.cert_store
-      assert_equal ssl_certificate,           http.certificate
-      assert_equal ssl_private_key,           http.private_key
-      assert_equal 'SSLv3',                   http.ssl_version if
-        RUBY_VERSION > '1.9'
-      assert_equal OpenSSL::SSL::VERIFY_PEER, http.verify_mode
-      assert http.verify_callback
-    end
-  end
-
-  def test_get_meta_refresh_header_follow_self
-    @agent.follow_meta_refresh = true
-    @agent.follow_meta_refresh_self = true
-
-    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, '',
-                               200, @mech)
-    @res.instance_variable_set :@header, 'refresh' => ['0']
-
-    refresh = @agent.get_meta_refresh @res, @uri, page
-
-    assert_equal [0.0, URI('http://example/')], refresh
-  end
-
-  def test_get_meta_refresh_header_no_follow
-    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, '',
-                               200, @mech)
-    @res.instance_variable_set :@header, 'refresh' => ['0']
-
-    refresh = @agent.get_meta_refresh @res, @uri, page
-
-    assert_nil refresh
-  end
-
-  def test_get_meta_refresh_header_no_follow_self
-    @agent.follow_meta_refresh = true
-
-    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, '',
-                               200, @mech)
-    @res.instance_variable_set :@header, 'refresh' => ['0']
-
-    refresh = @agent.get_meta_refresh @res, @uri, page
-
-    assert_nil refresh
-  end
-
-  def test_get_meta_refresh_meta_follow_self
-    @agent.follow_meta_refresh = true
-    @agent.follow_meta_refresh_self = true
-
-    body = <<-BODY
-<title></title>
-<meta http-equiv="refresh" content="0">
-    BODY
-
-    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, body,
-                               200, @mech)
-
-    refresh = @agent.get_meta_refresh @res, @uri, page
-
-    assert_equal [0, 'http://example/'], refresh
-  end
-
-  def test_get_meta_refresh_meta_no_follow
-    body = <<-BODY
-<title></title>
-<meta http-equiv="refresh" content="0">
-    BODY
-
-    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, body,
-                               200, @mech)
-
-    refresh = @agent.get_meta_refresh @res, @uri, page
-
-    assert_nil refresh
-  end
-
-  def test_get_meta_refresh_meta_no_follow_self
-    @agent.follow_meta_refresh = true
-
-    body = <<-BODY
-<title></title>
-<meta http-equiv="refresh" content="0">
-    BODY
-
-    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, body,
-                               200, @mech)
-
-    refresh = @agent.get_meta_refresh @res, @uri, page
-
-    assert_nil refresh
-  end
-
-  def test_hook_content_encoding_response
-    @mech.content_encoding_hooks << lambda{|agent, uri, response, response_body_io|
-      response['content-encoding'] = 'gzip' if response['content-encoding'] == 'agzip'}
-
-    @res.instance_variable_set :@header, 'content-encoding' => %w[agzip]
-    body_io = StringIO.new 'part'
-    @agent.hook_content_encoding @res, @uri, body_io
-
-    assert_equal 'gzip', @res['content-encoding']
+    assert_equal 'part', body.read
   end
 
   def test_response_cookies
@@ -1004,6 +981,92 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     end
   end
 
+  def test_response_parse
+    body = '<title>hi</title>'
+    @res.instance_variable_set :@header, 'content-type' => %w[text/html]
+
+    page = @agent.response_parse @res, body, @uri
+
+    assert_instance_of Mechanize::Page, page
+    assert_equal @mech, page.mech
+  end
+
+  def test_response_parse_content_type_case
+    body = '<title>hi</title>'
+    @res.instance_variable_set(:@header, 'content-type' => %w[text/HTML])
+
+    page = @agent.response_parse @res, body, @uri
+
+    assert_instance_of Mechanize::Page, page
+
+    assert_equal 'text/HTML', page.content_type
+  end
+
+  def test_response_parse_content_type_encoding
+    body = '<title>hi</title>'
+    @res.instance_variable_set(:@header,
+                               'content-type' =>
+                                 %w[text/html;charset=ISO-8859-1])
+
+    page = @agent.response_parse @res, body, @uri
+
+    assert_instance_of Mechanize::Page, page
+    assert_equal @mech, page.mech
+
+    assert_equal 'ISO-8859-1', page.encoding
+    assert_equal 'ISO-8859-1', page.parser.encoding
+  end
+
+  def test_response_parse_content_type_encoding_broken_iso_8859_1
+    body = '<title>hi</title>'
+    @res.instance_variable_set(:@header,
+                               'content-type' =>
+                                 %w[text/html; charset=ISO_8859-1])
+
+    page = @agent.response_parse @res, body, @uri
+
+    assert_instance_of Mechanize::Page, page
+    assert_equal 'ISO_8859-1', page.encoding
+  end
+
+  def test_response_parse_content_type_encoding_broken_utf_8
+    body = '<title>hi</title>'
+    @res.instance_variable_set(:@header,
+                               'content-type' =>
+                                 %w[text/html; charset=UTF8])
+
+    page = @agent.response_parse @res, body, @uri
+
+    assert_instance_of Mechanize::Page, page
+    assert_equal 'UTF8', page.encoding
+    assert_equal 'UTF8', page.parser.encoding
+  end
+
+  def test_response_parse_content_type_encoding_garbage
+    body = '<title>hi</title>'
+    @res.instance_variable_set(:@header,
+                               'content-type' =>
+                                 %w[text/html; charset=garbage_charset])
+
+    page = @agent.response_parse @res, body, @uri
+
+    assert_instance_of Mechanize::Page, page
+    assert_equal @mech, page.mech
+  end
+
+  def test_response_parse_content_type_encoding_semicolon
+    body = '<title>hi</title>'
+    @res.instance_variable_set(:@header,
+                               'content-type' =>
+                                 %w[text/html;charset=UTF-8;])
+
+    page = @agent.response_parse @res, body, @uri
+
+    assert_instance_of Mechanize::Page, page
+
+    assert_equal 'UTF-8', page.encoding
+  end
+
   def test_response_read
     def @res.read_body() yield 'part' end
     def @res.content_length() 4 end
@@ -1014,28 +1077,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     assert_equal 'part', body
     assert_equal Encoding::BINARY, body.encoding if body.respond_to? :encoding
-  end
-
-  def test_response_read_large
-    def @res.read_body() yield 'a' * 10241 end
-    def @res.content_length() 10241 end
-
-    io = @agent.response_read @res, @req, @uri
-
-    assert_kind_of Tempfile, io
-    assert_equal 10241, io.stat.size
-  end
-
-  def test_response_read_large_chunked
-    def @res.read_body
-      11.times do yield 'a' * 1024 end
-    end
-    def @res.content_length() end
-
-    io = @agent.response_read @res, @req, @uri
-
-    assert_kind_of Tempfile, io
-    assert_equal 11264, io.stat.size
   end
 
   def test_response_read_content_length_head
@@ -1107,6 +1148,28 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
       assert_equal expected, body
       assert_equal Encoding::BINARY, body.encoding if body.respond_to? :encoding
     end
+  end
+
+  def test_response_read_large
+    def @res.read_body() yield 'a' * 10241 end
+    def @res.content_length() 10241 end
+
+    io = @agent.response_read @res, @req, @uri
+
+    assert_kind_of Tempfile, io
+    assert_equal 10241, io.stat.size
+  end
+
+  def test_response_read_large_chunked
+    def @res.read_body
+      11.times do yield 'a' * 1024 end
+    end
+    def @res.content_length() end
+
+    io = @agent.response_read @res, @req, @uri
+
+    assert_kind_of Tempfile, io
+    assert_equal 11264, io.stat.size
   end
 
   def test_response_read_no_body
@@ -1190,92 +1253,6 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal URI('http://fake.example/'), page.uri
   end
 
-  def test_response_parse
-    body = '<title>hi</title>'
-    @res.instance_variable_set :@header, 'content-type' => %w[text/html]
-
-    page = @agent.response_parse @res, body, @uri
-
-    assert_instance_of Mechanize::Page, page
-    assert_equal @mech, page.mech
-  end
-
-  def test_response_parse_content_type_case
-    body = '<title>hi</title>'
-    @res.instance_variable_set(:@header, 'content-type' => %w[text/HTML])
-
-    page = @agent.response_parse @res, body, @uri
-
-    assert_instance_of Mechanize::Page, page
-
-    assert_equal 'text/HTML', page.content_type
-  end
-
-  def test_response_parse_content_type_encoding
-    body = '<title>hi</title>'
-    @res.instance_variable_set(:@header,
-                               'content-type' =>
-                                 %w[text/html;charset=ISO-8859-1])
-
-    page = @agent.response_parse @res, body, @uri
-
-    assert_instance_of Mechanize::Page, page
-    assert_equal @mech, page.mech
-
-    assert_equal 'ISO-8859-1', page.encoding
-    assert_equal 'ISO-8859-1', page.parser.encoding
-  end
-
-  def test_response_parse_content_type_encoding_garbage
-    body = '<title>hi</title>'
-    @res.instance_variable_set(:@header,
-                               'content-type' =>
-                                 %w[text/html; charset=garbage_charset])
-
-    page = @agent.response_parse @res, body, @uri
-
-    assert_instance_of Mechanize::Page, page
-    assert_equal @mech, page.mech
-  end
-
-  def test_response_parse_content_type_encoding_broken_iso_8859_1
-    body = '<title>hi</title>'
-    @res.instance_variable_set(:@header,
-                               'content-type' =>
-                                 %w[text/html; charset=ISO_8859-1])
-
-    page = @agent.response_parse @res, body, @uri
-
-    assert_instance_of Mechanize::Page, page
-    assert_equal 'ISO_8859-1', page.encoding
-  end
-
-  def test_response_parse_content_type_encoding_broken_utf_8
-    body = '<title>hi</title>'
-    @res.instance_variable_set(:@header,
-                               'content-type' =>
-                                 %w[text/html; charset=UTF8])
-
-    page = @agent.response_parse @res, body, @uri
-
-    assert_instance_of Mechanize::Page, page
-    assert_equal 'UTF8', page.encoding
-    assert_equal 'UTF8', page.parser.encoding
-  end
-
-  def test_response_parse_content_type_encoding_semicolon
-    body = '<title>hi</title>'
-    @res.instance_variable_set(:@header,
-                               'content-type' =>
-                                 %w[text/html;charset=UTF-8;])
-
-    page = @agent.response_parse @res, body, @uri
-
-    assert_instance_of Mechanize::Page, page
-
-    assert_equal 'UTF-8', page.encoding
-  end
-
   def test_retry_change_request_equals
     refute @agent.http.retry_change_requests
 
@@ -1340,6 +1317,29 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     end
 
     assert_equal 'invalid value for port: "nonexistent service"', e.message
+  end
+
+  def test_ssl
+    in_tmpdir do
+      store = OpenSSL::X509::Store.new
+      @agent.ca_file = '.'
+      @agent.cert_store = store
+      @agent.certificate = ssl_certificate
+      @agent.private_key = ssl_private_key
+      @agent.ssl_version = 'SSLv3' if RUBY_VERSION > '1.9'
+      @agent.verify_callback = proc { |ok, context| }
+
+      http = @agent.http
+
+      assert_equal '.',                       http.ca_file
+      assert_equal store,                     http.cert_store
+      assert_equal ssl_certificate,           http.certificate
+      assert_equal ssl_private_key,           http.private_key
+      assert_equal 'SSLv3',                   http.ssl_version if
+        RUBY_VERSION > '1.9'
+      assert_equal OpenSSL::SSL::VERIFY_PEER, http.verify_mode
+      assert http.verify_callback
+    end
   end
 
   def test_verify_none_equals

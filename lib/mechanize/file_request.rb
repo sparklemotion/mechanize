@@ -22,5 +22,9 @@ class Mechanize::FileRequest
   def each_header
   end
 
+  def response_body_permitted?
+    true
+  end
+
 end
 

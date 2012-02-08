@@ -370,14 +370,15 @@ class Mechanize
   end
 
   ##
-  # HEAD +uri+ with +query_params+, and setting +headers+:
+  # HEAD +uri+ with +query_params+ and +headers+:
   #
   #   head('http://example/', {'q' => 'foo'}, {})
 
   def head(uri, query_params = {}, headers = {})
-    # fetch the page
-    page = @agent.fetch(uri, :head, headers, query_params)
+    page = @agent.fetch uri, :head, headers, query_params
+
     yield page if block_given?
+
     page
   end
 

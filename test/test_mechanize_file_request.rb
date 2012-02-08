@@ -2,17 +2,23 @@ require 'mechanize/test_case'
 
 class TestMechanizeFileRequest < Mechanize::TestCase
 
+  def setup
+    @uri = URI.parse 'file:///nonexistent'
+
+    @r = Mechanize::FileRequest.new @uri
+  end
+
   def test_initialize
-    uri = URI.parse 'http://example/'
+    assert_equal @uri, @r.uri
+    assert_equal '/nonexistent', @r.path
 
-    r = Mechanize::FileRequest.new uri
+    assert_respond_to @r, :[]=
+    assert_respond_to @r, :add_field
+    assert_respond_to @r, :each_header
+  end
 
-    assert_equal uri, r.uri
-    assert_equal '/', r.path
-
-    assert_respond_to r, :[]=
-    assert_respond_to r, :add_field
-    assert_respond_to r, :each_header
+  def test_response_body_permitted_eh
+    assert @r.response_body_permitted?
   end
 
 end

@@ -131,6 +131,14 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_kind_of Mechanize::Page, page
   end
 
+  def test_fetch_head_gzip
+    uri = @uri + '/gzip?file=index.html'
+
+    page = @agent.fetch uri, :head
+
+    assert_kind_of Mechanize::Page, page
+  end
+
   def test_fetch_hooks
     @agent.pre_connect_hooks << proc do |agent, request|
       assert_equal '/index.html', request.path

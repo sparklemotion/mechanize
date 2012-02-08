@@ -7,6 +7,10 @@
   * SSL parameters and proxy may now be set at any time.  Issue #194 by
     dsisnero.
 
+* Bug fixes
+  * Fixed handling of a HEAD request with Accept-Encoding: gzip.  Issue #198
+    by Oleg Dashevskii
+
 === 2.1.1 / 2012-02-03
 
 * Bug fixes

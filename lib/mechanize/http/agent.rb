@@ -235,7 +235,8 @@ class Mechanize::HTTP::Agent
 
     hook_content_encoding response, uri, response_body_io
 
-    response_body_io = response_content_encoding response, response_body_io
+    response_body_io = response_content_encoding response, response_body_io if
+      request.response_body_permitted?
 
     post_connect uri, response, response_body_io
 

@@ -284,6 +284,24 @@ class Mechanize::Page < Mechanize::File
   elements_with :iframe
 
   ##
+  # :method: image_with(criteria)
+  #
+  # Find a single image matching +criteria+.
+  # Example:
+  #   page.image_with(:alt => /main/).fetch.save
+
+  ##
+  # :method: images_with(criteria)
+  #
+  # Find all images matching +criteria+.
+  # Example:
+  #   page.images_with(:src => /jpg\Z/).each do |img|
+  #     img.fetch.save
+  #   end
+
+  elements_with :image
+
+  ##
   # Return a list of all link and area tags
   def links
     @links ||= %w{ a area }.map do |tag|

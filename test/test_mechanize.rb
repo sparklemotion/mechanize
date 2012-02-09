@@ -275,16 +275,45 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert_equal 'GET', page.header['X-Request-Method']
   end
 
-  #def test_download
-  #  Dir.mktmpdir do |dir|
-  #    file = "#{dir}/download"
-  #    open file, 'w' do |io|
-  #      @mech.download 'http://example', io
-  #    end
+  def test_download
+    page = nil
 
-  #    assert_equal 1, File.stat(file).size
-  #  end
-  #end
+    in_tmpdir do
+      open 'download', 'w' do |io|
+        page = @mech.download 'http://example', io
+
+        refute io.closed?
+      end
+
+      assert_operator 1, :<=, File.stat('download').size
+    end
+
+    assert_empty @mech.history
+    assert_kind_of Mechanize::Page, page
+  end
+
+  def test_download_filename
+    page = nil
+
+    in_tmpdir do
+      page = @mech.download 'http://example', 'download'
+
+      assert_operator 1, :<=, File.stat('download').size
+    end
+
+    assert_empty @mech.history
+    assert_kind_of Mechanize::Page, page
+  end
+
+  def test_download_filename_error
+    in_tmpdir do
+      assert_raises Mechanize::UnauthorizedError do
+        @mech.download 'http://example/digest_auth', 'download'
+      end
+
+      refute File.exist? 'download'
+    end
+  end
 
   def test_get
     uri = URI 'http://localhost'

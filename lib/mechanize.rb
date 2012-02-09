@@ -320,6 +320,44 @@ class Mechanize
   end
 
   ##
+  # GETs +uri+ and writes it to +io_or_filename+ without recording the request
+  # in the history.  If +io_or_filename+ does not respond to #write it will be
+  # used as a file name.  +parameters+, +referer+ and +headers+ are used as in
+  # #get.
+  #
+  # By default, if the Content-type of the response matches a Mechanize::File
+  # or Mechanize::Page parser, the response body will be loaded into memory
+  # before being saved.  See #pluggable_parser for details on changing this
+  # default.
+
+  def download uri, io_or_filename, parameters = [], referer = nil, headers = {}
+    page = transact do
+      get uri, parameters, referer, headers
+    end
+
+    io = if io_or_filename.respond_to? :write then
+           io_or_filename
+         else
+           open io_or_filename, 'wb'
+         end
+
+    case page
+    when Mechanize::File then
+      io.write page.body
+    else
+      body_io = page.body_io
+
+      until body_io.eof? do
+        io.write body_io.read 16384
+      end
+    end
+
+    page
+  ensure
+    io.close if io and not io_or_filename.respond_to? :write
+  end
+
+  ##
   # DELETE +uri+ with +query_params+, and setting +headers+:
   #
   #   delete('http://example/', {'q' => 'foo'}, {})
@@ -341,18 +379,20 @@ class Mechanize
 
     referer ||=
       if uri.to_s =~ %r{\Ahttps?://}
-        Page.new(nil, {'content-type'=>'text/html'})
+        Page.new(nil, 'content-type' => 'text/html')
       else
-        current_page || Page.new(nil, {'content-type'=>'text/html'})
+        current_page || Page.new(nil, 'content-type' => 'text/html')
       end
 
     # FIXME: Huge hack so that using a URI as a referer works.  I need to
     # refactor everything to pass around URIs but still support
     # Mechanize::Page#base
     unless Mechanize::Parser === referer then
-      referer = referer.is_a?(String) ?
-      Page.new(URI.parse(referer), {'content-type' => 'text/html'}) :
-        Page.new(referer, {'content-type' => 'text/html'})
+      referer = if referer.is_a?(String) then
+                  Page.new URI(referer), 'content-type' => 'text/html'
+                else
+                  Page.new referer, 'content-type' => 'text/html'
+                end
     end
 
     # fetch the page
@@ -1062,7 +1102,6 @@ class Mechanize
       content_type, = data.downcase.split ',', 2 unless data.nil?
     end
 
-    # Find our pluggable parser
     parser_klass = @pluggable_parser.parser content_type
 
     unless parser_klass <= Mechanize::Download then

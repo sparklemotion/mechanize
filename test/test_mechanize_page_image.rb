@@ -9,7 +9,7 @@ class TestMechanizePageImage < Mechanize::TestCase
     @src = (@uri + 'a.jpg').to_s
 
     @empty_page = Mechanize::Page.new(@uri, { 'content-type' => 'text/html' },
-                                      nil, 200, @mech)
+                                      '', 200, @mech)
   end
 
   def img attributes
@@ -100,6 +100,8 @@ class TestMechanizePageImage < Mechanize::TestCase
     assert_equal "",     img("src" => "nosuffiximage").extname
 
     assert_nil img("width" => "1", "height" => "1").extname
+
+    assert_equal ".jpg", img("src" => "a.jpg?cache_buster").extname
   end
 
   def test_mime_type

@@ -6,97 +6,139 @@ class Mechanize::Page::Image
   attr_accessor :page
   attr_accessor :mech
 
-  def initialize(node, page)
+  ##
+  # Creates a new Mechanize::Page::Image from an image +node+ and source
+  # +page+.
+
+  def initialize node, page
     @node = node
     @page = page
     @mech = page.mech
   end
 
+  ##
+  # The src attribute of the image
+
   def src
     node['src']
   end
+
+  ##
+  # The width attribute of the image
 
   def width
     node['width']
   end
 
+  ##
+  # The height attribute of the image
+
   def height
     node['height']
   end
+
+  ##
+  # The alt attribute of the image
 
   def alt
     node['alt']
   end
 
+  ##
+  # The title attribute of the image
+
   def title
     node['title']
   end
 
-  # 'id' attribute of the image
+  ##
+  # The id attribute of the image
+
   def dom_id
     node['id']
   end
 
-  # 'class' attribute of the image
+  ##
+  # The class attribute of the image
+
   def dom_class
     node['class']
   end
 
-  # "caption" of the image. #title, #alt, or empty string "".
-  #   <img src="..." alt="ALT"> ==> "ALT"
-  #   <img src="..." title="TITLE"> ==> "TITLE"
-  #   <img src="..." alt="ALT" title="TITLE"> ==> "TITLE"
-  #   <img src="..." alt="no-popup-ALT" title=""> ==> ""
-  #   <img src="..."> ==> ""
+  ##
+  # The caption of the image.  In order of preference, the #title, #alt, or
+  # empty string "".
+
   def caption
     title || alt || ''
   end
 
   alias :text :caption
 
-  # suffix of url. dot is a part of suffix, not a delimiter
-  #   p page.images[0].url #=> "http://example/test.jpg"
-  #   p page.images[0].extname #=> ".jpg"
-  # returns "" if url has no suffix
-  #   p page.images[1].url #=> "http://example/sampleimage"
-  #   p page.images[1].extname #=> ""
+  ##
+  # The suffix of the #url. The dot is a part of suffix, not a delimiter.
+  #
+  #   p image.url     # => "http://example/test.jpg"
+  #   p image.extname # => ".jpg"
+  #
+  # Returns an empty string if #url has no suffix:
+  #
+  #   p image.url     # => "http://example/sampleimage"
+  #   p image.extname # => ""
+
   def extname
-    # Image#src returns nil when no src attribute
-    src ? ::File.extname(src) : nil
+    return nil unless src
+
+    File.extname url.path
   end
 
-  # mime type guessed with image url suffix
-  #   p page.images[0].extname #=> ".jpg"
-  #   p page.images[0].mime_type #=> "image/jpeg"
+  ##
+  # MIME type guessed from the image url suffix
+  #
+  #   p image.extname   # => ".jpg"
+  #   p image.mime_type # => "image/jpeg"
   #   page.images_with(:mime_type => /gif|jpeg|png/).each do ...
-  # retruns nil if url has no (well-known) suffix
-  #   p page.images[1].url #=> "http://example/sampleimage"
-  #   p page.images[1].mime_type #=> nil
+  #
+  # Returns nil if url has no (well-known) suffix:
+  #
+  #   p image.url       # => "http://example/sampleimage"
+  #   p image.mime_type # => nil
+
   def mime_type
     suffix_without_dot = extname ? extname.sub(/\A\./){''}.downcase : nil
+
     Mechanize::Util::DefaultMimeTypes[suffix_without_dot]
   end
 
-  # url String of self for Page#image_urls
+  ##
+  # URI for this image
+
   def url
-    if relative?
-      if page.bases[0]
-        (page.bases[0].href + src).to_s
+    if relative? then
+      if page.bases[0] then
+         page.bases[0].href + src
       else
-        (page.uri + src).to_s
+        page.uri + src
       end
     else
       src
     end
   end
 
-  alias :to_s :url
+  ##
+  # The URL string of this image
 
-  # get #src with Mechanize#get. returns Mechanize#get result.
+  def to_s
+    url.to_s
+  end
+
+  ##
+  # Downloads the image.
   #
   #   agent.page.image_with(:src => /logo/).fetch.save
   #
   # The referer is:
+  #
   # #page("parent") ::
   #   all images on http html, relative #src images on https html
   # (no referer)    ::
@@ -124,19 +166,24 @@ class Mechanize::Page::Image
     %r{^https?://} !~ src
   end
 
-  # #fetch and File#save(or, Download#save)
+  ##
+  # Fetches the file and saves it to the given +path+.
+  #
   #   page.images_with(:src => /img/).each{|img| img.save}
-  #   page.images_with(src: /img/).map(&:save) # Ruby 1.9.x
+
   def save(path = nil, parameters = [], referer = nil, headers = {})
     fetch(parameters, referer, headers).save(path)
   end
 
   alias :save_as :save
 
-  # #save self with Mechanize#transact. self is not added to history.
-  #   p agent.page.uri.to_s => "http://example/images.html"
+  ##
+  # Saves the image to the given +path+ with Mechanize#transact.
+  #
+  #   p agent.page.uri.to_s # => "http://example/images.html"
   #   agent.page.images[0].download
-  #   p agent.page.uri.to_s #=> "http://example/images.html"
+  #   p agent.page.uri.to_s # => "http://example/images.html"
+
   def download(path = nil, parameters = [], referer = nil, headers = {})
     mech.transact{ save(path, parameters, referer, headers) }
   end

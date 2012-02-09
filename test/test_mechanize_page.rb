@@ -68,7 +68,8 @@ class TestMechanizePage < Mechanize::TestCase
 <img src="c.png">
     BODY
 
-    assert_equal "http://example/b.jpg", page.image_with(:src => 'b.jpg').url
+    assert_equal "http://example/b.jpg",
+                 page.image_with(:src => 'b.jpg').url.to_s
   end
 
   def test_images_with
@@ -78,7 +79,7 @@ class TestMechanizePage < Mechanize::TestCase
 <img src="c.png">
     BODY
 
-    images = page.images_with(:src => /jpg\Z/).map { |img| img.url }
+    images = page.images_with(:src => /jpg\Z/).map { |img| img.url.to_s }
     assert_equal %w[http://example/a.jpg http://example/b.jpg], images
   end
 

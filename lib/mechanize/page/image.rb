@@ -2,6 +2,7 @@
 # An image element on an HTML page
 
 class Mechanize::Page::Image
+
   attr_reader :node
   attr_accessor :page
   attr_accessor :mech
@@ -17,52 +18,10 @@ class Mechanize::Page::Image
   end
 
   ##
-  # The src attribute of the image
-
-  def src
-    node['src']
-  end
-
-  ##
-  # The width attribute of the image
-
-  def width
-    node['width']
-  end
-
-  ##
-  # The height attribute of the image
-
-  def height
-    node['height']
-  end
-
-  ##
   # The alt attribute of the image
 
   def alt
     node['alt']
-  end
-
-  ##
-  # The title attribute of the image
-
-  def title
-    node['title']
-  end
-
-  ##
-  # The id attribute of the image
-
-  def dom_id
-    node['id']
-  end
-
-  ##
-  # The class attribute of the image
-
-  def dom_class
-    node['class']
   end
 
   ##
@@ -74,6 +33,31 @@ class Mechanize::Page::Image
   end
 
   alias :text :caption
+
+  ##
+  # The class attribute of the image
+
+  def dom_class
+    node['class']
+  end
+
+  ##
+  # The id attribute of the image
+
+  def dom_id
+    node['id']
+  end
+
+  ##
+  # Saves the image to the given +path+ with Mechanize#transact.
+  #
+  #   p agent.page.uri.to_s # => "http://example/images.html"
+  #   agent.page.images[0].download
+  #   p agent.page.uri.to_s # => "http://example/images.html"
+
+  def download(path = nil, parameters = [], referer = nil, headers = {})
+    mech.transact{ save(path, parameters, referer, headers) }
+  end
 
   ##
   # The suffix of the #url. The dot is a part of suffix, not a delimiter.
@@ -90,46 +74,6 @@ class Mechanize::Page::Image
     return nil unless src
 
     File.extname url.path
-  end
-
-  ##
-  # MIME type guessed from the image url suffix
-  #
-  #   p image.extname   # => ".jpg"
-  #   p image.mime_type # => "image/jpeg"
-  #   page.images_with(:mime_type => /gif|jpeg|png/).each do ...
-  #
-  # Returns nil if url has no (well-known) suffix:
-  #
-  #   p image.url       # => "http://example/sampleimage"
-  #   p image.mime_type # => nil
-
-  def mime_type
-    suffix_without_dot = extname ? extname.sub(/\A\./){''}.downcase : nil
-
-    Mechanize::Util::DefaultMimeTypes[suffix_without_dot]
-  end
-
-  ##
-  # URI for this image
-
-  def url
-    if relative? then
-      if page.bases[0] then
-         page.bases[0].href + src
-      else
-        page.uri + src
-      end
-    else
-      src
-    end
-  end
-
-  ##
-  # The URL string of this image
-
-  def to_s
-    url.to_s
   end
 
   ##
@@ -150,6 +94,13 @@ class Mechanize::Page::Image
     mech.get(src, parameters, referer || image_referer, headers)
   end
 
+  ##
+  # The height attribute of the image
+
+  def height
+    node['height']
+  end
+
   def image_referer # :nodoc:
     http_page  = page.uri && page.uri.scheme == 'http'
     https_page = page.uri && page.uri.scheme == 'https'
@@ -161,6 +112,33 @@ class Mechanize::Page::Image
       Mechanize::File.new(nil, { 'content-type' => 'text/plain' }, '', 200)
     end
   end
+
+  ##
+  # MIME type guessed from the image url suffix
+  #
+  #   p image.extname   # => ".jpg"
+  #   p image.mime_type # => "image/jpeg"
+  #   page.images_with(:mime_type => /gif|jpeg|png/).each do ...
+  #
+  # Returns nil if url has no (well-known) suffix:
+  #
+  #   p image.url       # => "http://example/sampleimage"
+  #   p image.mime_type # => nil
+
+  def mime_type
+    suffix_without_dot = extname ? extname.sub(/\A\./){''}.downcase : nil
+
+    Mechanize::Util::DefaultMimeTypes[suffix_without_dot]
+  end
+
+  def pretty_print(q) # :nodoc:
+    q.object_group(self) {
+      q.breakable; q.pp url
+      q.breakable; q.pp caption
+    }
+  end
+
+  alias inspect pretty_inspect # :nodoc:
 
   def relative? # :nodoc:
     %r{^https?://} !~ src
@@ -176,24 +154,47 @@ class Mechanize::Page::Image
   end
 
   ##
-  # Saves the image to the given +path+ with Mechanize#transact.
-  #
-  #   p agent.page.uri.to_s # => "http://example/images.html"
-  #   agent.page.images[0].download
-  #   p agent.page.uri.to_s # => "http://example/images.html"
+  # The src attribute of the image
 
-  def download(path = nil, parameters = [], referer = nil, headers = {})
-    mech.transact{ save(path, parameters, referer, headers) }
+  def src
+    node['src']
   end
 
-  def pretty_print(q) # :nodoc:
-    q.object_group(self) {
-      q.breakable; q.pp url
-      q.breakable; q.pp caption
-    }
+  ##
+  # The title attribute of the image
+
+  def title
+    node['title']
   end
 
-  alias inspect pretty_inspect # :nodoc:
+  ##
+  # The URL string of this image
+
+  def to_s
+    url.to_s
+  end
+
+  ##
+  # URI for this image
+
+  def url
+    if relative? then
+      if page.bases[0] then
+         page.bases[0].href + src
+      else
+        page.uri + src
+      end
+    else
+      src
+    end
+  end
+
+  ##
+  # The width attribute of the image
+
+  def width
+    node['width']
+  end
 
 end
 

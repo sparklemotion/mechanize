@@ -47,6 +47,7 @@ lib/mechanize/http/auth_challenge.rb
 lib/mechanize/http/auth_realm.rb
 lib/mechanize/http/content_disposition_parser.rb
 lib/mechanize/http/www_authenticate_parser.rb
+lib/mechanize/image.rb
 lib/mechanize/monkey_patch.rb
 lib/mechanize/page.rb
 lib/mechanize/page/base.rb
@@ -144,16 +145,19 @@ test/test_mechanize_http_auth_challenge.rb
 test/test_mechanize_http_auth_realm.rb
 test/test_mechanize_http_content_disposition_parser.rb
 test/test_mechanize_http_www_authenticate_parser.rb
+test/test_mechanize_image.rb
 test/test_mechanize_link.rb
 test/test_mechanize_page.rb
 test/test_mechanize_page_encoding.rb
 test/test_mechanize_page_frame.rb
+test/test_mechanize_page_image.rb
 test/test_mechanize_page_link.rb
 test/test_mechanize_page_meta_refresh.rb
 test/test_mechanize_parser.rb
 test/test_mechanize_pluggable_parser.rb
 test/test_mechanize_redirect_limit_reached_error.rb
 test/test_mechanize_redirect_not_get_or_head_error.rb
+test/test_mechanize_response_read_error.rb
 test/test_mechanize_subclass.rb
 test/test_mechanize_util.rb
 test/test_multi_select.rb

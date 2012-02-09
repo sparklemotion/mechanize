@@ -3,13 +3,10 @@ require 'mechanize/file_saver'
 require 'mechanize/page'
 
 ##
-# This class is used to register and maintain pluggable parsers for Mechanize
-# to use.
-#
 # Mechanize allows different parsers for different content types.  Mechanize
 # uses PluggableParser to determine which parser to use for any content type.
-# To use your own pluggable parser or to change the default pluggable parsers,
-# register them with this class.
+# To use your own parser or to change the default parsers, register them with
+# this class through Mechanize#pluggable_parser.
 #
 # The default parser for unregistered content types is Mechanize::File.
 #
@@ -22,8 +19,8 @@ require 'mechanize/page'
 # == Example
 #
 # To create your own parser, just create a class that takes four parameters in
-# the constructor.  Here is an example of registering a pluggable parser that
-# handles CSV files:
+# the constructor.  Here is an example of registering a parser that handles
+# CSV files:
 #
 #   require 'csv'
 #
@@ -43,8 +40,8 @@ require 'mechanize/page'
 # Now any response with a content type of 'text/csv' will initialize a
 # CSVParser and return that object to the caller.
 #
-# To register a pluggable parser for a content type that pluggable parser does
-# not know about, use the hash syntax:
+# To register a parser for a content type that Mechanize does not know about,
+# use the hash syntax:
 #
 #   agent.pluggable_parser['text/something'] = SomeClass
 #
@@ -73,6 +70,7 @@ class Mechanize::PluggableParser
       CONTENT_TYPES[:html]  => Mechanize::Page,
       CONTENT_TYPES[:xhtml] => Mechanize::Page,
       CONTENT_TYPES[:wap]   => Mechanize::Page,
+      'image'               => Mechanize::Image
     }
 
     @default = Mechanize::File
@@ -81,11 +79,24 @@ class Mechanize::PluggableParser
   ##
   # Returns the parser registered for the given +content_type+
 
-  def parser(content_type)
-    content_type.nil? ? default : @parsers[content_type] || default
+  def parser content_type
+    return default unless content_type
+
+    parser = @parsers[content_type]
+
+    return parser if parser
+
+    mime_type = MIME::Type.new content_type
+
+    parser = @parsers[mime_type.to_s] ||
+             @parsers[mime_type.simplified] ||
+             @parsers[mime_type.media_type] ||
+             default
+  rescue MIME::InvalidContentType
+    default
   end
 
-  def register_parser(content_type, klass) # :nodoc:
+  def register_parser content_type, klass # :nodoc:
     @parsers[content_type] = klass
   end
 
@@ -135,9 +146,12 @@ class Mechanize::PluggableParser
 
   ##
   # Sets the parser for +content_type+ content to +klass+
+  #
+  # The +content_type+ may either be a full MIME type a simplified MIME type
+  # ('text/x-csv' simplifies to 'text/csv') or a media type like 'image'.
 
-  def []=(content_type, klass)
-    @parsers[content_type] = klass
+  def []= content_type, klass
+    register_parser content_type, klass
   end
 
 end

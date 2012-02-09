@@ -32,6 +32,21 @@ class TestMechanizePluggableParser < Mechanize::TestCase
     assert_nil @pp['text/xml']
 
     assert_equal Mechanize::File, @pp.parser('text/xml')
+    assert_equal Mechanize::File, @pp.parser(nil)
+  end
+
+  def test_parser_mime
+    @pp['image/png'] = :png
+
+    assert_equal :png, @pp.parser('x-image/x-png')
+    assert_equal :png, @pp.parser('image/png')
+    assert_equal Mechanize::Image, @pp.parser('image')
+  end
+
+  def test_parser_bogus
+    assert_nil @pp['bogus']
+
+    assert_equal Mechanize::File, @pp.parser('bogus')
   end
 
   def test_pdf

@@ -6,6 +6,13 @@
   * Expose ssl_version from net-http-persistent.  Patch by astera.
   * SSL parameters and proxy may now be set at any time.  Issue #194 by
     dsisnero.
+  * Improved Mechanize::Page with #image_with and #images_with and
+    Mechanize::Page::Image various img element attribute accessors, #caption,
+    #extname, #mime_type and #fetch.  Pull request #173 by kitamomonga
+  * Added MIME type parsing for content-types in Mechanize::PluggableParser
+    for fine-grained parser choices.  Parsers will be chosen based on exact
+    match, simplified type or media type in that order.  See
+    Mechanize::PluggableParser#[]=.
 
 * Bug fixes
   * Fixed handling of a HEAD request with Accept-Encoding: gzip.  Issue #198

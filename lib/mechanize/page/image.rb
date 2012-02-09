@@ -49,17 +49,6 @@ class Mechanize::Page::Image
   end
 
   ##
-  # Saves the image to the given +path+ with Mechanize#transact.
-  #
-  #   p agent.page.uri.to_s # => "http://example/images.html"
-  #   agent.page.images[0].download
-  #   p agent.page.uri.to_s # => "http://example/images.html"
-
-  def download(path = nil, parameters = [], referer = nil, headers = {})
-    mech.transact{ save(path, parameters, referer, headers) }
-  end
-
-  ##
   # The suffix of the #url. The dot is a part of suffix, not a delimiter.
   #
   #   p image.url     # => "http://example/test.jpg"
@@ -90,8 +79,8 @@ class Mechanize::Page::Image
   # user specified  ::
   #   img.fetch(nil, my_referer_uri_or_page)
 
-  def fetch(parameters = [], referer = nil, headers = {})
-    mech.get(src, parameters, referer || image_referer, headers)
+  def fetch parameters = [], referer = nil, headers = {}
+    mech.get src, parameters, referer || image_referer, headers
   end
 
   ##
@@ -142,15 +131,6 @@ class Mechanize::Page::Image
 
   def relative? # :nodoc:
     %r{^https?://} !~ src
-  end
-
-  ##
-  # Fetches the file and saves it to the given +path+.
-  #
-  #   page.images_with(:src => /img/).each{|img| img.save}
-
-  def save(path = nil, parameters = [], referer = nil, headers = {})
-    fetch(parameters, referer, headers).save(path)
   end
 
   ##

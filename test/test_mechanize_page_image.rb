@@ -52,30 +52,6 @@ class TestMechanizePageImage < Mechanize::TestCase
                               "alt" => "alt", "title" => "title").caption
   end
 
-  def test_download
-    in_tmpdir do
-      page = html_page <<-BODY
-<img src="http://localhost/button.jpg">
-      BODY
-
-      page.images.first.download 'my_button.jpg'
-
-      assert_equal 983, File.size('my_button.jpg')
-    end
-  end
-
-  def test_save
-    in_tmpdir do
-      page = html_page <<-BODY
-<img src="http://localhost/button.jpg">
-      BODY
-
-      page.images.first.save 'my_button.jpg'
-
-      assert_equal 983, File.size('my_button.jpg')
-    end
-  end
-
   def test_url
     assert_equal "http://example/a.jpg", img('src' => @src).url
   end

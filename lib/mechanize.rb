@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'forwardable'
 require 'iconv' if RUBY_VERSION < '1.9.2'
+require 'mime/types'
 require 'mutex_m'
 require 'net/http/digest_auth'
 require 'net/http/persistent'
@@ -538,6 +539,18 @@ class Mechanize
   attr_accessor :keep_alive_time
 
   ##
+  # The pluggable parser maps a response Content-Type to a parser class.  The
+  # registered Content-Type may be either a full content type like 'image/png'
+  # or a media type 'text'.  See Mechanize::PluggableParser for further
+  # details.
+  #
+  # Example:
+  #
+  #   agent.pluggable_parser['application/octet-stream'] = Mechanize::Download
+
+  attr_reader :pluggable_parser
+
+  ##
   # The HTTP proxy address
 
   attr_reader :proxy_addr
@@ -1037,8 +1050,6 @@ class Mechanize
 
   attr_reader :agent # :nodoc:
 
-  attr_reader :pluggable_parser # :nodoc:
-
   ##
   # Parses the +body+ of the +response+ from +uri+ using the pluggable parser
   # that matches its content type
@@ -1143,6 +1154,7 @@ require 'mechanize/http/auth_challenge'
 require 'mechanize/http/auth_realm'
 require 'mechanize/http/content_disposition_parser'
 require 'mechanize/http/www_authenticate_parser'
+require 'mechanize/image'
 require 'mechanize/page'
 require 'mechanize/monkey_patch'
 require 'mechanize/pluggable_parsers'

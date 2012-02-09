@@ -61,6 +61,27 @@ class TestMechanizePage < Mechanize::TestCase
     assert_equal "File Upload Form",  page.iframes.first.content.title
   end
 
+  def test_image_with
+    page = html_page <<-BODY
+<img src="a.jpg">
+<img src="b.jpg">
+<img src="c.png">
+    BODY
+
+    assert_equal "http://example/b.jpg", page.image_with(:src => 'b.jpg').url
+  end
+
+  def test_images_with
+    page = html_page <<-BODY
+<img src="a.jpg">
+<img src="b.jpg">
+<img src="c.png">
+    BODY
+
+    images = page.images_with(:src => /jpg\Z/).map { |img| img.url }
+    assert_equal %w[http://example/a.jpg http://example/b.jpg], images
+  end
+
   def test_links
     page = html_page <<-BODY
 <a href="foo.html">

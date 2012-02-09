@@ -9,7 +9,7 @@ class Mechanize::Page::Image
   def initialize(node, page)
     @node = node
     @page = page
-    @mech = page && page.mech
+    @mech = page.mech
   end
 
   def src
@@ -93,30 +93,36 @@ class Mechanize::Page::Image
   alias :to_s :url
 
   # get #src with Mechanize#get. returns Mechanize#get result.
+  #
   #   agent.page.image_with(:src => /logo/).fetch.save
+  #
   # The referer is:
-  # #page("parent") : all images on http html, relative #src images on https html
-  # (no referer)    : absolute #src images on https html
-  # user specified  : img.fetch(nil, my_referer_uri_or_page)
+  # #page("parent") ::
+  #   all images on http html, relative #src images on https html
+  # (no referer)    ::
+  #   absolute #src images on https html
+  # user specified  ::
+  #   img.fetch(nil, my_referer_uri_or_page)
+
   def fetch(parameters = [], referer = nil, headers = {})
     mech.get(src, parameters, referer || image_referer, headers)
   end
 
-  def image_referer
-    http_page = page && page.uri && page.uri.scheme == 'http'
-    https_page = page && page.uri && page.uri.scheme == 'https'
-    empty_referer = Mechanize::Page.new(nil, {'content-type'=>'text/html'})
+  def image_referer # :nodoc:
+    http_page  = page.uri && page.uri.scheme == 'http'
+    https_page = page.uri && page.uri.scheme == 'https'
+
     case
-    when http_page then page
+    when http_page               then page
     when https_page && relative? then page
-    else empty_referer end
+    else
+      Mechanize::File.new(nil, { 'content-type' => 'text/plain' }, '', 200)
+    end
   end
 
-  def relative?
+  def relative? # :nodoc:
     %r{^https?://} !~ src
   end
-
-  private :image_referer, :relative?
 
   # #fetch and File#save(or, Download#save)
   #   page.images_with(:src => /img/).each{|img| img.save}

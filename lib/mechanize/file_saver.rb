@@ -1,7 +1,7 @@
 ##
 # This is a pluggable parser that automatically saves every file it
-# encounters.  It saves the files as a tree, reflecting the host and file
-# path.
+# encounters.  Unlike Mechanize::DirectorySaver, the file saver saves the
+# responses as a tree, reflecting the host and file path.
 #
 # == Example
 #
@@ -11,7 +11,7 @@
 #
 #   agent = Mechanize.new
 #   agent.pluggable_parser.pdf = Mechanize::FileSaver
-#   agent.get('http://example.com/foo.pdf')
+#   agent.get 'http://example.com/foo.pdf'
 #
 #   Dir['example.com/*'] # => foo.pdf
 

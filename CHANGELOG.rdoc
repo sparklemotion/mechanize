@@ -15,6 +15,8 @@
     Mechanize::PluggableParser#[]=.
   * Added Mechanize#download which downloads a response body to an IO-like or
     filename.
+  * Added Mechanize::DirectorySaver which saves responses in a single
+    directory.  Issue #187 by yoshie902a.
 
 * Bug fixes
   * Fixed handling of a HEAD request with Accept-Encoding: gzip.  Issue #198

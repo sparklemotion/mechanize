@@ -329,6 +329,9 @@ class Mechanize
   # or Mechanize::Page parser, the response body will be loaded into memory
   # before being saved.  See #pluggable_parser for details on changing this
   # default.
+  #
+  # For alternate ways of downloading files see Mechanize::FileSaver and
+  # Mechanize::DirectorySaver.
 
   def download uri, io_or_filename, parameters = [], referer = nil, headers = {}
     page = transact do
@@ -1181,6 +1184,7 @@ require 'mechanize/cookie'
 require 'mechanize/cookie_jar'
 require 'mechanize/parser'
 require 'mechanize/download'
+require 'mechanize/directory_saver'
 require 'mechanize/file'
 require 'mechanize/file_connection'
 require 'mechanize/file_request'

@@ -175,8 +175,6 @@ class Mechanize::Page::Image
     fetch(parameters, referer, headers).save(path)
   end
 
-  alias :save_as :save
-
   ##
   # Saves the image to the given +path+ with Mechanize#transact.
   #

@@ -872,9 +872,8 @@ class Mechanize::HTTP::Agent
 
     redirect_method = method == :head ? :head : :get
 
-    from_uri = page.uri
-    @history.push(page, from_uri)
-    new_uri = from_uri + response['Location'].to_s
+    @history.push(page, page.uri)
+    new_uri = resolve response['Location'].to_s, page
 
     fetch new_uri, redirect_method, {}, [], referer, redirects + 1
   end

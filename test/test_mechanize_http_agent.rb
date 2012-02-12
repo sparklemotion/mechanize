@@ -1217,6 +1217,19 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'http://example/referer', requests.first['Referer']
   end
 
+  def test_response_redirect_malformed
+    @agent.redirect_ok = true
+    referer = page 'http://example/referer'
+
+    page = fake_page
+    page = @agent.response_redirect({ 'Location' => '/index.html?q=あ' }, :get,
+                                    page, 0, referer)
+
+    assert_equal URI('http://fake.example/index.html?q=%E3%81%82'), page.uri
+
+    assert_equal 'http://example/referer', requests.first['Referer']
+  end
+
   def test_response_redirect_limit
     @agent.redirect_ok = true
     referer = page 'http://example/referer'

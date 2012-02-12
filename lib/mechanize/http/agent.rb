@@ -541,10 +541,24 @@ class Mechanize::HTTP::Agent
   end
 
   def resolve(uri, referer = current_page)
+    referer_uri = referer && referer.uri
     if uri.is_a?(URI)
       uri = uri.dup
+    elsif uri.nil?
+      if referer_uri
+        return referer_uri
+      end
+      raise ArgumentError, "absolute URL needed (not nil)"
     else
-      url = uri.to_s.strip.gsub(/[^#{0.chr}-#{126.chr}]/o) { |match|
+      url = uri.to_s.strip
+      if url.empty?
+        if referer_uri
+          return referer_uri.dup.tap { |u| u.fragment = nil }
+        end
+        raise ArgumentError, "absolute URL needed (not #{uri.inspect})"
+      end
+
+      url.gsub!(/[^#{0.chr}-#{126.chr}]/o) { |match|
         if RUBY_VERSION >= "1.9.0"
           Mechanize::Util.uri_escape(match)
         else
@@ -568,9 +582,9 @@ class Mechanize::HTTP::Agent
     scheme = uri.relative? ? 'relative' : uri.scheme.downcase
     uri = @scheme_handlers[scheme].call(uri, referer)
 
-    if referer && referer.uri
+    if referer_uri
       if uri.path.length == 0 && uri.relative?
-        uri.path = referer.uri.path
+        uri.path = referer_uri.path
       end
     end
 
@@ -578,17 +592,16 @@ class Mechanize::HTTP::Agent
 
     if uri.relative?
       raise ArgumentError, "absolute URL needed (not #{uri})" unless
-        referer && referer.uri
+        referer_uri
 
-      base = nil
-      if referer.respond_to?(:bases) && referer.parser
-        base = referer.bases.last
+      if referer.respond_to?(:bases) && referer.parser &&
+          (lbase = referer.bases.last) && lbase.uri && lbase.uri.absolute?
+        base = lbase
+      else
+        base = nil
       end
 
-      uri = ((base && base.uri && base.uri.absolute?) ?
-             base.uri :
-             referer.uri) + uri
-      uri = referer.uri + uri
+      uri = referer_uri + (base ? base.uri : referer_uri) + uri
       # Strip initial "/.." bits from the path
       uri.path.sub!(/^(\/\.\.)+(?=\/)/, '')
     end

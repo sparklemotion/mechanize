@@ -34,6 +34,14 @@ class TestMechanizeLink < Mechanize::TestCase
     # HACK no assertion
   end
 
+  def test_click_empty_href
+    page = @mech.get("http://google.com/tc_links.html?q=test#anchor")
+    link = page.link_with(:text => 'empty href')
+
+    new_page = link.click
+    assert_equal "http://google.com/tc_links.html?q=test", new_page.uri.to_s
+  end
+
   def test_text_alt_text
     page = @mech.get("http://localhost/alt_text.html")
     assert_equal(5, page.links.length)

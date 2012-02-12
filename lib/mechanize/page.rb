@@ -328,7 +328,7 @@ class Mechanize::Page < Mechanize::File
     query = @mech.follow_meta_refresh == :anywhere ? 'meta' : 'head > meta'
 
     @meta_refresh ||= search(query).map do |node|
-      MetaRefresh.from_node node, self, uri
+      MetaRefresh.from_node node, self
     end.compact
   end
 

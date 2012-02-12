@@ -774,7 +774,8 @@ class Mechanize::HTTP::Agent
 
   def response_follow_meta_refresh response, uri, page, redirects
     delay, new_url = get_meta_refresh(response, uri, page)
-    return nil unless new_url
+    return nil unless delay
+    new_url = new_url ? resolve(new_url, page) : uri
 
     raise Mechanize::RedirectLimitReachedError.new(page, redirects) if
       redirects + 1 > @redirection_limit

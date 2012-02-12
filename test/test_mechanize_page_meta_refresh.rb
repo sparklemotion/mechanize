@@ -21,7 +21,7 @@ class TestMechanizePageMetaRefresh < Mechanize::TestCase
 
   def util_meta_refresh page
     node = page.search('meta').first
-    @MR.from_node node, page, @uri
+    @MR.from_node node, page
   end
 
   def test_class_parse
@@ -103,17 +103,17 @@ class TestMechanizePageMetaRefresh < Mechanize::TestCase
     page = util_page 5, 'test'
     link = util_meta_refresh page
     assert_equal 5, link.delay
-    assert_equal 'http://example/here/test', link.href
+    assert_equal 'test', link.href
 
     page = util_page 5, '/test'
     link = util_meta_refresh page
     assert_equal 5, link.delay
-    assert_equal 'http://example/test', link.href
+    assert_equal '/test', link.href
 
     page = util_page 5, nil
     link = util_meta_refresh page
     assert_equal 5, link.delay
-    assert_equal 'http://example/here/', link.href
+    assert_equal nil, link.href
 
     page = util_page 5, @uri
     link = util_meta_refresh page

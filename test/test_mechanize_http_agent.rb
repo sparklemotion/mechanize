@@ -221,7 +221,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     refresh = @agent.get_meta_refresh @res, @uri, page
 
-    assert_equal [0, 'http://example/'], refresh
+    assert_equal [0, nil], refresh
   end
 
   def test_get_meta_refresh_meta_no_follow

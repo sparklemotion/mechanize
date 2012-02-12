@@ -2,6 +2,11 @@
 
 === 2.2
 
+* API changes
+  * MetaRefresh#href is not normalized to an absolute URL, but set to the
+    original value and resolved later.  It is even set to nil when the
+    Refresh URL is unspecified or empty.
+
 * Minor enhancements
   * Expose ssl_version from net-http-persistent.  Patch by astera.
   * SSL parameters and proxy may now be set at any time.  Issue #194 by
@@ -17,10 +22,16 @@
     filename.
   * Added Mechanize::DirectorySaver which saves responses in a single
     directory.  Issue #187 by yoshie902a.
+  * Added Link#noreferrer?.
 
 * Bug fixes
   * Fixed handling of a HEAD request with Accept-Encoding: gzip.  Issue #198
     by Oleg Dashevskii
+  * Use #resolve for resolving a Location header value.  fixes #197
+  * A Refresh value can have whitespaces around the semicolon and equal sign.
+  * MetaRefresh#click no longer sends out Referer.
+  * A link with an empty href is now resolved correctly where previously the
+    query part was dropped.
 
 === 2.1.1 / 2012-02-03
 

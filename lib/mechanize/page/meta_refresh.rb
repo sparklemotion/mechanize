@@ -52,9 +52,9 @@ class Mechanize::Page::MetaRefresh < Mechanize::Page::Link
     return delay, dest, link_self
   end
 
-  def self.from_node node, page, uri
-    http_equiv = node['http-equiv']
-    return unless http_equiv and http_equiv.downcase == 'refresh'
+  def self.from_node node, page, uri = nil
+    http_equiv = node['http-equiv'] and
+      /\ARefresh\z/i =~ http_equiv or return
 
     delay, uri, link_self = parse node['content'], uri
 
@@ -66,7 +66,7 @@ class Mechanize::Page::MetaRefresh < Mechanize::Page::Link
   def initialize node, page, delay, href, link_self = false
     super node, page.mech, page
 
-    @delay     = delay =~ /\./ ? delay.to_f : delay.to_i
+    @delay     = delay.include?(?.) ? delay.to_f : delay.to_i
     @href      = href
     @link_self = link_self
   end

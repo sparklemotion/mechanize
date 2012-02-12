@@ -541,10 +541,10 @@ class Mechanize::HTTP::Agent
   end
 
   def resolve(uri, referer = current_page)
-    uri = uri.dup if uri.is_a?(URI)
-
-    unless uri.is_a?(URI)
-      uri = uri.to_s.strip.gsub(/[^#{0.chr}-#{126.chr}]/o) { |match|
+    if uri.is_a?(URI)
+      uri = uri.dup
+    else
+      url = uri.to_s.strip.gsub(/[^#{0.chr}-#{126.chr}]/o) { |match|
         if RUBY_VERSION >= "1.9.0"
           Mechanize::Util.uri_escape(match)
         else
@@ -552,19 +552,16 @@ class Mechanize::HTTP::Agent
         end
       }
 
-      unescaped = uri.split(/(?:%[0-9A-Fa-f]{2})+|#/)
-      escaped   = uri.scan(/(?:%[0-9A-Fa-f]{2})+|#/)
-
-      escaped_uri = Mechanize::Util.html_unescape(
-        unescaped.zip(escaped).map { |x,y|
+      escaped_url = Mechanize::Util.html_unescape(
+        url.split(/((?:%[0-9A-Fa-f]{2})+|#)/).each_slice(2).map { |x, y|
           "#{WEBrick::HTTPUtils.escape(x)}#{y}"
         }.join('')
       )
 
       begin
-        uri = URI.parse(escaped_uri)
+        uri = URI.parse(escaped_url)
       rescue
-        uri = URI.parse(WEBrick::HTTPUtils.escape(escaped_uri))
+        uri = URI.parse(WEBrick::HTTPUtils.escape(escaped_url))
       end
     end
 

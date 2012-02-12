@@ -71,5 +71,8 @@ class Mechanize::Page::MetaRefresh < Mechanize::Page::Link
     @link_self = link_self
   end
 
+  def noreferrer?
+    true
+  end
 end
 

@@ -293,7 +293,7 @@ class Mechanize
           raise RobotsDisallowedError.new(link.href)
         end
       end
-      if link.rel?('noreferrer')
+      if link.noreferrer?
         href = @agent.resolve(link.href, link.page || current_page)
         referer = Page.new(nil, {'content-type'=>'text/html'})
       else

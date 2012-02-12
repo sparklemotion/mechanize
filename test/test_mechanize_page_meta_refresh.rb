@@ -143,5 +143,11 @@ class TestMechanizePageMetaRefresh < Mechanize::TestCase
     assert_nil util_meta_refresh page
   end
 
+  def test_meta_refresh_click_sends_no_referer
+    page = util_page 0, '/referer'
+    link = util_meta_refresh page
+    refreshed = link.click
+    assert_equal '', refreshed.body
+  end
 end
 

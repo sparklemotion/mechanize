@@ -63,6 +63,11 @@ class Mechanize::Page::Link
     rel.include? kind
   end
 
+  # Test if this link should not be traced.
+  def noreferrer?
+    rel?('noreferrer')
+  end
+
   # The text content of this link
   def text
     return @text if @text

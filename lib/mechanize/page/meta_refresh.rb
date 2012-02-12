@@ -22,7 +22,7 @@ class Mechanize::Page::MetaRefresh < Mechanize::Page::Link
   #   $1:: delay
   #   $3:: url
 
-  CONTENT_REGEXP = /^\s*(\d+\.?\d*)(;|;\s*url=\s*['"]?(\S*?)['"]?)?\s*$/i
+  CONTENT_REGEXP = /^\s*(\d+\.?\d*)\s*(?:;(?:\s*url\s*=\s*(['"]?)(\S*)\2)?\s*)?$/i
 
   ##
   # Regexp of unsafe URI characters that excludes % for Issue #177

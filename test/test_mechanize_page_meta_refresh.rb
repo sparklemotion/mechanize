@@ -63,7 +63,17 @@ class TestMechanizePageMetaRefresh < Mechanize::TestCase
     assert_equal "http://example/here/", uri.to_s
     assert link_self
 
+    delay, uri, link_self = @MR.parse "   0 ;   ", @uri
+    assert_equal "0", delay
+    assert_equal "http://example/here/", uri.to_s
+    assert link_self
+
     delay, uri, link_self = @MR.parse "0; UrL=http://localhost:8080/path", @uri
+    assert_equal "0", delay
+    assert_equal "http://localhost:8080/path", uri.to_s
+    refute link_self
+
+    delay, uri, link_self = @MR.parse "0 ; UrL = http://localhost:8080/path", @uri
     assert_equal "0", delay
     assert_equal "http://localhost:8080/path", uri.to_s
     refute link_self

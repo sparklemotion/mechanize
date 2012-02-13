@@ -186,9 +186,26 @@ class Mechanize::Page < Mechanize::File
     @meta_content_type || response['content-type']
   end
 
-  # Search through the page like HPricot
+  ##
+  # :method: search
+  #
+  # Search for +paths+ in the page using Nokogiri's #search.  The +paths+ can
+  # be XPath or CSS and an optional Hash of namespaces may be appended.
+  #
+  # See Nokogiri::XML::Node#search for further details.
+
   def_delegator :parser, :search, :search
-  def_delegator :parser, :/, :/
+
+  alias / search
+
+  ##
+  # :method: at
+  #
+  # Search through the page for +path+ under +namespace+ using Nokogiri's #at.
+  # The +path+ may be either a CSS or XPath expression.
+  #
+  # See also Nokogiri::XML::Node#at
+
   def_delegator :parser, :at, :at
 
   ##

@@ -130,7 +130,7 @@ In this section, I want to touch on using the different types in input fields
 possible with a form.  Password and textarea fields can be treated just like
 text input fields.  Select fields are very similar to text fields, but they
 have many options associated with them.  If you select one option, mechanize
-will deselect the other options (unless it is a multi select!).
+will de-select the other options (unless it is a multi select!).
 
 For example, lets select an option on a list:
 
@@ -154,10 +154,15 @@ tell it what file name you want to upload:
 
 == Scraping Data
 
-Mechanize uses nokogiri[http://nokogiri.org/] to parse
-html.  What does this mean for you?  You can treat a mechanize page like
-an nokogiri object.  After you have used Mechanize to navigate to the page
-that you need to scrape, then scrape it using nokogiri methods:
+Mechanize uses nokogiri[http://nokogiri.org/] to parse HTML.  What does this
+mean for you?  You can treat a mechanize page like an nokogiri object.  After
+you have used Mechanize to navigate to the page that you need to scrape, then
+scrape it using nokogiri methods:
+
+  agent.get('http://someurl.com/').search("p.posted")
+
+The expression given to Mechanize::Page#search may be a CSS expression or an
+XPath expression:
 
   agent.get('http://someurl.com/').search(".//p[@class='posted']")
 

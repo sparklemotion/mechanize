@@ -1,8 +1,9 @@
 = Mechanize examples
 
 Note: Several examples show methods chained to the end of do/end blocks.
-Do...end is the same as curly braces ({...}). For example, do ... end.submit
-is the same as { ... }.submit.
+<code>do...end</code> is the same as curly braces (<code>{...}</code>).  For
+example, <code>do ... end.submit</code> is the same as <code>{ ...
+}.submit</code>.
 
 == Google
 
@@ -81,7 +82,8 @@ Upload a file to flickr.
   end
 
 == Pluggable Parsers
-Lets say you want html pages to automatically be parsed with Rubyful Soup.
+
+Lets say you want HTML pages to automatically be parsed with Rubyful Soup.
 This example shows you how:
 
   require 'rubygems'
@@ -115,10 +117,10 @@ Beautiful Soup for that page.
 
 == The transact method
 
-transact runs the given block and then resets the page history. I.e. after the
-block has been executed, you're back at the original page; no need count how
-many times to call the back method at the end of a loop (while accounting for
-possible exceptions).
+Mechanize#transact runs the given block and then resets the page history. I.e.
+after the block has been executed, you're back at the original page; no need
+count how many times to call the back method at the end of a loop (while
+accounting for possible exceptions).
 
 This example also demonstrates subclassing Mechanize.
 
@@ -154,17 +156,12 @@ This example also demonstrates subclassing Mechanize.
 
 == Client Certificate Authentication (Mutual Auth)
 
-In most cases a client certificate is created as an additional layer of security
-for certain websites.  The specific case that this was initially tested on was
-for automating the download of archived images from a banks (Wachovia) lockbox
-system.  Once the certificate is installed into your browser you will have to
-export it and split the certificate and private key into separate files.
-Exported files are usually in .p12 format (IE 7 & Firefox 2.0) which stands for
-PKCS #12.  You can convert them from p12 to pem format by using the following
-commands:
-
-openssl.exe pkcs12 -in input_file.p12 -clcerts -out example.key -nocerts -nodes
-openssl.exe pkcs12 -in input_file.p12 -clcerts -out example.cer -nokeys
+In most cases a client certificate is created as an additional layer of
+security for certain websites.  The specific case that this was initially
+tested on was for automating the download of archived images from a banks
+(Wachovia) lockbox system.  Once the certificate is installed into your
+browser you will have to export it and split the certificate and private key
+into separate files.
 
   require 'rubygems'
   require 'mechanize'
@@ -185,3 +182,11 @@ openssl.exe pkcs12 -in input_file.p12 -clcerts -out example.cer -nokeys
 
   # submit login form
   agent.submit(login_form, login_form.buttons.first)
+
+Exported files are usually in .p12 format (IE 7 & Firefox 2.0) which stands
+for PKCS #12.  You can convert them from p12 to pem format by using the
+following commands:
+
+  openssl pkcs12 -in input_file.p12 -clcerts -out example.key -nocerts -nodes
+  openssl pkcs12 -in input_file.p12 -clcerts -out example.cer -nokeys
+

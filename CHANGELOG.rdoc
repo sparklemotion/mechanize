@@ -22,7 +22,9 @@
     filename.
   * Added Mechanize::DirectorySaver which saves responses in a single
     directory.  Issue #187 by yoshie902a.
-  * Added Link#noreferrer?.
+  * Added Mechanize::Page::Link#noreferrer?
+  * The documentation for Mechanize::Page#search and #at now show that both
+    XPath and CSS expressions are allowed.  Issue #199 by Shane Becker.
 
 * Bug fixes
   * Fixed handling of a HEAD request with Accept-Encoding: gzip.  Issue #198

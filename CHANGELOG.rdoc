@@ -1,6 +1,6 @@
 = Mechanize CHANGELOG
 
-=== 2.2
+=== 2.2 / 2012-02-12
 
 * API changes
   * MetaRefresh#href is not normalized to an absolute URL, but set to the

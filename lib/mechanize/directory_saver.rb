@@ -9,6 +9,8 @@
 
 class Mechanize::DirectorySaver < Mechanize::Download
 
+  @directory = nil
+
   ##
   # Creates a DirectorySaver subclass that will save responses to the given
   # +directory+.
@@ -30,7 +32,7 @@ class Mechanize::DirectorySaver < Mechanize::Download
 
   ##
   # Saves the +body_io+ into the directory specified for this DirectorySaver
-  # by save_to.  The filename is chosen by Mechanize::Parser#extract_filename.  
+  # by save_to.  The filename is chosen by Mechanize::Parser#extract_filename.
 
   def initialize uri = nil, response = nil, body_io = nil, code = nil
     directory = self.class.directory

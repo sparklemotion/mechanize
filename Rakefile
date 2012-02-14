@@ -27,6 +27,8 @@ hoe = Hoe.spec 'mechanize' do
   self.spec_extras[:required_ruby_version] = '>= 1.8.7'
 end
 
+task :prerelease => [:clobber, :check_manifest, :test]
+
 desc "Update SSL Certificate"
 task('ssl_cert') do |p|
   sh "openssl genrsa -des3 -out server.key 1024"

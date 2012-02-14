@@ -1,5 +1,11 @@
 = Mechanize CHANGELOG
 
+=== 2.2.1 / 2012-02-13
+
+* Bug fixes
+  * Add missing file to the gem, ensure that missing files won't cause
+    failures again.  Issue #201 by Alex
+
 === 2.2 / 2012-02-12
 
 * API changes

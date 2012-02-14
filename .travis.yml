@@ -3,7 +3,7 @@ before_script:
   - gem install rdoc --no-rdoc --no-ri
   - gem install minitest --no-rdoc --no-ri
   - rake travis_deps
-  - echo 'exclude: !ruby/regexp /\.(git|travis)/' > ~/.hoerc
+  - "echo 'exclude: !ruby/regexp /\.(git|travis)/' > ~/.hoerc"
   - rake check_manifest
 rvm:
   - 1.8.7

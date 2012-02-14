@@ -5,6 +5,7 @@
 * Bug fixes
   * Add missing file to the gem, ensure that missing files won't cause
     failures again.  Issue #201 by Alex
+  * Fix minor grammar issue in README.  Issue #200 by Shane Becker.
 
 === 2.2 / 2012-02-12
 

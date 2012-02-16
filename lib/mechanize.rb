@@ -295,7 +295,7 @@ class Mechanize
       end
       if link.noreferrer?
         href = @agent.resolve(link.href, link.page || current_page)
-        referer = Page.new(nil, {'content-type'=>'text/html'})
+        referer = Page.new
       else
         href = link.href
       end
@@ -382,9 +382,9 @@ class Mechanize
 
     referer ||=
       if uri.to_s =~ %r{\Ahttps?://}
-        Page.new(nil, 'content-type' => 'text/html')
+        Page.new
       else
-        current_page || Page.new(nil, 'content-type' => 'text/html')
+        current_page || Page.new
       end
 
     # FIXME: Huge hack so that using a URI as a referer works.  I need to
@@ -392,9 +392,9 @@ class Mechanize
     # Mechanize::Page#base
     unless Mechanize::Parser === referer then
       referer = if referer.is_a?(String) then
-                  Page.new URI(referer), 'content-type' => 'text/html'
+                  Page.new URI(referer)
                 else
-                  Page.new referer, 'content-type' => 'text/html'
+                  Page.new referer
                 end
     end
 
@@ -479,7 +479,7 @@ class Mechanize
   # as the request body, if allowed.
 
   def request_with_entity(verb, uri, entity, headers = {})
-    cur_page = current_page || Page.new(nil, {'content-type'=>'text/html'})
+    cur_page = current_page || Page.new
 
     headers = {
       'Content-Type' => 'application/octet-stream',
@@ -1152,7 +1152,7 @@ class Mechanize
 
   def post_form(uri, form, headers = {})
     cur_page = form.page || current_page ||
-      Page.new(nil, {'content-type'=>'text/html'})
+      Page.new
 
     request_data = form.request_data
 

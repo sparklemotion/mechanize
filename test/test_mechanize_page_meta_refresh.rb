@@ -15,8 +15,7 @@ class TestMechanizePageMetaRefresh < Mechanize::TestCase
 <head><meta http-equiv="refresh" content="#{delay};url=#{uri}"></head>
     BODY
 
-    Mechanize::Page.new(@uri, { 'content-type' => 'text/html' }, body, 200,
-                        @mech)
+    Mechanize::Page.new(@uri, nil, body, 200, @mech)
   end
 
   def util_meta_refresh page
@@ -126,8 +125,7 @@ class TestMechanizePageMetaRefresh < Mechanize::TestCase
 <head><meta http-equiv="refresh"></head>
     BODY
 
-    page = Mechanize::Page.new(@uri, { 'content-type' => 'text/html' }, body,
-                               200, @mech)
+    page = Mechanize::Page.new(@uri, nil, body, 200, @mech)
 
     assert_nil util_meta_refresh page
   end
@@ -137,8 +135,7 @@ class TestMechanizePageMetaRefresh < Mechanize::TestCase
 <head><meta http-equiv="other-thing" content="0;"></head>
     BODY
 
-    page = Mechanize::Page.new(@uri, { 'content-type' => 'text/html' }, body,
-                               200, @mech)
+    page = Mechanize::Page.new(@uri, nil, body, 200, @mech)
 
     assert_nil util_meta_refresh page
   end

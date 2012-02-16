@@ -9,6 +9,9 @@ class TestMechanizePage < Mechanize::TestCase
   end
 
   def test_initialize_good_content_type
+    page = Mechanize::Page.new
+    assert_equal('text/html', page.content_type)
+
     [
       'text/html',
       'Text/HTML',

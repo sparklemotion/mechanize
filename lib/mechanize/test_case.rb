@@ -38,9 +38,7 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
 </html>
     END
 
-    response = { 'content-type' => 'text/html' }
-
-    Mechanize::Page.new uri, response, html, 200, agent
+    Mechanize::Page.new uri, nil, html, 200, agent
   end
 
   def have_encoding?
@@ -49,7 +47,7 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
 
   def html_page body
     uri = URI 'http://example/'
-    Mechanize::Page.new uri, { 'content-type' => 'text/html' }, body, 200, @mech
+    Mechanize::Page.new uri, nil, body, 200, @mech
   end
 
   def in_tmpdir

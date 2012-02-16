@@ -13,6 +13,10 @@ class Mechanize::Page < Mechanize::File
   extend Forwardable
   extend Mechanize::ElementMatcher
 
+  DEFAULT_RESPONSE = {
+    'content-type' => 'text/html',
+  }.freeze
+
   attr_accessor :mech
 
   ##
@@ -21,6 +25,7 @@ class Mechanize::Page < Mechanize::File
   attr_reader :encodings
 
   def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
+    response ||= DEFAULT_RESPONSE
     raise Mechanize::ContentTypeError, response['content-type'] unless
       response['content-type'] =~ %r{\A(?:text/html|application/xhtml\+xml)(?:$|\s*[\s;,])}i
 

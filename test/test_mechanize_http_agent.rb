@@ -176,8 +176,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     @agent.follow_meta_refresh = true
     @agent.follow_meta_refresh_self = true
 
-    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, '',
-                               200, @mech)
+    page = Mechanize::Page.new(@uri, nil, '', 200, @mech)
     @res.instance_variable_set :@header, 'refresh' => ['0']
 
     refresh = @agent.get_meta_refresh @res, @uri, page
@@ -186,8 +185,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_get_meta_refresh_header_no_follow
-    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, '',
-                               200, @mech)
+    page = Mechanize::Page.new(@uri, nil, '', 200, @mech)
     @res.instance_variable_set :@header, 'refresh' => ['0']
 
     refresh = @agent.get_meta_refresh @res, @uri, page
@@ -198,8 +196,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   def test_get_meta_refresh_header_no_follow_self
     @agent.follow_meta_refresh = true
 
-    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, '',
-                               200, @mech)
+    page = Mechanize::Page.new(@uri, nil, '', 200, @mech)
     @res.instance_variable_set :@header, 'refresh' => ['0']
 
     refresh = @agent.get_meta_refresh @res, @uri, page
@@ -216,8 +213,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 <meta http-equiv="refresh" content="0">
     BODY
 
-    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, body,
-                               200, @mech)
+    page = Mechanize::Page.new(@uri, nil, body, 200, @mech)
 
     refresh = @agent.get_meta_refresh @res, @uri, page
 
@@ -230,8 +226,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 <meta http-equiv="refresh" content="0">
     BODY
 
-    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, body,
-                               200, @mech)
+    page = Mechanize::Page.new(@uri, nil, body, 200, @mech)
 
     refresh = @agent.get_meta_refresh @res, @uri, page
 
@@ -246,8 +241,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 <meta http-equiv="refresh" content="0">
     BODY
 
-    page = Mechanize::Page.new(@uri, {'content-type' => 'text/html'}, body,
-                               200, @mech)
+    page = Mechanize::Page.new(@uri, nil, body, 200, @mech)
 
     refresh = @agent.get_meta_refresh @res, @uri, page
 
@@ -958,8 +952,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 <meta http-equiv="refresh" content="0">
     BODY
 
-    page = Mechanize::Page.new(uri, {'content-type' => 'text/html'}, body,
-                               200, @mech)
+    page = Mechanize::Page.new(uri, nil, body, 200, @mech)
 
     @agent.follow_meta_refresh = true
     @agent.follow_meta_refresh_self = true
@@ -977,8 +970,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 <meta http-equiv="refresh" content="0">
     BODY
 
-    page = Mechanize::Page.new(uri, {'content-type' => 'text/html'}, body,
-                               200, @mech)
+    page = Mechanize::Page.new(uri, nil, body, 200, @mech)
 
     @agent.follow_meta_refresh = true
     @agent.follow_meta_refresh_self = true

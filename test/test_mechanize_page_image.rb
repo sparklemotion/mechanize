@@ -8,8 +8,7 @@ class TestMechanizePageImage < Mechanize::TestCase
     @uri = URI 'http://example/'
     @src = (@uri + 'a.jpg').to_s
 
-    @empty_page = Mechanize::Page.new(@uri, { 'content-type' => 'text/html' },
-                                      '', 200, @mech)
+    @empty_page = Mechanize::Page.new(@uri, nil, '', 200, @mech)
   end
 
   def img attributes

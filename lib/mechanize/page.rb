@@ -22,7 +22,7 @@ class Mechanize::Page < Mechanize::File
 
   def initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
     raise Mechanize::ContentTypeError, response['content-type'] unless
-      response['content-type'] =~ /^(text\/html)|(application\/xhtml\+xml)/i
+      response['content-type'] =~ %r{\A(?:text/html|application/xhtml\+xml)(?:$|\s*[\s;,])}i
 
     @meta_content_type = nil
     @encoding = nil

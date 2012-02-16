@@ -8,13 +8,40 @@ class TestMechanizePage < Mechanize::TestCase
     @uri = URI 'http://example/'
   end
 
-  def test_initialize_bad_content_type
-    e = assert_raises Mechanize::ContentTypeError do
-      Mechanize::Page.new(URI('http://example/'),
-                          { 'content-type' => 'text/xml' }, 'hello', '200')
-    end
+  def test_initialize_good_content_type
+    [
+      'text/html',
+      'Text/HTML',
+      'text/html; charset=UTF-8',
+      'text/html ; charset=US-ASCII',
+      'application/xhtml+xml',
+      'Application/XHTML+XML',
+      'application/xhtml+xml; charset=UTF-8',
+      'application/xhtml+xml ; charset=US-ASCII',
+    ].each { |content_type|
+      page = Mechanize::Page.new(URI('http://example/'),
+        { 'content-type' => content_type }, 'hello', '200')
 
-    assert_equal('text/xml', e.content_type)
+      assert_equal(content_type, page.content_type, content_type)
+    }
+  end
+
+  def test_initialize_bad_content_type
+    [
+      'text/xml',
+      'text/xhtml',
+      'text/htmlfu',
+      'footext/html',
+      'application/xhtml+xmlfu',
+      'fooapplication/xhtml+xml',
+    ].each { |content_type|
+      e = assert_raises(Mechanize::ContentTypeError, content_type) do
+        Mechanize::Page.new(URI('http://example/'),
+          { 'content-type' => content_type }, 'hello', '200')
+      end
+
+      assert_equal(content_type, e.content_type, content_type)
+    }
   end
 
   def test_frames

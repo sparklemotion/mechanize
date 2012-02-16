@@ -5,22 +5,24 @@
 #
 # See Mechanize::PluggableParser for instructions on using this class.
 
-class Mechanize::Download
-
-  include Mechanize::Parser
-
-  ##
-  # The filename for this file based on the content-disposition of the
-  # response or the basename of the URL
-
-  attr_accessor :filename
+class Mechanize::Download < Mechanize::File
 
   ##
   # Accessor for the IO-like that contains the body
 
   attr_reader :body_io
 
+  # This method returns an IO-like object, not a String like
+  # Mechanize::File and Mechanize::Page do.
   alias content body_io
+
+  # Returns a whole content body.  Use save() instead if you just want
+  # to download the content into a file.
+  def body
+    @body_io.read.tap {
+      @body_io.rewind
+    }
+  end
 
   ##
   # Creates a new download retrieved from the given +uri+ and +response+
@@ -28,16 +30,8 @@ class Mechanize::Download
   # +code+ is the HTTP status.
 
   def initialize uri = nil, response = nil, body_io = nil, code = nil
-    @uri      = uri
+    super uri, response, nil, code
     @body_io  = body_io
-    @code     = code
-
-    @full_path = false unless defined? @full_path
-
-    fill_header response
-    extract_filename
-
-    yield self if block_given?
   end
 
   ##

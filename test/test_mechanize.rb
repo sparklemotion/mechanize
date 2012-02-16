@@ -844,6 +844,8 @@ but not <a href="/" rel="me nofollow">this</a>!
 
     assert_kind_of Mechanize::Download, download
     assert_kind_of StringIO, download.content
+    assert_equal 'raw', download.body
+    assert_equal 'raw', download.body, 'test if body() is repeatable'
   end
 
   def test_parse_html

@@ -358,6 +358,14 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 1, @agent.http.idle_timeout
   end
 
+  def test_inflate
+    body_io = StringIO.new "x\x9C+H,*\x01\x00\x04?\x01\xB8"
+
+    result = @agent.inflate body_io
+
+    assert_equal 'part', result.read
+  end
+
   def test_post_connect
     @agent.post_connect_hooks << proc { |agent, uri, response, body|
       assert_equal @agent, agent
@@ -773,6 +781,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     body = @agent.response_content_encoding @res, body_io
 
     assert_equal 'part', body.read
+
+    assert body_io.closed?
   end
 
   def test_response_content_encoding_deflate_chunked
@@ -794,6 +804,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     assert_match %r%error handling content-encoding deflate:%, e.message
     assert_match %r%Zlib%, e.message
+
+    assert body_io.closed?
   end
 
   def test_response_content_encoding_deflate_empty
@@ -821,6 +833,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     body = @agent.response_content_encoding @res, body_io
 
     assert_equal 'part', body.read
+
+    assert body_io.closed?
   end
 
   def test_response_content_encoding_gzip_chunked
@@ -852,6 +866,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     assert_match %r%unable to gunzip response, trying raw inflate%, log.string
     assert_match %r%unable to gunzip response:%, log.string
+
+    assert body_io.closed?
   end
 
   def test_response_content_encoding_gzip_corrupt_checksum

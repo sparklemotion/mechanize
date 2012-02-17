@@ -393,6 +393,7 @@ class Mechanize::HTTP::Agent
     end
   ensure
     zio.close if zio and not zio.closed?
+    body_io.close unless body_io.closed?
   end
 
   ##
@@ -414,6 +415,8 @@ class Mechanize::HTTP::Agent
       log.error("unable to inflate response: #{e}") if log
       raise
     end
+  ensure
+    body_io.close
   end
 
   def disable_keep_alive request

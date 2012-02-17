@@ -222,6 +222,8 @@ class Mechanize
   # unlimited.  Take care when doing this, mechanize stores response bodies in
   # memory for pages and in the temporary files directory for other responses.
   # For a long-running mechanize program this can be quite large.
+  #
+  # See also the discussion under #max_file_buffer=
 
   def max_history= length
     @agent.history.max_size = length
@@ -775,8 +777,10 @@ class Mechanize
   # Note that for Mechanize::Download subclasses, the maximum buffer size
   # multiplied by the number of pages stored in history (controlled by
   # #max_history) is an approximate upper limit on the amount of memory
-  # Mechanize will use.  By default Mechanize can use up to ~5MB to store
+  # Mechanize will use.  By default, Mechanize can use up to ~5MB to store
   # response bodies for non-File and non-Page (HTML) responses.
+  #
+  # See also the discussion under #max_history=
 
   def max_file_buffer= bytes
     @agent.max_file_buffer = bytes

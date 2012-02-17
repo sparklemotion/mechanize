@@ -31,6 +31,69 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     realm
   end
 
+  def test_auto_io
+    Tempfile.open 'input' do |input_io|
+      input_io.binmode
+      input_io.write '12345'
+      input_io.rewind
+
+      out_io = @agent.auto_io __name__, 1024, input_io
+
+      assert_equal '12345', out_io.string
+
+      assert_equal Encoding::BINARY, out_io.string.encoding if
+        Object.const_defined? :Encoding
+    end
+  end
+
+  def test_auto_io_chunk
+    Tempfile.open 'input' do |input_io|
+      chunks = []
+
+      input_io.binmode
+      input_io.write '12345'
+      input_io.rewind
+
+      @agent.auto_io __name__, 1, input_io do |chunk|
+        chunks << chunk
+      end
+
+      assert_equal %w[1 2 3 4 5], chunks
+    end
+  end
+
+  def test_auto_io_tempfile
+    @agent.max_file_buffer = 3
+
+    Tempfile.open 'input' do |input_io|
+      input_io.binmode
+      input_io.write '12345'
+      input_io.rewind
+
+      out_io = @agent.auto_io __name__, 1, input_io
+
+      result = out_io.read
+      assert_equal '12345', result
+
+      assert_equal Encoding::BINARY, result.encoding if
+        Object.const_defined? :Encoding
+    end
+  end
+
+  def test_auto_io_yield
+    Tempfile.open 'input' do |input_io|
+      input_io.binmode
+      input_io.write '12345'
+      input_io.rewind
+
+      out_io = @agent.auto_io __name__, 1024, input_io do |chunk|
+        "x#{chunk}"
+      end
+
+      assert_equal 'x12345', out_io.string
+    end
+  end
+
   def test_certificate_equals
     cert_path = File.expand_path '../data/server.crt', __FILE__
     cert = OpenSSL::X509::Certificate.new File.read cert_path

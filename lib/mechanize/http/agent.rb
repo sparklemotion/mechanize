@@ -375,14 +375,7 @@ class Mechanize::HTTP::Agent
     log.debug('gzip response') if log
 
     zio = Zlib::GzipReader.new body_io
-    out_io = Tempfile.new 'mechanize-decode'
-    out_io.unlink
-    out_io.binmode
-
-    until zio.eof? do
-      out_io.write zio.read 16384
-    end
-
+    out_io = auto_io 'mechanize-gunzip', 16384, zio
     zio.finish
 
     return out_io
@@ -739,7 +732,10 @@ class Mechanize::HTTP::Agent
     raise Mechanize::Error, message
   ensure
     begin
-      body_io.close! if Tempfile === body_io and out_io.path != body_io.path
+      if Tempfile === body_io and
+         (StringIO === out_io or out_io.path != body_io.path) then
+        body_io.close! 
+      end
     rescue IOError
       # HACK ruby 1.8 raises IOError when closing the stream
     end
@@ -1034,17 +1030,53 @@ class Mechanize::HTTP::Agent
 
   # :section: Utility
 
+  ##
+  # Creates a new output IO by reading +input_io+ in +read_size+ chunks.  If
+  # the output is over the max_file_buffer size a Tempfile with +name+ is
+  # created.
+  #
+  # If a block is provided, each chunk of +input_io+ is yielded for further
+  # processing.
+
+  def auto_io name, read_size, input_io
+    out_io = StringIO.new
+
+    out_io.set_encoding Encoding::BINARY if out_io.respond_to? :set_encoding
+
+    until input_io.eof? do
+      if StringIO === out_io and out_io.size > @max_file_buffer then
+        new_io = Tempfile.new name
+        new_io.unlink
+        new_io.binmode
+
+        new_io.write out_io.string
+        out_io = new_io
+      end
+
+      chunk = input_io.read read_size
+      chunk = yield chunk if block_given?
+
+      out_io.write chunk
+    end
+
+    out_io.rewind
+
+    out_io
+  end
+
   def inflate compressed, window_bits = nil
     inflate = Zlib::Inflate.new window_bits
-    out_io = Tempfile.new 'mechanize-decode'
 
-    until compressed.eof? do
-      out_io.write inflate.inflate compressed.read 1024
+    out_io = auto_io 'mechanize-inflate', 1024, compressed do |chunk|
+      inflate.inflate chunk
     end
 
     out_io.write inflate.finish
 
     out_io
+  ensure
+    inflate.close
+    
   end
 
   def log

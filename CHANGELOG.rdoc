@@ -6,6 +6,8 @@
   * Added Mechanize::Download#body for compatibility with Mechanize::File when
     using Mechanize#get_file with Mechanize::Image or other Download-based
     pluggable parser.  Issue #202 by angas
+  * Applied max_file_buffer to the Content-Encoding handlers as well to
+    prevent extra Tempfiles for small gzip or deflate response
 
 === 2.2.1 / 2012-02-13
 

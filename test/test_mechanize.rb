@@ -696,6 +696,19 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert_equal('File Upload Form', pages.title)
   end
 
+  def test_get_file
+    body = @mech.get_file 'http://localhost/referer'
+
+    assert_kind_of String, body
+  end
+
+  def test_get_file_download
+    # non-Mechanize::File
+    body = @mech.get_file 'http://localhost/button.jpg'
+
+    assert_kind_of String, body
+  end
+
   def test_head
     page = @mech.head('http://localhost/verb', { 'q' => 'foo' })
     assert_equal 0, @mech.history.length

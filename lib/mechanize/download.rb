@@ -41,6 +41,15 @@ class Mechanize::Download
   end
 
   ##
+  # The body of this response as a String.
+  #
+  # Take care, this may use lots of memory if the response body is large.
+
+  def body
+    @body_io.read.tap { @body_io.rewind }
+  end
+
+  ##
   # Saves a copy of the body_io to +filename+
 
   def save filename = nil

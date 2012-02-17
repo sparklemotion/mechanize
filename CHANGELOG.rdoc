@@ -1,5 +1,12 @@
 = Mechanize CHANGELOG
 
+=== 2.2.2 / 2010-02-16
+
+* Bug fixes
+  * Added Mechanize::Download#body for compatibility with Mechanize::File when
+    using Mechanize#get_file with Mechanize::Image or other Download-based
+    pluggable parser.  Issue #202 by angas
+
 === 2.2.1 / 2012-02-13
 
 * Bug fixes

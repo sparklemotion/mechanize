@@ -16,6 +16,10 @@ require 'mechanize/page'
 # Mechanize::File.  For large files you should subclass Mechanize::Download as
 # the content is only loaded into memory in small chunks.
 #
+# When writing your own pluggable parser, be sure to provide a method #body
+# that returns a String containing the response body for compatibility with
+# Mechanize#get_file.
+#
 # == Example
 #
 # To create your own parser, just create a class that takes four parameters in

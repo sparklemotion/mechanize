@@ -8,6 +8,16 @@ class TestMechanizeDownload < Mechanize::TestCase
     @parser = Mechanize::Download
   end
 
+  def test_body
+    uri = URI.parse 'http://example/foo.html'
+    body_io = StringIO.new '0123456789'
+
+    download = @parser.new uri, nil, body_io
+
+    assert_equal '0123456789', download.body
+    assert_equal 0, download.body_io.pos
+  end
+
   def test_save_string_io
     uri = URI.parse 'http://example/foo.html'
     body_io = StringIO.new '0123456789'

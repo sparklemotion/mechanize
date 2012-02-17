@@ -98,7 +98,7 @@ class Mechanize::HTTP::Agent
   attr_accessor :cookie_jar
 
   # Responses larger than this will be written to a Tempfile instead of stored
-  # in memory.
+  # in memory.  Setting this to nil disables creation of Tempfiles.
   attr_accessor :max_file_buffer
 
   # :section: Utility
@@ -800,7 +800,7 @@ class Mechanize::HTTP::Agent
   def response_read response, request, uri
     content_length = response.content_length
 
-    if content_length and content_length > @max_file_buffer then
+    if use_tempfile? content_length then
       body_io = Tempfile.new 'mechanize-raw'
       body_io.unlink
       body_io.binmode if defined? body_io.binmode
@@ -815,7 +815,7 @@ class Mechanize::HTTP::Agent
       response.read_body { |part|
         total += part.length
 
-        if StringIO === body_io and total > @max_file_buffer then
+        if StringIO === body_io and use_tempfile? total then
           new_io = Tempfile.new 'mechanize-raw'
           new_io.unlink
           new_io.binmode
@@ -1044,7 +1044,7 @@ class Mechanize::HTTP::Agent
     out_io.set_encoding Encoding::BINARY if out_io.respond_to? :set_encoding
 
     until input_io.eof? do
-      if StringIO === out_io and out_io.size > @max_file_buffer then
+      if StringIO === out_io and use_tempfile? out_io.size then
         new_io = Tempfile.new name
         new_io.unlink
         new_io.binmode
@@ -1076,7 +1076,6 @@ class Mechanize::HTTP::Agent
     out_io
   ensure
     inflate.close
-    
   end
 
   def log
@@ -1113,6 +1112,13 @@ class Mechanize::HTTP::Agent
     proxy_uri.password = pass if pass
 
     @http.proxy = proxy_uri
+  end
+
+  def use_tempfile? size
+    return false unless @max_file_buffer
+    return false unless size
+
+    size >= @max_file_buffer
   end
 
 end

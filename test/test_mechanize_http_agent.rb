@@ -1422,6 +1422,19 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     end
   end
 
+  def test_use_tempfile_eh
+    refute @agent.use_tempfile? nil
+
+    @agent.max_file_buffer = 1
+
+    refute @agent.use_tempfile? 0
+    assert @agent.use_tempfile? 1
+
+    @agent.max_file_buffer = nil
+
+    refute @agent.use_tempfile? 1
+  end
+
   def test_verify_none_equals
     @agent.verify_mode = OpenSSL::SSL::VERIFY_NONE
 

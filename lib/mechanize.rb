@@ -207,7 +207,9 @@ class Mechanize
   end
 
   ##
-  # Maximum number of items allowed in the history.
+  # Maximum number of items allowed in the history.  The default setting is 50
+  # pages.  Note that the size of the history multiplied by the maximum
+  # response body size 
 
   def max_history
     @agent.history.max_size
@@ -217,9 +219,9 @@ class Mechanize
   # Sets the maximum number of items allowed in the history to +length+.
   #
   # Setting the maximum history length to nil will make the history size
-  # unlimited.  Take care when doing this, mechanize stores page bodies in the
-  # temporary files directory for pages in the history.  For a long-running
-  # mechanize program this can be quite large.
+  # unlimited.  Take care when doing this, mechanize stores response bodies in
+  # memory for pages and in the temporary files directory for other responses.
+  # For a long-running mechanize program this can be quite large.
 
   def max_history= length
     @agent.history.max_size = length
@@ -757,7 +759,9 @@ class Mechanize
 
   ##
   # Responses larger than this will be written to a Tempfile instead of stored
-  # in memory.  The default is 10240 bytes
+  # in memory.  The default is 100,000 bytes.
+  #
+  # A value of nil disables creation of Tempfiles.
 
   def max_file_buffer
     @agent.max_file_buffer
@@ -765,7 +769,14 @@ class Mechanize
 
   ##
   # Sets the maximum size of a response body that will be stored in memory to
-  # +bytes+
+  # +bytes+.  A value of nil causes all response bodies to be stored in
+  # memory.
+  #
+  # Note that for Mechanize::Download subclasses, the maximum buffer size
+  # multiplied by the number of pages stored in history (controlled by
+  # #max_history) is an approximate upper limit on the amount of memory
+  # Mechanize will use.  By default Mechanize can use up to ~5MB to store
+  # response bodies for non-File and non-Page (HTML) responses.
 
   def max_file_buffer= bytes
     @agent.max_file_buffer = bytes

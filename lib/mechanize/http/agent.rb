@@ -126,7 +126,7 @@ class Mechanize::HTTP::Agent
     @gzip_enabled             = true
     @history                  = Mechanize::History.new
     @keep_alive               = true
-    @max_file_buffer          = 10240
+    @max_file_buffer          = 100_000 # 5MB for response bodies
     @open_timeout             = nil
     @post_connect_hooks       = []
     @pre_connect_hooks        = []

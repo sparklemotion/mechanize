@@ -1214,6 +1214,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_read_large
+    @agent.max_file_buffer = 10240
+
     def @res.read_body() yield 'a' * 10241 end
     def @res.content_length() 10241 end
 
@@ -1224,6 +1226,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_read_large_chunked
+    @agent.max_file_buffer = 10240
+
     def @res.read_body
       11.times do yield 'a' * 1024 end
     end

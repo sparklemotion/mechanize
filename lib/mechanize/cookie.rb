@@ -1,5 +1,5 @@
 require 'time'
-require 'webrick/cookie'
+require 'webrick/httputils'
 require 'domain_name'
 
 # This class is used to represent an HTTP Cookie.

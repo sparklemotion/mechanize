@@ -1,7 +1,7 @@
 = Mechanize
 
 * http://mechanize.rubyforge.org
-* http://github.com/tenderlove/mechanize/tree/master
+* https://github.com/tenderlove/mechanize
 
 == DESCRIPTION
 
@@ -24,7 +24,7 @@ The mechanize mailing list is available here:
 
 The bug tracker is available here:
 
-  * http://github.com/tenderlove/mechanize/issues
+  * https://github.com/tenderlove/mechanize/issues
 
 == Examples
 

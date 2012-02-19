@@ -93,12 +93,13 @@ class Mechanize::Cookie
 
         cookie_elem.each do |pair|
           pair.strip!
-          key, value = pair.split(/\=/, 2)
+          key, value = pair.split(/=/, 2)
           next unless key
           value = WEBrick::HTTPUtils.dequote(value.strip) if value
 
           case key.downcase
           when 'domain'
+            next unless value && !value.empty?
             begin
               cookie.domain = value
               cookie.for_domain = true
@@ -106,9 +107,10 @@ class Mechanize::Cookie
               log.warn("Couldn't parse domain: #{value}") if log
             end
           when 'path'
+            next unless value && !value.empty?
             cookie.path = value
           when 'expires'
-            if value.empty?
+            if !value || value.empty?
               cookie.session = true
               next
             end
@@ -119,14 +121,17 @@ class Mechanize::Cookie
               log.warn("Couldn't parse expires: #{value}") if log
             end
           when 'max-age'
+            next unless value && !value.empty?
             begin
               cookie.max_age = Integer(value)
             rescue
               log.warn("Couldn't parse max age '#{value}'") if log
             end
           when 'comment'
+            next unless value
             cookie.comment = value
           when 'version'
+            next unless value
             begin
               cookie.version = Integer(value)
             rescue

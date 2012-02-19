@@ -198,10 +198,15 @@ class TestMechanizeCookie < Mechanize::TestCase
       "name=Aaron; Domain=localhost; Expires=Sun, 06 Nov 2011 00:29:51 GMT; Path=/; HttpOnly, " \
       "expired=doh; Expires=Fri, 04 Nov 2011 00:29:51 GMT; Path=/, " \
       "a_path=some_path; Expires=Sun, 06 Nov 2011 00:29:51 GMT; Path=/some_path, " \
-      "no_path=no_path; Expires=Sun, 06 Nov 2011 00:29:51 GMT, no_expires=nope; Path=/"
+      "no_path1=no_path; Expires=Sun, 06 Nov 2011 00:29:52 GMT, no_expires=nope, Path=/, " \
+      "no_path2=no_path; Expires=Sun, 06 Nov 2011 00:29:52 GMT; no_expires=nope; Path, " \
+      "no_path3=no_path; Expires=Sun, 06 Nov 2011 00:29:52 GMT; no_expires=nope; Path=, " \
+      "no_domain1=no_domain; Expires=Sun, 06 Nov 2011 00:29:53 GMT; no_expires=nope, " \
+      "no_domain2=no_domain; Expires=Sun, 06 Nov 2011 00:29:53 GMT; no_expires=nope; Domain, " \
+      "no_domain3=no_domain; Expires=Sun, 06 Nov 2011 00:29:53 GMT; no_expires=nope; Domain="
 
     cookies = Mechanize::Cookie.parse url, cookie_str
-    assert_equal 8, cookies.length
+    assert_equal 14, cookies.length
 
     name = cookies.find { |c| c.name == 'name' }
     assert_equal "Aaron",             name.value
@@ -218,10 +223,20 @@ class TestMechanizeCookie < Mechanize::TestCase
     assert_equal "/",    no_expires.path
     assert_nil           no_expires.expires
 
-    no_path = cookies.find { |c| c.name == 'no_path' }
-    assert_equal "no_path",           no_path.value
-    assert_equal "/",                 no_path.path
-    assert_equal Time.at(1320539391), no_path.expires
+    no_path_cookies = cookies.select { |c| c.value == 'no_path' }
+    assert_equal 3, no_path_cookies.size
+    no_path_cookies.each { |c|
+      assert_equal "/",                 c.path,    c.name
+      assert_equal Time.at(1320539392), c.expires, c.name
+    }
+
+    no_domain_cookies = cookies.select { |c| c.value == 'no_domain' }
+    assert_equal 3, no_domain_cookies.size
+    no_domain_cookies.each { |c|
+      assert !c.for_domain?, c.name
+      assert_equal c.domain, url.host, c.name
+      assert_equal Time.at(1320539393), c.expires, c.name
+    }
 
     assert cookies.find { |c| c.name == 'expired' }
   end

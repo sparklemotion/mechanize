@@ -180,13 +180,45 @@ class TestMechanizeCookie < Mechanize::TestCase
   end
 
   def test_parse_expires_session
-    cookie = 'PRETANET=TGIAqbFXtt; Name=/PRETANET; Path=/; Max-Age=1.2; Content-type=text/html; Domain=192.168.6.196; expires=;'
-
     url = URI.parse('http://localhost/')
 
-    cookie = Mechanize::Cookie.parse(url, cookie).first
+    date = 'Mon, 19 Feb 2012 19:26:04 GMT'
 
-    assert cookie.session
+    cookie = Mechanize::Cookie.parse(url, "name=Akinori; expires=#{date}").first
+    assert_equal Time.at(1329679564), cookie.expires
+
+    cookie = Mechanize::Cookie.parse(url, 'name=Akinori; max-age=3600').first
+    assert_equal Time.now + 3600, cookie.expires, 1
+
+    # Max-Age has precedence over Expires
+    cookie = Mechanize::Cookie.parse(url, "name=Akinori; max-age=3600; expires=#{date}").first
+    assert_equal Time.now + 3600, cookie.expires, 1
+
+    cookie = Mechanize::Cookie.parse(url, "name=Akinori; expires=#{date}; max-age=3600").first
+    assert_equal Time.now + 3600, cookie.expires, 1
+  end
+
+  def test_parse_expires_session
+    url = URI.parse('http://localhost/')
+
+    [
+      'name=Akinori',
+      'name=Akinori; expires',
+      'name=Akinori; max-age',
+      'name=Akinori; expires=',
+      'name=Akinori; max-age=',
+    ].each { |str|
+      cookie = Mechanize::Cookie.parse(url, str).first
+      assert cookie.session, str
+    }
+
+    [
+      'name=Akinori; expires=Mon, 19 Feb 2012 19:26:04 GMT',
+      'name=Akinori; max-age=3600',
+    ].each { |str|
+      cookie = Mechanize::Cookie.parse(url, str).first
+      assert !cookie.session, str
+    }
   end
 
   def test_parse_many

@@ -110,11 +110,7 @@ class Mechanize::Cookie
             next unless value && !value.empty?
             cookie.path = value
           when 'expires'
-            if !value || value.empty?
-              cookie.session = true
-              next
-            end
-
+            next unless value && !value.empty?
             begin
               cookie.expires = Time::parse(value)
             rescue
@@ -146,6 +142,11 @@ class Mechanize::Cookie
         cookie.path    ||= (uri + './').path
         cookie.secure  ||= false
         cookie.domain  ||= uri.host
+
+        # RFC 6265 4.1.2.2
+        cookie.expires   = Time.now + cookie.max_age if cookie.max_age
+        cookie.session   = !cookie.expires
+
         # Move this in to the cookie jar
         yield cookie if block_given?
 

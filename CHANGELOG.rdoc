@@ -2,6 +2,9 @@
 
 === 2.2.2 / 2010-02-16
 
+* New Features
+  * Add support for the Max-Age attribute in the Set-Cookie header.
+
 * Bug fixes
   * Added Mechanize::Download#body for compatibility with Mechanize::File when
     using Mechanize#get_file with Mechanize::Image or other Download-based
@@ -13,6 +16,7 @@
     of 50 pages (depending on GC behavior).
   * Mechanize#max_file_buffer may be set to nil to disable creation of
     Tempfiles.
+  * Ignore empty path/domain attributes.
 
 === 2.2.1 / 2012-02-13
 

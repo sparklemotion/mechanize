@@ -179,7 +179,7 @@ class TestMechanizeCookie < Mechanize::TestCase
     assert !cookie.for_domain?
   end
 
-  def test_parse_expires_session
+  def test_parse_max_age
     url = URI.parse('http://localhost/')
 
     date = 'Mon, 19 Feb 2012 19:26:04 GMT'
@@ -188,14 +188,14 @@ class TestMechanizeCookie < Mechanize::TestCase
     assert_equal Time.at(1329679564), cookie.expires
 
     cookie = Mechanize::Cookie.parse(url, 'name=Akinori; max-age=3600').first
-    assert_equal Time.now + 3600, cookie.expires, 1
+    assert_in_delta Time.now + 3600, cookie.expires, 1
 
     # Max-Age has precedence over Expires
     cookie = Mechanize::Cookie.parse(url, "name=Akinori; max-age=3600; expires=#{date}").first
-    assert_equal Time.now + 3600, cookie.expires, 1
+    assert_in_delta Time.now + 3600, cookie.expires, 1
 
     cookie = Mechanize::Cookie.parse(url, "name=Akinori; expires=#{date}; max-age=3600").first
-    assert_equal Time.now + 3600, cookie.expires, 1
+    assert_in_delta Time.now + 3600, cookie.expires, 1
   end
 
   def test_parse_expires_session

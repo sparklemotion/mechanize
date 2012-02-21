@@ -388,13 +388,6 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert block_called
   end
 
-  def test_get_file
-    page = @mech.get("http://localhost/frame_test.html")
-    content_length = page.header['Content-Length']
-    page_as_string = @mech.get_file("http://localhost/frame_test.html")
-    assert_equal(content_length.to_i, page_as_string.length.to_i)
-  end
-
   def test_get_follow_meta_refresh
     @mech.follow_meta_refresh = true
 
@@ -697,9 +690,10 @@ but not <a href="/" rel="me nofollow">this</a>!
   end
 
   def test_get_file
-    body = @mech.get_file 'http://localhost/referer'
+    body = @mech.get_file 'http://localhost/frame_test.html'
 
     assert_kind_of String, body
+    refute_empty body
   end
 
   def test_get_file_download
@@ -707,6 +701,7 @@ but not <a href="/" rel="me nofollow">this</a>!
     body = @mech.get_file 'http://localhost/button.jpg'
 
     assert_kind_of String, body
+    refute_empty body
   end
 
   def test_head

@@ -2,6 +2,7 @@ require 'rubygems'
 require 'mechanize'
 
 agent = Mechanize.new
+agent.max_history = nil # unlimited history
 stack = agent.get(ARGV[0]).links
 
 while l = stack.pop

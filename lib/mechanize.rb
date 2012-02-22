@@ -209,7 +209,7 @@ class Mechanize
   ##
   # Maximum number of items allowed in the history.  The default setting is 50
   # pages.  Note that the size of the history multiplied by the maximum
-  # response body size 
+  # response body size
 
   def max_history
     @agent.history.max_size

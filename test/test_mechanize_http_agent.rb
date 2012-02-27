@@ -1229,6 +1229,21 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     end
   end
 
+  def test_file_response_content_type
+    Tempfile.open ['pi','.nothtml'] do |tempfile|
+      res = Mechanize::FileResponse.new tempfile.path
+      assert_equal nil, res['content-type']
+    end
+    Tempfile.open ['pi','.xhtml'] do |tempfile|
+      res = Mechanize::FileResponse.new tempfile.path
+      assert_equal 'text/html', res['content-type']
+    end
+    Tempfile.open ['pi','.html'] do |tempfile|
+      res = Mechanize::FileResponse.new tempfile.path
+      assert_equal 'text/html', res['Content-Type']
+    end
+  end
+
   def test_response_read_large
     @agent.max_file_buffer = 10240
 

@@ -84,7 +84,7 @@ class Mechanize::Page < Mechanize::File
 
     if @parser
       parser_encoding = @parser.encoding
-      if (parser_encoding && parser_encoding.downcase) != (encoding && encoding.downcase)
+      if parser_encoding && encoding && parser_encoding.casecmp(encoding) != 0
         # lazy reinitialize the parser with the new encoding
         @parser = nil
       end

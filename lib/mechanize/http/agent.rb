@@ -523,8 +523,8 @@ class Mechanize::HTTP::Agent
   # major browsers do.
   def request_referer request, uri, referer
     return unless referer
-    return if 'https' == referer.scheme.downcase and
-              'https' != uri.scheme.downcase
+    return if 'https'.casecmp(referer.scheme) == 0 and
+              'https'.casecmp(uri.scheme) != 0
     if referer.fragment || referer.user || referer.password
       referer = referer.dup
       referer.fragment = referer.user = referer.password = nil

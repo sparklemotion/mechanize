@@ -30,10 +30,10 @@ class Mechanize::FileResponse
   def each_header; end
 
   def [](key)
-    return nil unless key.downcase == 'content-type'
+    return nil if key.casecmp('Content-Type') != 0
     return 'text/html' if directory?
     return 'text/html' if ['.html', '.xhtml'].any? { |extn|
-      @file_path =~ /#{extn}$/
+      @file_path.end_with?(extn)
     }
     nil
   end

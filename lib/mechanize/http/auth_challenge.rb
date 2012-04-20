@@ -45,6 +45,13 @@ class Mechanize::HTTP
     end
 
     ##
+    # The name of the realm for this challenge
+
+    def realm_name
+      params['realm'] if Hash === params # NTLM has a string for params
+    end
+
+    ##
     # The reconstructed, normalized challenge
 
     def to_s

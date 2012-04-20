@@ -45,6 +45,8 @@ class Mechanize::HTTP::WWWAuthenticateParser
 
         challenges << challenge
         next
+      else
+        scheme.capitalize!
       end
 
       next unless space
@@ -54,6 +56,8 @@ class Mechanize::HTTP::WWWAuthenticateParser
       while true do
         pos = @scanner.pos
         name, value = auth_param
+
+        name.downcase! if name =~ /^realm$/i
 
         unless name then
           challenge.params = params

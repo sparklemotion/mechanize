@@ -43,11 +43,9 @@ class Mechanize::HTTP::Agent
 
   # :section: HTTP Authentication
 
+  attr_reader :auth_store # :nodoc:
   attr_reader :authenticate_methods # :nodoc:
   attr_reader :digest_challenges # :nodoc:
-  attr_accessor :user
-  attr_accessor :password
-  attr_accessor :domain
 
   # :section: Redirection
 
@@ -139,6 +137,7 @@ class Mechanize::HTTP::Agent
     @webrobots                = nil
 
     # HTTP Authentication
+    @auth_store           = Mechanize::HTTP::AuthStore.new
     @authenticate_parser  = Mechanize::HTTP::WWWAuthenticateParser.new
     @authenticate_methods = Hash.new do |methods, uri|
       methods[uri] = Hash.new do |realms, auth_scheme|
@@ -147,9 +146,6 @@ class Mechanize::HTTP::Agent
     end
     @digest_auth          = Net::HTTP::DigestAuth.new
     @digest_challenges    = {}
-    @password             = nil # HTTP auth password
-    @user                 = nil # HTTP auth user
-    @domain               = nil # NTLM HTTP domain
 
     # SSL
     @pass = nil
@@ -170,6 +166,33 @@ class Mechanize::HTTP::Agent
     @http.keep_alive   = 300
   end
 
+  ##
+  # Adds credentials +user+, +pass+ for +uri+.  If +realm+ is set the
+  # credentials are used only for that realm.  If +realm+ is not set the
+  # credentials become the default for any realm on that URI.
+  #
+  # +domain+ and +realm+ are exclusive as NTLM does not follow RFC 2617.  If
+  # +domain+ is given it is only used for NTLM authentication.
+
+  def add_auth uri, user, password, realm = nil, domain = nil
+    @auth_store.add_auth uri, user, password, realm, domain
+  end
+
+  ##
+  # USE OF add_default_auth IS NOT RECOMMENDED AS IT MAY EXPOSE PASSWORDS TO
+  # THIRD PARTIES
+  #
+  # Adds credentials +user+, +pass+ as the default authentication credentials.
+  # If no other credentials are available  these will be returned from
+  # credentials_for.
+  #
+  # If +domain+ is given it is only used for NTLM authentication.
+
+  def add_default_auth user, password, domain = nil # :nodoc:
+    @auth_store.add_default_auth user, password, domain
+  end
+
+  ##
   # Retrieves +uri+ and parses it into a page or other object according to
   # PluggableParser.  If the URI is an HTTP or HTTPS scheme URI the given HTTP
   # +method+ is used to retrieve it, along with the HTTP +headers+, request
@@ -470,16 +493,18 @@ class Mechanize::HTTP::Agent
       request_auth_digest request, uri, realm, base_uri, false
     elsif realm = schemes[:iis_digest].find { |r| r.uri == base_uri } then
       request_auth_digest request, uri, realm, base_uri, true
-    elsif schemes[:basic].find { |r| r.uri == base_uri } then
-      request.basic_auth @user, @password
+    elsif realm = schemes[:basic].find { |r| r.uri == base_uri } then
+      user, password, = @auth_store.credentials_for uri, realm.realm
+      request.basic_auth user, password
     end
   end
 
   def request_auth_digest request, uri, realm, base_uri, iis
     challenge = @digest_challenges[realm]
 
-    uri.user = @user
-    uri.password = @password
+    user, password, = @auth_store.credentials_for uri, realm.realm
+    uri.user     = user
+    uri.password = password
 
     auth = @digest_auth.auth_header uri, challenge.to_s, request.method, iis
     request['Authorization'] = auth
@@ -643,13 +668,14 @@ class Mechanize::HTTP::Agent
 
   def response_authenticate(response, page, uri, request, headers, params,
                             referer)
-    raise Mechanize::UnauthorizedError, page unless @user || @password
-
     www_authenticate = response['www-authenticate']
 
     raise Mechanize::UnauthorizedError, page unless www_authenticate
 
     challenges = @authenticate_parser.parse www_authenticate
+
+    raise Mechanize::UnauthorizedError, page unless
+      @auth_store.credentials? uri, challenges
 
     if challenge = challenges.find { |c| c.scheme =~ /^Digest$/i } then
       realm = challenge.realm uri
@@ -678,7 +704,10 @@ class Mechanize::HTTP::Agent
       if challenge.params then
         type_2 = Net::NTLM::Message.decode64 challenge.params
 
-        type_3 = type_2.response({ :user => @user, :password => @password, :domain => @domain },
+        user, password, domain = @auth_store.credentials_for uri, nil
+
+        type_3 = type_2.response({ :user => user, :password => password,
+                                   :domain => domain },
                                  { :ntlmv2 => true }).encode64
 
         headers['Authorization'] = "NTLM #{type_3}"
@@ -1125,4 +1154,6 @@ class Mechanize::HTTP::Agent
   end
 
 end
+
+require 'mechanize/http/auth_store'
 

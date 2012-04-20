@@ -618,16 +618,41 @@ class Mechanize
   attr_reader :proxy_user
 
   ##
-  # Sets the user and password to be used for HTTP authentication.
-  # sets the optional domain for NTLM authentication
+  # *NOTE*: These credentials will be used as a default for any challenge
+  # exposing your password to disclosure to malicious servers.  Use of this
+  # method will warn.  This method is deprecated and will be removed in
+  # mechanize 3.
+  #
+  # Sets the +user+ and +password+ as the default credentials to be used for
+  # HTTP authentication for any server.  The +domain+ is used for NTLM
+  # authentication.
 
-  def auth(user, password, domain = nil)
-    @agent.user     = user
-    @agent.password = password
-    @agent.domain = domain
+  def auth user, password, domain = nil
+    caller.first =~ /(.*?):(\d+).*?$/
+
+    warn <<-WARNING
+At #{$1} line #{$2}
+
+Use of #auth and #basic_auth are deprecated due to a security vulnerability.
+
+    WARNING
+
+    @agent.add_default_auth user, password, domain
   end
 
   alias basic_auth auth
+
+  ##
+  # Adds credentials +user+, +pass+ for +uri+.  If +realm+ is set the
+  # credentials are used only for that realm.  If +realm+ is not set the
+  # credentials become the default for any realm on that URI.
+  #
+  # +domain+ and +realm+ are exclusive as NTLM does not follow RFC 2617.  If
+  # +domain+ is given it is only used for NTLM authentication.
+
+  def add_auth uri, user, password, realm = nil, domain = nil
+    @agent.add_auth uri, user, password, realm, domain
+  end
 
   ##
   # Are If-Modified-Since conditional requests enabled?

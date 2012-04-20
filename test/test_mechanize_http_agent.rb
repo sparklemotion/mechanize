@@ -436,8 +436,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_request_auth_basic
-    @agent.user = 'user'
-    @agent.password = 'password'
+    @agent.add_auth @uri, 'user', 'password'
 
     auth_realm @uri, 'Basic', :basic
 
@@ -447,8 +446,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_request_auth_digest
-    @agent.user = 'user'
-    @agent.password = 'password'
+    @agent.add_auth @uri, 'user', 'password'
 
     realm = auth_realm @uri, 'Digest', :digest
     @agent.digest_challenges[realm] = 'Digest realm=r, qop="auth"'
@@ -460,8 +458,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_request_auth_iis_digest
-    @agent.user = 'user'
-    @agent.password = 'password'
+    @agent.add_auth @uri, 'user', 'password'
 
     realm = auth_realm @uri, 'Digest', :digest
     @agent.digest_challenges[realm] = 'Digest realm=r, qop="auth"'
@@ -672,9 +669,9 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_authenticate
+    @agent.add_auth @uri, 'user', 'password'
+
     @res.instance_variable_set :@header, 'www-authenticate' => ['Basic realm=r']
-    @agent.user = 'user'
-    @agent.password = 'password'
 
     @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
 
@@ -684,10 +681,10 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_authenticate_digest
+    @agent.add_auth @uri, 'user', 'password'
+
     @res.instance_variable_set(:@header,
                                'www-authenticate' => ['Digest realm=r'])
-    @agent.user = 'user'
-    @agent.password = 'password'
 
     @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
 
@@ -700,12 +697,11 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_authenticate_digest_iis
+    @agent.add_auth @uri, 'user', 'password'
+
     @res.instance_variable_set(:@header,
                                'www-authenticate' => ['Digest realm=r'],
                                'server'           => ['Microsoft-IIS'])
-    @agent.user = 'user'
-    @agent.password = 'password'
-
     @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
 
     base_uri = @uri + '/'
@@ -714,11 +710,11 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_authenticate_multiple
+    @agent.add_auth @uri, 'user', 'password'
+
     @res.instance_variable_set(:@header,
                                'www-authenticate' =>
                                  ['Basic realm=r, Digest realm=r'])
-    @agent.user = 'user'
-    @agent.password = 'password'
 
     @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
 
@@ -729,10 +725,18 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_empty @agent.authenticate_methods[base_uri][:basic]
   end
 
+  def test_response_authenticate_no_credentials
+    @res.instance_variable_set :@header, 'www-authenticate' => ['Basic realm=r']
+
+    assert_raises Mechanize::UnauthorizedError do
+      @agent.response_authenticate @res, fake_page, @uri, @req, {}, nil, nil
+    end
+  end
+
   def test_response_authenticate_no_www_authenticate
+    @agent.add_auth @uri, 'user', 'password'
+
     denied = page URI('http://example/denied'), 'text/html', '', 403
-    @agent.user = 'user'
-    @agent.password = 'password'
 
     e = assert_raises Mechanize::UnauthorizedError do
       @agent.response_authenticate @res, denied, @uri, @req, {}, nil, nil
@@ -743,11 +747,10 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
   def test_response_authenticate_ntlm
     @uri += '/ntlm'
+    @agent.add_auth @uri, 'user', 'password'
+
     @res.instance_variable_set(:@header,
                                'www-authenticate' => ['Negotiate, NTLM'])
-    @agent.user = 'user'
-    @agent.password = 'password'
-    @agent.domain = 'domain'
 
     page = @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
 
@@ -755,8 +758,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_authenticate_unknown
-    @agent.user = 'user'
-    @agent.password = 'password'
+    @agent.add_auth @uri, 'user', 'password'
+
     page = Mechanize::File.new nil, nil, nil, 401
     @res.instance_variable_set(:@header,
                                'www-authenticate' => ['Unknown realm=r'])

@@ -120,21 +120,24 @@ end
 
 class BasicAuthServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req,res)
-    htpd = WEBrick::HTTPAuth::Htpasswd.new('dot.htpasswd')
-    htpd.set_passwd('Blah', 'user', 'pass')
+    htpd = nil
+    Tempfile.open 'dot.htpasswd' do |io|
+      htpd = WEBrick::HTTPAuth::Htpasswd.new(io.path)
+      htpd.set_passwd('Blah', 'user', 'pass')
+    end
+
     authenticator = WEBrick::HTTPAuth::BasicAuth.new({
       :UserDB => htpd,
       :Realm  => 'Blah',
       :Logger => Logger.new(nil)
-    }
-                                                    )
-                                                    begin
-                                                      authenticator.authenticate(req,res)
-                                                      res.body = 'You are authenticated'
-                                                    rescue WEBrick::HTTPStatus::Unauthorized
-                                                      res.status = 401
-                                                    end
-                                                    FileUtils.rm('dot.htpasswd')
+    })
+
+    begin
+      authenticator.authenticate(req,res)
+      res.body = 'You are authenticated'
+    rescue WEBrick::HTTPStatus::Unauthorized
+      res.status = 401
+    end
   end
   alias :do_POST :do_GET
 end
@@ -148,29 +151,34 @@ class ContentTypeServlet < WEBrick::HTTPServlet::AbstractServlet
 end
 
 class DigestAuthServlet < WEBrick::HTTPServlet::AbstractServlet
-  htpd = WEBrick::HTTPAuth::Htdigest.new('digest.htpasswd')
-  htpd.set_passwd('Blah', 'user', 'pass')
+  htpd = nil
+
+  Tempfile.open 'digest.htpasswd' do |io|
+    htpd = WEBrick::HTTPAuth::Htdigest.new(io.path)
+    htpd.set_passwd('Blah', 'user', 'pass')
+  end
+
   @@authenticator = WEBrick::HTTPAuth::DigestAuth.new({
     :UserDB => htpd,
     :Realm  => 'Blah',
     :Algorithm => 'MD5',
     :Logger => Logger.new(nil)
-  }
-                                                     )
-                                                     def do_GET(req,res)
-                                                       def req.request_time; Time.now; end
-                                                       def req.request_uri; '/digest_auth'; end
-                                                       def req.request_method; "GET"; end
+  })
 
-                                                       begin
-                                                         @@authenticator.authenticate(req,res)
-                                                         res.body = 'You are authenticated'
-                                                       rescue WEBrick::HTTPStatus::Unauthorized
-                                                         res.status = 401
-                                                       end
-                                                       FileUtils.rm('digest.htpasswd') if File.exists?('digest.htpasswd')
-                                                     end
-                                                     alias :do_POST :do_GET
+  def do_GET(req,res)
+    def req.request_time; Time.now; end
+    def req.request_uri; '/digest_auth'; end
+    def req.request_method; "GET"; end
+
+    begin
+      @@authenticator.authenticate(req,res)
+      res.body = 'You are authenticated'
+    rescue WEBrick::HTTPStatus::Unauthorized
+      res.status = 401
+    end
+    FileUtils.rm('digest.htpasswd') if File.exists?('digest.htpasswd')
+  end
+  alias :do_POST :do_GET
 end
 
 class FileUploadServlet < WEBrick::HTTPServlet::AbstractServlet

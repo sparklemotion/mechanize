@@ -41,9 +41,17 @@ class TestMechanize < Mechanize::TestCase
   end
 
   def test_basic_auth
-    @mech.basic_auth('user', 'pass')
-    page = @mech.get("http://localhost/basic_auth")
-    assert_equal('You are authenticated', page.body)
+    _, err = capture_io do
+      @mech.basic_auth 'user', 'pass' # warns
+    end
+
+    line = __LINE__ - 3
+    file = File.basename __FILE__
+
+    assert_match "#{file} line #{line}", err
+
+    page = @mech.get @uri + '/basic_auth'
+    assert_equal 'You are authenticated', page.body
   end
 
   def test_cert_key_file
@@ -326,7 +334,11 @@ but not <a href="/" rel="me nofollow">this</a>!
 
   def test_get_HTTP
     page = @mech.get('HTTP://localhost/', { :q => 'hello' })
-    assert_equal('HTTP://localhost/?q=hello', page.uri.to_s)
+
+    assert_kind_of URI::HTTP, page.uri
+    assert_equal 'localhost', page.uri.host
+    assert_equal 80,          page.uri.port
+    assert_equal '/?q=hello', page.uri.request_uri
   end
 
   def test_get_anchor
@@ -340,19 +352,19 @@ but not <a href="/" rel="me nofollow">this</a>!
     end
   end
 
-  def test_get_basic_auth_bad
-    @mech.basic_auth('aaron', 'aaron')
+  def test_get_auth_bad
+    @mech.add_auth(@uri, 'aaron', 'aaron')
 
     e = assert_raises Mechanize::UnauthorizedError do
-      @mech.get("http://localhost/basic_auth")
+      @mech.get(@uri + '/basic_auth')
     end
 
     assert_equal("401", e.response_code)
   end
 
-  def test_get_basic_auth_none
+  def test_get_auth_none
     e = assert_raises Mechanize::UnauthorizedError do
-      @mech.get("http://localhost/basic_auth")
+      @mech.get(@uri + '/basic_auth')
     end
 
     assert_equal("401", e.response_code)
@@ -374,7 +386,7 @@ but not <a href="/" rel="me nofollow">this</a>!
   def test_get_digest_auth
     block_called = false
 
-    @mech.basic_auth('user', 'pass')
+    @mech.add_auth(@uri, 'user', 'pass')
 
     @mech.pre_connect_hooks << lambda { |_, request|
       block_called = true
@@ -383,7 +395,7 @@ but not <a href="/" rel="me nofollow">this</a>!
       end
     }
 
-    page = @mech.get("http://localhost/digest_auth")
+    page = @mech.get(@uri + '/digest_auth')
     assert_equal('You are authenticated', page.body)
     assert block_called
   end
@@ -869,15 +881,15 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert_equal "gender=female", requests.first.body
   end
 
-  def test_post_basic_auth
+  def test_post_auth
     requests = []
 
     @mech.pre_connect_hooks << proc { |agent, request|
       requests << request.class
     }
 
-    @mech.basic_auth('user', 'pass')
-    page = @mech.post("http://localhost/basic_auth")
+    @mech.add_auth(@uri, 'user', 'pass')
+    page = @mech.post(@uri + '/basic_auth')
     assert_equal('You are authenticated', page.body)
     assert_equal(2, requests.length)
     r1 = requests[0]

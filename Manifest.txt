@@ -46,6 +46,7 @@ lib/mechanize/http.rb
 lib/mechanize/http/agent.rb
 lib/mechanize/http/auth_challenge.rb
 lib/mechanize/http/auth_realm.rb
+lib/mechanize/http/auth_store.rb
 lib/mechanize/http/content_disposition_parser.rb
 lib/mechanize/http/www_authenticate_parser.rb
 lib/mechanize/image.rb
@@ -145,6 +146,7 @@ test/test_mechanize_history.rb
 test/test_mechanize_http_agent.rb
 test/test_mechanize_http_auth_challenge.rb
 test/test_mechanize_http_auth_realm.rb
+test/test_mechanize_http_auth_store.rb
 test/test_mechanize_http_content_disposition_parser.rb
 test/test_mechanize_http_www_authenticate_parser.rb
 test/test_mechanize_image.rb

@@ -288,7 +288,7 @@ class Mechanize::HTTP::Agent
       response_authenticate(response, page, uri, request, headers, params,
                             referer)
     else
-      raise Mechanize::ResponseCodeError.new(page), "Unhandled response"
+      raise Mechanize::ResponseCodeError.new(page, 'unhandled response')
     end
   end
 
@@ -670,12 +670,17 @@ class Mechanize::HTTP::Agent
                             referer)
     www_authenticate = response['www-authenticate']
 
-    raise Mechanize::UnauthorizedError, page unless www_authenticate
-
+    unless www_authenticate = response['www-authenticate'] then
+      message = 'WWW-Authenticate header missing in response'
+      raise Mechanize::UnauthorizedError.new(page, nil, message)
+    end
+                                               
     challenges = @authenticate_parser.parse www_authenticate
 
-    raise Mechanize::UnauthorizedError, page unless
-      @auth_store.credentials? uri, challenges
+    unless @auth_store.credentials? uri, challenges then
+      message = "no credentials found, provide some with #add_auth"
+      raise Mechanize::UnauthorizedError.new(page, challenges, message)
+    end
 
     if challenge = challenges.find { |c| c.scheme =~ /^Digest$/i } then
       realm = challenge.realm uri
@@ -688,16 +693,20 @@ class Mechanize::HTTP::Agent
 
       existing_realms = @authenticate_methods[realm.uri][auth_scheme]
 
-      raise Mechanize::UnauthorizedError, page if
-        existing_realms.include? realm
+      if existing_realms.include? realm
+        message = 'Digest authentication failed'
+        raise Mechanize::UnauthorizedError.new(page, challeges, message)
+      end
 
       existing_realms << realm
       @digest_challenges[realm] = challenge
     elsif challenge = challenges.find { |c| c.scheme == 'NTLM' } then
       existing_realms = @authenticate_methods[uri + '/'][:ntlm]
 
-      raise Mechanize::UnauthorizedError, page if
-        existing_realms.include?(realm) and not challenge.params
+      if existing_realms.include?(realm) and not challenge.params then
+        message = 'NTLM authentication failed'
+        raise Mechanize::UnauthorizedError.new(page, challenges, message)
+      end
 
       existing_realms << realm
 
@@ -720,12 +729,15 @@ class Mechanize::HTTP::Agent
 
       existing_realms = @authenticate_methods[realm.uri][:basic]
 
-      raise Mechanize::UnauthorizedError, page if
-        existing_realms.include? realm
+      if existing_realms.include? realm then
+        message = 'Basic authentication failed'
+        raise Mechanize::UnauthorizedError.new(page, challenges, message)
+      end
 
       existing_realms << realm
     else
-      raise Mechanize::UnauthorizedError, page
+      message = 'unsupported authentication scheme'
+      raise Mechanize::UnauthorizedError.new(page, challenges, message)
     end
 
     fetch uri, request.method.downcase.to_sym, headers, params, referer
@@ -869,7 +881,7 @@ class Mechanize::HTTP::Agent
     body_io.flush
     body_io.rewind
 
-    raise Mechanize::ResponseCodeError, response if
+    raise Mechanize::ResponseCodeError.new(response, uri) if
       Net::HTTPUnknownResponse === response
 
     content_length = response.content_length

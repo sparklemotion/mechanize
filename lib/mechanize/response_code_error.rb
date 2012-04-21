@@ -7,13 +7,16 @@ class Mechanize::ResponseCodeError < Mechanize::Error
   attr_reader :response_code
   attr_reader :page
 
-  def initialize(page)
+  def initialize(page, message = nil)
+    super message
+
     @page          = page
     @response_code = page.code.to_s
   end
 
   def to_s
-    "#{@response_code} => #{Net::HTTPResponse::CODE_TO_OBJ[@response_code]}"
+    "#{@response_code} => #{Net::HTTPResponse::CODE_TO_OBJ[@response_code]} " \
+    "for #{@page.uri} -- #{super}"
   end
 
   alias inspect to_s

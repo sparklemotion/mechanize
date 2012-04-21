@@ -164,7 +164,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
         @agent.fetch uri
       end
 
-      assert_equal '404 => Net::HTTPNotFound', e.message
+      assert_match "404 => Net::HTTPNotFound for #{uri}", e.message
     end
   end
 
@@ -728,21 +728,28 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   def test_response_authenticate_no_credentials
     @res.instance_variable_set :@header, 'www-authenticate' => ['Basic realm=r']
 
-    assert_raises Mechanize::UnauthorizedError do
+    e = assert_raises Mechanize::UnauthorizedError do
       @agent.response_authenticate @res, fake_page, @uri, @req, {}, nil, nil
     end
+
+    assert_match 'no credentials', e.message
+    assert_match 'available realms: r', e.message
   end
 
   def test_response_authenticate_no_www_authenticate
     @agent.add_auth @uri, 'user', 'password'
 
-    denied = page URI('http://example/denied'), 'text/html', '', 403
+    denied_uri = URI('http://example/denied')
+
+    denied = page denied_uri, 'text/html', '', 401
 
     e = assert_raises Mechanize::UnauthorizedError do
       @agent.response_authenticate @res, denied, @uri, @req, {}, nil, nil
     end
 
-    assert_equal '403 => Net::HTTPForbidden', e.message
+    assert_equal "401 => Net::HTTPUnauthorized for #{denied_uri} -- " \
+                 "WWW-Authenticate header missing in response",
+                 e.message
   end
 
   def test_response_authenticate_ntlm

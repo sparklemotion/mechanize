@@ -19,6 +19,10 @@
   the credentials are intended for, the username and the password.
   Optionally an HTTP authentication realm or NTLM domain may be provided.
 
+* Minor enhancement
+  * Improved exception messages for 401 Unauthorized responses.  Mechanize now
+    tells you if you were missing credentials, had an incorrect password, etc.
+
 === 2.3 / 2012-02-20
 
 * Minor enhancements

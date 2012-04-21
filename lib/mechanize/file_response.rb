@@ -2,12 +2,15 @@
 # Fake response for dealing with file:/// requests
 
 class Mechanize::FileResponse
+
   def initialize(file_path)
     @file_path = file_path
+    @uri       = nil
   end
 
   def read_body
-    raise Mechanize::ResponseCodeError, self unless File.exist? @file_path
+    raise Mechanize::ResponseCodeError.new(self) unless
+      File.exist? @file_path
 
     if directory?
       yield dir_body
@@ -53,6 +56,10 @@ class Mechanize::FileResponse
     File.exist?(@file_path) ? 'OK' : 'Not Found'
   end
 
+  def uri
+    @uri ||= URI "file://#{@file_path}"
+  end
+
   private
 
   def dir_body
@@ -70,5 +77,6 @@ class Mechanize::FileResponse
   def directory?
     File.directory?(@file_path)
   end
+
 end
 

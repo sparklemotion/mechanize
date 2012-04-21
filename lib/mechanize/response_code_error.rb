@@ -15,8 +15,10 @@ class Mechanize::ResponseCodeError < Mechanize::Error
   end
 
   def to_s
-    "#{@response_code} => #{Net::HTTPResponse::CODE_TO_OBJ[@response_code]} " \
-    "for #{@page.uri} -- #{super}"
+    response_class = Net::HTTPResponse::CODE_TO_OBJ[@response_code]
+    out = "#{@response_code} => #{response_class} "
+    out << "for #{@page.uri} " if @page.respond_to? :uri # may be HTTPResponse
+    out << "-- #{super}"
   end
 
   alias inspect to_s

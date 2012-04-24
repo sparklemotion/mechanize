@@ -175,6 +175,7 @@ class Mechanize::HTTP::Agent
   # +domain+ is given it is only used for NTLM authentication.
 
   def add_auth uri, user, password, realm = nil, domain = nil
+    uri = resolve(uri)
     @auth_store.add_auth uri, user, password, realm, domain
   end
 

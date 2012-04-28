@@ -162,7 +162,7 @@ module Mechanize::Parser
     number = 1
 
     while File.exist? filename do
-      filename = "#{@filename}.#{number}"
+      filename = "#{filename}.#{number}"
       number += 1
     end
 

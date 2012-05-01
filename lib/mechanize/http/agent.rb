@@ -399,7 +399,7 @@ class Mechanize::HTTP::Agent
 
     zio = Zlib::GzipReader.new body_io
     out_io = auto_io 'mechanize-gunzip', 16384, zio
-    zio.finish
+    zio.finish rescue nil
 
     return out_io
   rescue Zlib::Error
@@ -415,7 +415,7 @@ class Mechanize::HTTP::Agent
       raise
     end
   ensure
-    zio.close if zio and not zio.closed?
+    zio.close rescue nil if zio and not zio.closed?
     body_io.close unless body_io.closed?
   end
 

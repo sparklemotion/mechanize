@@ -52,6 +52,12 @@ class TestMechanizeHttpContentDispositionParser < Mechanize::TestCase
     assert_equal 'value',      content_disposition.filename
   end
 
+  def test_parse_quoted_size
+    content_disposition = @parser.parse 'size="5"'
+
+    assert_equal 5, content_disposition.size
+  end
+
   def test_rfc_2045_quoted_string
     @parser.scanner = StringScanner.new '"text"'
 

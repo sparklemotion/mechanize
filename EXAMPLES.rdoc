@@ -83,7 +83,7 @@ Upload a file to flickr.
 
 == Pluggable Parsers
 
-Lets say you want HTML pages to automatically be parsed with Rubyful Soup.
+Let's say you want HTML pages to automatically be parsed with Rubyful Soup.
 This example shows you how:
 
   require 'rubygems'
@@ -119,7 +119,7 @@ Beautiful Soup for that page.
 
 Mechanize#transact runs the given block and then resets the page history. I.e.
 after the block has been executed, you're back at the original page; no need
-count how many times to call the back method at the end of a loop (while
+to count how many times to call the back method at the end of a loop (while
 accounting for possible exceptions).
 
 This example also demonstrates subclassing Mechanize.

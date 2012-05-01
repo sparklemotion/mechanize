@@ -4,6 +4,8 @@
 
 * Bug fixes
   * Fixed typos in EXAMPLES and GUIDES.  Pull Request #213 by Erkan Yilmaz.
+  * Fixed handling of a quoted content-disposition size.  Pull Request #220 by
+    Jason Rust
 
 === 2.4
 

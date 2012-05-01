@@ -1,5 +1,10 @@
 = Mechanize CHANGELOG
 
+=== 2.4.1
+
+* Bug fixes
+  * Fixed typos in EXAMPLES and GUIDES.  Pull Request #213 by Erkan Yilmaz.
+
 === 2.4
 
 * Security fix:

@@ -95,7 +95,7 @@ class Mechanize::HTTP::ContentDispositionParser
               when /^(creation|modification|read)-date$/ then
                 Time.rfc822 rfc_2045_quoted_string
               when /^size$/ then
-                @scanner.scan(/\d+/).to_i(10)
+                rfc_2045_value.to_i(10)
               else
                 rfc_2045_value
               end

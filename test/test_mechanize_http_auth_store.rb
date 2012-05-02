@@ -57,6 +57,18 @@ class TestMechanizeHttpAuthStore < Mechanize::TestCase
     assert_equal expected, @store.auth_accounts
   end
 
+  def test_add_auth_string
+    @store.add_auth "#{@uri}/path", 'user', 'pass'
+
+    expected = {
+      @uri => {
+        nil => ['user', 'pass', nil],
+      }
+    }
+
+    assert_equal expected, @store.auth_accounts
+  end
+
   def test_add_default_auth
     _, err = capture_io do
       @store.add_default_auth 'user', 'pass'
@@ -88,6 +100,7 @@ class TestMechanizeHttpAuthStore < Mechanize::TestCase
     @store.add_auth @uri, 'user', 'pass'
 
     assert @store.credentials? @uri, challenges
+    assert @store.credentials? "#{@uri}/path", challenges
   end
 
   def test_credentials_for
@@ -96,6 +109,8 @@ class TestMechanizeHttpAuthStore < Mechanize::TestCase
     @store.add_auth @uri, 'user', 'pass', 'realm'
 
     assert_equal ['user', 'pass', nil], @store.credentials_for(@uri, 'realm')
+    assert_equal ['user', 'pass', nil],
+                 @store.credentials_for(@uri.to_s, 'realm')
     assert_nil @store.credentials_for(@uri, 'other')
   end
 
@@ -166,6 +181,14 @@ class TestMechanizeHttpAuthStore < Mechanize::TestCase
     }
 
     assert_equal expected, @store.auth_accounts
+  end
+
+  def test_remove_auth_string
+    @store.add_auth @uri, 'user1', 'pass'
+
+    @store.remove_auth "#{@uri}/path"
+
+    assert_empty @store.auth_accounts
   end
 
 end

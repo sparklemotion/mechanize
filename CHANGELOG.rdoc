@@ -1,12 +1,19 @@
 = Mechanize CHANGELOG
 
+=== 2.4.1
+
+* Bug fixes
+  * Fixed typos in EXAMPLES and GUIDES.  Pull Request #213 by Erkan Yilmaz.
+  * Fixed handling of a quoted content-disposition size.  Pull Request #220 by
+    Jason Rust
+
 === 2.4
 
 * Security fix:
 
   Mechanize#auth and Mechanize#basic_auth allowed disclosure of passwords to
-  malicious servers and have been removed.
-  
+  malicious servers and have been deprecated.
+
   In prior versions of mechanize only one set of HTTP authentication
   credentials were allowed for all connections.  If a mechanize instance
   connected to more than one server then a malicious server detecting
@@ -14,8 +21,8 @@
   username and password intended only for one server.
 
   Mechanize#auth and Mechanize#basic_auth now warn when used.
-  
-  To fix the warning switch to Mechanize#add_auth which requires at the URI
+
+  To fix the warning switch to Mechanize#add_auth which requires the URI
   the credentials are intended for, the username and the password.
   Optionally an HTTP authentication realm or NTLM domain may be provided.
 

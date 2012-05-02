@@ -434,15 +434,15 @@ but not <a href="/" rel="me nofollow">this</a>!
     @mech.follow_meta_refresh = true
     @mech.follow_meta_refresh_self = true
 
-    page = @mech.get('http://localhost/refresh_with_empty_url')
+    page = @mech.get('http://example/refresh_with_empty_url')
 
     assert_equal(3, @mech.history.length)
-    assert_equal('http://localhost/refresh_with_empty_url',
+    assert_equal('http://example/refresh_with_empty_url',
                  @mech.history[0].uri.to_s)
-    assert_equal('http://localhost/refresh_with_empty_url',
+    assert_equal('http://example/refresh_with_empty_url',
                  @mech.history[1].uri.to_s)
-    assert_equal('http://localhost/index.html', page.uri.to_s)
-    assert_equal('http://localhost/index.html', @mech.history.last.uri.to_s)
+    assert_equal('http://example/', page.uri.to_s)
+    assert_equal('http://example/', @mech.history.last.uri.to_s)
   end
 
   def test_get_follow_meta_refresh_in_body
@@ -460,15 +460,15 @@ but not <a href="/" rel="me nofollow">this</a>!
     @mech.follow_meta_refresh = true
     @mech.follow_meta_refresh_self = true
 
-    page = @mech.get('http://localhost/refresh_without_url')
+    page = @mech.get('http://example/refresh_without_url')
 
     assert_equal(3, @mech.history.length)
-    assert_equal('http://localhost/refresh_without_url',
+    assert_equal('http://example/refresh_without_url',
                  @mech.history[0].uri.to_s)
-    assert_equal('http://localhost/refresh_without_url',
+    assert_equal('http://example/refresh_without_url',
                  @mech.history[1].uri.to_s)
-    assert_equal('http://localhost/index.html', page.uri.to_s)
-    assert_equal('http://localhost/index.html', @mech.history.last.uri.to_s)
+    assert_equal('http://example/', page.uri.to_s)
+    assert_equal('http://example/', @mech.history.last.uri.to_s)
   end
 
   def test_get_follow_meta_refresh_referer_not_sent
@@ -566,9 +566,9 @@ but not <a href="/" rel="me nofollow">this</a>!
       requests << request
     }
 
-    page = @mech.get('http://localhost/http_refresh?refresh_time=0')
+    page = @mech.get('http://example/http_refresh?refresh_time=0')
 
-    assert_equal('http://localhost/index.html', page.uri.to_s)
+    assert_equal('http://example/', page.uri.to_s)
     assert_equal(2, @mech.history.length)
     assert_nil requests.last['referer']
   end

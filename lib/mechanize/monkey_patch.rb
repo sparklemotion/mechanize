@@ -1,6 +1,7 @@
-# :stopdoc:
+module Net # :nodoc:
+end
 
-class Net::HTTP
+class Net::HTTP # :nodoc:
   alias old_keep_alive? keep_alive?
 
   def keep_alive?(req, res)

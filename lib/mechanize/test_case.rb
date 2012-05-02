@@ -437,9 +437,9 @@ end
 
 class RedirectServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
-    res['Content-Type'] = req.query['ct'] || "text/html"
+    res['Content-Type'] = req.query['ct'] || 'text/html'
     res.status = req.query['code'] ? req.query['code'].to_i : '302'
-    res['Location'] = "/verb"
+    res['Location'] = req['X-Location'] || '/verb'
   end
 
   alias :do_POST :do_GET
@@ -513,12 +513,12 @@ class SendCookiesServlet < WEBrick::HTTPServlet::AbstractServlet
 end
 
 class VerbServlet < WEBrick::HTTPServlet::AbstractServlet
-  %w(HEAD GET POST PUT DELETE).each do |verb|
-    eval(<<-eomethod)
+  %w[HEAD GET POST PUT DELETE].each do |verb|
+    eval <<-METHOD
       def do_#{verb}(req, res)
         res.header['X-Request-Method'] = #{verb.dump}
       end
-        eomethod
+    METHOD
   end
 end
 

@@ -1,6 +1,6 @@
 = Mechanize CHANGELOG
 
-=== 2.4.1
+=== 2.4
 
 * Bug fixes
   * Fixed typos in EXAMPLES and GUIDES.  Pull Request #213 by Erkan Yilmaz.
@@ -10,6 +10,7 @@
     by afhbl
   * Mechanize handles saving of files with the same name better now.  Pull
     Request #223 by Godfrey Chan, Issue #219 by Jon Hart
+  * Mechanize now sends headers across redirects.  Issue #215 by Chris Gahan
 
 === 2.4
 

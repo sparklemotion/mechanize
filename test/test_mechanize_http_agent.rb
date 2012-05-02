@@ -227,6 +227,14 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert response
   end
 
+  def test_fetch_redirect_header
+    page = @agent.fetch('http://example/redirect', :get,
+                        'X-Location' => '/http_headers',
+                        'Range' => 'bytes=0-99999')
+
+    assert_match 'range|bytes=0-999', page.body
+  end
+
   def test_fetch_server_error
     e = assert_raises Mechanize::ResponseCodeError do
       @mech.get 'http://localhost/response_code?code=500'
@@ -1355,11 +1363,28 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     page = fake_page
     page = @agent.response_redirect({ 'Location' => '/index.html' }, :get,
-                                    page, 0, referer)
+                                    page, 0, {}, referer)
 
     assert_equal URI('http://fake.example/index.html'), page.uri
 
     assert_equal 'http://example/referer', requests.first['Referer']
+  end
+
+  def test_response_redirect_header
+    @agent.redirect_ok = true
+    referer = page 'http://example/referer'
+
+    headers = {
+      'Range' => 'bytes=0-9999',
+    }
+
+    page = fake_page
+    page = @agent.response_redirect({ 'Location' => '/http_headers' }, :get,
+                                    page, 0, headers, referer)
+
+    assert_equal URI('http://fake.example/http_headers'), page.uri
+
+    assert_match 'range|bytes=0-999', page.body
   end
 
   def test_response_redirect_malformed
@@ -1368,7 +1393,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     page = fake_page
     page = @agent.response_redirect({ 'Location' => '/index.html?q=あ' }, :get,
-                                    page, 0, referer)
+                                    page, 0, {}, referer)
 
     assert_equal URI('http://fake.example/index.html?q=%E3%81%82'), page.uri
 

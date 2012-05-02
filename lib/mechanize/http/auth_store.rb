@@ -38,6 +38,8 @@ class Mechanize::HTTP::AuthStore
   # 2617.  If +domain+ is given it is only used for NTLM authentication.
 
   def add_auth uri, user, pass, realm = nil, domain = nil
+    uri = URI uri
+
     raise ArgumentError,
           'NTLM domain given with realm which NTLM does not use' if
       realm and domain
@@ -88,6 +90,8 @@ only to a particular server you specify.
   # Retrieves credentials for +realm+ on the server at +uri+.
 
   def credentials_for uri, realm
+    uri = URI uri
+
     uri += '/'
 
     realms = @auth_accounts[uri]
@@ -100,6 +104,8 @@ only to a particular server you specify.
   # set all credentials for the server at +uri+ are removed.
 
   def remove_auth uri, realm = nil
+    uri = URI uri
+
     uri += '/'
 
     if realm then

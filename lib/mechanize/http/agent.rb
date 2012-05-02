@@ -402,20 +402,23 @@ class Mechanize::HTTP::Agent
     zio.finish
 
     return out_io
-  rescue Zlib::Error
-    log.error('unable to gunzip response, trying raw inflate') if log
+  rescue Zlib::Error => gz_error
+    log.warn "unable to gunzip response: #{gz_error} (#{gz_error.class})" if
+      log
 
     body_io.rewind
     body_io.read 10
 
     begin
+      log.warn "trying raw inflate on response" if log
       return inflate body_io, -Zlib::MAX_WBITS
     rescue Zlib::Error => e
-      log.error("unable to gunzip response: #{e}") if log
+      log.error "unable to inflate response: #{e} (#{e.class})" if log
       raise
     end
   ensure
-    zio.close if zio and not zio.closed?
+    # do not close a second time if we failed the first time
+    zio.close if zio and not (zio.closed? or gz_error)
     body_io.close unless body_io.closed?
   end
 
@@ -1115,7 +1118,7 @@ class Mechanize::HTTP::Agent
       inflate.inflate chunk
     end
 
-    out_io.write inflate.finish
+    inflate.finish
 
     out_io
   ensure

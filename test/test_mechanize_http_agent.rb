@@ -874,13 +874,49 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_match %r%error handling content-encoding gzip:%, e.message
     assert_match %r%Zlib%, e.message
 
-    assert_match %r%unable to gunzip response, trying raw inflate%, log.string
-    assert_match %r%unable to gunzip response:%, log.string
+    assert_match %r%unable to gunzip response: unexpected end of file%,
+                 log.string
+    assert_match %r%unable to inflate response: buffer error%,
+                 log.string
 
     assert body_io.closed?
   end
 
-  def test_response_content_encoding_gzip_corrupt_checksum
+  def test_response_content_encoding_gzip_checksum_corrupt_crc
+    log = StringIO.new
+    logger = Logger.new log
+    @agent.context.log = logger
+
+    @res.instance_variable_set :@header, 'content-encoding' => %w[gzip]
+    body_io = StringIO.new \
+      "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017J\004\000\000\000"
+
+    body = @agent.response_content_encoding @res, body_io
+
+    assert_equal 'part', body.read
+
+    assert body_io.closed?
+
+    assert_match %r%invalid compressed data -- crc error%, log.string
+  end
+
+  def test_response_content_encoding_gzip_checksum_corrupt_length
+    log = StringIO.new
+    logger = Logger.new log
+    @agent.context.log = logger
+
+    @res.instance_variable_set :@header, 'content-encoding' => %w[gzip]
+    body_io = StringIO.new \
+      "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017I\005\000\000\000"
+
+    body = @agent.response_content_encoding @res, body_io
+
+    assert body_io.closed?
+
+    assert_match %r%invalid compressed data -- length error%, log.string
+  end
+
+  def test_response_content_encoding_gzip_checksum_truncated
     log = StringIO.new
     logger = Logger.new log
     @agent.context.log = logger
@@ -889,14 +925,11 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     body_io = StringIO.new \
       "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017I\004\000\000"
 
-    e = assert_raises Mechanize::Error do
-      @agent.response_content_encoding @res, body_io
-    end
+    body = @agent.response_content_encoding @res, body_io
 
-    assert_match %r%error handling content-encoding gzip:%, e.message
-    assert_match %r%Zlib%, e.message
+    assert body_io.closed?
 
-    assert_match %r%unable to gunzip response, trying raw inflate%, log.string
+    assert_match %r%unable to gunzip response: footer is not found%, log.string
   end
 
   def test_response_content_encoding_gzip_empty
@@ -924,6 +957,18 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     content = body.read
     assert_equal expected, content
     assert_equal Encoding::BINARY, content.encoding if have_encoding?
+  end
+
+  def test_response_content_encoding_gzip_no_footer
+    @res.instance_variable_set :@header, 'content-encoding' => %w[gzip]
+    body_io = StringIO.new \
+      "\037\213\b\0002\002\225M\000\003+H,*\001\000"
+
+    body = @agent.response_content_encoding @res, body_io
+
+    assert_equal 'part', body.read
+
+    assert body_io.closed?
   end
 
   def test_response_content_encoding_none

@@ -8,6 +8,8 @@
     Jason Rust
   * Mechanize now ignores a missing gzip footer like browsers do.  Issue #224
     by afhbl
+  * Mechanize handles saving of files with the same name better now.  Pull
+    Request #223 by Godfrey Chan, Issue #219 by Jon Hart
 
 === 2.4
 

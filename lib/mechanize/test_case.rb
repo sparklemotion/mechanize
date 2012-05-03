@@ -19,6 +19,9 @@ require 'minitest/autorun'
 # Mechanize::TestCase for your tests will create an isolated mechanize
 # instance that won't pollute your filesystem or other tests.
 #
+# Once Mechanize::TestCase is loaded no HTTP requests will be made outside
+# mechanize itself.  All requests are handled via WEBrick servlets.
+#
 # Mechanize uses WEBrick servlets to test some functionality.  You can run
 # other HTTP clients against the servlets using:
 #
@@ -31,6 +34,9 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
   TEST_DIR = File.expand_path '../../../test', __FILE__
   REQUESTS = []
 
+  ##
+  # Creates a clean mechanize instance +@mech+ for use in tests.
+
   def setup
     super
 
@@ -39,6 +45,10 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
     @ssl_private_key = nil
     @ssl_certificate = nil
   end
+
+  ##
+  # Creates a fake page with URI http://fake.example and an empty, submittable
+  # form.
 
   def fake_page agent = @mech
     uri = URI 'http://fake.example/'
@@ -53,14 +63,23 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
     Mechanize::Page.new uri, nil, html, 200, agent
   end
 
+  ##
+  # Is the Encoding constant defined?
+
   def have_encoding?
     Object.const_defined? :Encoding
   end
+
+  ##
+  # Creates a Mechanize::Page with the given +body+
 
   def html_page body
     uri = URI 'http://example/'
     Mechanize::Page.new uri, nil, body, 200, @mech
   end
+
+  ##
+  # Runs the block inside a temporary directory
 
   def in_tmpdir
     Dir.mktmpdir do |dir|
@@ -69,6 +88,9 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
       end
     end
   end
+
+  ##
+  # Creates a Nokogiri Node +element+ with the given +attributes+
 
   def node element, attributes = {}
     doc = Nokogiri::HTML::Document.new
@@ -82,6 +104,10 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
     node
   end
 
+  ##
+  # Creates a Mechanize::Page for the given +uri+ with the given
+  # +content_type+, response +body+ and HTTP status +code+
+
   def page uri, content_type = 'text/html', body = '', code = 200
     uri = URI uri unless URI::Generic === uri
 
@@ -89,9 +115,15 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
                         @mech)
   end
 
+  ##
+  # Requests made during this tests
+
   def requests
     REQUESTS
   end
+
+  ##
+  # An SSL private key.  This key is the same across all test runs
 
   def ssl_private_key
     @ssl_private_key ||= OpenSSL::PKey::RSA.new <<-KEY
@@ -103,6 +135,9 @@ p80joKOug2UUgqOLD2GUSO//AiEA9ssY6AFxjHWuwo/+/rkLmkfO2s1Lz3OeUEWq
 -----END RSA PRIVATE KEY-----
     KEY
   end
+
+  ##
+  # An X509 certificate.  This certificate is the same across all test runs
 
   def ssl_certificate
     @ssl_certificate ||= OpenSSL::X509::Certificate.new <<-CERT
@@ -117,6 +152,9 @@ UQIBATANBgkqhkiG9w0BAQUFAANBAAAB////////////////////////////////
 -----END CERTIFICATE-----
     CERT
   end
+
+  ##
+  # Creates a Tempfile with +content+ that is immediately unlinked
 
   def tempfile content
     body_io = Tempfile.new @__name__

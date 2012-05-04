@@ -155,6 +155,7 @@ test/test_mechanize_download.rb
 test/test_mechanize_file.rb
 test/test_mechanize_file_connection.rb
 test/test_mechanize_file_request.rb
+test/test_mechanize_file_response.rb
 test/test_mechanize_file_saver.rb
 test/test_mechanize_form.rb
 test/test_mechanize_form_check_box.rb

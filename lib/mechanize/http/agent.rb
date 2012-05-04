@@ -1177,7 +1177,8 @@ class Mechanize::HTTP::Agent
 
   def make_tempfile name
     io = Tempfile.new name
-    io.unlink
+    # https://jira.codehaus.org/browse/JRUBY-6477
+    io.unlink unless RUBY_ENGINE == 'jruby'
     io.binmode if io.respond_to? :binmode
     io
   end

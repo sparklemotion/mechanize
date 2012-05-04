@@ -861,9 +861,7 @@ class Mechanize::HTTP::Agent
     content_length = response.content_length
 
     if use_tempfile? content_length then
-      body_io = Tempfile.new 'mechanize-raw'
-      body_io.unlink
-      body_io.binmode if defined? body_io.binmode
+      body_io = make_tempfile 'mechanize-raw'
     else
       body_io = StringIO.new
     end
@@ -876,9 +874,7 @@ class Mechanize::HTTP::Agent
         total += part.length
 
         if StringIO === body_io and use_tempfile? total then
-          new_io = Tempfile.new 'mechanize-raw'
-          new_io.unlink
-          new_io.binmode
+          new_io = make_tempfile 'mechanize-raw'
 
           new_io.write body_io.string
 
@@ -1113,10 +1109,7 @@ class Mechanize::HTTP::Agent
 
     until input_io.eof? do
       if StringIO === out_io and use_tempfile? out_io.size then
-        new_io = Tempfile.new name
-        new_io.unlink
-        new_io.binmode
-
+        new_io = make_tempfile name
         new_io.write out_io.string
         out_io = new_io
       end
@@ -1180,6 +1173,13 @@ class Mechanize::HTTP::Agent
     proxy_uri.password = pass if pass
 
     @http.proxy = proxy_uri
+  end
+
+  def make_tempfile name
+    io = Tempfile.new name
+    io.unlink
+    io.binmode if io.respond_to? :binmode
+    io
   end
 
   def use_tempfile? size

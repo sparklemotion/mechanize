@@ -67,6 +67,7 @@ lib/mechanize/response_read_error.rb
 lib/mechanize/robots_disallowed_error.rb
 lib/mechanize/test_case.rb
 lib/mechanize/test_case/.document
+lib/mechanize/test_case/bad_chunking_servlet.rb
 lib/mechanize/test_case/basic_auth_servlet.rb
 lib/mechanize/test_case/content_type_servlet.rb
 lib/mechanize/test_case/digest_auth_servlet.rb

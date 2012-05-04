@@ -1,3 +1,4 @@
+require 'mechanize/test_case/bad_chunking_servlet'
 require 'mechanize/test_case/basic_auth_servlet'
 require 'mechanize/test_case/content_type_servlet'
 require 'mechanize/test_case/digest_auth_servlet'
@@ -24,6 +25,7 @@ require 'mechanize/test_case/send_cookies_servlet'
 require 'mechanize/test_case/verb_servlet'
 
 MECHANIZE_TEST_CASE_SERVLETS = {
+  '/bad_chunking'           => BadChunkingServlet,
   '/basic_auth'             => BasicAuthServlet,
   '/content_type_test'      => ContentTypeServlet,
   '/digest_auth'            => DigestAuthServlet,

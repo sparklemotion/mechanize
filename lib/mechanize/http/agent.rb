@@ -875,6 +875,13 @@ class Mechanize::HTTP::Agent
         body_io.write(part)
         log.debug("Read #{part.length} bytes (#{total} total)") if log
       }
+    rescue EOFError => e
+      # terminating CRLF might be missing, let the user check the document
+      raise unless response.chunked? and total.nonzero?
+
+      body_io.rewind
+      raise Mechanize::ResponseReadError.new(e, response, body_io, uri,
+                                             @context)
     rescue Net::HTTP::Persistent::Error => e
       body_io.rewind
       raise Mechanize::ResponseReadError.new(e, response, body_io, uri,

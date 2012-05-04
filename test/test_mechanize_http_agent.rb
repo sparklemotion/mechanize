@@ -1221,6 +1221,21 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal Encoding::BINARY, body.encoding if body.respond_to? :encoding
   end
 
+  def test_response_read_chunked_no_trailer
+    @res['Transfer-Encoding'] = 'chunked'
+    def @res.content_length() end
+    def @res.read_body
+      yield 'a' * 10
+      raise EOFError
+    end
+
+    e = assert_raises Mechanize::ResponseReadError do
+      @agent.response_read @res, @req, @uri
+    end
+
+    assert_equal 'aaaaaaaaaa', e.body_io.read
+  end
+
   def test_response_read_content_length_head
     req = Net::HTTP::Head.new '/'
 

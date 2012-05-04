@@ -248,8 +248,12 @@ class Net::HTTP # :nodoc:
 
     io = StringIO.new(res.body)
     response.instance_variable_set :@socket, io
-    def io.read clen, dest, _
-      dest << string[0, clen]
+    def io.read clen, dest = nil, _ = nil
+      if dest then
+        dest << super(clen)
+      else
+        super clen
+      end
     end
 
     body_exist = req.response_body_permitted? &&

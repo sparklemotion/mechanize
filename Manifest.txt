@@ -13,6 +13,7 @@ examples/rubyforge.rb
 examples/spider.rb
 examples/wikipedia_links_to_philosophy.rb
 lib/mechanize.rb
+lib/mechanize/chunked_termination_error.rb
 lib/mechanize/content_type_error.rb
 lib/mechanize/cookie.rb
 lib/mechanize/cookie_jar.rb

@@ -106,6 +106,11 @@ class Mechanize::HTTP::Agent
 
   attr_reader :http # :nodoc:
 
+  # When set to true mechanize will ignore an EOF during chunked transfer
+  # encoding so long as at least one byte was received.  Be careful when
+  # enabling this as it may cause data loss.
+  attr_accessor :ignore_bad_chunking
+
   # Handlers for various URI schemes
   attr_accessor :scheme_handlers
 
@@ -123,6 +128,7 @@ class Mechanize::HTTP::Agent
     @follow_meta_refresh_self = false
     @gzip_enabled             = true
     @history                  = Mechanize::History.new
+    @ignore_bad_chunking      = false
     @keep_alive               = true
     @max_file_buffer          = 100_000 # 5MB for response bodies
     @open_timeout             = nil
@@ -248,13 +254,20 @@ class Mechanize::HTTP::Agent
     response_body_io = nil
 
     # Send the request
-    response = connection.request(uri, request) { |res|
-      response_log res
+    begin
+      response = connection.request(uri, request) { |res|
+        response_log res
 
-      response_body_io = response_read res, request, uri
+        response_body_io = response_read res, request, uri
 
-      res
-    }
+        res
+      }
+    rescue Mechanize::ChunkedTerminationError => e
+      raise unless @ignore_bad_chunking
+
+      response = e.response
+      response_body_io = e.body_io
+    end
 
     hook_content_encoding response, uri, response_body_io
 
@@ -880,8 +893,8 @@ class Mechanize::HTTP::Agent
       raise unless response.chunked? and total.nonzero?
 
       body_io.rewind
-      raise Mechanize::ResponseReadError.new(e, response, body_io, uri,
-                                             @context)
+      raise Mechanize::ChunkedTerminationError.new(e, response, body_io, uri,
+                                                   @context)
     rescue Net::HTTP::Persistent::Error => e
       body_io.rewind
       raise Mechanize::ResponseReadError.new(e, response, body_io, uri,

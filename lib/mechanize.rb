@@ -753,6 +753,28 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
   end
 
   ##
+  # When set to true mechanize will ignore an EOF during chunked transfer
+  # encoding so long as at least one byte was received.  Be careful when
+  # enabling this as it may cause data loss.
+  #
+  # Net::HTTP does not inform mechanize of where in the chunked stream the EOF
+  # occurred.  Usually it is after the last-chunk but before the terminating
+  # CRLF (invalid termination) but it may occur earlier.  In the second case
+  # your response body may be incomplete.
+
+  def ignore_bad_chunking
+    @agent.ignore_bad_chunking
+  end
+
+  ##
+  # When set to true mechanize will ignore an EOF during chunked transfer
+  # encoding.  See ignore_bad_chunking for further details
+
+  def ignore_bad_chunking= ignore_bad_chunking
+    @agent.ignore_bad_chunking = ignore_bad_chunking
+  end
+
+  ##
   # Are HTTP/1.1 keep-alive connections enabled?
 
   def keep_alive
@@ -1219,6 +1241,8 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
 
 end
 
+require 'mechanize/response_read_error'
+require 'mechanize/chunked_termination_error'
 require 'mechanize/content_type_error'
 require 'mechanize/cookie'
 require 'mechanize/cookie_jar'
@@ -1244,9 +1268,8 @@ require 'mechanize/pluggable_parsers'
 require 'mechanize/redirect_limit_reached_error'
 require 'mechanize/redirect_not_get_or_head_error'
 require 'mechanize/response_code_error'
-require 'mechanize/unauthorized_error'
-require 'mechanize/response_read_error'
 require 'mechanize/robots_disallowed_error'
+require 'mechanize/unauthorized_error'
 require 'mechanize/unsupported_scheme_error'
 require 'mechanize/util'
 

@@ -1,7 +1,11 @@
 = Mechanize CHANGELOG
 
-=== 2.4.1
+=== 2.5
 
+* Minor enhancement
+  * Added Mechanize#ignore_bad_chunking for working around servers that don't
+    terminate chunked transfer-encoding properly.  Enabling this may cause
+    data loss.  Issue #116
 * Bug fixes
   * Fixed typos in EXAMPLES and GUIDES.  Pull Request #213 by Erkan Yilmaz.
   * Fixed handling of a quoted content-disposition size.  Pull Request #220 by

@@ -218,6 +218,14 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     @agent.fetch URI 'http://example/index.html'
   end
 
+  def test_fetch_ignore_bad_chunking
+    @agent.ignore_bad_chunking = true
+
+    file = @agent.fetch 'http://example/bad_chunking'
+
+    assert_equal '0123456789', file.content
+  end
+
   def test_fetch_post_connect_hook
     response = nil
     @agent.post_connect_hooks << lambda { |_, _, res, _| response = res }
@@ -1229,7 +1237,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
       raise EOFError
     end
 
-    e = assert_raises Mechanize::ResponseReadError do
+    e = assert_raises Mechanize::ChunkedTerminationError do
       @agent.response_read @res, @req, @uri
     end
 

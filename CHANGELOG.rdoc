@@ -20,6 +20,8 @@
   * A jruby workaround for https://jira.codehaus.org/browse/JRUBY-6477 was
     added which allows mechanize to store large response bodies on disk.
     Issue #205 by tcpipmen
+  * Mechanize no longer raises an exception when multiple identical
+    radiobuttons are checked.  Issue #214 by Matthias Guenther
 
 === 2.4
 

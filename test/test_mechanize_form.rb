@@ -65,6 +65,40 @@ class TestMechanizeForm < Mechanize::TestCase
     assert query.all? { |x| x[1] == '' }
   end
 
+  def test_build_query_radio_button_duplicate
+    html = Nokogiri::HTML <<-HTML
+<form>
+  <input type=radio name=name value=a checked=true>
+  <input type=radio name=name value=a checked=true>
+</form>
+    HTML
+
+    form = Mechanize::Form.new html.at('form'), @mech, @page
+
+    query = form.build_query
+
+    assert_equal [%w[name a]], query
+  end
+
+  def test_build_query_radio_button_multiple_checked
+    html = Nokogiri::HTML <<-HTML
+<form>
+  <input type=radio name=name value=a checked=true>
+  <input type=radio name=name value=b checked=true>
+</form>
+    HTML
+
+    form = Mechanize::Form.new html.at('form'), @mech, @page
+
+    e = assert_raises Mechanize::Error do
+      form.build_query
+    end
+
+    assert_equal 'radiobuttons "a, b" are checked in the "name" group, ' \
+                 'only one is allowed',
+                 e.message
+  end
+
   def test_method_missing_get
     page = html_page <<-BODY
 <form>

@@ -4,12 +4,22 @@
 
 class Mechanize::Form::RadioButton < Mechanize::Form::Field
   attr_accessor :checked
+  attr_reader :form
 
   def initialize node, form
     @checked = !!node['checked']
     @form    = form
     super(node)
   end
+
+  def == other # :nodoc:
+    self.class === other and
+      other.form  == @form and
+      other.name  == @name and
+      other.value == @value
+  end
+
+  alias eql? == # :nodoc:
 
   def check
     uncheck_peers
@@ -24,6 +34,10 @@ class Mechanize::Form::RadioButton < Mechanize::Form::Field
 
   def click
     checked ? uncheck : check
+  end
+
+  def hash # :nodoc:
+    @form.hash ^ @name.hash ^ @value.hash
   end
 
   def label

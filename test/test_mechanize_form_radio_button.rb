@@ -12,7 +12,8 @@ class TestMechanizeFormRadioButton < Mechanize::TestCase
   <input type="radio" name="color" value="brown">
   <input type="radio" name="color" value="green">
   <input type="radio" name="color" value="red">
-  <input type="radio" name="color" value="yellow">
+  <input type="radio" name="color" value="yellow" id="a">
+  <input type="radio" name="color" value="yellow" id="b">
 
   <input type="submit" value="Submit">
 </form>
@@ -24,7 +25,7 @@ class TestMechanizeFormRadioButton < Mechanize::TestCase
     @brown  = @form.radiobutton_with :value => 'brown'
     @green  = @form.radiobutton_with :value => 'green'
     @red    = @form.radiobutton_with :value => 'red'
-    @yellow = @form.radiobutton_with :value => 'yellow'
+    @yellow = @form.radiobutton_with :id    => 'a'
   end
   
   def test_check
@@ -56,6 +57,22 @@ class TestMechanizeFormRadioButton < Mechanize::TestCase
     @blue.click
 
     refute @blue.checked?
+  end
+
+  def test_equals2
+    refute_equal @yellow, @red
+
+    other_yellow = @form.radiobutton_with :id => 'b'
+
+    assert_equal @yellow, other_yellow
+  end
+
+  def test_hash
+    refute_equal @yellow.hash, @red.hash
+
+    other_yellow = @form.radiobutton_with :id => 'b'
+
+    assert_equal @yellow.hash, other_yellow.hash
   end
 
   def test_label

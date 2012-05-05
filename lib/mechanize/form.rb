@@ -231,12 +231,14 @@ class Mechanize::Form
     radio_groups.each_value do |g|
       checked = g.select {|f| f.checked}
 
-      if checked.size == 1
-        f = checked.first
-        successful_controls << f
-      elsif checked.size > 1
+      if checked.uniq.size > 1 then
+        values = checked.map { |button| button.value }.join(', ').inspect
+        name = checked.first.name.inspect
         raise Mechanize::Error,
-              "multiple radiobuttons are checked in the same group!"
+              "radiobuttons #{values} are checked in the #{name} group, " \
+              "only one is allowed"
+      else
+        successful_controls << checked.first unless checked.empty?
       end
     end
 

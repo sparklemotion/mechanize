@@ -19,6 +19,8 @@
     terminate chunked transfer-encoding properly.  Issue #116
   * Mechanize no longer raises an exception when multiple identical
     radiobuttons are checked.  Issue #214 by Matthias Guenther
+  * Fixed documentation for pre_connect_hooks and post_connect_hooks.  Issue
+    #226 by Robert Poor
 
 === 2.4
 

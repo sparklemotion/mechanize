@@ -263,16 +263,16 @@ class Mechanize
   attr_accessor :history_added
 
   ##
-  # A list of hooks to call after retrieving a response.  Hooks are called with
-  # the agent and the response returned.
+  # A list of hooks to call after retrieving a response. Hooks are called with
+  # the agent, the URI, the response, and the response body.
 
   def post_connect_hooks
     @agent.post_connect_hooks
   end
 
   ##
-  # A list of hooks to call before making a request.  Hooks are called with
-  # the agent and the request to be performed.
+  # A list of hooks to call before retrieving a response. Hooks are called
+  # with the agent, the URI, the response, and the response body.
 
   def pre_connect_hooks
     @agent.pre_connect_hooks

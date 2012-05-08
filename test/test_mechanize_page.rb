@@ -38,12 +38,10 @@ class TestMechanizePage < Mechanize::TestCase
       'application/xhtml+xmlfu',
       'fooapplication/xhtml+xml',
     ].each { |content_type|
-      e = assert_raises(Mechanize::ContentTypeError, content_type) do
-        Mechanize::Page.new(URI('http://example/'),
-          { 'content-type' => content_type }, 'hello', '200')
-      end
+      page = Mechanize::Page.new(URI('http://example/'),
+        { 'content-type' => content_type }, 'hello', '200')
 
-      assert_equal(content_type, e.content_type, content_type)
+      assert_equal(content_type, page.content_type, content_type)
     }
   end
 

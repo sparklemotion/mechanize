@@ -52,38 +52,6 @@ class TestMechanizePageLink < Mechanize::TestCase
     Mechanize::Page.new @uri, res, body, 200, @mech
   end
 
-  def test_initialize_supported_content_type
-    page = Mechanize::Page.new nil, 'content-type' => 'application/xhtml+xml'
-    assert page
-    assert_equal 'application/xhtml+xml', page.content_type
-
-    page = Mechanize::Page.new nil, 'content-type' => 'text/html'
-    assert page
-    assert_equal 'text/html', page.content_type
-
-    page = Mechanize::Page.new nil, 'content-type' => 'application/xhtml+xml;charset=utf-8'
-    assert page
-    assert_equal 'application/xhtml+xml;charset=utf-8', page.content_type
-
-    page = Mechanize::Page.new nil, 'content-type' => 'text/html;charset=utf-8'
-    assert page
-    assert_equal 'text/html;charset=utf-8', page.content_type
-  end
-
-  def test_initialize_unsupported_content_type
-    e = assert_raises Mechanize::ContentTypeError do
-      Mechanize::Page.new nil, 'content-type' => 'text/plain'
-    end
-
-    assert_equal 'text/plain', e.content_type
-
-    e = assert_raises Mechanize::ContentTypeError do
-      Mechanize::Page.new nil, 'content-type' => 'text/plain;charset=utf-8'
-    end
-
-    assert_equal 'text/plain;charset=utf-8', e.content_type
-  end
-
   def test_override_content_type
     page = Mechanize::Page.new nil, {'content-type' => 'text/html'}, WINDOWS_1255
     assert page

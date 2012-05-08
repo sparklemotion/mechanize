@@ -6,6 +6,8 @@
   * Added Mechanize#ignore_bad_chunking for working around servers that don't
     terminate chunked transfer-encoding properly.  Enabling this may cause
     data loss.  Issue #116
+  * Removed content-type check from Mechanize::Page allowing forced parsing
+    of incorrect or missing content-types.  Issue #221 by GarthSnyder
 * Bug fixes
   * Fixed typos in EXAMPLES and GUIDES.  Pull Request #213 by Erkan Yilmaz.
   * Fixed handling of a quoted content-disposition size.  Pull Request #220 by

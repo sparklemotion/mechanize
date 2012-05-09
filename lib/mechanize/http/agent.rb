@@ -599,7 +599,13 @@ class Mechanize::HTTP::Agent
         if RUBY_VERSION >= "1.9.0"
           Mechanize::Util.uri_escape(match)
         else
-          sprintf('%%%X', match.unpack($KCODE == 'UTF8' ? 'U' : 'C')[0])
+          begin
+            sprintf('%%%X', match.unpack($KCODE == 'UTF8' ? 'U' : 'C').first)
+          rescue ArgumentError
+            # workaround for ruby 1.8 with -Ku but ISO-8859-1 characters in
+            # URIs.  See #227.  I can't wait to drop 1.8 support
+            sprintf('%%%X', match.unpack('C').first)
+          end
         end
       }
 

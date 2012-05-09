@@ -23,6 +23,8 @@
     radiobuttons are checked.  Issue #214 by Matthias Guenther
   * Fixed documentation for pre_connect_hooks and post_connect_hooks.  Issue
     #226 by Robert Poor
+  * Worked around ruby 1.8 run with -Ku and ISO-8859-1 encoded characters in
+    URIs.  Issue #228 by Stanislav O.Pogrebnyak
 
 === 2.4
 

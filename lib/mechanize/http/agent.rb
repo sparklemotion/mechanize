@@ -938,6 +938,11 @@ class Mechanize::HTTP::Agent
 
     redirect_method = method == :head ? :head : :get
 
+    # Make sure we are not copying over the POST headers from the original request
+    ['Content-Length', 'Content-MD5', 'Content-Type'].each do |key|
+      headers.delete key
+    end
+
     @history.push(page, page.uri)
     new_uri = resolve response['Location'].to_s, page
 

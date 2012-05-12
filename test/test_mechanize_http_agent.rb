@@ -1384,6 +1384,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     headers = {
       'Range' => 'bytes=0-9999',
+      'Content-Type' => 'application/x-www-form-urlencoded',
+      'Content-Length' => '9999',
     }
 
     page = fake_page
@@ -1392,7 +1394,9 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     assert_equal URI('http://fake.example/http_headers'), page.uri
 
-    assert_match 'range|bytes=0-999', page.body
+    assert_match 'range|bytes=0-9999', page.body
+    refute_match 'content-type|application/x-www-form-urlencoded', page.body
+    refute_match 'content-length|9999', page.body
   end
 
   def test_response_redirect_malformed
@@ -1414,7 +1418,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     assert_raises Mechanize::RedirectLimitReachedError do
       @agent.response_redirect({ 'Location' => '/index.html' }, :get,
-                               fake_page, @agent.redirection_limit, referer)
+                               fake_page, @agent.redirection_limit, {}, referer)
     end
   end
 
@@ -1423,7 +1427,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     page = fake_page
     page = @agent.response_redirect({ 'Location' => '/other' }, :get, page, 0,
-                                    page)
+                                    {}, page)
 
     assert_equal URI('http://fake.example'), page.uri
   end
@@ -1435,7 +1439,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     response.instance_variable_set :@header, { 'location' => %w[/index.html] }
 
     page = fake_page
-    page = @agent.response_redirect response, :get, page, 0, page
+    page = @agent.response_redirect response, :get, page, 0, {}, page
 
     assert_equal URI('http://fake.example/index.html'), page.uri
   end
@@ -1447,7 +1451,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     response.instance_variable_set :@header, { 'location' => %w[/index.html] }
 
     page = fake_page
-    page = @agent.response_redirect response, :get, page, 0, page
+    page = @agent.response_redirect response, :get, page, 0, {}, page
 
     assert_equal URI('http://fake.example/'), page.uri
   end

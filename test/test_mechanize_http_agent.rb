@@ -1394,7 +1394,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     assert_equal URI('http://fake.example/http_headers'), page.uri
 
-    assert_match 'range|bytes=0-999', page.body
+    assert_match 'range|bytes=0-9999', page.body
     refute_match 'content-type|application/x-www-form-urlencoded', page.body
     refute_match 'content-length|9999', page.body
   end

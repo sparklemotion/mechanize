@@ -1,8 +1,14 @@
 = Mechanize CHANGELOG
 
+=== 2.5.1
+
+* Bug fix
+  * Mechanize no longer copies POST requests during a redirect which was
+    introduced by #215.  Pull request #229 by Godfrey Chan.
+
 === 2.5
 
-* Minor enhancement
+* Minor enhancements
   * Added Mechanize#ignore_bad_chunking for working around servers that don't
     terminate chunked transfer-encoding properly.  Enabling this may cause
     data loss.  Issue #116

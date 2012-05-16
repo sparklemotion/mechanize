@@ -75,9 +75,9 @@ class Mechanize::CookieJar
   # Available formats:
   # :yaml  <- YAML structure
   # :cookiestxt  <- Mozilla's cookies.txt format
-  def save_as(file, format = :yaml)
+  def save_as(file, format = :yaml, cookie_cleanup = true)
     jar = dup
-    jar.cleanup true
+    jar.cleanup cookie_cleanup
 
     open(file, 'w') { |f|
       case format

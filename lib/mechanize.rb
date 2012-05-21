@@ -129,6 +129,8 @@ class Mechanize
     'iPhone' => 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1C28 Safari/419.3',
   }
 
+  AGENT_ALIASES['Mac FireFox'] = AGENT_ALIASES['Mac Firefox']
+
   def self.inherited(child) # :nodoc:
     child.html_parser ||= html_parser
     child.log ||= log

@@ -3,6 +3,9 @@
 === 2.5.2
 
 * Bug fix
+  * Fixed casing of the Mac Firefox user-agent alias to match Linux Firefox.
+    In mechanize 3 the old "Mac FireFox" user-agent alias will be removed.
+    Pull request #231 by Gavin Miller.
   * Mechanize now authenticates using the raw challenge, not a reconstructed
     one, to avoid dealing with quoting rules of RFC 2617.  Fixes failures in
     #231 due to net-http-digest_auth 1.2.1

@@ -15,19 +15,19 @@ class DigestAuthServlet < WEBrick::HTTPServlet::AbstractServlet
     :Logger => Logger.new(nil)
   })
 
-  def do_GET(req,res)
+  def do_GET req, res
     def req.request_time; Time.now; end
     def req.request_uri; '/digest_auth'; end
-    def req.request_method; "GET"; end
+    def req.request_method; 'GET'; end
 
     begin
-      @@authenticator.authenticate(req,res)
+      @@authenticator.authenticate req, res
       res.body = 'You are authenticated'
     rescue WEBrick::HTTPStatus::Unauthorized
       res.status = 401
     end
-    FileUtils.rm('digest.htpasswd') if File.exists?('digest.htpasswd')
   end
+
   alias :do_POST :do_GET
 end
 

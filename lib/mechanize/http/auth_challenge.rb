@@ -1,6 +1,6 @@
 class Mechanize::HTTP
 
-  AuthChallenge = Struct.new :scheme, :params
+  AuthChallenge = Struct.new :scheme, :params, :raw
 
   ##
   # A parsed WWW-Authenticate header
@@ -52,13 +52,9 @@ class Mechanize::HTTP
     end
 
     ##
-    # The reconstructed, normalized challenge
+    # The raw authentication challenge
 
-    def to_s
-      auth_params = params.map { |name, value| "#{name}=\"#{value}\"" }
-
-      "#{scheme} #{auth_params.join ', '}"
-    end
+    alias to_s raw
 
   end
 

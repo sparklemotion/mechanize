@@ -384,20 +384,11 @@ but not <a href="/" rel="me nofollow">this</a>!
   end
 
   def test_get_digest_auth
-    block_called = false
+    @mech.add_auth @uri, 'user', 'pass'
 
-    @mech.add_auth(@uri, 'user', 'pass')
+    page = @mech.get @uri + '/digest_auth'
 
-    @mech.pre_connect_hooks << lambda { |_, request|
-      block_called = true
-      request.to_hash.each do |k,v|
-        assert_equal(1, v.length)
-      end
-    }
-
-    page = @mech.get(@uri + '/digest_auth')
-    assert_equal('You are authenticated', page.body)
-    assert block_called
+    assert_equal 'You are authenticated', page.body
   end
 
   def test_get_follow_meta_refresh

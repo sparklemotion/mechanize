@@ -25,6 +25,7 @@ class Mechanize::HTTP::WWWAuthenticateParser
 
     while true do
       break if @scanner.eos?
+      start = @scanner.pos
       challenge = Mechanize::HTTP::AuthChallenge.new
 
       scheme = auth_scheme
@@ -43,6 +44,7 @@ class Mechanize::HTTP::WWWAuthenticateParser
           challenge.params = @scanner.scan(/.*/)
         end
 
+        challenge.raw = www_authenticate[start, @scanner.pos]
         challenges << challenge
         next
       else
@@ -62,10 +64,15 @@ class Mechanize::HTTP::WWWAuthenticateParser
         unless name then
           challenge.params = params
           challenges << challenge
-          break if @scanner.eos?
+
+          if @scanner.eos? then
+            challenge.raw = www_authenticate[start, @scanner.pos]
+            break
+          end
 
           @scanner.pos = pos # rewind
-          challenge = '' # a token should be next, new challenge
+          challenge.raw = www_authenticate[start, @scanner.pos].sub(/,+ *$/, '')
+          challenge = nil # a token should be next, new challenge
           break
         else
           params[name] = value

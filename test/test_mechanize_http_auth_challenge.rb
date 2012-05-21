@@ -8,7 +8,7 @@ class TestMechanizeHttpAuthChallenge < Mechanize::TestCase
     @uri = URI 'http://example/'
     @AR = Mechanize::HTTP::AuthRealm
     @AC = Mechanize::HTTP::AuthChallenge
-    @challenge = @AC.new 'Digest', 'realm' => 'r'
+    @challenge = @AC.new 'Digest', { 'realm' => 'r' }, 'Digest realm=r'
   end
 
   def test_realm_basic

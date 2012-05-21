@@ -708,7 +708,10 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     realm = Mechanize::HTTP::AuthRealm.new 'Digest', base_uri, 'r'
     assert_equal [realm], @agent.authenticate_methods[base_uri][:digest]
 
-    challenge = Mechanize::HTTP::AuthChallenge.new 'Digest', 'realm' => 'r'
+    challenge = Mechanize::HTTP::AuthChallenge.new('Digest',
+                                                   { 'realm' => 'r' },
+                                                   'Digest realm=r')
+
     assert_equal challenge, @agent.digest_challenges[realm]
   end
 

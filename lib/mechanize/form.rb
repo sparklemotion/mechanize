@@ -141,7 +141,6 @@ class Mechanize::Form
   # following:
   #
   #   form.set_fields :foo => { 1 => 'bar' }
-
   def set_fields fields = {}
     fields.each do |name, v|
       case v
@@ -163,18 +162,14 @@ class Mechanize::Form
     end
   end
 
-  # Fetch the value of the first input field with the name passed in
-  # ==Example
-  # Fetch the value set in the input field 'name'
+  # Fetch the value of the first input field with the name passed in. Example:
   #  puts form['name']
   def [](field_name)
     f = field(field_name)
     f && f.value
   end
 
-  # Set the value of the first input field with the name passed in
-  # ==Example
-  # Set the value in the input field 'name' to "Aaron"
+  # Set the value of the first input field with the name passed in. Example:
   #  form['name'] = 'Aaron'
   def []=(field_name, value)
     f = field(field_name)
@@ -557,7 +552,6 @@ class Mechanize::Form
 
     body
   end
-
 end
 
 require 'mechanize/form/field'
@@ -575,4 +569,3 @@ require 'mechanize/form/option'
 require 'mechanize/form/radio_button'
 require 'mechanize/form/check_box'
 require 'mechanize/form/select_list'
-

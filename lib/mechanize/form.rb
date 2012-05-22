@@ -173,7 +173,8 @@ class Mechanize::Form
     super
   end
 
-  # Submit this form with the button passed in
+  # Submit the form. Does not include the +button+ as a form parameter.
+  # Use +click_button+ or provide button as a parameter.
   def submit button=nil, headers = {}
     @mech.submit(self, button, headers)
   end

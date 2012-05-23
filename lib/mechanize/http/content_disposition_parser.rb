@@ -86,7 +86,7 @@ class Mechanize::HTTP::ContentDispositionParser
 
     while true do
       return nil unless param = rfc_2045_token
-      param.downcase
+      param.downcase!
       return nil unless @scanner.scan(/=/)
 
       value = case param

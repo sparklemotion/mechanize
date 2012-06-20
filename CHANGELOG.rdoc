@@ -12,6 +12,7 @@
   * Mechanize now authenticates using the raw challenge, not a reconstructed
     one, to avoid dealing with quoting rules of RFC 2617.  Fixes failures in
     #231 due to net-http-digest_auth 1.2.1
+  * Fixed Content-Disposition parameter parser to be case insensitive. #233
 
 === 2.5.1
 

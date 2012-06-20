@@ -2,6 +2,9 @@
 
 === 2.5.2
 
+* Minor enhancements
+  * Added Mechanize#follow_redirect= as an alias to redirect_ok=.
+
 * Bug fix
   * Fixed casing of the Mac Firefox user-agent alias to match Linux Firefox.
     In mechanize 3 the old "Mac FireFox" user-agent alias will be removed.

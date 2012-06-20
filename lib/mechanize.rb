@@ -886,6 +886,8 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
     @agent.redirect_ok = follow
   end
 
+  alias follow_redirect= redirect_ok=
+
   ##
   # Maximum number of redirections to follow
 

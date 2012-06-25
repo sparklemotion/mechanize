@@ -402,6 +402,21 @@ but not <a href="/" rel="me nofollow">this</a>!
                  @mech.history.first.uri.to_s)
     assert_equal('http://localhost/index.html', page.uri.to_s)
     assert_equal('http://localhost/index.html', @mech.history.last.uri.to_s)
+
+    [5, 6].each { |limit|
+      @mech.redirection_limit = limit
+      begin
+        @mech.get('http://localhost/tc_follow_meta_loop_1.html')
+      rescue => e
+        assert_instance_of Mechanize::RedirectLimitReachedError, e
+        assert_equal limit, e.redirects
+        if limit % 2 == 0
+          assert_equal '/tc_follow_meta_loop_1.html', e.page.uri.path
+        else
+          assert_equal '/tc_follow_meta_loop_2.html', e.page.uri.path
+        end
+      end
+    }
   end
 
   def test_get_follow_meta_refresh_anywhere

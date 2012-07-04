@@ -10,6 +10,7 @@ class Mechanize::Cookie
   attr_accessor :comment, :max_age
 
   attr_accessor :session
+  attr_accessor :httponly
 
   attr_accessor :created_at
   attr_accessor :accessed_at
@@ -33,7 +34,7 @@ class Mechanize::Cookie
     @version = 0     # Netscape Cookie
 
     @domain = @path = @secure = @comment = @max_age =
-      @expires = @comment_url = @discard = @port = nil
+      @expires = @comment_url = @discard = @port = @httponly = nil
 
     @created_at = @accessed_at = Time.now
     case args.size
@@ -97,6 +98,7 @@ class Mechanize::Cookie
           next unless key
           value = WEBrick::HTTPUtils.dequote(value.strip) if value
 
+
           case key.downcase
           when 'domain'
             next unless value && !value.empty?
@@ -134,6 +136,8 @@ class Mechanize::Cookie
               log.warn("Couldn't parse version '#{value}'") if log
               cookie.version = nil
             end
+          when 'httponly'
+            cookie.httponly = true
           when 'secure'
             cookie.secure = true
           end
@@ -142,6 +146,7 @@ class Mechanize::Cookie
         cookie.path    ||= (uri + './').path
         cookie.secure  ||= false
         cookie.domain  ||= uri.host
+        cookie.httponly ||= false
 
         # RFC 6265 4.1.2.2
         cookie.expires   = Time.now + cookie.max_age if cookie.max_age
@@ -193,6 +198,7 @@ class Mechanize::Cookie
   end
 
   alias secure? secure
+  alias httponly? httponly
 
   def acceptable_from_uri?(uri)
     host = DomainName.new(uri.host)

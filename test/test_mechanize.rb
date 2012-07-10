@@ -76,6 +76,7 @@ class TestMechanize < Mechanize::TestCase
     end
 
     assert_equal ssl_certificate, mech.certificate
+    assert_equal ssl_certificate, mech.cert
   end
 
   def test_cert_store

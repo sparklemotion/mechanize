@@ -1080,7 +1080,7 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
   # An OpenSSL private key or the path to a private key
 
   def key
-    @agent.key
+    @agent.private_key
   end
 
   ##

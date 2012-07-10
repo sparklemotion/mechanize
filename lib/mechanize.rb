@@ -1021,7 +1021,7 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
   # An OpenSSL client certificate or the path to a certificate file.
 
   def cert
-    @agent.cert
+    @agent.certificate
   end
 
   ##

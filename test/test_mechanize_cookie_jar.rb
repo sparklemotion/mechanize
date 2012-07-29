@@ -289,6 +289,33 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     assert_equal(3, @jar.cookies(url).length)
   end
 
+  def test_save_session_cookies_yaml
+    url = URI 'http://rubyforge.org/'
+
+    # Add one cookie with an expiration date in the future
+    cookie = Mechanize::Cookie.new(cookie_values)
+    s_cookie = Mechanize::Cookie.new(cookie_values(:name => 'Bar',
+                                              :expires => nil,
+                                              :session => true))
+
+    @jar.add(url, cookie)
+    @jar.add(url, s_cookie)
+    @jar.add(url, Mechanize::Cookie.new(cookie_values(:name => 'Baz')))
+
+    assert_equal(3, @jar.cookies(url).length)
+
+    in_tmpdir do
+      @jar.save_as("cookies.yml", :yaml, false)
+
+      jar = Mechanize::CookieJar.new
+      jar.load("cookies.yml")
+      assert_equal(3, jar.cookies(url).length)
+    end
+
+    assert_equal(3, @jar.cookies(url).length)
+  end
+
+
   def test_save_cookies_cookiestxt
     url = URI 'http://rubyforge.org/'
 

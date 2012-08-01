@@ -251,6 +251,22 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal '500', e.response_code
   end
 
+  def test_fetch_allowed_error_codes
+    @agent.allowed_error_codes = ['500']
+
+    page = @mech.get 'http://localhost/response_code?code=500'
+
+    assert_equal '500', page.code
+  end
+
+  def test_fetch_allowed_error_codes_int
+    @agent.allowed_error_codes = [500]
+
+    page = @mech.get 'http://localhost/response_code?code=500'
+
+    assert_equal '500', page.code
+  end
+
   def test_get_meta_refresh_header_follow_self
     @agent.follow_meta_refresh = true
     @agent.follow_meta_refresh_self = true

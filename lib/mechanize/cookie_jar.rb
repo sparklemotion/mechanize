@@ -70,7 +70,8 @@ class Mechanize::CookieJar
     }
   end
 
-  # Save the cookie jar to a file in the format specified.
+  # Save the cookie jar to a file in the format specified and return
+  # self.
   #
   # Available formats:
   # :yaml  <- YAML structure

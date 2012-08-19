@@ -2,6 +2,10 @@
 
 === 2.5.2
 
+* New Features
+  * Mechanize::CookieJar#save_as takes a keyword option "session" to say
+    that session cookies should be saved.  Based on #230 by Jim Jones.
+
 * Minor enhancements
   * Added Mechanize#follow_redirect= as an alias to redirect_ok=.
 

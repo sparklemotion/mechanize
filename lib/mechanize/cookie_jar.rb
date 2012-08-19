@@ -70,15 +70,37 @@ class Mechanize::CookieJar
     }
   end
 
+  # call-seq:
+  #   jar.save_as(file, format = :yaml)
+  #   jar.save_as(file, options)
+  #
   # Save the cookie jar to a file in the format specified and return
   # self.
   #
-  # Available formats:
-  # :yaml  <- YAML structure
-  # :cookiestxt  <- Mozilla's cookies.txt format
-  def save_as(file, format = :yaml, cookie_cleanup = true)
+  # Available option keywords are below:
+  #
+  # * +format+
+  #   [<tt>:yaml</tt>]
+  #     YAML structure (default)
+  #   [<tt>:cookiestxt</tt>]
+  #     Mozilla's cookies.txt format
+  # * +session+
+  #   [+true+]
+  #     Save session cookies as well.
+  #   [+false+]
+  #     Do not save session cookies. (default)
+  def save_as(file, options = nil)
+    if Symbol === options
+      format = options
+      session = false
+    else
+      options ||= {}
+      format = options[:format] || :yaml
+      session = !!options[:session]
+    end
+
     jar = dup
-    jar.cleanup cookie_cleanup
+    jar.cleanup !session
 
     open(file, 'w') { |f|
       case format

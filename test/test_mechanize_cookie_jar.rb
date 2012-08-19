@@ -306,7 +306,7 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     assert_equal(3, @jar.cookies(url).length)
 
     in_tmpdir do
-      @jar.save_as("cookies.yml", :yaml, false)
+      @jar.save_as("cookies.yml", :format => :yaml, :session => true)
 
       jar = Mechanize::CookieJar.new
       jar.load("cookies.yml")

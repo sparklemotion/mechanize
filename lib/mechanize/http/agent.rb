@@ -239,8 +239,6 @@ class Mechanize::HTTP::Agent
     end
 
     # Add If-Modified-Since if page is in history
-    page = visited_page(uri)
-
     if (page = visited_page(uri)) and page.response['Last-Modified']
       request['If-Modified-Since'] = page.response['Last-Modified']
     end if(@conditional_requests)

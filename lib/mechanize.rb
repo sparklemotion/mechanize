@@ -1211,6 +1211,22 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
     @agent.set_proxy address, port, user, password
   end
 
+  ##
+  # Clears history and cookies.
+
+  def reset!
+    @agent.reset!
+  end
+
+  ##
+  # Shuts down this session by clearing browsing state and closing all
+  # persistent connections.
+
+  def shutdown
+    reset!
+    @agent.shutdown
+  end
+
   private
 
   ##

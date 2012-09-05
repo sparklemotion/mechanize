@@ -140,6 +140,8 @@ test/htdocs/tc_checkboxes.html
 test/htdocs/tc_encoded_links.html
 test/htdocs/tc_field_precedence.html
 test/htdocs/tc_follow_meta.html
+test/htdocs/tc_follow_meta_loop_1.html
+test/htdocs/tc_follow_meta_loop_2.html
 test/htdocs/tc_form_action.html
 test/htdocs/tc_links.html
 test/htdocs/tc_meta_in_body.html

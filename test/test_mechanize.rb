@@ -1037,6 +1037,18 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert_empty @mech.cookies
   end
 
+  def test_start
+    body, id = nil
+
+    Mechanize.start do |m|
+      body = m.get("http://localhost/").body
+      id = m.agent.http.request_key
+    end
+
+    assert_match /Hello World/, body
+    assert_nil Thread.current[id]
+  end
+
   def test_submit_bad_form_method
     page = @mech.get("http://localhost/bad_form_test.html")
     assert_raises ArgumentError do

@@ -1203,7 +1203,7 @@ class Mechanize::HTTP::Agent
     size >= @max_file_buffer
   end
 
-  def reset!
+  def reset
     @cookie_jar.clear!
     @history.clear
   end

@@ -1214,8 +1214,8 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
   ##
   # Clears history and cookies.
 
-  def reset!
-    @agent.reset!
+  def reset
+    @agent.reset
   end
 
   ##
@@ -1223,7 +1223,7 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
   # persistent connections.
 
   def shutdown
-    reset!
+    reset
     @agent.shutdown
   end
 

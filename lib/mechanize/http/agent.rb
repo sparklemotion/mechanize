@@ -1,5 +1,5 @@
 require 'tempfile'
-require 'net/ntlm'
+require 'ntlm'
 require 'kconv'
 require 'webrobots'
 
@@ -691,21 +691,22 @@ class Mechanize::HTTP::Agent
     elsif challenge = challenges.find { |c| c.scheme == 'NTLM' } then
       existing_realms = @authenticate_methods[uri + '/'][:ntlm]
 
-      raise Mechanize::UnauthorizedError, page if
-        existing_realms.include?(realm) and not challenge.params
+
+      if existing_realms.include?(realm) and not challenge.params
+        # TO-DO, need to reset the existing_realms if the persistent
+        # connection is reset
+        raise Mechanize::UnauthorizedError, page
+      end
+
+
 
       existing_realms << realm
 
       if challenge.params then
-        type_2 = Net::NTLM::Message.decode64 challenge.params
-
-        type_3 = type_2.response({ :user => @user, :password => @password, :domain => @domain },
-                                 { :ntlmv2 => true }).encode64
-
-        headers['Authorization'] = "NTLM #{type_3}"
+        ntlm_challenge = challenge.params.unpack('m').first
+        headers['Authorization'] =  'NTLM ' + NTLM.authenticate(ntlm_challenge, @user, @domain,@password).to_base64
       else
-        type_1 = Net::NTLM::Message::Type1.new.encode64
-        headers['Authorization'] = "NTLM #{type_1}"
+        headers['Authorization'] = 'NTLM ' + NTLM.negotiate.to_base64
       end
     elsif challenge = challenges.find { |c| c.scheme == 'Basic' } then
       realm = challenge.realm uri

@@ -80,8 +80,6 @@ class Mechanize::HTTP::WWWAuthenticateParser
 
         spaces
 
-        return nil unless ',' == @scanner.peek(1) or @scanner.eos?
-
         @scanner.scan(/(, *)+/)
       end
     end

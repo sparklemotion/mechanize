@@ -44,10 +44,10 @@ class TestMechanizeHttpWwwAuthenticateParser < Mechanize::TestCase
 
   def test_parse
     expected = [
-      challenge('Basic', { 'realm' => 'foo' }, 'Basic realm=foo'),
+      challenge('Basic', { 'realm' => 'foo', 'qop' => 'auth,auth-int' }, 'Basic realm=foo, qop="auth,auth-int"'),
     ]
 
-    assert_equal expected, @parser.parse('Basic realm=foo')
+    assert_equal expected, @parser.parse('Basic realm=foo, qop="auth,auth-int"')
   end
 
   def test_parse_multiple

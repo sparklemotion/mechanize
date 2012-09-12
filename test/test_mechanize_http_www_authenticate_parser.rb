@@ -67,6 +67,15 @@ class TestMechanizeHttpWwwAuthenticateParser < Mechanize::TestCase
     assert_equal expected, @parser.parse('Basic realm=foo, Digest realm=bar')
   end
 
+  def test_parse_multiple_without_comma_delimiter
+    expected = [
+      challenge('Basic',  { 'realm' => 'foo' }, 'Basic realm=foo'),
+      challenge('Digest', { 'realm' => 'bar' }, 'Digest realm=bar'),
+    ]
+
+    assert_equal expected, @parser.parse('Basic realm=foo Digest realm=bar')
+  end
+
   def test_parse_multiple_blank
     expected = [
       challenge('Basic',  { 'realm' => 'foo' }, 'Basic realm=foo'),

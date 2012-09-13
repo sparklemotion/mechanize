@@ -498,11 +498,8 @@ class TestMechanizeCookie < Mechanize::TestCase
   def test_cookie_httponly
     url = URI.parse('http://rubyforge.org/')
     cookie_params = {}
-    cookie_params['expires']   = 'expires=Sun, 27-Sep-2037 00:00:00 GMT'
-    cookie_params['path']      = 'path=/'
-    cookie_params['domain']    = 'domain=.rubyforge.org'
     cookie_params['httponly']  = 'HttpOnly'
-    cookie_value = 'test_httponly=test_httponly'
+    cookie_value = '12345%7D=ASDFWEE345%3DASda'
 
     expires = Time.parse('Sun, 27-Sep-2037 00:00:00 GMT')
     
@@ -516,11 +513,8 @@ class TestMechanizeCookie < Mechanize::TestCase
         end
       end
       cookie = nil
-      puts 'CALLED'
-      Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
+      Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie; }
 
-      assert_equal('test_httponly=test_httponly', cookie.to_s)
-      assert_equal('/', cookie.path)
       assert_equal(true, cookie.httponly)
 
       

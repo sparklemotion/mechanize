@@ -37,7 +37,7 @@ require 'zlib'
 # == Issues with mechanize
 #
 # If you think you have a bug with mechanize, but aren't sure, please file a
-# ticket at https://github.com/tenderlove/mechanize/issues
+# ticket at https://github.com/sparklemotion/mechanize/issues
 #
 # Here are some common problems you may experience with mechanize
 #
@@ -113,7 +113,7 @@ class Mechanize
   #   agent.user_agent_alias = 'Mac Safari'
 
   AGENT_ALIASES = {
-    'Mechanize' => "Mechanize/#{VERSION} Ruby/#{ruby_version} (http://github.com/tenderlove/mechanize/)",
+    'Mechanize' => "Mechanize/#{VERSION} Ruby/#{ruby_version} (http://github.com/sparklemotion/mechanize/)",
     'Linux Firefox' => 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.1) Gecko/20100122 firefox/3.6.1',
     'Linux Konqueror' => 'Mozilla/5.0 (compatible; Konqueror/3; Linux)',
     'Linux Mozilla' => 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.4) Gecko/20030624',

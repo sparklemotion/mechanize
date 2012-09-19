@@ -1,5 +1,11 @@
 = Mechanize CHANGELOG
 
+=== Unreleased
+
+* Bug fix
+  * Mechanize#cert and Mechanize#key now return the values set by
+    #cert= and #key=. #244, #245 (Thanks, Robert Gogolok!)
+
 === 2.5.2
 
 * New Features

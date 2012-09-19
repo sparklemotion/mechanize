@@ -1,7 +1,7 @@
 = Mechanize
 
 * http://mechanize.rubyforge.org
-* https://github.com/tenderlove/mechanize
+* https://github.com/sparklemotion/mechanize
 
 == DESCRIPTION
 
@@ -24,7 +24,7 @@ The mechanize mailing list is available here:
 
 The bug tracker is available here:
 
-  * https://github.com/tenderlove/mechanize/issues
+  * https://github.com/sparklemotion/mechanize/issues
 
 == Examples
 

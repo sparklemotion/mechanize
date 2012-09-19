@@ -100,6 +100,18 @@ class TestMechanize < Mechanize::TestCase
                  @mech.history.last.uri.to_s)
   end
 
+  def test_click_bogus_link_with_cookies
+    @mech.cookie_jar = cookie_jar("a=b")
+
+    page = html_page <<-BODY
+<a href="http:///index.html">yes really</a>
+    BODY
+
+    page.links[0].click
+
+    assert_equal '/index.html', requests.first.path
+  end
+
   def test_click_frame
     frame = node 'frame', 'src' => '/index.html'
     frame = Mechanize::Page::Frame.new frame, @mech, fake_page

@@ -138,6 +138,23 @@ class Mechanize
   end
 
   ##
+  # Creates a new Mechanize instance and yields it to the given block.
+  #
+  # After the block executes, the instance is cleaned up. This includes
+  # closing all open connections.
+  #
+  #   Mechanize.start do |m|
+  #     m.get("http://example.com")
+  #   end
+
+  def self.start
+    instance = new
+    yield(instance)
+  ensure
+    instance.shutdown
+  end
+
+  ##
   # Creates a new mechanize instance.  If a block is given, the created
   # instance is yielded to the block for setting up pre-connection state such
   # as SSL parameters or proxies:
@@ -1209,6 +1226,22 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
     @proxy_pass = password
 
     @agent.set_proxy address, port, user, password
+  end
+
+  ##
+  # Clears history and cookies.
+
+  def reset
+    @agent.reset
+  end
+
+  ##
+  # Shuts down this session by clearing browsing state and closing all
+  # persistent connections.
+
+  def shutdown
+    reset
+    @agent.shutdown
   end
 
   private

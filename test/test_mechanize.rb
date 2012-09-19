@@ -1017,6 +1017,40 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert_equal URI('http://user:pass@localhost:8080'), http.proxy_uri
   end
 
+  def test_shutdown
+    uri = URI 'http://localhost'
+    jar = Mechanize::CookieJar.new
+    Mechanize::Cookie.parse uri, 'a=b' do |cookie|
+      jar.add uri, cookie
+    end
+
+    @mech.cookie_jar = jar
+
+    @mech.get("http://localhost/")
+
+    assert_match /Hello World/, @mech.current_page.body
+    refute_empty @mech.cookies
+    refute_empty Thread.current[@mech.agent.http.request_key]
+
+    @mech.shutdown
+
+    assert_nil Thread.current[@mech.agent.http.request_key]
+    assert_empty @mech.history
+    assert_empty @mech.cookies
+  end
+
+  def test_start
+    body, id = nil
+
+    Mechanize.start do |m|
+      body = m.get("http://localhost/").body
+      id = m.agent.http.request_key
+    end
+
+    assert_match /Hello World/, body
+    assert_nil Thread.current[id]
+  end
+
   def test_submit_bad_form_method
     page = @mech.get("http://localhost/bad_form_test.html")
     assert_raises ArgumentError do

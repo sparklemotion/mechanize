@@ -2,6 +2,9 @@
 
 === Unreleased
 
+* New Features
+  * Mechanize#start and Mechanize#shutdown (Thanks, Damian Janowski!)
+
 * Bug fix
   * Mechanize#cert and Mechanize#key now return the values set by
     #cert= and #key=. #244, #245 (Thanks, Robert Gogolok!)

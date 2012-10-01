@@ -401,6 +401,11 @@ class Mechanize::HTTP::Agent
     end
   end
 
+  # Closes all open connections for this agent.
+  def shutdown
+    http.shutdown
+  end
+
   ##
   # Decodes a gzip-encoded +body_io+.  If it cannot be decoded, inflate is
   # tried followed by raising an error.
@@ -694,7 +699,7 @@ class Mechanize::HTTP::Agent
       message = 'WWW-Authenticate header missing in response'
       raise Mechanize::UnauthorizedError.new(page, nil, message)
     end
-                                               
+
     challenges = @authenticate_parser.parse www_authenticate
 
     unless @auth_store.credentials? uri, challenges then
@@ -798,7 +803,7 @@ class Mechanize::HTTP::Agent
     begin
       if Tempfile === body_io and
          (StringIO === out_io or out_io.path != body_io.path) then
-        body_io.close! 
+        body_io.close!
       end
     rescue IOError
       # HACK ruby 1.8 raises IOError when closing the stream
@@ -1196,6 +1201,11 @@ class Mechanize::HTTP::Agent
     return false unless size
 
     size >= @max_file_buffer
+  end
+
+  def reset
+    @cookie_jar.clear!
+    @history.clear
   end
 
 end

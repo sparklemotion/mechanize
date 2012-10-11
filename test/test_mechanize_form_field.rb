@@ -2,6 +2,13 @@ require 'mechanize/test_case'
 
 class TestMechanizeFormField < Mechanize::TestCase
 
+  def test_inspect
+    field = node 'input'
+    field = Mechanize::Form::Field.new field, 'a&b'
+
+    assert_match "value: a&b", field.inspect
+  end
+
   def test_name
     field = node 'input', 'name' => 'a&b'
     field = Mechanize::Form::Field.new field

@@ -22,6 +22,10 @@ class TestMechanizeFormSelectList < Mechanize::TestCase
     @select = form.fields.first
   end
 
+  def test_inspect
+    assert_match "value: 2", @select.inspect
+  end
+
   def test_option_with
     option = @select.option_with :value => '1'
 

@@ -158,7 +158,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     in_tmpdir do
       nonexistent = File.join Dir.pwd, 'nonexistent'
 
-      uri = URI.parse "file://#{nonexistent}"
+      uri = URI.parse "file:///#{nonexistent}"
 
       e = assert_raises Mechanize::ResponseCodeError do
         @agent.fetch uri
@@ -511,9 +511,10 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     @agent.request_cookies @req, uri
 
-    expected = cookie_str.sub ', ', '; '
-
-    assert_equal expected, @req['Cookie']
+    expected_variant1 = 'a=b domain=\.example\.com; c=d domain=\.example\.com'
+    expected_variant2 = 'c=d domain=\.example\.com; a=b domain=\.example\.com'
+    
+    assert_match /^(#{expected_variant1}|#{expected_variant2})$/, @req['Cookie']
   end
 
   def test_request_cookies_none
@@ -1066,15 +1067,18 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     uri = URI.parse 'http://host.example.com'
     cookie1 = 'a=b domain=.example.com'
     cookie2 = 'c=d domain=.example.com'
+    cookies = [cookie1, cookie2]
     @res.instance_variable_set(:@header,
-                               'set-cookie' => [cookie1, cookie2],
+                               'set-cookie' => cookies,
                                'content-type' => %w[text/html])
     page = Mechanize::Page.new uri, @res, '', 200, @mech
 
     @agent.response_cookies @res, uri, page
 
-    assert_equal ['a=b domain=.example.com', 'c=d domain=.example.com'],
-                 @agent.cookie_jar.cookies(uri).map { |c| c.to_s }
+    cookies_from_jar = @agent.cookie_jar.cookies(uri)
+
+    assert_equal 2, cookies_from_jar.length
+    cookies_from_jar.each { |cookie| assert cookies.include? cookie.to_s }
   end
 
   def test_response_cookies_meta
@@ -1312,8 +1316,13 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
       expected = "π\n"
       expected.force_encoding Encoding::BINARY if expected.respond_to? :encoding
 
+      # Ruby 1.8.7 doesn't let us set the write mode of the tempfile to binary, 
+      # so we should expect an inserted carriage return on some platforms
+      expected_with_carriage_return = "π\r\n"
+      expected_with_carriage_return.force_encoding Encoding::BINARY if expected_with_carriage_return.respond_to? :encoding
+
       body = io.read
-      assert_equal expected, body
+      assert_match /^(#{expected}|#{expected_with_carriage_return})$/m, body
       assert_equal Encoding::BINARY, body.encoding if body.respond_to? :encoding
     end
   end

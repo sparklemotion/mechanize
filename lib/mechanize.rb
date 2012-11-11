@@ -132,8 +132,8 @@ class Mechanize
   AGENT_ALIASES['Mac FireFox'] = AGENT_ALIASES['Mac Firefox']
 
   def self.inherited(child) # :nodoc:
-    child.html_parser ||= html_parser
-    child.log ||= log
+    child.html_parser = html_parser
+    child.log = log
     super
   end
 
@@ -561,6 +561,7 @@ class Mechanize
   # keep-alives, compression, redirects and headers.
 
   @html_parser = Nokogiri::HTML
+  @log = nil
 
   class << self
 

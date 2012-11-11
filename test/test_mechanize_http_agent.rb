@@ -16,7 +16,9 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     @res.instance_variable_set :@code, 200
     @res.instance_variable_set :@header, {}
 
-    @headers = if RUBY_VERSION > '1.9' then
+    @headers = if RUBY_VERSION >= '2.0.0' then
+                 %w[accept accept-encoding user-agent]
+               elsif RUBY_VERSION >= '1.9.0' then
                  %w[accept user-agent]
                else
                  %w[accept]

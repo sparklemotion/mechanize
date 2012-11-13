@@ -290,12 +290,12 @@ class Mechanize::HTTP::Agent
     meta = response_follow_meta_refresh response, uri, page, redirects
     return meta if meta
 
+    if robots && page.is_a?(Mechanize::Page)
+      page.parser.noindex? and raise Mechanize::RobotsDisallowedError.new(uri)
+    end
+
     case response
     when Net::HTTPSuccess
-      if robots && page.is_a?(Mechanize::Page)
-        page.parser.noindex? and raise Mechanize::RobotsDisallowedError.new(uri)
-      end
-
       page
     when Mechanize::FileResponse
       page
@@ -309,10 +309,6 @@ class Mechanize::HTTP::Agent
                             referer)
     else
       if @allowed_error_codes.any? {|code| code.to_s == page.code} then
-        if robots && page.is_a?(Mechanize::Page)
-          page.parser.noindex? and raise Mechanize::RobotsDisallowedError.new(uri)
-        end
-
         page
       else
         raise Mechanize::ResponseCodeError.new(page, 'unhandled response')

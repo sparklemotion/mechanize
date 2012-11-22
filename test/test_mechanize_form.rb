@@ -921,4 +921,18 @@ class TestMechanizeForm < Mechanize::TestCase
     assert_equal expected, query
   end
 
+  def test_form_input_disabled
+    page = html_page <<-BODY
+<form name="form1" method="post" action="/form_post">
+  <input type="text" name="opa" value="omg" disabled />
+  <input type="submit" value="Submit" />
+</form>
+    BODY
+    form = page.forms.first
+
+    page = @mech.submit form
+
+    assert_empty page.links
+  end
+
 end

@@ -8,6 +8,8 @@
 * Bug fix
   * Mechanize#cert and Mechanize#key now return the values set by
     #cert= and #key=. #244, #245 (Thanks, Robert Gogolok!)
+  * Mechanize no longer submits disabled form fields.  #276 by Bogdan Gusiev,
+    #279 by Ricardo Valeriano.
 
 === 2.5.2
 

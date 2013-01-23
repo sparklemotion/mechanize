@@ -434,7 +434,7 @@ class Mechanize::HTTP::Agent
     end
   ensure
     # do not close a second time if we failed the first time
-    zio.close if zio and not (zio.closed? or gz_error)
+    zio.close if zio and !(zio.closed? or gz_error)
     body_io.close unless body_io.closed?
   end
 
@@ -1150,7 +1150,7 @@ class Mechanize::HTTP::Agent
 
     out_io
   ensure
-    inflate.close
+    inflate.close if inflate.finished?
   end
 
   def log

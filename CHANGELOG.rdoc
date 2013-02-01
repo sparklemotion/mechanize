@@ -10,6 +10,9 @@
     #cert= and #key=. #244, #245 (Thanks, Robert Gogolok!)
   * Mechanize no longer submits disabled form fields.  #276 by Bogdan Gusiev,
     #279 by Ricardo Valeriano.
+  * Mechanize::File#save now behaves like Mechanize::Download#save in
+    that it will create the parent directory before saving.
+    #272, #280 by Ryan Kowalick
 
 === 2.5.2
 
@@ -890,4 +893,4 @@ Mechanize is now under the MIT license
 * Added a response code exception
 * Thanks to Brian Ellin (brianellin@gmail.com) for:
   Added support for CA files, and support for 301 response codes
-  
+

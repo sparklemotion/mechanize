@@ -65,5 +65,7 @@ class Mechanize::Download
     end
   end
 
+  alias save_as save
+
 end
 

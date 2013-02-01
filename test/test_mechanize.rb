@@ -1028,7 +1028,7 @@ but not <a href="/" rel="me nofollow">this</a>!
 
     @mech.get("http://localhost/")
 
-    assert_match /Hello World/, @mech.current_page.body
+    assert_match(/Hello World/, @mech.current_page.body)
     refute_empty @mech.cookies
     refute_empty Thread.current[@mech.agent.http.request_key]
 
@@ -1047,7 +1047,7 @@ but not <a href="/" rel="me nofollow">this</a>!
       id = m.agent.http.request_key
     end
 
-    assert_match /Hello World/, body
+    assert_match(/Hello World/, body)
     assert_nil Thread.current[id]
   end
 

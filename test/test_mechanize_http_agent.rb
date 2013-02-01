@@ -515,8 +515,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     expected_variant1 = 'a=b domain=\.example\.com; c=d domain=\.example\.com'
     expected_variant2 = 'c=d domain=\.example\.com; a=b domain=\.example\.com'
-    
-    assert_match /^(#{expected_variant1}|#{expected_variant2})$/, @req['Cookie']
+
+    assert_match(/^(#{expected_variant1}|#{expected_variant2})$/, @req['Cookie'])
   end
 
   def test_request_cookies_none
@@ -931,7 +931,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     body_io = StringIO.new \
       "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017I\005\000\000\000"
 
-    body = @agent.response_content_encoding @res, body_io
+    @agent.response_content_encoding @res, body_io
 
     assert body_io.closed?
 
@@ -947,7 +947,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     body_io = StringIO.new \
       "\037\213\b\0002\002\225M\000\003+H,*\001\000\306p\017I\004\000\000"
 
-    body = @agent.response_content_encoding @res, body_io
+    @agent.response_content_encoding @res, body_io
 
     assert body_io.closed?
 
@@ -1318,13 +1318,13 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
       expected = "π\n"
       expected.force_encoding Encoding::BINARY if expected.respond_to? :encoding
 
-      # Ruby 1.8.7 doesn't let us set the write mode of the tempfile to binary, 
+      # Ruby 1.8.7 doesn't let us set the write mode of the tempfile to binary,
       # so we should expect an inserted carriage return on some platforms
       expected_with_carriage_return = "π\r\n"
       expected_with_carriage_return.force_encoding Encoding::BINARY if expected_with_carriage_return.respond_to? :encoding
 
       body = io.read
-      assert_match /^(#{expected}|#{expected_with_carriage_return})$/m, body
+      assert_match(/^(#{expected}|#{expected_with_carriage_return})$/m, body)
       assert_equal Encoding::BINARY, body.encoding if body.respond_to? :encoding
     end
   end

@@ -5,6 +5,9 @@
 * New Features
   * Mechanize#start and Mechanize#shutdown (Thanks, Damian Janowski!)
 
+* Minor enhancements
+  * Added Mechanize::Download#save_as as an alias to #save. #246
+
 * Bug fix
   * Mechanize#cert and Mechanize#key now return the values set by
     #cert= and #key=. #244, #245 (Thanks, Robert Gogolok!)

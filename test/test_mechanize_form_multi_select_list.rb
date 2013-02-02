@@ -23,7 +23,7 @@ class TestMechanizeFormMultiSelectList < Mechanize::TestCase
   end
 
   def test_inspect
-    assert_match "value: 2", @select.inspect
+    assert_match "value: #{%w[2]}", @select.inspect
   end
 
   def test_inspect_select_all

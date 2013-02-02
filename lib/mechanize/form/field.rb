@@ -54,7 +54,7 @@ class Mechanize::Form::Field
   def inspect # :nodoc:
     "[%s:0x%x type: %s name: %s value: %s]" % [
       self.class.name.sub(/Mechanize::Form::/, '').downcase,
-      object_id, @type, @name, @value
+      object_id, type, name, value
     ]
   end
 

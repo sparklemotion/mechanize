@@ -20,6 +20,10 @@ class TestMechanizeFormOption < Mechanize::TestCase
     @option2 = @select.options.last
   end
 
+  def test_inspect
+    assert_match "value: 2", @select.inspect
+  end
+
   def test_value_missing_value
     option = node 'option'
     option.inner_html = 'blah'

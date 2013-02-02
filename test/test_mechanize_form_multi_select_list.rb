@@ -22,6 +22,15 @@ class TestMechanizeFormMultiSelectList < Mechanize::TestCase
     @select = form.fields.first
   end
 
+  def test_inspect
+    assert_match "value: 2", @select.inspect
+  end
+
+  def test_inspect_select_all
+    @select.select_all
+    assert_match "value: #{%w[1 2 3 4 5 6]}", @select.inspect
+  end
+
   def test_option_with
     option = @select.option_with :value => '1'
 

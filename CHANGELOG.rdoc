@@ -7,6 +7,7 @@
 
 * Minor enhancements
   * Added Mechanize::Download#save_as as an alias to #save. #246
+  * Fix documentation for `Mechanize::Page` element matchers. #269
 
 * Bug fix
   * Mechanize#cert and Mechanize#key now return the values set by

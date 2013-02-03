@@ -20,11 +20,11 @@ a history.
 
 The mechanize mailing list is available here:
 
-  * http://rubyforge.org/mailman/listinfo/mechanize-users
+* http://rubyforge.org/mailman/listinfo/mechanize-users
 
 The bug tracker is available here:
 
-  * https://github.com/sparklemotion/mechanize/issues
+* https://github.com/sparklemotion/mechanize/issues
 
 == Examples
 

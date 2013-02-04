@@ -332,12 +332,6 @@ class Mechanize::Page < Mechanize::File
   end
 
   ##
-  # All links found with an xpath or css selector
-  def search_links(selector)
-    search(selector).map {|node| Link.new(node, @mech, self)}
-  end
-
-  ##
   # Return a list of all form tags
   def forms
     @forms ||= search('form').map do |html_form|
@@ -388,12 +382,6 @@ class Mechanize::Page < Mechanize::File
 
   def image_urls
     @image_urls ||= images.map(&:url).uniq
-  end
-
-  ##
-  # All images found with an xpath or css selector
-  def search_images(selector)
-    search(selector).map {|node| Image.new(node, self)}
   end
 
   ##

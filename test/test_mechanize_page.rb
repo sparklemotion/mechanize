@@ -149,21 +149,21 @@ class TestMechanizePage < Mechanize::TestCase
   <meta>
   <head><title></title>
   <body>
-    <a href="b.html" class="letter">b</a>
-    <a href="a.html" class="letter">a</a>
+    <span id="spany">
+      <a href="b.html">b</a>
+      <a href="a.html">a</a>
+    </span>
     <a href="6.html">6</a>
   </body>
 </html>
     BODY
 
-    links = page.search_links(".letter")
+    links = page.links_with(:selector => "#spany a")
 
     assert_equal 2, links.size
-    assert_equal "letter", links[0].dom_class
     assert_equal "b.html", links[0].href
     assert_equal "b",      links[0].text
 
-    assert_equal "letter", links[1].dom_class
     assert_equal "a.html", links[1].href
     assert_equal "a",      links[1].text
   end
@@ -181,7 +181,7 @@ class TestMechanizePage < Mechanize::TestCase
 </html>
     BODY
 
-    images = page.search_images("//img[@class='pretty']")
+    images = page.images_with(:selector => "//img[@class='pretty']")
 
     assert_equal 2, images.size
     assert_equal "pretty", images[0].dom_class

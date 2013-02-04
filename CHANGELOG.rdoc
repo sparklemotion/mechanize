@@ -17,6 +17,8 @@
   * Mechanize::File#save now behaves like Mechanize::Download#save in
     that it will create the parent directory before saving.
     #272, #280 by Ryan Kowalick
+  * Ensure `application/xml` is registered as an XML parser in
+    `PluggableParser`, not just `text/xml`. #266 James Gregory
 
 === 2.5.2
 

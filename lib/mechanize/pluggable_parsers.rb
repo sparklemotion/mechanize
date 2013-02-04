@@ -59,23 +59,23 @@ require 'mechanize/page'
 class Mechanize::PluggableParser
 
   CONTENT_TYPES = {
-    :html  => 'text/html',
-    :wap   => 'application/vnd.wap.xhtml+xml',
-    :xhtml => 'application/xhtml+xml',
-    :pdf   => 'application/pdf',
-    :csv   => 'text/csv',
-    :xml   => 'text/xml',
+    :html  => ['text/html'],
+    :wap   => ['application/vnd.wap.xhtml+xml'],
+    :xhtml => ['application/xhtml+xml'],
+    :pdf   => ['application/pdf'],
+    :csv   => ['text/csv'],
+    :xml   => ['text/xml', 'application/xml'],
   }
 
   attr_accessor :default
 
   def initialize
-    @parsers = {
-      CONTENT_TYPES[:html]  => Mechanize::Page,
-      CONTENT_TYPES[:xhtml] => Mechanize::Page,
-      CONTENT_TYPES[:wap]   => Mechanize::Page,
-      'image'               => Mechanize::Image
-    }
+    @parsers = {}
+
+    register_parser CONTENT_TYPES[:html], Mechanize::Page
+    register_parser CONTENT_TYPES[:xhtml], Mechanize::Page
+    register_parser CONTENT_TYPES[:wap], Mechanize::Page
+    register_parser 'image', Mechanize::Image
 
     @default = Mechanize::File
   end
@@ -100,8 +100,10 @@ class Mechanize::PluggableParser
     default
   end
 
-  def register_parser content_type, klass # :nodoc:
-    @parsers[content_type] = klass
+  def register_parser content_types, klass # :nodoc:
+    [content_types].flatten.each do |content_type|
+      @parsers[content_type] = klass
+    end
   end
 
   ##

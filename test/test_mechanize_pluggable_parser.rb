@@ -57,10 +57,12 @@ class TestMechanizePluggableParser < Mechanize::TestCase
 
   def test_xml
     assert_nil @pp['text/xml']
+    assert_nil @pp['application/xml']
 
     @pp.xml = Mechanize::Download
 
     assert_equal Mechanize::Download, @pp['text/xml']
+    assert_equal Mechanize::Download, @pp['application/xml']
   end
 
 end

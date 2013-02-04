@@ -1,7 +1,7 @@
 require 'mechanize/element_matcher'
 
 # This class encapsulates a form parsed out of an HTML page.  Each type of
-# input fields available in a form can be accessed through this object.
+# input field available in a form can be accessed through this object.
 #
 # == Examples
 #
@@ -60,25 +60,49 @@ class Mechanize::Form
 
   alias :has_key? :has_field?
 
+  # Returns whether or not the form contains a field with +value+
   def has_value?(value)
     fields.find { |f| f.value == value }
   end
 
+  # Returns all field names (keys) for this form
   def keys; fields.map { |f| f.name }; end
 
+  # Returns all field values for this form
   def values; fields.map { |f| f.value }; end
 
+  # Returns all buttons of type Submit
   def submits  ; @submits   ||= buttons.select { |f| f.class == Submit   }; end
+
+  # Returns all buttons of type Reset
   def resets   ; @resets    ||= buttons.select { |f| f.class == Reset    }; end
+
+  # Returns all fields of type Text
   def texts    ; @texts     ||=  fields.select { |f| f.class == Text     }; end
+
+  # Returns all fields of type Hidden
   def hiddens  ; @hiddens   ||=  fields.select { |f| f.class == Hidden   }; end
+
+  # Returns all fields of type Textarea
   def textareas; @textareas ||=  fields.select { |f| f.class == Textarea }; end
+
+  # Returns all fields of type Keygen
   def keygens  ; @keygens   ||=  fields.select { |f| f.class == Keygen   }; end
 
+
+  # Returns whether or not the form contains a Submit button named +button_name+
   def submit_button?(button_name)   submits.find{|f| f.name == button_name}; end
+
+  # Returns whether or not the form contains a Reset button named +button_name+
   def reset_button?(button_name)     resets.find{|f| f.name == button_name}; end
+
+  # Returns whether or not the form contains a Text field named +field_name+
   def text_field?(field_name)         texts.find{|f| f.name == field_name}; end
+
+  # Returns whether or not the form contains a Hidden field named +field_name+
   def hidden_field?(field_name)     hiddens.find{|f| f.name == field_name}; end
+
+  # Returns whether or not the form contains a Textarea named +field_name+
   def textarea_field?(field_name) textareas.find{|f| f.name == field_name}; end
 
   # This method is a shortcut to get form's DOM id.
@@ -117,7 +141,6 @@ class Mechanize::Form
   # following:
   #
   #   form.set_fields :foo => { 1 => 'bar' }
-
   def set_fields fields = {}
     fields.each do |name, v|
       case v
@@ -139,18 +162,14 @@ class Mechanize::Form
     end
   end
 
-  # Fetch the value of the first input field with the name passed in
-  # ==Example
-  # Fetch the value set in the input field 'name'
+  # Fetch the value of the first input field with the name passed in. Example:
   #  puts form['name']
   def [](field_name)
     f = field(field_name)
     f && f.value
   end
 
-  # Set the value of the first input field with the name passed in
-  # ==Example
-  # Set the value in the input field 'name' to "Aaron"
+  # Set the value of the first input field with the name passed in. Example:
   #  form['name'] = 'Aaron'
   def []=(field_name, value)
     f = field(field_name)
@@ -173,7 +192,8 @@ class Mechanize::Form
     super
   end
 
-  # Submit this form with the button passed in
+  # Submit the form. Does not include the +button+ as a form parameter.
+  # Use +click_button+ or provide button as a parameter.
   def submit button=nil, headers = {}
     @mech.submit(self, button, headers)
   end
@@ -209,7 +229,9 @@ class Mechanize::Form
 
     successful_controls = []
 
-    (fields + checkboxes).sort.each do |f|
+    (fields + checkboxes).reject do |f|
+      f.node["disabled"]
+    end.sort.each do |f|
       case f
       when Mechanize::Form::CheckBox
         if f.checked
@@ -532,7 +554,6 @@ class Mechanize::Form
 
     body
   end
-
 end
 
 require 'mechanize/form/field'
@@ -550,4 +571,3 @@ require 'mechanize/form/option'
 require 'mechanize/form/radio_button'
 require 'mechanize/form/check_box'
 require 'mechanize/form/select_list'
-

@@ -64,7 +64,7 @@ class Mechanize::PluggableParser
     :xhtml => 'application/xhtml+xml',
     :pdf   => 'application/pdf',
     :csv   => 'text/csv',
-    :xml   => 'text/xml',
+    :xml   => ['text/xml', 'application/xml'],
   }
 
   attr_accessor :default
@@ -138,7 +138,9 @@ class Mechanize::PluggableParser
   # Registers +klass+ as the parser for text/xml content
 
   def xml=(klass)
-    register_parser(CONTENT_TYPES[:xml], klass)
+    CONTENT_TYPES[:xml].each do |content_type|
+      register_parser content_type, klass
+    end
   end
 
   ##

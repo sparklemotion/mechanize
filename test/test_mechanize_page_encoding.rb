@@ -111,7 +111,7 @@ class TestMechanizePageEncoding < Mechanize::TestCase
     assert_empty charsets
   end
 
-  # Test to fix issue: https://github.com/tenderlove/mechanize/issues/143
+  # Test to fix issue: https://github.com/sparklemotion/mechanize/issues/143
   def test_page_meta_charset_handles_whitespace
     body = '<meta http-equiv = "Content-Type" content = "text/html; charset=iso-8859-1">'
     charsets = Mechanize::Page.meta_charset(body)

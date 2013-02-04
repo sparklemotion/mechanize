@@ -294,7 +294,11 @@ class Mechanize::HTTP::Agent
       log.debug("Got cached page") if log
       visited_page(uri) || page
     when Net::HTTPRedirection
-      response_redirect response, method, page, redirects, headers, referer
+      if request.is_a?(Net::HTTP::Head) or request.is_a?(Net::HTTP::Get)
+        response_redirect response, method, page, redirects, headers, referer
+      else
+        page
+      end
     when Net::HTTPUnauthorized
       response_authenticate(response, page, uri, request, headers, params,
                             referer)
@@ -401,6 +405,11 @@ class Mechanize::HTTP::Agent
     end
   end
 
+  # Closes all open connections for this agent.
+  def shutdown
+    http.shutdown
+  end
+
   ##
   # Decodes a gzip-encoded +body_io+.  If it cannot be decoded, inflate is
   # tried followed by raising an error.
@@ -429,7 +438,7 @@ class Mechanize::HTTP::Agent
     end
   ensure
     # do not close a second time if we failed the first time
-    zio.close if zio and not (zio.closed? or gz_error)
+    zio.close if zio and !(zio.closed? or gz_error)
     body_io.close unless body_io.closed?
   end
 
@@ -694,7 +703,7 @@ class Mechanize::HTTP::Agent
       message = 'WWW-Authenticate header missing in response'
       raise Mechanize::UnauthorizedError.new(page, nil, message)
     end
-                                               
+
     challenges = @authenticate_parser.parse www_authenticate
 
     unless @auth_store.credentials? uri, challenges then
@@ -798,7 +807,7 @@ class Mechanize::HTTP::Agent
     begin
       if Tempfile === body_io and
          (StringIO === out_io or out_io.path != body_io.path) then
-        body_io.close! 
+        body_io.close!
       end
     rescue IOError
       # HACK ruby 1.8 raises IOError when closing the stream
@@ -1145,7 +1154,7 @@ class Mechanize::HTTP::Agent
 
     out_io
   ensure
-    inflate.close
+    inflate.close if inflate.finished?
   end
 
   def log
@@ -1196,6 +1205,11 @@ class Mechanize::HTTP::Agent
     return false unless size
 
     size >= @max_file_buffer
+  end
+
+  def reset
+    @cookie_jar.clear!
+    @history.clear
   end
 
 end

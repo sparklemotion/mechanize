@@ -2,9 +2,23 @@
 
 === Unreleased
 
+* New Features
+  * Mechanize#start and Mechanize#shutdown (Thanks, Damian Janowski!)
+
+* Minor enhancements
+  * Added Mechanize::Download#save_as as an alias to #save. #246
+  * Fix documentation for `Mechanize::Page` element matchers. #269
+
 * Bug fix
   * Mechanize#cert and Mechanize#key now return the values set by
     #cert= and #key=. #244, #245 (Thanks, Robert Gogolok!)
+  * Mechanize no longer submits disabled form fields.  #276 by Bogdan Gusiev,
+    #279 by Ricardo Valeriano.
+  * Mechanize::File#save now behaves like Mechanize::Download#save in
+    that it will create the parent directory before saving.
+    #272, #280 by Ryan Kowalick
+  * Ensure `application/xml` is registered as an XML parser in
+    `PluggableParser`, not just `text/xml`. #266 James Gregory
 
 === 2.5.2
 
@@ -885,4 +899,4 @@ Mechanize is now under the MIT license
 * Added a response code exception
 * Thanks to Brian Ellin (brianellin@gmail.com) for:
   Added support for CA files, and support for 301 response codes
-  
+

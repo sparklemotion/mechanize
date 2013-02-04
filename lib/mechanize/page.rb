@@ -212,7 +212,10 @@ class Mechanize::Page < Mechanize::File
   def_delegator :parser, :at, :at
 
   ##
-  # :method: form_with(criteria)
+  # :method: form_with
+  #
+  # :call-seq:
+  #   form_with(criteria)
   #
   # Find a single form matching +criteria+.
   # Example:
@@ -221,7 +224,9 @@ class Mechanize::Page < Mechanize::File
   #   end
 
   ##
-  # :method: forms_with(criteria)
+  # :method: forms_with
+  #
+  # :call-seq: forms_with(criteria)
   #
   # Find all forms form matching +criteria+.
   # Example:
@@ -232,14 +237,19 @@ class Mechanize::Page < Mechanize::File
   elements_with :form
 
   ##
-  # :method: link_with(criteria)
+  # :method: link_with
+  #
+  # :call-seq: link_with(criteria)
   #
   # Find a single link matching +criteria+.
   # Example:
   #   page.link_with(:href => /foo/).click
 
   ##
-  # :method: links_with(criteria)
+  # :method: links_with
+  #
+  # :call-seq:
+  #   links_with(criteria)
   #
   # Find all links matching +criteria+.
   # Example:
@@ -250,14 +260,18 @@ class Mechanize::Page < Mechanize::File
   elements_with :link
 
   ##
-  # :method: base_with(criteria)
+  # :method: base_with
+  #
+  # :call-seq: base_with(criteria)
   #
   # Find a single base tag matching +criteria+.
   # Example:
   #   page.base_with(:href => /foo/).click
 
   ##
-  # :method: bases_with(criteria)
+  # :method: bases_with
+  #
+  # :call-seq: bases_with(criteria)
   #
   # Find all base tags matching +criteria+.
   # Example:
@@ -268,14 +282,18 @@ class Mechanize::Page < Mechanize::File
   elements_with :base
 
   ##
-  # :method: frame_with(criteria)
+  # :method: frame_with
+  #
+  # :call-seq: frame_with(criteria)
   #
   # Find a single frame tag matching +criteria+.
   # Example:
   #   page.frame_with(:src => /foo/).click
 
   ##
-  # :method: frames_with(criteria)
+  # :method: frames_with
+  #
+  # :call-seq: frames_with(criteria)
   #
   # Find all frame tags matching +criteria+.
   # Example:
@@ -286,14 +304,18 @@ class Mechanize::Page < Mechanize::File
   elements_with :frame
 
   ##
-  # :method: iframe_with(criteria)
+  # :method: iframe_with
+  #
+  # :call-seq: iframe_with(criteria)
   #
   # Find a single iframe tag matching +criteria+.
   # Example:
   #   page.iframe_with(:src => /foo/).click
 
   ##
-  # :method: iframes_with(criteria)
+  # :method: iframes_with
+  #
+  # :call-seq: iframes_with(criteria)
   #
   # Find all iframe tags matching +criteria+.
   # Example:
@@ -304,14 +326,18 @@ class Mechanize::Page < Mechanize::File
   elements_with :iframe
 
   ##
-  # :method: image_with(criteria)
+  # :method: image_with
+  #
+  # :call-seq: image_with(criteria)
   #
   # Find a single image matching +criteria+.
   # Example:
   #   page.image_with(:alt => /main/).fetch.save
 
   ##
-  # :method: images_with(criteria)
+  # :method: images_with
+  #
+  # :call-seq: images_with(criteria)
   #
   # Find all images matching +criteria+.
   # Example:

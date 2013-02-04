@@ -1,9 +1,9 @@
 = Mechanize
 
 * http://mechanize.rubyforge.org
-* https://github.com/tenderlove/mechanize
+* https://github.com/sparklemotion/mechanize
 
-== DESCRIPTION
+== Description
 
 The Mechanize library is used for automating interaction with websites.
 Mechanize automatically stores and sends cookies, follows redirects,
@@ -16,15 +16,15 @@ a history.
 * ruby 1.8.7, 1.9.2, or 1.9.3
 * nokogiri[http://nokogiri.rubyforge.org]
 
-== SUPPORT:
+== Support:
 
 The mechanize mailing list is available here:
 
-  * http://rubyforge.org/mailman/listinfo/mechanize-users
+* http://rubyforge.org/mailman/listinfo/mechanize-users
 
 The bug tracker is available here:
 
-  * https://github.com/tenderlove/mechanize/issues
+* https://github.com/sparklemotion/mechanize/issues
 
 == Examples
 

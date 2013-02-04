@@ -37,7 +37,7 @@ require 'zlib'
 # == Issues with mechanize
 #
 # If you think you have a bug with mechanize, but aren't sure, please file a
-# ticket at https://github.com/tenderlove/mechanize/issues
+# ticket at https://github.com/sparklemotion/mechanize/issues
 #
 # Here are some common problems you may experience with mechanize
 #
@@ -106,6 +106,8 @@ class Mechanize
   # * Windows IE 9
   # * Windows Mozilla
   # * iPhone (3.0)
+  # * iPad
+  # * Android (Motorola Xoom)
   #
   # Example:
   #
@@ -113,7 +115,7 @@ class Mechanize
   #   agent.user_agent_alias = 'Mac Safari'
 
   AGENT_ALIASES = {
-    'Mechanize' => "Mechanize/#{VERSION} Ruby/#{ruby_version} (http://github.com/tenderlove/mechanize/)",
+    'Mechanize' => "Mechanize/#{VERSION} Ruby/#{ruby_version} (http://github.com/sparklemotion/mechanize/)",
     'Linux Firefox' => 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.1) Gecko/20100122 firefox/3.6.1',
     'Linux Konqueror' => 'Mozilla/5.0 (compatible; Konqueror/3; Linux)',
     'Linux Mozilla' => 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.4) Gecko/20030624',
@@ -127,14 +129,33 @@ class Mechanize
     'Windows IE 9' => 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)',
     'Windows Mozilla' => 'Mozilla/5.0 (Windows; U; Windows NT 5.0; en-US; rv:1.4b) Gecko/20030516 Mozilla Firebird/0.6',
     'iPhone' => 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1C28 Safari/419.3',
+    'iPad' => 'Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B334b Safari/531.21.10',
+    'Android' => 'Mozilla/5.0 (Linux; U; Android 3.0; en-us; Xoom Build/HRI39) AppleWebKit/534.13 (KHTML, like Gecko) Version/4.0 Safari/534.13'
   }
 
   AGENT_ALIASES['Mac FireFox'] = AGENT_ALIASES['Mac Firefox']
 
   def self.inherited(child) # :nodoc:
-    child.html_parser ||= html_parser
-    child.log ||= log
+    child.html_parser = html_parser
+    child.log = log
     super
+  end
+
+  ##
+  # Creates a new Mechanize instance and yields it to the given block.
+  #
+  # After the block executes, the instance is cleaned up. This includes
+  # closing all open connections.
+  #
+  #   Mechanize.start do |m|
+  #     m.get("http://example.com")
+  #   end
+
+  def self.start
+    instance = new
+    yield(instance)
+  ensure
+    instance.shutdown
   end
 
   ##
@@ -544,6 +565,7 @@ class Mechanize
   # keep-alives, compression, redirects and headers.
 
   @html_parser = Nokogiri::HTML
+  @log = nil
 
   class << self
 
@@ -1209,6 +1231,22 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
     @proxy_pass = password
 
     @agent.set_proxy address, port, user, password
+  end
+
+  ##
+  # Clears history and cookies.
+
+  def reset
+    @agent.reset
+  end
+
+  ##
+  # Shuts down this session by clearing browsing state and closing all
+  # persistent connections.
+
+  def shutdown
+    reset
+    @agent.shutdown
   end
 
   private

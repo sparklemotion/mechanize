@@ -294,7 +294,11 @@ class Mechanize::HTTP::Agent
       log.debug("Got cached page") if log
       visited_page(uri) || page
     when Net::HTTPRedirection
-      response_redirect response, method, page, redirects, headers, referer
+      if request.is_a?(Net::HTTP::Head) or request.is_a?(Net::HTTP::Get)
+        response_redirect response, method, page, redirects, headers, referer
+      else
+        page
+      end
     when Net::HTTPUnauthorized
       response_authenticate(response, page, uri, request, headers, params,
                             referer)

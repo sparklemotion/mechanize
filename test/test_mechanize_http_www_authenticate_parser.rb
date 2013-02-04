@@ -44,10 +44,18 @@ class TestMechanizeHttpWwwAuthenticateParser < Mechanize::TestCase
 
   def test_parse
     expected = [
-      challenge('Basic', { 'realm' => 'foo' }, 'Basic realm=foo'),
+      challenge('Basic', { 'realm' => 'foo', 'qop' => 'auth,auth-int' }, 'Basic realm=foo, qop="auth,auth-int"'),
     ]
 
-    assert_equal expected, @parser.parse('Basic realm=foo')
+    assert_equal expected, @parser.parse('Basic realm=foo, qop="auth,auth-int"')
+  end
+
+  def test_parse_without_comma_delimiter
+    expected = [
+      challenge('Basic', { 'realm' => 'foo', 'qop' => 'auth,auth-int' }, 'Basic realm=foo qop="auth,auth-int"'),
+    ]
+
+    assert_equal expected, @parser.parse('Basic realm=foo qop="auth,auth-int"')
   end
 
   def test_parse_multiple
@@ -57,6 +65,15 @@ class TestMechanizeHttpWwwAuthenticateParser < Mechanize::TestCase
     ]
 
     assert_equal expected, @parser.parse('Basic realm=foo, Digest realm=bar')
+  end
+
+  def test_parse_multiple_without_comma_delimiter
+    expected = [
+      challenge('Basic',  { 'realm' => 'foo' }, 'Basic realm=foo'),
+      challenge('Digest', { 'realm' => 'bar' }, 'Digest realm=bar'),
+    ]
+
+    assert_equal expected, @parser.parse('Basic realm=foo Digest realm=bar')
   end
 
   def test_parse_multiple_blank

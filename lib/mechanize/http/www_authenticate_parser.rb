@@ -71,7 +71,7 @@ class Mechanize::HTTP::WWWAuthenticateParser
           end
 
           @scanner.pos = pos # rewind
-          challenge.raw = www_authenticate[start, @scanner.pos].sub(/,+ *$/, '')
+          challenge.raw = www_authenticate[start, @scanner.pos].sub(/(,+)? *$/, '')
           challenge = nil # a token should be next, new challenge
           break
         else
@@ -79,8 +79,6 @@ class Mechanize::HTTP::WWWAuthenticateParser
         end
 
         spaces
-
-        return nil unless ',' == @scanner.peek(1) or @scanner.eos?
 
         @scanner.scan(/(, *)+/)
       end

@@ -1119,6 +1119,24 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
                  @agent.cookie_jar.cookies(uri).map { |c| c.to_s }
   end
 
+  def test_response_cookies_meta_bogus
+    uri = URI.parse 'http://host.example.com'
+
+    body = <<-BODY
+<head>
+  <meta http-equiv="Set-Cookie">
+</head>"
+    BODY
+
+    @res.instance_variable_set(:@header,
+                               'content-type' => %w[text/html])
+    page = Mechanize::Page.new uri, @res, body, 200, @mech
+
+    @agent.response_cookies @res, uri, page
+
+    assert_empty @agent.cookie_jar.cookies(uri)
+  end
+
   def test_response_follow_meta_refresh
     uri = URI.parse 'http://example/#id+1'
 

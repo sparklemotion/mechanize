@@ -466,7 +466,7 @@ class Mechanize
   #   agent.post('http://example.com/', "<message>hello</message>",
   #              'Content-Type' => 'application/xml')
 
-  def post(uri, query={}, headers={})
+  def post(uri, query = {}, headers = {})
     return request_with_entity(:post, uri, query, headers) if String === query
 
     node = {}
@@ -530,7 +530,7 @@ class Mechanize
   #
   #   agent.submit(page.forms.first, page.forms.first.buttons.first)
 
-  def submit(form, button=nil, headers={})
+  def submit(form, button = nil, headers = {})
     form.add_button_to_query(button) if button
 
     case form.method.upcase

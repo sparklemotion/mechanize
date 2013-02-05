@@ -27,7 +27,7 @@ class Mechanize::Util
   #   Mechanize::Util::DefaultMimeTypes.replace(mimetab)
   DefaultMimeTypes = WEBrick::HTTPUtils::DefaultMimeTypes
 
-  def self.build_query_string(parameters, enc=nil)
+  def self.build_query_string(parameters, enc = nil)
     parameters.map { |k,v|
       # WEBrick::HTTP.escape* has some problems about m17n on ruby-1.9.*.
       [CGI.escape(k.to_s), CGI.escape(v.to_s)].join("=") if k
@@ -35,7 +35,7 @@ class Mechanize::Util
   end
 
   # Converts string +s+ from +code+ to UTF-8.
-  def self.from_native_charset(s, code, ignore_encoding_error=false, log=nil)
+  def self.from_native_charset(s, code, ignore_encoding_error = false, log = nil)
     return s unless s && code
     return s unless Mechanize.html_parser == Nokogiri::HTML
 

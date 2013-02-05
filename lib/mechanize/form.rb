@@ -38,7 +38,7 @@ class Mechanize::Form
   attr_reader :form_node
   attr_reader :page
 
-  def initialize(node, mech=nil, page=nil)
+  def initialize(node, mech = nil, page = nil)
     @enctype = node['enctype'] || 'application/x-www-form-urlencoded'
     @form_node        = node
     @action           = Mechanize::Util.html_unescape(node['action'])
@@ -219,7 +219,7 @@ class Mechanize::Form
 
   # Submit the form. Does not include the +button+ as a form parameter.
   # Use +click_button+ or provide button as a parameter.
-  def submit button=nil, headers = {}
+  def submit button = nil, headers = {}
     @mech.submit(self, button, headers)
   end
 

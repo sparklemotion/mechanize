@@ -69,6 +69,12 @@ class Mechanize::HTTP::Agent
   # Maximum number of redirects to follow
   attr_accessor :redirection_limit
 
+  # :section: Allowed error codes
+
+  # List of error codes to handle without raising an exception.
+
+  attr_accessor :allowed_error_codes
+
   # :section: Robots
 
   # When true, this agent will consult the site's robots.txt for each access.
@@ -120,6 +126,7 @@ class Mechanize::HTTP::Agent
   # implementation detail of mechanize and its API may change at any time.
 
   def initialize
+    @allowed_error_codes      = []
     @conditional_requests     = true
     @context                  = nil
     @content_encoding_hooks   = []
@@ -281,12 +288,12 @@ class Mechanize::HTTP::Agent
     meta = response_follow_meta_refresh response, uri, page, redirects
     return meta if meta
 
+    if robots && page.is_a?(Mechanize::Page)
+      page.parser.noindex? and raise Mechanize::RobotsDisallowedError.new(uri)
+    end
+
     case response
     when Net::HTTPSuccess
-      if robots && page.is_a?(Mechanize::Page)
-        page.parser.noindex? and raise Mechanize::RobotsDisallowedError.new(uri)
-      end
-
       page
     when Mechanize::FileResponse
       page
@@ -303,7 +310,11 @@ class Mechanize::HTTP::Agent
       response_authenticate(response, page, uri, request, headers, params,
                             referer)
     else
-      raise Mechanize::ResponseCodeError.new(page, 'unhandled response')
+      if @allowed_error_codes.any? {|code| code.to_s == page.code} then
+        page
+      else
+        raise Mechanize::ResponseCodeError.new(page, 'unhandled response')
+      end
     end
   end
 

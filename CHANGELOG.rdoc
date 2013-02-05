@@ -4,6 +4,8 @@
 
 * New Features
   * Mechanize#start and Mechanize#shutdown (Thanks, Damian Janowski!)
+  * Added Mechanize::Agent#allowed_error_codes for setting an Array
+    of status codes which should not raise an error. #248 Laurence Rowe.
 
 * Minor enhancements
   * Added Mechanize::Download#save_as as an alias to #save. #246

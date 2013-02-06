@@ -15,6 +15,8 @@
 
 class Mechanize::Form::Field
   attr_accessor :name, :value, :node, :type
+
+  # This fields value before it's sent through Util.html_unescape.
   attr_reader :raw_value
 
   def initialize node, value = node['value']
@@ -47,7 +49,7 @@ class Mechanize::Form::Field
     node['id']
   end
 
-  # This method is a shortcut to get field's DOM id.
+  # This method is a shortcut to get field's DOM class.
   # Common usage: form.field_with(:dom_class => "foo")
   def dom_class
     node['class']

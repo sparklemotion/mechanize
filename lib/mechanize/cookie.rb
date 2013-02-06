@@ -78,7 +78,7 @@ class Mechanize::Cookie
     # array of Cookie objects.  Note that this array may contain
     # nil's when some of the cookie-pairs are malformed.
     def parse(uri, str, log = Mechanize.log)
-      return str.split(/,(?=[^;,]*=)|,$/).map { |c|
+      return str.to_s.split(/,(?=[^;,]*=)|,$/).map { |c|
         cookie_elem = c.split(/;+/)
         first_elem = cookie_elem.shift
         first_elem.strip!

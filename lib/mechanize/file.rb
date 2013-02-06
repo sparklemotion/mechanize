@@ -51,8 +51,8 @@ class Mechanize::File
   ##
   # Use this method to save the content of this object to +filename+
 
-  def save filename = nil
-    filename = find_free_name filename
+  def save filename = nil, options = {}
+    filename = find_free_name filename unless options[:overwrite]
 
 		dirname = File.dirname filename
 		FileUtils.mkdir_p dirname

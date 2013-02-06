@@ -18,14 +18,14 @@ class TestMechanizeFile < Mechanize::TestCase
 
         assert File.exist? 'test.html'
         assert_equal '0123456789', File.read('test.html')
-        
+
         page.save 'test.html'
-        
+
         assert File.exist? 'test.html.1'
         assert_equal '0123456789', File.read('test.html.1')
-        
+
         page.save 'test.html'
-        
+
         assert File.exist? 'test.html.2'
         assert_equal '0123456789', File.read('test.html.2')
       end
@@ -73,6 +73,24 @@ class TestMechanizeFile < Mechanize::TestCase
     page = Mechanize::File.new uri, nil, ''
 
     assert_equal "test.html", page.filename
+  end
+
+  def test_save_overwrite
+    uri = URI 'http://example/test.html'
+    page = Mechanize::File.new uri, nil, ''
+
+    Dir.mktmpdir do |dir|
+      Dir.chdir dir do
+        page.save 'test.html'
+
+        assert File.exist? 'test.html'
+
+        page.save 'test.html', :overwrite => true
+
+        assert File.exist? 'test.html'
+        refute File.exist? 'test.html.1'
+      end
+    end
   end
 
 end

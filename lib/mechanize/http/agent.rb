@@ -640,6 +640,8 @@ class Mechanize::HTTP::Agent
       end
     end
 
+    uri.host = referer_uri.host if referer_uri && URI::HTTP === uri && uri.host.nil?
+
     scheme = uri.relative? ? 'relative' : uri.scheme.downcase
     uri = @scheme_handlers[scheme].call(uri, referer)
 

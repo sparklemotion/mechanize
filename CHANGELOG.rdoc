@@ -6,6 +6,9 @@
   * Mechanize#start and Mechanize#shutdown (Thanks, Damian Janowski!)
   * Added Mechanize::Agent#allowed_error_codes for setting an Array
     of status codes which should not raise an error. #248 Laurence Rowe.
+  * `File.save` now takes an optional second Hash argument, this includes
+    an `overwrite` option which when set to true will overwrite the original
+    file if it exists, otherwise fall back to the default behaviour. #219
 
 * Minor enhancements
   * Added Mechanize::Download#save_as as an alias to #save. #246

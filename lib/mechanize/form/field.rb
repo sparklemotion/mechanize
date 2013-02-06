@@ -14,11 +14,12 @@
 #   field.value = "foo"
 
 class Mechanize::Form::Field
-  attr_accessor :name, :value, :node, :type
+  attr_accessor :name, :raw_value, :value, :node, :type
 
   def initialize node, value = node['value']
     @node = node
     @name = Mechanize::Util.html_unescape(node['name'])
+    @raw_value = value
     @value = if value.is_a? String
                Mechanize::Util.html_unescape(value)
              else

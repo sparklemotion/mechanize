@@ -28,11 +28,11 @@ class Mechanize::Form::SelectList < Mechanize::Form::MultiSelectList
     end
   end
 
-  def value=(new)
-    if new != new.to_s and new.respond_to? :first
-      super([new.first])
+  def value=(new_value)
+    if new_value != new_value.to_s and new_value.respond_to? :first
+      super([new_value.first])
     else
-      super([new.to_s])
+      super([new_value.to_s])
     end
   end
 

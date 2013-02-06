@@ -14,7 +14,8 @@
 #   field.value = "foo"
 
 class Mechanize::Form::Field
-  attr_accessor :name, :raw_value, :value, :node, :type
+  attr_accessor :name, :value, :node, :type
+  attr_reader :raw_value
 
   def initialize node, value = node['value']
     @node = node

@@ -14,6 +14,8 @@
 * Minor enhancements
   * Added Mechanize::Download#save_as as an alias to #save. #246
   * Fix documentation for `Mechanize::Page` element matchers. #269
+  * Added Mechanize::Form::Field#raw_value for fetching a fields value
+    before it's sent through Mechanize::Util.html_unescape. #283
 
 * Bug fix
   * Mechanize#cert and Mechanize#key now return the values set by

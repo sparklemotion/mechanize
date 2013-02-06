@@ -35,6 +35,16 @@ class TestMechanizeDirectorySaver < Mechanize::TestCase
     end
   end
 
+  def test_with_decode_filename
+    in_tmpdir do
+      saver = saver = Mechanize::DirectorySaver.save_to 'dir', decode_filename: true
+      uri = URI 'http://example.com/foo+bar.html'
+      saver.new uri, nil, @io, 200
+
+      assert File.exist? 'dir/foo bar.html'
+    end
+  end
+
   def test_initialize_no_save_dir
     in_tmpdir do
       e = assert_raises Mechanize::Error do

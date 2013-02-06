@@ -10,16 +10,20 @@
 class Mechanize::DirectorySaver < Mechanize::Download
 
   @directory = nil
+  @options = {}
 
   ##
   # Creates a DirectorySaver subclass that will save responses to the given
-  # +directory+.
+  # +directory+. If +options+ includes a +decode_filename+ value set to +true+
+  # then the downloaded filename will be ran through +CGI.unescape+ before
+  # being saved.
 
-  def self.save_to directory
+  def self.save_to directory, options = {}
     directory = File.expand_path directory
 
     Class.new self do |klass|
       klass.instance_variable_set :@directory, directory
+      klass.instance_variable_set :@options, options
     end
   end
 
@@ -28,6 +32,13 @@ class Mechanize::DirectorySaver < Mechanize::Download
 
   def self.directory
     @directory
+  end
+
+  ##
+  # True if downloaded files should have their names decoded before saving.
+
+  def self.decode_filename?
+    @options[:decode_filename]
   end
 
   ##
@@ -44,6 +55,7 @@ class Mechanize::DirectorySaver < Mechanize::Download
 
     super
 
+    @filename = CGI.unescape(@filename) if self.class.decode_filename?
     path = File.join directory, @filename
 
     save path

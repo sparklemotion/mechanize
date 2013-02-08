@@ -37,7 +37,7 @@ class TestMechanizeDirectorySaver < Mechanize::TestCase
 
   def test_with_decode_filename
     in_tmpdir do
-      saver = saver = Mechanize::DirectorySaver.save_to 'dir', :decode_filename => true
+      saver = Mechanize::DirectorySaver.save_to 'dir', :decode_filename => true
       uri = URI 'http://example.com/foo+bar.html'
       saver.new uri, nil, @io, 200
 

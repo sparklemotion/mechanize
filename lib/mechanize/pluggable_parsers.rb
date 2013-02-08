@@ -1,6 +1,7 @@
 require 'mechanize/file'
 require 'mechanize/file_saver'
 require 'mechanize/page'
+require 'mechanize/xml_file'
 
 ##
 # Mechanize allows different parsers for different content types.  Mechanize
@@ -74,7 +75,9 @@ class Mechanize::PluggableParser
       CONTENT_TYPES[:html]  => Mechanize::Page,
       CONTENT_TYPES[:xhtml] => Mechanize::Page,
       CONTENT_TYPES[:wap]   => Mechanize::Page,
-      'image'               => Mechanize::Image
+      'image'               => Mechanize::Image,
+      'text/xml'            => Mechanize::XmlFile,
+      'application/xml'     => Mechanize::XmlFile,
     }
 
     @default = Mechanize::File

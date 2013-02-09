@@ -1,24 +1,19 @@
 module Mechanize::ElementMatcher
 
-  def normalize(criteria)
-    if String === criteria then
-      {:name => criteria}
-    else
-      Hash[criteria.map do |k, v|
-        k = :dom_id if k.to_sym == :id
-        k = :dom_class if k.to_sym == :class
-        [k, v]
-      end]
-    end
-  end
-  module_function :normalize
-
   def elements_with singular, plural = "#{singular}s"
     class_eval <<-CODE
       def #{plural}_with criteria = {}
-        criteria = Mechanize::ElementMatcher.normalize(criteria)
+        criteria = if String === criteria then
+                     {:name => criteria}
+                   else
+                     Hash[criteria.map do |k, v|
+                            k = :dom_id if k.to_sym == :id
+                            k = :dom_class if k.to_sym == :class
+                            [k, v]
+                          end]
+                   end
 
-        f = select_#{plural}(criteria.delete(:selector)).find_all do |thing|
+        f = select_#{plural}(criteria.delete(:search)).find_all do |thing|
           criteria.all? do |k,v|
             v === thing.send(k)
           end

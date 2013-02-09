@@ -158,7 +158,7 @@ class TestMechanizePage < Mechanize::TestCase
 </html>
     BODY
 
-    links = page.links_with(:selector => "#spany a")
+    links = page.links_with(:search => "#spany a")
 
     assert_equal 2, links.size
     assert_equal "b.html", links[0].href
@@ -181,7 +181,7 @@ class TestMechanizePage < Mechanize::TestCase
 </html>
     BODY
 
-    images = page.images_with(:selector => "//img[@class='pretty']")
+    images = page.images_with(:search => "//img[@class='pretty']")
 
     assert_equal 2, images.size
     assert_equal "pretty", images[0].dom_class

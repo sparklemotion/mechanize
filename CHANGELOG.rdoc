@@ -18,6 +18,7 @@
   * Fix documentation for `Mechanize::Page` element matchers. #269
   * Added Mechanize::Form::Field#raw_value for fetching a fields value
     before it's sent through Mechanize::Util.html_unescape. #283
+  * Added iPad and Android user agents.  #277 by sambit, #278 by seansay.
 
 * Bug fix
   * Mechanize#cert and Mechanize#key now return the values set by

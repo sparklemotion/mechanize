@@ -10,6 +10,8 @@
     an `overwrite` option which when set to true will overwrite the original
     file if it exists, otherwise fall back to the default behaviour. #219
   * DirectorySaver::save_to now accepts an option to decode filename. #262
+  * element(s)_with methods now accept a :search option for doing xpath/css
+    selector searching. #287 Philippe Bourgau
 
 * Minor enhancements
   * Added Mechanize::Download#save_as as an alias to #save. #246

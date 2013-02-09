@@ -191,5 +191,15 @@ class TestMechanizePage < Mechanize::TestCase
     assert_equal "c.png", images[1].src
   end
 
+  def test_search_bad_selectors
+    page = html_page <<-BODY
+<a href="foo.html">foo</a>
+<img src="foo.jpg" />
+    BODY
+
+    assert_empty page.images_with(:search => '//a')
+    assert_empty page.links_with(:search => '//img')
+  end
+
 end
 

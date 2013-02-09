@@ -143,5 +143,53 @@ class TestMechanizePage < Mechanize::TestCase
     assert_kind_of Nokogiri::HTML::Document, page.root
   end
 
+  def test_search_links
+    page = html_page <<-BODY
+<html>
+  <meta>
+  <head><title></title>
+  <body>
+    <span id="spany">
+      <a href="b.html">b</a>
+      <a href="a.html">a</a>
+    </span>
+    <a href="6.html">6</a>
+  </body>
+</html>
+    BODY
+
+    links = page.links_with(:search => "#spany a")
+
+    assert_equal 2, links.size
+    assert_equal "b.html", links[0].href
+    assert_equal "b",      links[0].text
+
+    assert_equal "a.html", links[1].href
+    assert_equal "a",      links[1].text
+  end
+
+  def test_search_images
+    page = html_page <<-BODY
+<html>
+  <meta>
+  <head><title></title>
+  <body>
+    <img src="a.jpg" class="pretty">
+    <img src="b.jpg">
+    <img src="c.png" class="pretty">
+  </body>
+</html>
+    BODY
+
+    images = page.images_with(:search => "//img[@class='pretty']")
+
+    assert_equal 2, images.size
+    assert_equal "pretty", images[0].dom_class
+    assert_equal "a.jpg", images[0].src
+
+    assert_equal "pretty", images[1].dom_class
+    assert_equal "c.png", images[1].src
+  end
+
 end
 

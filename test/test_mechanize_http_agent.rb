@@ -1299,6 +1299,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   end
 
   def test_response_read_content_length_mismatch
+    return if RUBY_VERSION >= '2.0.0'
     def @res.content_length() 5 end
     def @res.read_body() yield 'part' end
 

@@ -257,7 +257,7 @@ class Net::HTTP # :nodoc:
     end
 
     response['Content-Type'] ||= 'text/html'
-    response['Content-Length'] = res['Content-Length'] || res.body.length.to_s
+    response['Content-Length'] = res['Content-Length'] || res.body.bytesize.to_s
 
     io = StringIO.new(res.body)
     response.instance_variable_set :@socket, io

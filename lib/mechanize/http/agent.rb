@@ -934,7 +934,7 @@ class Mechanize::HTTP::Agent
     unless Net::HTTP::Head === request or Net::HTTPRedirection === response then
       raise EOFError, "Content-Length (#{content_length}) does not match " \
                       "response body length (#{body_io.length})" if
-        content_length and content_length != body_io.length
+        content_length and content_length != body_io.length and RUBY_VERSION < '2.0.0'
     end
 
     body_io

@@ -187,6 +187,7 @@ class Mechanize::CookieJar
 
   # Write cookies to Mozilla cookies.txt-style IO stream
   def dump_cookiestxt(io)
+    io.puts "# HTTP Cookie File"
     to_a.each do |cookie|
       io.puts([
         cookie.domain,

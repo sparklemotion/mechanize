@@ -492,6 +492,20 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert_equal('http://example/', @mech.history.last.uri.to_s)
   end
 
+  def test_get_follow_meta_refresh_no_head
+    @mech.follow_meta_refresh = true
+    @mech.follow_meta_refresh_self = true
+
+    page = @mech.get('http://localhost/tc_meta_no_head.html')
+    assert_equal(2, @mech.history.length)
+    assert_equal('http://localhost/tc_meta_no_head.html',
+                 @mech.history[0].uri.to_s)
+    assert_equal('http://localhost/index.html',
+                 @mech.history[1].uri.to_s)
+    assert_equal('http://localhost/index.html', page.uri.to_s)
+    assert_equal('http://localhost/index.html', @mech.history.last.uri.to_s)
+  end
+
   def test_get_follow_meta_refresh_referer_not_sent
     @mech.follow_meta_refresh = true
 

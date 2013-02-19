@@ -371,7 +371,7 @@ class Mechanize::Page < Mechanize::File
   # Return a list of all meta refresh elements
 
   def meta_refresh
-    query = @mech.follow_meta_refresh == :anywhere ? 'meta' : 'head > meta'
+    query = @mech.follow_meta_refresh == :anywhere || search('head').empty? ? 'meta' : 'head > meta'
 
     @meta_refresh ||= search(query).map do |node|
       MetaRefresh.from_node node, self

@@ -192,7 +192,7 @@ class Mechanize::CookieJar
       "#{Mechanize::VERSION} https://github.com/sparklemotion/mechanize.\n\n"
     to_a.each do |cookie|
       io.puts([
-        cookie.domain,
+        (cookie.for_domain? ? "." : "") + cookie.domain,
         cookie.for_domain? ? "TRUE" : "FALSE",
         cookie.path,
         cookie.secure ? "TRUE" : "FALSE",

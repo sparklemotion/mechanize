@@ -10,12 +10,16 @@
     an `overwrite` option which when set to true will overwrite the original
     file if it exists, otherwise fall back to the default behaviour. #219
   * DirectorySaver::save_to now accepts an option to decode filename. #262
+  * element(s)_with methods now accept a :search option for doing xpath/css
+    selector searching. #287 Philippe Bourgau
+  * Added httponly option for Mechanize::Cookie #242 by Paolo Perego.
 
 * Minor enhancements
   * Added Mechanize::Download#save_as as an alias to #save. #246
   * Fix documentation for `Mechanize::Page` element matchers. #269
   * Added Mechanize::Form::Field#raw_value for fetching a fields value
     before it's sent through Mechanize::Util.html_unescape. #283
+  * Added iPad and Android user agents.  #277 by sambit, #278 by seansay.
 
 * Bug fix
   * Mechanize#cert and Mechanize#key now return the values set by
@@ -29,6 +33,8 @@
     `PluggableParser`, not just `text/xml`. #266 James Gregory
   * Mechanize no longer attempts to follow redirects in non HEAD/GET
     requests. See RFC 2616#10.3. #281
+  * Mechanize now writes cookiestxt with a prefixed dot for wildcard domain
+    handling. #295 by Mike Morearty.
 
 === 2.5.2
 

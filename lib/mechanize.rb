@@ -134,6 +134,7 @@ class Mechanize
   }
 
   AGENT_ALIASES['Mac FireFox'] = AGENT_ALIASES['Mac Firefox']
+  AGENT_ALIASES['Linux FireFox'] = AGENT_ALIASES['Linux Firefox']
 
   def self.inherited(child) # :nodoc:
     child.html_parser = html_parser

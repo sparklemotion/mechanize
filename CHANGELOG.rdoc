@@ -13,6 +13,8 @@
   * element(s)_with methods now accept a :search option for doing xpath/css
     selector searching. #287 Philippe Bourgau
   * Added httponly option for Mechanize::Cookie #242 by Paolo Perego.
+  * Added Mechanize::XmlFile as a default pluggable parser for handling
+    XML responses. #289
 
 * Minor enhancements
   * Added Mechanize::Download#save_as as an alias to #save. #246

@@ -508,4 +508,42 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     assert_equal('Foo1',      @jar.cookies(nurl).map { |c| c.name }.sort.join(' ') )
     assert_equal('Foo1 Foo2', @jar.cookies(surl).map { |c| c.name }.sort.join(' ') )
   end
+
+  def test_save_cookies_cookiestxt_subdomain
+    top_url = URI 'http://rubyforge.org/'
+    subdomain_url = URI 'http://admin.rubyforge.org/'
+
+    # cookie1 is for *.rubyforge.org; cookie2 is only for rubyforge.org, no subdomains
+    cookie1 = Mechanize::Cookie.new(cookie_values)
+    cookie2 = Mechanize::Cookie.new(cookie_values(:name => 'Boo', :for_domain => false))
+
+    @jar.add(top_url, cookie1)
+    @jar.add(top_url, cookie2)
+
+    assert_equal(2, @jar.cookies(top_url).length)
+    assert_equal(1, @jar.cookies(subdomain_url).length)
+
+    in_tmpdir do
+      @jar.save_as("cookies.txt", :cookiestxt)
+
+      jar = Mechanize::CookieJar.new
+      jar.load("cookies.txt", :cookiestxt) # HACK test the format
+      assert_equal(2, jar.cookies(top_url).length)
+      assert_equal(1, jar.cookies(subdomain_url).length)
+
+      # Check that we actually wrote the file correctly (not just that we were
+      # able to read what we wrote):
+      #
+      # * Cookies that only match exactly the domain specified must not have a
+      #   leading dot, and must have FALSE as the second field.
+      # * Cookies that match subdomains must have a leading dot, and must have
+      #   TRUE as the second field.
+      cookies_txt = File.readlines("cookies.txt")
+      assert_equal(1, cookies_txt.grep( /^rubyforge\.org\tFALSE/ ).length)
+      assert_equal(1, cookies_txt.grep( /^\.rubyforge\.org\tTRUE/ ).length)
+    end
+
+    assert_equal(2, @jar.cookies(top_url).length)
+    assert_equal(1, @jar.cookies(subdomain_url).length)
+  end
 end

@@ -162,7 +162,7 @@ class Mechanize::Page::Image
       if page.bases[0] then
          page.bases[0].href + src
       else
-        URI page.uri + src
+        page.uri + src
       end
     else
       URI src

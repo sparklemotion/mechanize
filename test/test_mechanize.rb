@@ -292,10 +292,9 @@ but not <a href="/" rel="me nofollow">this</a>!
   def test_delete_redirect
     page = @mech.delete('http://localhost/redirect')
 
-    assert_equal(page.uri.to_s, 'http://localhost/redirect')
+    assert_equal(page.uri.to_s, 'http://localhost/verb')
 
-    assert_equal '302', page.code
-    assert_equal '/verb', page.header['Location']
+    assert_equal 'GET', page.header['X-Request-Method']
   end
 
   def test_download
@@ -948,10 +947,9 @@ but not <a href="/" rel="me nofollow">this</a>!
   def test_post_redirect
     page = @mech.post('http://localhost/redirect')
 
-    assert_equal(page.uri.to_s, 'http://localhost/redirect')
+    assert_equal(page.uri.to_s, 'http://localhost/verb')
 
-    assert_equal '302', page.code
-    assert_equal '/verb', page.header['Location']
+    assert_equal 'GET', page.header['X-Request-Method']
   end
 
   def test_put
@@ -963,10 +961,9 @@ but not <a href="/" rel="me nofollow">this</a>!
   def test_put_redirect
     page = @mech.put('http://localhost/redirect', 'foo')
 
-    assert_equal(page.uri.to_s, 'http://localhost/redirect')
+    assert_equal(page.uri.to_s, 'http://localhost/verb')
 
-    assert_equal '302', page.code
-    assert_equal '/verb', page.header['Location']
+    assert_equal 'GET', page.header['X-Request-Method']
   end
 
   def test_read_timeout_equals

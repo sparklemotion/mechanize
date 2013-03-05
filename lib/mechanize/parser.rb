@@ -54,21 +54,30 @@ module Mechanize::Parser
   attr_accessor :code
 
   ##
-  # :method: [](header)
+  # :method: []
+  #
+  # :call-seq:
+  #   [](header)
   #
   # Access HTTP +header+ by name
 
   def_delegator :header, :[], :[]
 
   ##
-  # :method: []=(header, value)
+  # :method: []=
+  #
+  # :call-seq:
+  #   []=(header, value)
   #
   # Set HTTP +header+ to +value+
 
   def_delegator :header, :[]=, :[]=
 
   ##
-  # :method: key?(header)
+  # :method: key?
+  #
+  # :call-seq:
+  #   key?(header)
   #
   # Is the named +header+ present?
 

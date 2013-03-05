@@ -18,7 +18,10 @@ class Mechanize::HTTP
     # The authentication parameters
 
     ##
-    # :method: initialize(scheme = nil, params = nil)
+    # :method: initialize
+    #
+    # :call-seq:
+    #   initialize(scheme = nil, params = nil)
     #
     # Creates a new AuthChallenge header with the given scheme and parameters
 

@@ -33,8 +33,6 @@
     #272, #280 by Ryan Kowalick
   * Ensure `application/xml` is registered as an XML parser in
     `PluggableParser`, not just `text/xml`. #266 James Gregory
-  * Mechanize no longer attempts to follow redirects in non HEAD/GET
-    requests. See RFC 2616#10.3. #281
   * Mechanize now writes cookiestxt with a prefixed dot for wildcard domain
     handling. #295 by Mike Morearty.
 

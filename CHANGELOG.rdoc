@@ -1,6 +1,6 @@
 = Mechanize CHANGELOG
 
-=== Unreleased
+=== 2.6.0
 
 * New Features
   * Mechanize#start and Mechanize#shutdown (Thanks, Damian Janowski!)

@@ -85,7 +85,7 @@ class TestMechanizeFile < Mechanize::TestCase
 
         assert File.exist? 'test.html'
 
-        page.save 'test.html', :overwrite => true
+        page.save! 'test.html'
 
         assert File.exist? 'test.html'
         refute File.exist? 'test.html.1'

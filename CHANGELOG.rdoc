@@ -6,9 +6,7 @@
   * Mechanize#start and Mechanize#shutdown (Thanks, Damian Janowski!)
   * Added Mechanize::Agent#allowed_error_codes for setting an Array
     of status codes which should not raise an error. #248 Laurence Rowe.
-  * `File.save` now takes an optional second Hash argument, this includes
-    an `overwrite` option which when set to true will overwrite the original
-    file if it exists, otherwise fall back to the default behaviour. #219
+  * Added `File.save!` for overwriting existing files #219.
   * DirectorySaver::save_to now accepts an option to decode filename. #262
   * element(s)_with methods now accept a :search option for doing xpath/css
     selector searching. #287 Philippe Bourgau

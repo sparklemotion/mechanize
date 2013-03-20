@@ -50,15 +50,13 @@ class Mechanize::File
 
   ##
   # Use this method to save the content of this object to +filename+.
-  # If +options+ has an +overwrite+ key set to +true+, the saved file
-  # will overwrite any original.
   #
   #   file.save 'index.html'
   #   file.save 'index.html' # saves index.html.1
-  #   file.save 'index.html', :overwrite => true # overwrites index.html
+  #   file.save 'index.html'
 
-  def save filename = nil, options = {}
-    filename = find_free_name filename unless options[:overwrite]
+  def save filename = nil
+    filename = find_free_name filename
 
 		dirname = File.dirname filename
 		FileUtils.mkdir_p dirname
@@ -69,6 +67,23 @@ class Mechanize::File
   end
 
   alias save_as save
+
+  ##
+  # Use this method to save the content of this object to +filename+.
+  # This method will overwrite any existing filename that exists with the
+  # same name.
+  #
+  #   file.save 'index.html'
+  #   file.save! 'index.html' # overwrite original file
+
+  def save! filename = nil
+    dirname = File.dirname filename
+    FileUtils.mkdir_p dirname
+
+    open filename, 'wb' do |f|
+      f.write body
+    end
+  end
 
 end
 

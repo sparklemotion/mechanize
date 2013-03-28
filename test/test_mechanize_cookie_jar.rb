@@ -463,8 +463,7 @@ class TestMechanizeCookieJar < Mechanize::TestCase
       @jar.load("cookies.txt", :cookiestxt)
     end
 
-    assert_equal(1, @jar.cookies(url).length)
-    assert_nil @jar.cookies(url).first.expires
+    assert_equal(0, @jar.cookies(url).length)
   end
 
   def test_save_and_read_expired_cookies
@@ -536,7 +535,7 @@ class TestMechanizeCookieJar < Mechanize::TestCase
       #
       # * Cookies that only match exactly the domain specified must not have a
       #   leading dot, and must have FALSE as the second field.
-      # * Cookies that match subdomains must have a leading dot, and must have
+      # * Cookies that match subdomains may have a leading dot, and must have
       #   TRUE as the second field.
       cookies_txt = File.readlines("cookies.txt")
       assert_equal(1, cookies_txt.grep( /^rubyforge\.org\tFALSE/ ).length)

@@ -84,9 +84,7 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
   def cookie_jar str, uri = URI('http://example')
     jar = Mechanize::CookieJar.new
 
-    Mechanize::Cookie.parse uri, str do |cookie|
-      jar.add uri, cookie
-    end
+    jar.parse str, uri
 
     jar
   end

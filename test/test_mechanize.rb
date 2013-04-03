@@ -264,7 +264,7 @@ but not <a href="/" rel="me nofollow">this</a>!
   def test_cookies
     uri = URI 'http://example'
     jar = HTTP::CookieJar.new
-    jar.parse 'a=b', jar
+    jar.parse 'a=b', uri
 
     @mech.cookie_jar = jar
 

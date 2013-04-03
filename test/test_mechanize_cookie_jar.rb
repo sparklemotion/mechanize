@@ -123,8 +123,9 @@ class TestMechanizeCookieJar < Mechanize::TestCase
 
     tld_cookie = Mechanize::Cookie.new(cookie_values(:domain => '.org'))
     @jar.add(url, tld_cookie)
-    single_dot_cookie = Mechanize::Cookie.new(cookie_values(:domain => '.'))
-    @jar.add(url, single_dot_cookie)
+    # single dot domain is now treated as no domain
+    # single_dot_cookie = Mechanize::Cookie.new(cookie_values(:domain => '.'))
+    # @jar.add(url, single_dot_cookie)
 
     assert_equal(0, @jar.cookies(url).length)
   end

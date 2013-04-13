@@ -1,5 +1,10 @@
 = Mechanize CHANGELOG
 
+=== Unreleased
+
+* New Features
+  * Added `Download#save!` for overwriting existing files. #300 Sean Kim.
+
 === 2.6.0
 
 * New Features

@@ -57,13 +57,7 @@ class Mechanize::File
 
   def save filename = nil
     filename = find_free_name filename
-
-		dirname = File.dirname filename
-		FileUtils.mkdir_p dirname
-
-    open filename, 'wb' do |f|
-      f.write body
-    end
+    save! filename
   end
 
   alias save_as save

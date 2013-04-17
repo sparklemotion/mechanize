@@ -511,26 +511,22 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
   def test_request_cookies
     uri = URI.parse 'http://host.example.com'
-    Mechanize::Cookie.parse uri, 'hello=world domain=.example.com' do |cookie|
-      @agent.cookie_jar.add uri, cookie
-    end
+    @agent.cookie_jar.parse 'hello=world domain=.example.com', uri
 
     @agent.request_cookies @req, uri
 
-    assert_equal 'hello=world domain=.example.com', @req['Cookie']
+    assert_equal 'hello="world domain=.example.com"', @req['Cookie']
   end
 
   def test_request_cookies_many
     uri = URI.parse 'http://host.example.com'
     cookie_str = 'a=b domain=.example.com, c=d domain=.example.com'
-    Mechanize::Cookie.parse uri, cookie_str do |cookie|
-      @agent.cookie_jar.add uri, cookie
-    end
+    @agent.cookie_jar.parse cookie_str, uri
 
     @agent.request_cookies @req, uri
 
-    expected_variant1 = 'a=b domain=\.example\.com; c=d domain=\.example\.com'
-    expected_variant2 = 'c=d domain=\.example\.com; a=b domain=\.example\.com'
+    expected_variant1 = /a="b domain=\.example\.com"; c="d domain=\.example\.com"/
+    expected_variant2 = /c="d domain=\.example\.com"; a="b domain=\.example\.com"/
 
     assert_match(/^(#{expected_variant1}|#{expected_variant2})$/, @req['Cookie'])
   end
@@ -543,9 +539,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
   def test_request_cookies_wrong_domain
     uri = URI.parse 'http://host.example.com'
-    Mechanize::Cookie.parse uri, 'hello=world domain=.example.com' do |cookie|
-      @agent.cookie_jar.add uri, cookie
-    end
+    @agent.cookie_jar.parse 'hello=world domain=.example.com', uri
 
     @agent.request_cookies @req, @uri
 
@@ -1077,7 +1071,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     @agent.response_cookies @res, uri, page
 
-    assert_equal ['a=b domain=.example.com'],
+    assert_equal ['a="b domain=.example.com"'],
                  @agent.cookie_jar.cookies(uri).map { |c| c.to_s }
   end
 
@@ -1096,7 +1090,10 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     cookies_from_jar = @agent.cookie_jar.cookies(uri)
 
     assert_equal 2, cookies_from_jar.length
-    cookies_from_jar.each { |cookie| assert cookies.include? cookie.to_s }
+    assert_equal [
+      'a="b domain=.example.com"',
+      'c="d domain=.example.com"',
+    ], cookies_from_jar.sort_by { |c| c.name }.map(&:to_s)
   end
 
   def test_response_cookies_meta
@@ -1115,7 +1112,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     @agent.response_cookies @res, uri, page
 
-    assert_equal ['a=b domain=.example.com'],
+    assert_equal ['a="b domain=.example.com"'],
                  @agent.cookie_jar.cookies(uri).map { |c| c.to_s }
   end
 

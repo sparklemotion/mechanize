@@ -263,10 +263,8 @@ but not <a href="/" rel="me nofollow">this</a>!
 
   def test_cookies
     uri = URI 'http://example'
-    jar = Mechanize::CookieJar.new
-    Mechanize::Cookie.parse uri, 'a=b' do |cookie|
-      jar.add uri, cookie
-    end
+    jar = HTTP::CookieJar.new
+    jar.parse 'a=b', uri
 
     @mech.cookie_jar = jar
 
@@ -276,7 +274,7 @@ but not <a href="/" rel="me nofollow">this</a>!
   def test_cookie_jar
     assert_kind_of Mechanize::CookieJar, @mech.cookie_jar
 
-    jar = Mechanize::CookieJar.new
+    jar = HTTP::CookieJar.new
 
     @mech.cookie_jar = jar
 
@@ -1031,10 +1029,8 @@ but not <a href="/" rel="me nofollow">this</a>!
 
   def test_shutdown
     uri = URI 'http://localhost'
-    jar = Mechanize::CookieJar.new
-    Mechanize::Cookie.parse uri, 'a=b' do |cookie|
-      jar.add uri, cookie
-    end
+    jar = HTTP::CookieJar.new
+    jar.parse 'a=b', uri
 
     @mech.cookie_jar = jar
 

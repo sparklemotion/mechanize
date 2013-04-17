@@ -840,14 +840,15 @@ class Mechanize::HTTP::Agent
   end
 
   def save_cookies(uri, set_cookie)
-    log = log()	 # reduce method calls
-    Mechanize::Cookie.parse(uri, set_cookie, log) { |c|
-      if @cookie_jar.add(uri, c)
-        log.debug("saved cookie: #{c}") if log
-      else
-        log.debug("rejected cookie: #{c}") if log
-      end
-    }
+    return [] if set_cookie.nil?
+    if log = log()	 # reduce method calls
+      @cookie_jar.parse(set_cookie, uri, :logger => log) { |c|
+        log.debug("saved cookie: #{c}")
+        true
+      }
+    else
+      @cookie_jar.parse(set_cookie, uri)
+    end
   end
 
   def response_follow_meta_refresh response, uri, page, redirects
@@ -1217,7 +1218,7 @@ class Mechanize::HTTP::Agent
   end
 
   def reset
-    @cookie_jar.clear!
+    @cookie_jar.clear
     @history.clear
   end
 

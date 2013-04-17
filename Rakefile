@@ -21,7 +21,7 @@ hoe = Hoe.spec 'mechanize' do
   self.extra_deps << ['net-http-digest_auth', '~> 1.1', '>= 1.1.1']
   self.extra_deps << ['net-http-persistent',  '~> 2.5', '>= 2.5.2']
   self.extra_deps << ['mime-types',           '~> 1.17', '>= 1.17.2']
-  self.extra_deps << ['http-cookie',          '~> 1.0.0.pre9']
+  self.extra_deps << ['http-cookie',          '~> 1.0.0']
   self.extra_deps << ['nokogiri',             '~> 1.4']
   self.extra_deps << ['ntlm-http',            '~> 0.1', '>= 0.1.1']
   self.extra_deps << ['webrobots',            '<  0.2', '>= 0.0.9']

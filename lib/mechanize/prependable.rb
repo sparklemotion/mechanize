@@ -1,8 +1,8 @@
 # Fake implementation of prepend(), which does not support overriding
 # inherited methods nor methods that are formerly overridden by
-# another invocation of fake_prepend.
+# another invocation of prepend().
 #
-# Here's what <Original>.fake_prepend(<Wrapper>) does:
+# Here's what <Original>.prepend(<Wrapper>) does:
 #
 # - Create an anonymous stub module (hereinafter <Stub>) and define
 #   <Stub>#<method> that calls #<method>_without_<Wrapper> for each
@@ -39,7 +39,7 @@ module Mechanize::Prependable
   def prepend(mod)
     stub = Module.new
 
-    mod_id = (mod.name || 'Modile__%d' % mod.object_id).gsub(/::/, '__')
+    mod_id = (mod.name || 'Module__%d' % mod.object_id).gsub(/::/, '__')
 
     mod.instance_methods.each { |name|
       method_defined?(name) or next

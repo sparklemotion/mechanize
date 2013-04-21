@@ -24,7 +24,6 @@ rvm:
 script: rake travis
 matrix:
   allow_failures:
-    - rvm: 2.0.0
     - rvm: ruby-head
     - rvm: jruby-18mode
     - rvm: jruby-19mode

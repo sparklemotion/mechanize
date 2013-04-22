@@ -3,6 +3,8 @@
 === Unreleased
 
 * New Features
+  * Depend on http-cookie, add backwards compatible deprecations.
+    #257 Akinori MUSHA.
   * Added `Download#save!` for overwriting existing files. #300 Sean Kim.
 
 === 2.6.0

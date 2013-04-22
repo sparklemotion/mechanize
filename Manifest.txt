@@ -62,6 +62,7 @@ lib/mechanize/page/link.rb
 lib/mechanize/page/meta_refresh.rb
 lib/mechanize/parser.rb
 lib/mechanize/pluggable_parsers.rb
+lib/mechanize/prependable.rb
 lib/mechanize/redirect_limit_reached_error.rb
 lib/mechanize/redirect_not_get_or_head_error.rb
 lib/mechanize/response_code_error.rb

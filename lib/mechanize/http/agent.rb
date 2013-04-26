@@ -914,7 +914,7 @@ class Mechanize::HTTP::Agent
       body_io.rewind
       raise Mechanize::ChunkedTerminationError.new(e, response, body_io, uri,
                                                    @context)
-    rescue Net::HTTP::Persistent::Error => e
+    rescue Net::HTTP::Persistent::Error, Errno::ECONNRESET => e
       body_io.rewind
       raise Mechanize::ResponseReadError.new(e, response, body_io, uri,
                                              @context)

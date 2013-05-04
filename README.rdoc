@@ -28,7 +28,7 @@ The bug tracker is available here:
 
 == Examples
 
-If you are just starting, check out the GUIDE[https://github.com/sparklemotion/mechanize/blob/master/GUIDE.rdoc].  Also, check out the EXAMPLES[https://github.com/sparklemotion/mechanize/blob/master/EXAMPLES.rdoc]
+If you are just starting, check out the GUIDE[http://mechanize.rubyforge.org/GUIDE_rdoc.html].  Also, check out the EXAMPLES[http://mechanize.rubyforge.org/EXAMPLES_rdoc.html]
 file.
 
 == Developers
@@ -78,5 +78,5 @@ library!
 
 == License
 
-This library is distributed under the MIT license.  Please see the LICENSE[https://github.com/sparklemotion/mechanize/blob/master/LICENSE.rdoc] file.
+This library is distributed under the MIT license.  Please see the LICENSE[http://mechanize.rubyforge.org/LICENSE_rdoc.html] file.
 

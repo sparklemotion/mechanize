@@ -23,7 +23,7 @@ class TestMechanizeXmlFile < Mechanize::TestCase
   end
 
   def test_at
-    assert_equal 'Perl', @xml.at('language[2]').text
+    assert_equal 'Perl', @xml.at('//language[2]').text
   end
 
 end

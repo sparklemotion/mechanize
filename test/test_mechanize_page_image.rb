@@ -54,6 +54,7 @@ class TestMechanizePageImage < Mechanize::TestCase
   def test_url
     assert_equal ".jpg", img('src' => @src).extname
     assert_equal "http://example/a.jpg", img('src' => @src).url.to_s
+    assert_equal "http://example/a%20.jpg", img('src' => 'http://example/a .jpg' ).url.to_s
   end
 
   def test_url_base

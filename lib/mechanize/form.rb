@@ -252,6 +252,8 @@ class Mechanize::Form
     query = []
     @mech.log.info("form encoding: #{encoding}") if @mech && @mech.log
 
+    save_hash_field_order
+
     successful_controls = []
 
     (fields + checkboxes).reject do |f|
@@ -299,6 +301,19 @@ class Mechanize::Form
     end
 
     query
+  end
+
+  # This method adds an index to all fields that have Hash nodes. This
+  # enables field sorting to maintain order.
+  def save_hash_field_order
+    index = 0
+
+    fields.each do |field|
+      if Hash === field.node
+        field.index = index
+        index += 1
+      end
+    end
   end
 
   # This method adds a button to the query.  If the form needs to be

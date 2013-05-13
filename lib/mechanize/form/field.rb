@@ -19,6 +19,9 @@ class Mechanize::Form::Field
   # This fields value before it's sent through Util.html_unescape.
   attr_reader :raw_value
 
+  # index is used to maintain order for fields with Hash nodes
+  attr_accessor :index
+
   def initialize node, value = node['value']
     @node = node
     @name = Mechanize::Util.html_unescape(node['name'])
@@ -38,8 +41,17 @@ class Mechanize::Form::Field
 
   def <=> other
     return 0 if self == other
+
+    # If both are hashes, sort by index
+    if Hash === node && Hash === other.node
+      return index <=> other.index
+    end
+
+    # Otherwise put Hash based fields at the end
     return 1 if Hash === node
     return -1 if Hash === other.node
+
+    # Finally let nokogiri determine sort order
     node <=> other.node
   end
 

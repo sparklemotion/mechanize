@@ -935,4 +935,32 @@ class TestMechanizeForm < Mechanize::TestCase
     assert_empty page.links
   end
 
+  def test_form_built_from_array_post
+    submitted = @mech.post(
+      'http://example/form_post',
+      [
+        %w[order_matters 0],
+        %w[order_matters 1],
+        %w[order_matters 2],
+        %w[mess_it_up asdf]
+      ]
+    )
+
+    assert_equal 'order_matters=0&order_matters=1&order_matters=2&mess_it_up=asdf', submitted.parser.at('#query').text
+  end
+
+  def test_form_built_from_hashes_submit
+    uri = URI 'http://example/form_post'
+    page = page uri
+    form = Mechanize::Form.new node('form', 'name' => __name__, 'method' => 'POST'), @mech, page
+    form.fields << Mechanize::Form::Field.new({'name' => 'order_matters'}, '0')
+    form.fields << Mechanize::Form::Field.new({'name' => 'order_matters'}, '1')
+    form.fields << Mechanize::Form::Field.new({'name' => 'order_matters'}, '2')
+    form.fields << Mechanize::Form::Field.new({'name' => 'mess_it_up'}, 'asdf')
+
+    submitted = @mech.submit form
+
+    assert_equal 'order_matters=0&order_matters=1&order_matters=2&mess_it_up=asdf', submitted.parser.at('#query').text
+  end
+
 end

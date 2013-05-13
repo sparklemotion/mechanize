@@ -8,7 +8,7 @@ class TestMechanizeForm < Mechanize::TestCase
     @uri = URI 'http://example'
     @page = page @uri
 
-    @form = Mechanize::Form.new node('form', 'name' => __name__), @mech, @page
+    @form = Mechanize::Form.new node('form', 'name' => @NAME), @mech, @page
   end
 
   def test_action
@@ -25,7 +25,7 @@ class TestMechanizeForm < Mechanize::TestCase
     end
 
     assert_equal "#{button.inspect} does not belong to the same page " \
-                 "as the form \"#{@__name__}\" in #{@uri}",
+                 "as the form \"#{@NAME}\" in #{@uri}",
                  e.message
   end
 
@@ -312,7 +312,7 @@ class TestMechanizeForm < Mechanize::TestCase
     page = html_page '<form><input name="a" value="b"><input name="a"></form>'
     form = page.forms.first
 
-    form.set_fields :a => ['c', 1] 
+    form.set_fields :a => ['c', 1]
 
     assert_equal 'b', form.fields.first.value
     assert_equal 'c', form.fields.last.value
@@ -952,7 +952,7 @@ class TestMechanizeForm < Mechanize::TestCase
   def test_form_built_from_hashes_submit
     uri = URI 'http://example/form_post'
     page = page uri
-    form = Mechanize::Form.new node('form', 'name' => __name__, 'method' => 'POST'), @mech, page
+    form = Mechanize::Form.new node('form', 'name' => @NAME, 'method' => 'POST'), @mech, page
     form.fields << Mechanize::Form::Field.new({'name' => 'order_matters'}, '0')
     form.fields << Mechanize::Form::Field.new({'name' => 'order_matters'}, '1')
     form.fields << Mechanize::Form::Field.new({'name' => 'order_matters'}, '2')

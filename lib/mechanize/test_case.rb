@@ -29,7 +29,7 @@ require 'minitest/autorun'
 #
 # Which will launch a test server at http://localhost:8000
 
-class Mechanize::TestCase < MiniTest::Unit::TestCase
+class Mechanize::TestCase < Minitest::Test
 
   TEST_DIR = File.expand_path '../../../test', __FILE__
   REQUESTS = []
@@ -168,7 +168,7 @@ UQIBATANBgkqhkiG9w0BAQUFAANBAAAB////////////////////////////////
   # Creates a Tempfile with +content+ that is immediately unlinked
 
   def tempfile content
-    body_io = Tempfile.new @__name__
+    body_io = Tempfile.new @NAME
     body_io.unlink
     body_io.write content
     body_io.flush

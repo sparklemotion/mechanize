@@ -33,7 +33,7 @@ class TestMechanizeDownload < Mechanize::TestCase
 
   def test_save_tempfile
     uri = URI.parse 'http://example/foo.html'
-    Tempfile.open __name__ do |body_io|
+    Tempfile.open @NAME do |body_io|
       body_io.unlink
       body_io.write '0123456789'
 

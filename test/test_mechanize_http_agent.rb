@@ -39,7 +39,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
       input_io.write '12345'
       input_io.rewind
 
-      out_io = @agent.auto_io __name__, 1024, input_io
+      out_io = @agent.auto_io @NAME, 1024, input_io
 
       assert_equal '12345', out_io.string
 
@@ -56,7 +56,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
       input_io.write '12345'
       input_io.rewind
 
-      @agent.auto_io __name__, 1, input_io do |chunk|
+      @agent.auto_io @NAME, 1, input_io do |chunk|
         chunks << chunk
       end
 
@@ -72,7 +72,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
       input_io.write '12345'
       input_io.rewind
 
-      out_io = @agent.auto_io __name__, 1, input_io
+      out_io = @agent.auto_io @NAME, 1, input_io
 
       result = out_io.read
       assert_equal '12345', result
@@ -88,7 +88,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
       input_io.write '12345'
       input_io.rewind
 
-      out_io = @agent.auto_io __name__, 1024, input_io do |chunk|
+      out_io = @agent.auto_io @NAME, 1024, input_io do |chunk|
         "x#{chunk}"
       end
 
@@ -1030,7 +1030,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     refute body_io.closed?
   ensure
     begin
-      body_io.close! unless body_io.closed?
+      body_io.close! if body_io and not body_io.closed?
     rescue IOError
       # HACK for ruby 1.8
     end
@@ -1045,7 +1045,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'part', body.read
     assert body_io.closed?
   ensure
-    body_io.close! unless body_io.closed?
+    body_io.close! if body_io and not body_io.closed?
   end
 
   def test_response_content_encoding_unknown

@@ -43,7 +43,7 @@ class Mechanize::Form::Field
     return 0 if self == other
 
     # If both are hashes, sort by index
-    if Hash === node && Hash === other.node
+    if Hash === node && Hash === other.node && index
       return index <=> other.index
     end
 

@@ -929,9 +929,12 @@ class Mechanize::HTTP::Agent
     content_length = response.content_length
 
     unless Net::HTTP::Head === request or Net::HTTPRedirection === response then
-      raise EOFError, "Content-Length (#{content_length}) does not match " \
-                      "response body length (#{body_io.length})" if
-        content_length and content_length != body_io.length
+      if content_length and content_length != body_io.length
+        err = EOFError.new("Content-Length (#{content_length}) does not " \
+                      "match response body length (#{body_io.length})")
+        raise Mechanize::ResponseReadError.new(err, response, body_io, uri,
+                                                @context)
+      end
     end
 
     body_io

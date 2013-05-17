@@ -1307,12 +1307,12 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     def @res.content_length() 5 end
     def @res.read_body() yield 'part' end
 
-    e = assert_raises EOFError do
+    e = assert_raises Mechanize::ResponseReadError do
       @agent.response_read @res, @req, @uri
     end
 
-    assert_equal 'Content-Length (5) does not match response body length (4)',
-                 e.message
+    assert_equal 'Content-Length (5) does not match response body length (4)' \
+      ' (Mechanize::ResponseReadError)', e.message
   end
 
   def test_response_read_content_length_redirect

@@ -3,9 +3,15 @@
 === Unreleased
 
 * New Features
+  * Mechanize::Agent#response_read will now raise a
+    Mechanize::ResponseReadError instead of an EOFError and avoid losing
+    requested content. #296.
   * Depend on http-cookie, add backwards compatible deprecations.
     #257 Akinori MUSHA.
   * Added `Download#save!` for overwriting existing files. #300 Sean Kim.
+
+* Bug fix
+  * Ensure page URLs with whitespace in them are escaped #313 @pacop.
 
 === 2.6.0
 

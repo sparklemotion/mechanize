@@ -73,7 +73,7 @@ class Mechanize
   ##
   # The version of Mechanize you are using.
 
-  VERSION = '2.6.0'
+  VERSION = '2.7.0'
 
   ##
   # Base mechanize error class

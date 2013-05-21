@@ -1,6 +1,6 @@
 = Mechanize CHANGELOG
 
-=== Unreleased
+=== 2.7.0
 
 * New Features
   * Mechanize::Agent#response_read will now raise a

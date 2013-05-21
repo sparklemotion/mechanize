@@ -12,6 +12,7 @@
 
 * Bug fix
   * Ensure page URLs with whitespace in them are escaped #313 @pacop.
+  * Added a workaround for a bug of URI#+ that led to failure in resolving a relative path containing double slash like "/../http://.../". #304
 
 === 2.6.0
 

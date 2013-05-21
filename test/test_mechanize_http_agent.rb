@@ -697,6 +697,15 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_nil params
   end
 
+  def test_resolve_slashes
+    page = Mechanize::Page.new URI('http://example/foo/'), nil, '', 200, @mech
+    uri = '/bar/http://example/test/'
+
+    resolved = @agent.resolve uri, page
+
+    assert_equal 'http://example/bar/http://example/test/', resolved.to_s
+  end
+
   def test_response_authenticate
     @agent.add_auth @uri, 'user', 'password'
 

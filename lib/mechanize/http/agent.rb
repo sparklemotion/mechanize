@@ -660,7 +660,16 @@ class Mechanize::HTTP::Agent
         base = nil
       end
 
-      uri = referer_uri + (base ? base.uri : referer_uri) + uri
+      base = referer_uri + (base ? base.uri : referer_uri)
+
+      # Workaround for URI's bug in that it squashes consecutive
+      # slashes.  See #304.
+      if uri.path.match(%r{\A(.*?/)(?!/\.\.?(?!/))(/.*)\z}i)
+        uri = URI((base + $1).to_s + $2)
+      else
+        uri = base + uri
+      end
+
       # Strip initial "/.." bits from the path
       uri.path.sub!(/^(\/\.\.)+(?=\/)/, '')
     end

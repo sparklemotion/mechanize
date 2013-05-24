@@ -1,15 +1,13 @@
-= Mechanize
-
-* http://mechanize.rubyforge.org
-* https://github.com/sparklemotion/mechanize
-
-== Description
+= Mechanize {<img src="https://secure.travis-ci.org/sparklemotion/mechanize.png?rvm=1.9.3" />}[http://travis-ci.org/sparklemotion/mechanize]
 
 The Mechanize library is used for automating interaction with websites.
 Mechanize automatically stores and sends cookies, follows redirects,
 and can follow links and submit forms.  Form fields can be populated and
 submitted.  Mechanize also keeps track of the sites that you have visited as
 a history.
+
+* http://mechanize.rubyforge.org
+* https://github.com/sparklemotion/mechanize
 
 == Dependencies
 
@@ -28,8 +26,8 @@ The bug tracker is available here:
 
 == Examples
 
-If you are just starting, check out the GUIDE[http://mechanize.rubyforge.org/GUIDE_rdoc.html].  Also, check out the EXAMPLES[http://mechanize.rubyforge.org/EXAMPLES_rdoc.html]
-file.
+If you are just starting, check out the GUIDE[http://mechanize.rubyforge.org/GUIDE_rdoc.html] or
+the EXAMPLES[http://mechanize.rubyforge.org/EXAMPLES_rdoc.html] file.
 
 == Developers
 
@@ -57,10 +55,11 @@ Copyright (c) 2006-2011:
 * {Aaron Patterson}[http://tenderlovemaking.com] (aaronp@rubyforge.org)
 * {Mike Dalessio}[http://mike.daless.io] (mike@csa.net)
 
-Copyright (c) 2011-2012:
+Copyright (c) 2011-2013:
 
 * {Eric Hodel}[http://blog.segment7.net] (drbrain@segment7.net)
 * {Akinori MUSHA}[http://blog.akinori.org] (knu@idaemons.org)
+* {Lee Jarvis}[http://aeroproof.com] (ljjarvis@gmail.com)
 
 This library comes with a shameless plug for employing me
 (Aaron[http://tenderlovemaking.com/]) programming Ruby, my favorite language!

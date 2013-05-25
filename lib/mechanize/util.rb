@@ -1,6 +1,8 @@
 require 'cgi'
 require 'nkf'
 
+EncodingError = Class.new(StandardError) unless defined?(EncodingError)
+
 class Mechanize::Util
   CODE_DIC = {
     NKF::JIS => "ISO-2022-JP",

@@ -1,6 +1,5 @@
 require 'fileutils'
 require 'forwardable'
-require 'iconv' if RUBY_VERSION < '1.9.2'
 require 'mime/types'
 require 'mutex_m'
 require 'net/http/digest_auth'

@@ -216,28 +216,22 @@ class Mechanize::HTTP::Agent
 
   def fetch uri, method = :get, headers = {}, params = [],
             referer = current_page, redirects = 0
+
     referer_uri = referer ? referer.uri : nil
-
-    uri = resolve uri, referer
-
+    uri         = resolve uri, referer
     uri, params = resolve_parameters uri, method, params
-
-    request = http_request uri, method, params
-
-    connection = connection_for uri
+    request     = http_request uri, method, params
+    connection  = connection_for uri
 
     request_auth             request, uri
-
     disable_keep_alive       request
     enable_gzip              request
-
     request_language_charset request
     request_cookies          request, uri
     request_host             request, uri
     request_referer          request, uri, referer_uri
     request_user_agent       request
     request_add_headers      request, headers
-
     pre_connect              request
 
     # Consult robots.txt

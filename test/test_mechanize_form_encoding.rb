@@ -12,12 +12,7 @@ class TestMechanizeFormEncoding < Mechanize::TestCase
   encoded_value.force_encoding(::Encoding::SHIFT_JIS) if encoded_value.respond_to?(:force_encoding)
   EXPECTED_QUERY = "first_name=#{CGI.escape(encoded_value)}&first_name=&gender=&green%5Beggs%5D="
 
-  if Mechanize::Util::NEW_RUBY_ENCODING
-    ENCODING_ERRORS = [EncodingError, Encoding::ConverterNotFoundError] # and so on
-  else
-    ENCODING_ERRORS = [Iconv::InvalidEncoding, Iconv::IllegalSequence]
-  end
-
+  ENCODING_ERRORS = [EncodingError, Encoding::ConverterNotFoundError] # and so on
   ENCODING_LOG_MESSAGE = /INFO -- : form encoding: Shift_JIS/
   INVALID_ENCODING = 'UTF-eight'
 

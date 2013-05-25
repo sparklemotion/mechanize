@@ -8,14 +8,9 @@ class TestMechanizeUtil < Mechanize::TestCase
   CONTENT_ENCODING = 'Shift_JIS' # one of Japanese encoding
   ENCODED_VALUE = "\x83\x65\x83\x58\x83\x67" # "test" in Japanese Shift_JIS encoding
 
-  if Mechanize::Util::NEW_RUBY_ENCODING
-    ENCODING_ERRORS = [EncodingError, Encoding::ConverterNotFoundError] # and so on
-    ERROR_LOG_MESSAGE = /from_native_charset: Encoding::ConverterNotFoundError: form encoding: "UTF-eight"/
-    ENCODED_VALUE.force_encoding(::Encoding::SHIFT_JIS)
-  else
-    ENCODING_ERRORS = [Iconv::InvalidEncoding, Iconv::IllegalSequence]
-    ERROR_LOG_MESSAGE = /from_native_charset: Iconv::InvalidEncoding: form encoding: "UTF-eight"/
-  end
+  ENCODING_ERRORS = [EncodingError, Encoding::ConverterNotFoundError] # and so on
+  ERROR_LOG_MESSAGE = /from_native_charset: Encoding::ConverterNotFoundError: form encoding: "UTF-eight"/
+  ENCODED_VALUE.force_encoding(::Encoding::SHIFT_JIS)
 
   INVALID_ENCODING = 'UTF-eight'
 

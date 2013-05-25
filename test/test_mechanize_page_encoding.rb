@@ -5,7 +5,7 @@ require 'mechanize/test_case'
 
 class TestMechanizePageEncoding < Mechanize::TestCase
 
-  MECH_ASCII_ENCODING = Mechanize::Util::NEW_RUBY_ENCODING ? 'US-ASCII' : 'ISO-8859-1'
+  MECH_ASCII_ENCODING = 'US-ASCII'
 
   def setup
     super

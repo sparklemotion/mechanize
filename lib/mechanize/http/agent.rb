@@ -606,17 +606,7 @@ class Mechanize::HTTP::Agent
       end
 
       url.gsub!(/[^#{0.chr}-#{126.chr}]/o) { |match|
-        if RUBY_VERSION >= "1.9.0"
-          Mechanize::Util.uri_escape(match)
-        else
-          begin
-            sprintf('%%%X', match.unpack($KCODE == 'UTF8' ? 'U' : 'C').first)
-          rescue ArgumentError
-            # workaround for ruby 1.8 with -Ku but ISO-8859-1 characters in
-            # URIs.  See #227.  I can't wait to drop 1.8 support
-            sprintf('%%%X', match.unpack('C').first)
-          end
-        end
+        Mechanize::Util.uri_escape(match)
       }
 
       escaped_url = Mechanize::Util.html_unescape(
@@ -1084,12 +1074,12 @@ class Mechanize::HTTP::Agent
   # SSL version to use
   def ssl_version
     @http.ssl_version
-  end if RUBY_VERSION > '1.9'
+  end
 
   # Sets the SSL version to use
   def ssl_version= ssl_version
     @http.ssl_version = ssl_version
-  end if RUBY_VERSION > '1.9'
+  end
 
   # A callback for additional certificate verification.  See
   # OpenSSL::SSL::SSLContext#verify_callback

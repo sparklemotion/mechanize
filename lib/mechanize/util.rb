@@ -11,15 +11,8 @@ class Mechanize::Util
     NKF::UTF32 => "UTF-32",
   }
 
-  # true if RUBY_VERSION is 1.9.0 or later
-  NEW_RUBY_ENCODING = RUBY_VERSION >= '1.9.0'
-
   # contains encoding error classes to raise
-  ENCODING_ERRORS = if NEW_RUBY_ENCODING
-                      [EncodingError]
-                    else
-                      [Iconv::InvalidEncoding, Iconv::IllegalSequence]
-                    end
+  ENCODING_ERRORS = [EncodingError]
 
   # default mime type data for Page::Image#mime_type.
   # You can use another Apache-compatible mimetab.
@@ -53,11 +46,7 @@ class Mechanize::Util
 
   # inner convert method of Util.from_native_charset
   def self.encode_to(encoding, str)
-    if NEW_RUBY_ENCODING
-      str.encode(encoding)
-    else
-      Iconv.conv(encoding.to_s, "UTF-8", str)
-    end
+    str.encode(encoding)
   end
   private_class_method :encode_to
 
@@ -76,14 +65,11 @@ class Mechanize::Util
   end
 
   def self.detect_charset(src)
-    case enc = src && NKF.guess(src)
-    when Integer
-      # Ruby <= 1.8
-      CODE_DIC[enc]
+    if enc = src && NKF.guess(src)
+      enc.to_s.upcase
     else
-      # Ruby >= 1.9
-      enc && enc.to_s.upcase
-    end || "ISO-8859-1"
+      "ISO-8859-1"
+    end
   end
 
   def self.uri_escape str, unsafe = nil

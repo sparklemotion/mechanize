@@ -347,10 +347,12 @@ class Mechanize::HTTP::Agent
     @history.last
   end
 
+  # Returns the maximum size for the history stack.
   def max_history
     @history.max_size
   end
 
+  # Set the maximum size for the history stack.
   def max_history=(length)
     @history.max_size = length
   end

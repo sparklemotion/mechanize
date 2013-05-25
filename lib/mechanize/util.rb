@@ -11,6 +11,9 @@ class Mechanize::Util
     NKF::UTF32 => "UTF-32",
   }
 
+  # Used for backwards compatibility
+  NEW_RUBY_ENCODING = true
+
   # contains encoding error classes to raise
   ENCODING_ERRORS = [EncodingError]
 

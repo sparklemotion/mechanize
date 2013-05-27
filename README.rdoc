@@ -1,13 +1,15 @@
 = Mechanize {<img src="https://secure.travis-ci.org/sparklemotion/mechanize.png?rvm=1.9.3" />}[http://travis-ci.org/sparklemotion/mechanize]
 
+* http://mechanize.rubyforge.org
+* https://github.com/sparklemotion/mechanize
+
+== Description
+
 The Mechanize library is used for automating interaction with websites.
 Mechanize automatically stores and sends cookies, follows redirects,
 and can follow links and submit forms.  Form fields can be populated and
 submitted.  Mechanize also keeps track of the sites that you have visited as
 a history.
-
-* http://mechanize.rubyforge.org
-* https://github.com/sparklemotion/mechanize
 
 == Dependencies
 

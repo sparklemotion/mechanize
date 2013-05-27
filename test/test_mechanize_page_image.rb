@@ -180,5 +180,11 @@ class TestMechanizePageImage < Mechanize::TestCase
     assert_equal URI('https://example/'), page.images.first.image_referer.uri
   end
 
+  def test_no_src_attribute
+    page = html_page '<img width="10" height="10" class="foo" />'
+    page.uri = URI 'https://example/'
+    assert_equal URI('https://example/'), page.images.first.url
+  end
+
 end
 

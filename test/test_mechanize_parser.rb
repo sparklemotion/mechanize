@@ -45,6 +45,12 @@ class TestMechanizeParser < Mechanize::TestCase
     }
 
     assert_equal 'foo.html', @parser.extract_filename
+
+    @parser.response = {
+      'content-disposition' => "inline; filename=\"\""
+    }
+
+    assert_equal 'foo.html', @parser.extract_filename
   end
 
   def test_extract_filename_content_disposition_path

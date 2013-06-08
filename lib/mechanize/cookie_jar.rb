@@ -51,7 +51,10 @@ class Mechanize
   end
 
   class CookieJar < ::HTTP::CookieJar
-    def save(filename, *options)
+    def save(output, *options)
+      output.respond_to?(:write) or
+        return open(output, 'w') { |io| save(io, *options) }
+
       opthash = {
         :format => :yaml,
         :session => false,
@@ -97,43 +100,66 @@ class Mechanize
         $1 + ($2 ? Time.parse($2).httpdate : '')
       }
 
-      open(filename, 'w') { |io|
-        io.write yaml
-      }
+      output.write yaml
 
       self
     end
 
-    def load(filename, format = :yaml)
-      return super if format != :yaml
+    def load(input, *options)
+      input.respond_to?(:write) or
+        return open(input, 'r') { |io| load(io, *options) }
 
-      open(filename) { |io|
-        begin
-          data = YAML.load(io)
-        rescue ArgumentError
-          @logger.warn "unloadable YAML cookie data discarded" if @logger
-          return
+      opthash = {
+        :format => :yaml,
+        :session => false,
+      }
+      case options.size
+      when 0
+      when 1
+        case options = options.first
+        when Symbol
+          opthash[:format] = options
+        else
+          if hash = Hash.try_convert(options)
+            opthash.update(hash)
+          end
         end
+      when 2
+        opthash[:format], options = options
+        if hash = Hash.try_convert(options)
+          opthash.update(hash)
+        end
+      else
+        raise ArgumentError, 'wrong number of arguments (%d for 1-3)' % (1 + options.size)
+      end
 
-        case data
-        when Array
-          # Forward compatibility
-          data.each { |cookie|
-            add(cookie)
-          }
-        when Hash
-          data.each { |domain, paths|
-            paths.each { |path, names|
-              names.each { |cookie_name, cookie|
-                add(cookie)
-              }
+      return super if opthash[:format] != :yaml
+
+      begin
+        data = YAML.load(input)
+      rescue ArgumentError
+        @logger.warn "unloadable YAML cookie data discarded" if @logger
+        return self
+      end
+
+      case data
+      when Array
+        # Forward compatibility
+        data.each { |cookie|
+          add(cookie)
+        }
+      when Hash
+        data.each { |domain, paths|
+          paths.each { |path, names|
+            names.each { |cookie_name, cookie|
+              add(cookie)
             }
           }
-        else
-          @logger.warn "incompatible YAML cookie data discarded" if @logger
-          return
-        end
-      }
+        }
+      else
+        @logger.warn "incompatible YAML cookie data discarded" if @logger
+        return self
+      end
     end
   end
 

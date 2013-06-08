@@ -48,6 +48,18 @@ class Mechanize
       __deprecated__ :store
       @store.instance_variable_get(:@jar)
     end
+
+    # See HTTP::CookieJar#load.
+    def load_cookiestxt(io)
+      __deprecated__ :load
+      load(io, :cookiestxt)
+    end
+
+    # See HTTP::CookieJar#save.
+    def dump_cookiestxt(io)
+      __deprecated__ :save
+      save(io, :cookiestxt)
+    end
   end
 
   class CookieJar < ::HTTP::CookieJar

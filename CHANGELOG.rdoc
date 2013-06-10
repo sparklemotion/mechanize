@@ -4,6 +4,8 @@
 
 * Bug fix
   * Ensure images with no "src" attribute still return correct URLs. #317
+  * Fixes Mechanize::Parser#extract_filename where an empty string filename
+    in the response caused unhandled exception. #318
 
 === 2.7.0
 

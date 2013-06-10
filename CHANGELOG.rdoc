@@ -3,7 +3,7 @@
 === 2.7.1
 
 * Bug fix
-  * Ensure images with no "src" attribute still return correct URLs. #317
+  * Ensure images with no "src" attribute still return correct URLs. #318
 
 === 2.7.0
 

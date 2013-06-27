@@ -168,9 +168,17 @@ class Mechanize
   #     a.proxy_host = 'proxy.example'
   #     a.proxy_port = 8080
   #   end
+  #
+  # If you need segregated SSL connections give each agent a unique
+  # name.  Otherwise the connections will be shared.  This is
+  # particularly important if you are using certifcates.
+  #
+  #    agent_1 = Mechanize.new 'conn1'
+  #    agent_2 = Mechanize.new 'conn2'
+  #
 
-  def initialize
-    @agent = Mechanize::HTTP::Agent.new
+  def initialize(connection_name = 'mechanize')
+    @agent = Mechanize::HTTP::Agent.new(connection_name)
     @agent.context = self
     @log = nil
 

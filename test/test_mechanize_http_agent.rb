@@ -1584,6 +1584,11 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'invalid value for port: "nonexistent service"', e.message
   end
 
+  def test_setting_agent_name
+    mech = Mechanize.new 'user-set-name'
+    assert_equal 'user-set-name', mech.agent.http.name
+  end
+
   def test_ssl
     in_tmpdir do
       store = OpenSSL::X509::Store.new

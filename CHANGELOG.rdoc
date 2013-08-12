@@ -3,8 +3,8 @@
 === Unreleased
 
 * Bug fix
-  * API compatibility issue with Mechanize::CookieJar cookies has been
-    addressed.  https://github.com/sparklemotion/http-cookie/issues/2
+  * API compatibility issues with Mechanize::CookieJar cookies has been
+    addressed.  https://github.com/sparklemotion/http-cookie/issues/2 #326
 
 === 2.7.1
 

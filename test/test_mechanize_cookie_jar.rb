@@ -336,9 +336,21 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     in_tmpdir do
       @jar.save_as("cookies.txt", :cookiestxt)
 
+      assert_match(/\A# (?:Netscape )?HTTP Cookie File$/, File.read("cookies.txt"))
+
       jar = Mechanize::CookieJar.new
-      jar.load("cookies.txt", :cookiestxt) # HACK test the format
+      jar.load("cookies.txt", :cookiestxt)
       assert_equal(2, jar.cookies(url).length)
+    end
+
+    in_tmpdir do
+      @jar.save_as("cookies.txt", :cookiestxt, :session => true)
+
+      assert_match(/\A# (?:Netscape )?HTTP Cookie File$/, File.read("cookies.txt"))
+
+      jar = Mechanize::CookieJar.new
+      jar.load("cookies.txt", :cookiestxt)
+      assert_equal(3, jar.cookies(url).length)
     end
 
     assert_equal(3, @jar.cookies(url).length)

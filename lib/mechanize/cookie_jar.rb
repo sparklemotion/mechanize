@@ -87,7 +87,7 @@ class Mechanize
         raise ArgumentError, 'wrong number of arguments (%d for 1-3)' % (1 + options.size)
       end
 
-      return super if opthash[:format] != :yaml
+      return super(output, opthash) if opthash[:format] != :yaml
 
       session = opthash[:session]
       nstore = HashStore.new
@@ -145,7 +145,7 @@ class Mechanize
         raise ArgumentError, 'wrong number of arguments (%d for 1-3)' % (1 + options.size)
       end
 
-      return super if opthash[:format] != :yaml
+      return super(input, opthash) if opthash[:format] != :yaml
 
       begin
         data = YAML.load(input)

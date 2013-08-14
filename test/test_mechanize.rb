@@ -1293,6 +1293,14 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert @mech.visited?('http://localhost/response_code?code=302')
   end
 
+  def test_no_frames_exists
+    page = @mech.get("http://localhost/empty_form.html");
+    assert_nil page.frame_with(:name => 'noframe')
+    assert_raises Mechanize::ElementNotFoundError do
+      page.frame_with!(:name => 'noframe')
+    end
+  end
+
   def assert_header(page, header)
     headers = {}
 

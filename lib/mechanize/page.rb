@@ -224,6 +224,12 @@ class Mechanize::Page < Mechanize::File
   #   end
 
   ##
+  # :mehtod: form_with!(criteria)
+  #
+  # Same as +form_with+ but raises an ElementNotFoundError if no button matches
+  # +criteria+
+
+  ##
   # :method: forms_with
   #
   # :call-seq: forms_with(criteria)
@@ -244,6 +250,12 @@ class Mechanize::Page < Mechanize::File
   # Find a single link matching +criteria+.
   # Example:
   #   page.link_with(:href => /foo/).click
+
+  ##
+  # :mehtod: link_with!(criteria)
+  #
+  # Same as +link_with+ but raises an ElementNotFoundError if no button matches
+  # +criteria+
 
   ##
   # :method: links_with
@@ -269,6 +281,12 @@ class Mechanize::Page < Mechanize::File
   #   page.base_with(:href => /foo/).click
 
   ##
+  # :mehtod: base_with!(criteria)
+  #
+  # Same as +base_with+ but raises an ElementNotFoundError if no button matches
+  # +criteria+
+
+  ##
   # :method: bases_with
   #
   # :call-seq: bases_with(criteria)
@@ -289,6 +307,12 @@ class Mechanize::Page < Mechanize::File
   # Find a single frame tag matching +criteria+.
   # Example:
   #   page.frame_with(:src => /foo/).click
+
+  ##
+  # :mehtod: frame_with!(criteria)
+  #
+  # Same as +frame_with+ but raises an ElementNotFoundError if no button matches
+  # +criteria+
 
   ##
   # :method: frames_with
@@ -313,6 +337,12 @@ class Mechanize::Page < Mechanize::File
   #   page.iframe_with(:src => /foo/).click
 
   ##
+  # :mehtod: iframe_with!(criteria)
+  #
+  # Same as +iframe_with+ but raises an ElementNotFoundError if no button
+  # matches +criteria+
+
+  ##
   # :method: iframes_with
   #
   # :call-seq: iframes_with(criteria)
@@ -333,6 +363,12 @@ class Mechanize::Page < Mechanize::File
   # Find a single image matching +criteria+.
   # Example:
   #   page.image_with(:alt => /main/).fetch.save
+
+  ##
+  # :mehtod: image_with!(criteria)
+  #
+  # Same as +image_with+ but raises an ElementNotFoundError if no button matches
+  # +criteria+
 
   ##
   # :method: images_with

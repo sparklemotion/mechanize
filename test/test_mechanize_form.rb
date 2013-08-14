@@ -484,6 +484,13 @@ class TestMechanizeForm < Mechanize::TestCase
     end.submit
   end
 
+  def test_post_with_bang
+    page = @mech.get("http://localhost/form_test.html")
+    page.form_with!(:name => 'post_form1') do |form|
+      form.first_name = 10
+    end.submit
+  end
+
   def test_post
     page = @mech.get("http://localhost/form_test.html")
     post_form = page.forms.find { |f| f.name == "post_form1" }
@@ -891,6 +898,22 @@ class TestMechanizeForm < Mechanize::TestCase
     assert(!form.has_field?('intarweb'))
     assert form.add_field!('intarweb')
     assert(form.has_field?('intarweb'))
+  end
+
+  def test_fill_unexisting_form
+    page = @mech.get("http://localhost/empty_form.html")
+    assert_raises(NoMethodError) {
+      page.form_with(:name => 'no form') { |f| f.foo = 'bar' }
+    }
+    begin
+      page.form_with!(:name => 'no form') { |f| f.foo = 'bar' }
+    rescue => e
+      assert_instance_of Mechanize::ElementNotFoundError, e
+      assert_kind_of Mechanize::Page, e.source
+      assert_equal :form, e.element
+      assert_kind_of Hash, e.conditions
+      assert_equal 'no form', e.conditions[:name]
+    end
   end
 
   def test_field_error

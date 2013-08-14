@@ -1293,6 +1293,7 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
 
 end
 
+require 'mechanize/element_not_found_error'
 require 'mechanize/response_read_error'
 require 'mechanize/chunked_termination_error'
 require 'mechanize/content_type_error'

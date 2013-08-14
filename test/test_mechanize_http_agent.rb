@@ -33,6 +33,11 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     realm
   end
 
+  def test_agent_is_named
+    assert_equal 'mechanize', Mechanize::HTTP::Agent.new.http.name
+    assert_equal 'unique', Mechanize::HTTP::Agent.new('unique').http.name
+  end
+
   def test_auto_io
     Tempfile.open 'input' do |input_io|
       input_io.binmode

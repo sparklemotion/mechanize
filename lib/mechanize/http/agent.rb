@@ -127,8 +127,7 @@ class Mechanize::HTTP::Agent
 
   # The connection_name can be used to segregate SSL connections.
   # Agents with different names will not share the same persistent connection.
-
-  def initialize(connection_name)
+  def initialize(connection_name = 'mechanize')
     @allowed_error_codes      = []
     @conditional_requests     = true
     @context                  = nil

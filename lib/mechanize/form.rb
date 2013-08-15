@@ -370,6 +370,11 @@ class Mechanize::Form
   #   form.field_with(:id => "exact_field_id").value = 'hello'
 
   ##
+  # :method: field_with!(criteria)
+  #
+  # Same as +field_with+ but raises an error if no field matches +criteria+
+
+  ##
   # :method: fields_with(criteria)
   #
   # Find all fields that match +criteria+
@@ -386,6 +391,11 @@ class Mechanize::Form
   # Find one button that matches +criteria+
   # Example:
   #   form.button_with(:value => /submit/).value = 'hello'
+
+  ##
+  # :method: button_with!(criteria)
+  #
+  # Same as +button_with+ but raises an error if no button matches +criteria+
 
   ##
   # :method: buttons_with(criteria)
@@ -406,6 +416,11 @@ class Mechanize::Form
   #   form.file_upload_with(:file_name => /picture/).value = 'foo'
 
   ##
+  # :mehtod: file_upload_with!(criteria)
+  #
+  # Same as +file_upload_with+ but raises an error if no button matches +criteria+
+
+  ##
   # :method: file_uploads_with(criteria)
   #
   # Find all file upload fields that match +criteria+
@@ -424,6 +439,11 @@ class Mechanize::Form
   #   form.radiobutton_with(:name => /woo/).check
 
   ##
+  # :mehtod: radiobutton_with!(criteria)
+  #
+  # Same as +radiobutton_with+ but raises an error if no button matches +criteria+
+
+  ##
   # :method: radiobuttons_with(criteria)
   #
   # Find all radio buttons that match +criteria+
@@ -440,6 +460,11 @@ class Mechanize::Form
   # Find one checkbox that matches +criteria+
   # Example:
   #   form.checkbox_with(:name => /woo/).check
+
+  ##
+  # :mehtod: checkbox_with!(criteria)
+  #
+  # Same as +checkbox_with+ but raises an error if no button matches +criteria+
 
   ##
   # :method: checkboxes_with(criteria)

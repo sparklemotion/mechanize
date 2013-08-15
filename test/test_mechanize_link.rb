@@ -12,6 +12,16 @@ class TestMechanizeLink < Mechanize::TestCase
       @mech.history.last.uri.to_s)
   end
 
+  def test_click_bang
+    page = @mech.get("http://localhost/frame_test.html")
+    link = page.link_with!(:text => "Form Test")
+
+    assert_equal('Form Test', link.text)
+    page = link.click
+    assert_equal("http://localhost/form_test.html",
+      @mech.history.last.uri.to_s)
+  end
+
   def test_click_base
     page = @mech.get("http://google.com/tc_base_link.html")
     page = page.links.first.click
@@ -32,6 +42,22 @@ class TestMechanizeLink < Mechanize::TestCase
     link.click
 
     # HACK no assertion
+  end
+
+  def test_click_unexiting_link
+    page = @mech.get("http://google.com/tc_links.html")
+    assert_raises NoMethodError do
+      page.link_with(:text => 'no link').click
+    end
+    begin
+      page.link_with!(:text => 'no link').click
+    rescue => e
+      assert_instance_of Mechanize::ElementNotFoundError, e
+      assert_kind_of Mechanize::Page, e.source
+      assert_equal :link, e.element
+      assert_kind_of Hash, e.conditions
+      assert_equal 'no link', e.conditions[:text]
+    end
   end
 
   def test_click_empty_href

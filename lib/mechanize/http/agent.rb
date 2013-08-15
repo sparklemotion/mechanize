@@ -125,7 +125,9 @@ class Mechanize::HTTP::Agent
   # Creates a new Mechanize HTTP user agent.  The user agent is an
   # implementation detail of mechanize and its API may change at any time.
 
-  def initialize
+  # The connection_name can be used to segregate SSL connections.
+  # Agents with different names will not share the same persistent connection.
+  def initialize(connection_name = 'mechanize')
     @allowed_error_codes      = []
     @conditional_requests     = true
     @context                  = nil
@@ -174,7 +176,7 @@ class Mechanize::HTTP::Agent
     @scheme_handlers['relative']  = @scheme_handlers['http']
     @scheme_handlers['file']      = @scheme_handlers['http']
 
-    @http = Net::HTTP::Persistent.new 'mechanize'
+    @http = Net::HTTP::Persistent.new connection_name
     @http.idle_timeout = 5
     @http.keep_alive   = 300
   end

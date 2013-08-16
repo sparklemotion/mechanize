@@ -28,6 +28,13 @@ module Mechanize::ElementMatcher
         f
       end
 
+      def #{singular}_with! criteria = {}
+        f = #{singular}_with(criteria)
+        raise Mechanize::ElementNotFoundError.new(self, :#{singular}, criteria) if f.nil?
+        yield f if block_given?
+        f
+      end
+
       def select_#{plural} selector
         if selector.nil? then
           #{plural}

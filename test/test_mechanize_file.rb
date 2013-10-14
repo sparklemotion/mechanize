@@ -14,20 +14,23 @@ class TestMechanizeFile < Mechanize::TestCase
 
     Dir.mktmpdir do |dir|
       Dir.chdir dir do
-        page.save 'test.html'
+        filename = page.save 'test.html'
 
         assert File.exist? 'test.html'
         assert_equal '0123456789', File.read('test.html')
+        assert_equal "test.html", filename
 
-        page.save 'test.html'
+        filename = page.save 'test.html'
 
         assert File.exist? 'test.html.1'
         assert_equal '0123456789', File.read('test.html.1')
+        assert_equal "test.html.1", filename
 
-        page.save 'test.html'
+        filename = page.save 'test.html'
 
         assert File.exist? 'test.html.2'
         assert_equal '0123456789', File.read('test.html.2')
+        assert_equal "test.html.2", filename
       end
     end
   end
@@ -38,17 +41,20 @@ class TestMechanizeFile < Mechanize::TestCase
 
     Dir.mktmpdir do |dir|
       Dir.chdir dir do
-        page.save
+        filename = page.save
 
         assert File.exist? 'test.html'
+        assert_equal "test.html", filename
 
-        page.save
+        filename = page.save
 
         assert File.exist? 'test.html.1'
+        assert_equal "test.html.1", filename
 
-        page.save
+        filename = page.save
 
         assert File.exist? 'test.html.2'
+        assert_equal "test.html.2", filename
       end
     end
   end
@@ -59,11 +65,13 @@ class TestMechanizeFile < Mechanize::TestCase
 
     Dir.mktmpdir do |dir|
       Dir.chdir dir do
-        page.save
+        filename = page.save
         assert File.exist? 'test.html'
+        assert_equal "test.html", filename
 
-        page.save
+        filename = page.save
         assert File.exist? 'test.html.1'
+        assert_equal "test.html.1", filename
       end
     end
   end
@@ -81,14 +89,16 @@ class TestMechanizeFile < Mechanize::TestCase
 
     Dir.mktmpdir do |dir|
       Dir.chdir dir do
-        page.save 'test.html'
+        filename = page.save 'test.html'
 
         assert File.exist? 'test.html'
+        assert_equal "test.html", filename
 
-        page.save! 'test.html'
+        filename = page.save! 'test.html'
 
         assert File.exist? 'test.html'
         refute File.exist? 'test.html.1'
+        assert_equal "test.html", filename
       end
     end
   end

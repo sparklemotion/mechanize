@@ -71,6 +71,7 @@ class Mechanize::File
   #   file.save! 'index.html' # overwrite original file
 
   def save! filename = nil
+    filename ||= @filename
     dirname = File.dirname filename
     FileUtils.mkdir_p dirname
 

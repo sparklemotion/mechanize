@@ -31,6 +31,19 @@ class TestMechanizeDownload < Mechanize::TestCase
     end
   end
 
+  def test_save_bang
+    uri = URI.parse 'http://example/foo.html'
+    body_io = StringIO.new '0123456789'
+
+    download = @parser.new uri, nil, body_io
+
+    in_tmpdir do
+      download.save!
+
+      assert File.exist? 'foo.html'
+    end
+  end
+
   def test_save_tempfile
     uri = URI.parse 'http://example/foo.html'
     Tempfile.open @NAME do |body_io|

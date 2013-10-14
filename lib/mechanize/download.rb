@@ -65,6 +65,7 @@ class Mechanize::Download
   # same name.
 
   def save! filename = nil
+    filename ||= @filename
     dirname = File.dirname filename
     FileUtils.mkdir_p dirname
 

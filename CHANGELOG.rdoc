@@ -5,6 +5,10 @@
 * New Features
   * Allow net-http-persistent instance to be named. #324, John Weir.
 
+Bug fix
+  * Ensure Download#save! defaults back to original filename if
+    non is provided (#300)
+
 === 2.7.2
 
 * Bug fix

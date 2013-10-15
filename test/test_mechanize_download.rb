@@ -25,9 +25,10 @@ class TestMechanizeDownload < Mechanize::TestCase
     download = @parser.new uri, nil, body_io
 
     in_tmpdir do
-      download.save
+      filename = download.save
 
       assert File.exist? 'foo.html'
+      assert_equal "foo.html", filename
     end
   end
 
@@ -38,9 +39,10 @@ class TestMechanizeDownload < Mechanize::TestCase
     download = @parser.new uri, nil, body_io
 
     in_tmpdir do
-      download.save!
+      filename = download.save!
 
       assert File.exist? 'foo.html'
+      assert_equal "foo.html", filename
     end
   end
 
@@ -56,9 +58,20 @@ class TestMechanizeDownload < Mechanize::TestCase
       download = @parser.new uri, nil, body_io
 
       in_tmpdir do
-        download.save
+        filename = download.save
 
         assert File.exist? 'foo.html'
+        assert_equal "foo.html", filename
+
+        filename = download.save
+
+        assert File.exist? 'foo.html.1'
+        assert_equal "foo.html.1", filename
+
+        filename = download.save
+
+        assert File.exist? 'foo.html.2'
+        assert_equal "foo.html.2", filename
       end
     end
   end

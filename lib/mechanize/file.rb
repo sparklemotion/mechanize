@@ -50,10 +50,15 @@ class Mechanize::File
 
   ##
   # Use this method to save the content of this object to +filename+.
+  # returns the filename
   #
   #   file.save 'index.html'
-  #   file.save 'index.html' # saves index.html.1
-  #   file.save 'index.html'
+  #   file.save 'index.html' # saves to index.html.1
+  #
+  #   uri = URI 'http://localhost/test.html'
+  #   file = Mechanize::File.new uri, nil, ''
+  #   filename = file.save  # saves to test.html
+  #   puts filename         # test.html
 
   def save filename = nil
     filename = find_free_name filename
@@ -66,9 +71,11 @@ class Mechanize::File
   # Use this method to save the content of this object to +filename+.
   # This method will overwrite any existing filename that exists with the
   # same name.
+  # returns the filename
   #
   #   file.save 'index.html'
   #   file.save! 'index.html' # overwrite original file
+  #   filename = file.save! 'index.html' # overwrite original file with filename 'index.html'
 
   def save! filename = nil
     filename ||= @filename
@@ -78,6 +85,8 @@ class Mechanize::File
     open filename, 'wb' do |f|
       f.write body
     end
+
+    filename
   end
 
 end

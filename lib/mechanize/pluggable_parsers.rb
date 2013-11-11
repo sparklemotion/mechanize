@@ -99,7 +99,7 @@ class Mechanize::PluggableParser
              @parsers[mime_type.simplified] ||
              @parsers[mime_type.media_type] ||
              default
-  rescue MIME::InvalidContentType
+  rescue MIME::Type::InvalidContentType
     default
   end
 

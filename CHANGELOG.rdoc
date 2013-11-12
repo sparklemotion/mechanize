@@ -5,6 +5,7 @@
 * New Features
   * Allow net-http-persistent instance to be named. #324, John Weir.
   * #save and #save! return filename #340
+  * Updated mime-types requirement to 2.x versions.  #348 by Jeff Nyman.
 
 Bug fix
   * Ensure Download#save! defaults back to original filename if

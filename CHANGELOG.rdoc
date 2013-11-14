@@ -1,6 +1,6 @@
 = Mechanize CHANGELOG
 
-=== Unreleased
+=== 2.7.3
 
 * New Features
   * Allow net-http-persistent instance to be named. #324, John Weir.

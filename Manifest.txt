@@ -21,6 +21,7 @@ lib/mechanize/cookie_jar.rb
 lib/mechanize/directory_saver.rb
 lib/mechanize/download.rb
 lib/mechanize/element_matcher.rb
+lib/mechanize/element_not_found_error.rb
 lib/mechanize/file.rb
 lib/mechanize/file_connection.rb
 lib/mechanize/file_request.rb
@@ -159,6 +160,7 @@ test/test_mechanize_cookie.rb
 test/test_mechanize_cookie_jar.rb
 test/test_mechanize_directory_saver.rb
 test/test_mechanize_download.rb
+test/test_mechanize_element_not_found_error.rb
 test/test_mechanize_file.rb
 test/test_mechanize_file_connection.rb
 test/test_mechanize_file_request.rb

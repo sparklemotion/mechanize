@@ -942,6 +942,25 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert page.body.length > File.read(__FILE__).length
   end
 
+  def test_post_file_upload
+    name = File.basename(__FILE__)
+    file_upload = Mechanize::Form::FileUpload.new({'name' => 'userfile1'}, name)
+    file_upload.file_data = File.read(__FILE__)
+    file_upload.mime_type = 'application/zip'
+
+    page = @mech.post('http://localhost/file_upload', {
+      :name       => 'Some file',
+      :userfile1  => file_upload
+    })
+
+    assert_match(
+      "Content-Disposition: form-data; name=\"userfile1\"; filename=\"#{name}\"",
+      page.body
+    )
+    assert_match("Content-Type: application/zip", page.body)
+    assert page.body.length > File.read(__FILE__).length
+  end
+
   def test_post_redirect
     page = @mech.post('http://localhost/redirect')
 

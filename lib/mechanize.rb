@@ -495,6 +495,9 @@ class Mechanize
         ul = Form::FileUpload.new({'name' => k.to_s},::File.basename(v.path))
         ul.file_data = v.read
         form.file_uploads << ul
+      elsif v.is_a?(Form::FileUpload)
+        form.enctype = 'multipart/form-data'
+        form.file_uploads << v
       else
         form.fields << Form::Field.new({'name' => k.to_s},v)
       end

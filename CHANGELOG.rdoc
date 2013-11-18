@@ -1,5 +1,11 @@
 = Mechanize CHANGELOG
 
+=== Unreleased
+
+* New Features
+  * Allow passing a `Form::FileUpload` instance to `#post`. #350 by Sam
+    Rawlins.
+
 === 2.7.3
 
 * New Features

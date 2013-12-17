@@ -110,5 +110,12 @@ class TestMechanizeLink < Mechanize::TestCase
     assert_equal 'http://foo.bar/%20baz', link.uri.to_s
   end
 
+  def test_resolving_full_uri
+    page = @mech.get("http://localhost/frame_test.html")
+    link = page.link_with(:text => "Form Test")
+
+    assert_equal "/form_test.html", link.uri.to_s
+    assert_equal "http://localhost/form_test.html", link.resolved_uri.to_s
+  end
 end
 

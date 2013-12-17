@@ -938,6 +938,12 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
   end
 
   ##
+  # Resolve the full path of a link / uri
+  def resolve link
+    @agent.resolve link
+  end
+
+  ##
   # A hash of custom request headers that will be sent on every request
 
   def request_headers

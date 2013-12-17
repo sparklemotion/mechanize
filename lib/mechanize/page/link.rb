@@ -99,5 +99,10 @@ class Mechanize::Page::Link
              end
   end
 
+  # A fully resolved URI for the #href for this link.
+  def resolved_uri
+    @mech.resolve uri
+  end
+
 end
 

@@ -1,7 +1,9 @@
 require 'rubygems'
 require "bundler/gem_tasks"
 
-task :prerelease => [:clobber, :check_manifest, :test]
+require 'rdoc/task'
+
+task :prerelease => [:clobber_rdoc, :check_manifest, :test]
 
 desc "Update SSL Certificate"
 task('ssl_cert') do |p|
@@ -13,4 +15,9 @@ task('ssl_cert') do |p|
   sh "cp server.key server.pem"
   sh "mv server.key server.csr server.crt server.pem test/data/"
   sh "rm server.key.org"
+end
+
+desc "Run tests"
+task "test" do
+  ruby "-I'lib:test' " + FileList['test/**/test*.rb'].join(' ')
 end

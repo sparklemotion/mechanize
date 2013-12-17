@@ -3,7 +3,6 @@
 *.rbc
 /.bundle
 /.config
-/Gemfile
 /Gemfile.lock
 /TAGS
 /pkg

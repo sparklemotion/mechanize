@@ -102,6 +102,7 @@ lib/mechanize/unauthorized_error.rb
 lib/mechanize/unsupported_scheme_error.rb
 lib/mechanize/util.rb
 lib/mechanize/xml_file.rb
+mechanize.gemspec
 test/data/htpasswd
 test/data/server.crt
 test/data/server.csr

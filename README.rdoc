@@ -31,8 +31,7 @@ the EXAMPLES[http://mechanize.rubyforge.org/EXAMPLES_rdoc.html] file.
 
 To run the tests for the first time:
 
-  gem install hoe rake
-  rake newb
+  bundle install
 
 This will install all the required dependencies for running the tests.  For
 subsequent test runs:

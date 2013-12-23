@@ -1,6 +1,6 @@
 = Mechanize {<img src="https://secure.travis-ci.org/sparklemotion/mechanize.png?rvm=1.9.3" />}[http://travis-ci.org/sparklemotion/mechanize]
 
-* http://mechanize.rubyforge.org
+* http://docs.seattlerb.org/mechanize
 * https://github.com/sparklemotion/mechanize
 
 == Description
@@ -17,10 +17,6 @@ a history.
 * nokogiri[http://nokogiri.rubyforge.org]
 
 == Support:
-
-The mechanize mailing list is available here:
-
-* http://rubyforge.org/mailman/listinfo/mechanize-users
 
 The bug tracker is available here:
 

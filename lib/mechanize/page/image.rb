@@ -169,6 +169,8 @@ class Mechanize::Page::Image
     end
   end
 
+  alias uri url
+
   ##
   # The width attribute of the image
 

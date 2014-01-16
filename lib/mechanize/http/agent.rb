@@ -167,7 +167,7 @@ class Mechanize::HTTP::Agent
 
     @scheme_handlers = Hash.new { |h, scheme|
       h[scheme] = lambda { |link, page|
-        raise Mechanize::UnsupportedSchemeError, scheme
+        raise Mechanize::UnsupportedSchemeError.new(scheme, link)
       }
     }
 

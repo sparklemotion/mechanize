@@ -32,7 +32,13 @@ class TestMechanizeLink < Mechanize::TestCase
     page = @mech.get("http://google.com/tc_links.html")
     link = page.link_with(:text => 'javascript link')
     assert_raises Mechanize::UnsupportedSchemeError do
-      link.click
+      begin
+        link.click
+      rescue Mechanize::UnsupportedSchemeError => error
+          assert_equal 'javascript', error.scheme
+          assert_equal "javascript:new_page('1')", error.link.to_s
+        raise
+      end
     end
 
     @mech.scheme_handlers['javascript'] = lambda { |my_link, my_page|

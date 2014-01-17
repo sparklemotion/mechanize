@@ -140,8 +140,15 @@ class Mechanize
     'Android' => 'Mozilla/5.0 (Linux; Android 4.4.2; Nexus 7 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Safari/537.36',
   }
 
-  AGENT_ALIASES['Mac FireFox'] = AGENT_ALIASES['Mac Firefox']
-  AGENT_ALIASES['Linux FireFox'] = AGENT_ALIASES['Linux Firefox']
+  AGENT_ALIASES.default_proc = proc { |hash, key|
+    case key
+    when /FireFox/
+      if ua = hash[nkey = key.sub(/FireFox/, 'Firefox')]
+        warn "Mechanize#user_agent_alias: #{key.inspect} should be spelled as #{nkey.inspect}"
+        ua
+      end
+    end
+  }
 
   def self.inherited(child) # :nodoc:
     child.html_parser = html_parser

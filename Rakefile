@@ -29,7 +29,7 @@ hoe = Hoe.spec 'mechanize' do
 
   self.extra_dev_deps << ['minitest', '~> 5.0']
 
-  self.spec_extras[:required_ruby_version] = '>= 1.8.7'
+  self.spec_extras[:required_ruby_version] = '>= 1.9.2'
 end
 
 task :prerelease => [:clobber, :check_manifest, :test]

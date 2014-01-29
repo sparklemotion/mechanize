@@ -42,7 +42,7 @@ class Mechanize::Page < Mechanize::File
     if body
       # Force the encoding to be 8BIT so we can perform regular expressions.
       # We'll set it to the detected encoding later
-      body.force_encoding 'ASCII-8BIT' if body.respond_to? :force_encoding
+      body.force_encoding(Encoding::ASCII_8BIT)
 
       @encodings.concat self.class.meta_charset body
 

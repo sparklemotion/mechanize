@@ -69,9 +69,7 @@ class Mechanize::FileResponse
     }
     body << %w[</body></html>]
 
-    body = body.join "\n"
-    body.force_encoding Encoding::BINARY if body.respond_to? :force_encoding
-    body
+    body.join("\n").force_encoding(Encoding::BINARY)
   end
 
   def directory?

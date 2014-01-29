@@ -348,8 +348,7 @@ class Mechanize::Form
       params.concat @file_uploads.map { |f| file_to_multipart(f) }
 
       params.map do |part|
-        part.force_encoding('ASCII-8BIT') if part.respond_to? :force_encoding
-        "--#{boundary}\r\n#{part}"
+        "--#{boundary}\r\n#{part.force_encoding(Encoding::ASCII_8BIT)}"
       end.join('') +
         "--#{boundary}--\r\n"
     else

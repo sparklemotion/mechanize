@@ -18,10 +18,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     @headers = if RUBY_VERSION >= '2.0.0' then
                  %w[accept accept-encoding user-agent]
-               elsif RUBY_VERSION >= '1.9.0' then
-                 %w[accept user-agent]
                else
-                 %w[accept]
+                 %w[accept user-agent]
                end
   end
 
@@ -1601,7 +1599,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
       @agent.cert_store = store
       @agent.certificate = ssl_certificate
       @agent.private_key = ssl_private_key
-      @agent.ssl_version = 'SSLv3' if RUBY_VERSION > '1.9'
+      @agent.ssl_version = 'SSLv3'
       @agent.verify_callback = proc { |ok, context| }
 
       http = @agent.http
@@ -1610,8 +1608,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
       assert_equal store,                     http.cert_store
       assert_equal ssl_certificate,           http.certificate
       assert_equal ssl_private_key,           http.private_key
-      assert_equal 'SSLv3',                   http.ssl_version if
-        RUBY_VERSION > '1.9'
+      assert_equal 'SSLv3',                   http.ssl_version
       assert_equal OpenSSL::SSL::VERIFY_PEER, http.verify_mode
       assert http.verify_callback
     end

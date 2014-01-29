@@ -2,25 +2,6 @@ require 'cgi'
 require 'nkf'
 
 class Mechanize::Util
-  CODE_DIC = {
-    NKF::JIS => "ISO-2022-JP",
-    NKF::EUC => "EUC-JP",
-    NKF::SJIS => "SHIFT_JIS",
-    NKF::UTF8 => "UTF-8",
-    NKF::UTF16 => "UTF-16",
-    NKF::UTF32 => "UTF-32",
-  }
-
-  # true if RUBY_VERSION is 1.9.0 or later
-  NEW_RUBY_ENCODING = RUBY_VERSION >= '1.9.0'
-
-  # contains encoding error classes to raise
-  ENCODING_ERRORS = if NEW_RUBY_ENCODING
-                      [EncodingError]
-                    else
-                      [Iconv::InvalidEncoding, Iconv::IllegalSequence]
-                    end
-
   # default mime type data for Page::Image#mime_type.
   # You can use another Apache-compatible mimetab.
   #   mimetab = WEBrick::HTTPUtils.load_mime_types('/etc/mime.types')
@@ -40,8 +21,8 @@ class Mechanize::Util
     return s unless Mechanize.html_parser == Nokogiri::HTML
 
     begin
-      encode_to(code, s)
-    rescue *ENCODING_ERRORS => ex
+      s.encode(code)
+    rescue EncodingError => ex
       log.debug("from_native_charset: #{ex.class}: form encoding: #{code.inspect} string: #{s}") if log
       if ignore_encoding_error
         s
@@ -50,16 +31,6 @@ class Mechanize::Util
       end
     end
   end
-
-  # inner convert method of Util.from_native_charset
-  def self.encode_to(encoding, str)
-    if NEW_RUBY_ENCODING
-      str.encode(encoding)
-    else
-      Iconv.conv(encoding.to_s, "UTF-8", str)
-    end
-  end
-  private_class_method :encode_to
 
   def self.html_unescape(s)
     return s unless s
@@ -76,14 +47,11 @@ class Mechanize::Util
   end
 
   def self.detect_charset(src)
-    case enc = src && NKF.guess(src)
-    when Integer
-      # Ruby <= 1.8
-      CODE_DIC[enc]
+    if src
+      NKF.guess(src).name.upcase
     else
-      # Ruby >= 1.9
-      enc && enc.to_s.upcase
-    end || "ISO-8859-1"
+      Encoding::ISO8859_1.name
+    end
   end
 
   def self.uri_escape str, unsafe = nil

@@ -13,12 +13,6 @@ class TestMechanize < Mechanize::TestCase
     @res = Net::HTTPOK.allocate
     @res.instance_variable_set :@code, 200
     @res.instance_variable_set :@header, {}
-
-    @headers = if RUBY_VERSION > '1.9' then
-                 %w[accept user-agent]
-               else
-                 %w[accept]
-               end
   end
 
   def test_back
@@ -608,15 +602,6 @@ but not <a href="/" rel="me nofollow">this</a>!
     page = @mech.get('http://localhost/http_refresh?refresh_time=0')
     assert_equal('http://localhost/http_refresh?refresh_time=0', page.uri.to_s)
   end
-
-  def test_get_kcode
-    $KCODE = 'u'
-    page = @mech.get("http://localhost/?a=#{[0xd6].pack('U')}")
-
-    assert_equal('http://localhost/?a=%D6', page.uri.to_s)
-
-    $KCODE = 'NONE'
-  end unless RUBY_VERSION >= '1.9.0'
 
   def test_get_query
     page = @mech.get('http://localhost/', { :q => 'hello' })

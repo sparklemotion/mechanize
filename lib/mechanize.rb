@@ -1,6 +1,5 @@
 require 'fileutils'
 require 'forwardable'
-require 'iconv' if RUBY_VERSION < '1.9.2'
 require 'mime/types'
 require 'mutex_m'
 require 'net/http/digest_auth'
@@ -1160,19 +1159,19 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
   end
 
   ##
-  # SSL version to use.  Ruby 1.9 and newer only.
+  # SSL version to use.
 
   def ssl_version
     @agent.ssl_version
-  end if RUBY_VERSION > '1.9'
+  end
 
   ##
   # Sets the SSL version to use to +version+ without client/server
-  # negotiation.  Ruby 1.9 and newer only.
+  # negotiation.
 
   def ssl_version= ssl_version
     @agent.ssl_version = ssl_version
-  end if RUBY_VERSION > '1.9'
+  end
 
   ##
   # A callback for additional certificate verification.  See
@@ -1338,7 +1337,6 @@ require 'mechanize/http/content_disposition_parser'
 require 'mechanize/http/www_authenticate_parser'
 require 'mechanize/image'
 require 'mechanize/page'
-require 'mechanize/monkey_patch'
 require 'mechanize/pluggable_parsers'
 require 'mechanize/redirect_limit_reached_error'
 require 'mechanize/redirect_not_get_or_head_error'

@@ -53,7 +53,6 @@ lib/mechanize/http/auth_store.rb
 lib/mechanize/http/content_disposition_parser.rb
 lib/mechanize/http/www_authenticate_parser.rb
 lib/mechanize/image.rb
-lib/mechanize/monkey_patch.rb
 lib/mechanize/page.rb
 lib/mechanize/page/base.rb
 lib/mechanize/page/frame.rb

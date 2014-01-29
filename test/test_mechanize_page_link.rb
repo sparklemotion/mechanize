@@ -48,8 +48,7 @@ class TestMechanizePageLink < Mechanize::TestCase
   end
 
   def util_page body = @body, res = @res
-    body.force_encoding Encoding::BINARY if body.respond_to? :force_encoding
-    Mechanize::Page.new @uri, res, body, 200, @mech
+    Mechanize::Page.new @uri, res, body && body.force_encoding(Encoding::BINARY), 200, @mech
   end
 
   def test_override_content_type

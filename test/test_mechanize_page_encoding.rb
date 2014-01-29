@@ -16,8 +16,7 @@ class TestMechanizePageEncoding < Mechanize::TestCase
   end
 
   def util_page body = @body, headers = @response_headers
-    body.force_encoding Encoding::BINARY if body.respond_to? :force_encoding
-    Mechanize::Page.new @uri, headers, body, 200, @mech
+    Mechanize::Page.new @uri, headers, body && body.force_encoding(Encoding::BINARY), 200, @mech
   end
 
   def test_page_charset

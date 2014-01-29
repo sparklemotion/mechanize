@@ -1286,7 +1286,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     body = io.read
 
     assert_equal 'part', body
-    assert_equal Encoding::BINARY, body.encoding if body.respond_to? :encoding
+    assert_equal Encoding::BINARY, body.encoding
   end
 
   def test_response_read_chunked_no_trailer
@@ -1366,17 +1366,15 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
       io = @agent.response_read res, req, uri
 
-      expected = "π\n"
-      expected.force_encoding Encoding::BINARY if expected.respond_to? :encoding
+      expected = "π\n".force_encoding(Encoding::BINARY)
 
       # Ruby 1.8.7 doesn't let us set the write mode of the tempfile to binary,
       # so we should expect an inserted carriage return on some platforms
-      expected_with_carriage_return = "π\r\n"
-      expected_with_carriage_return.force_encoding Encoding::BINARY if expected_with_carriage_return.respond_to? :encoding
+      expected_with_carriage_return = "π\r\n".force_encoding(Encoding::BINARY)
 
       body = io.read
       assert_match(/^(#{expected}|#{expected_with_carriage_return})$/m, body)
-      assert_equal Encoding::BINARY, body.encoding if body.respond_to? :encoding
+      assert_equal Encoding::BINARY, body.encoding
     end
   end
 

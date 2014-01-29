@@ -92,7 +92,9 @@ class Mechanize::Page < Mechanize::File
   end
 
   def encoding
-    parser.respond_to?(:encoding) ? parser.encoding : nil
+    parser.encoding
+  rescue NoMethodError
+    nil
   end
 
   # Return whether parser result has errors related to encoding or not.

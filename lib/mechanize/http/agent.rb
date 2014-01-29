@@ -883,10 +883,9 @@ class Mechanize::HTTP::Agent
     if use_tempfile? content_length then
       body_io = make_tempfile 'mechanize-raw'
     else
-      body_io = StringIO.new
+      body_io = StringIO.new.set_encoding(Encoding::BINARY)
     end
 
-    body_io.set_encoding Encoding::BINARY if body_io.respond_to? :set_encoding
     total = 0
 
     begin
@@ -1131,9 +1130,7 @@ class Mechanize::HTTP::Agent
   # processing.
 
   def auto_io name, read_size, input_io
-    out_io = StringIO.new
-
-    out_io.set_encoding Encoding::BINARY if out_io.respond_to? :set_encoding
+    out_io = StringIO.new.set_encoding(Encoding::BINARY)
 
     until input_io.eof? do
       if StringIO === out_io and use_tempfile? out_io.size then
@@ -1206,7 +1203,7 @@ class Mechanize::HTTP::Agent
   def make_tempfile name
     io = Tempfile.new name
     io.unlink
-    io.binmode if io.respond_to? :binmode
+    io.binmode
     io
   end
 

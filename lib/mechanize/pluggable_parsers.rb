@@ -2,6 +2,7 @@ require 'mechanize/file'
 require 'mechanize/file_saver'
 require 'mechanize/page'
 require 'mechanize/xml_file'
+require 'mime/types'
 
 ##
 # Mechanize allows different parsers for different content types.  Mechanize
@@ -68,6 +69,15 @@ class Mechanize::PluggableParser
     :xml   => ['text/xml', 'application/xml'],
   }
 
+  InvalidContentTypeError =
+    if defined?(MIME::Types::InvalidContentType)
+      # For mime-types >=2.1
+      MIME::Types::InvalidContentType
+    else
+      # For mime-types <2.1
+      MIME::InvalidContentType
+    end
+
   attr_accessor :default
 
   def initialize
@@ -99,7 +109,7 @@ class Mechanize::PluggableParser
              @parsers[mime_type.simplified] ||
              @parsers[mime_type.media_type] ||
              default
-  rescue MIME::Type::InvalidContentType
+  rescue InvalidContentTypeError
     default
   end
 

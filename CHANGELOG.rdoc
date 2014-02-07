@@ -5,6 +5,7 @@
 * New Features
   * Allow passing a `Form::FileUpload` instance to `#post`. #350 by Sam
     Rawlins.
+  * Capture link when scheme is unsupported. #362 by Jon Rowe.
 
 === 2.7.3
 

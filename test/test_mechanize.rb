@@ -684,7 +684,7 @@ but not <a href="/" rel="me nofollow">this</a>!
         @mech.get('ftp://server.com/foo.html')
       rescue Mechanize::UnsupportedSchemeError => error
         assert_equal 'ftp', error.scheme
-        assert_equal 'ftp://server.com/foo.html', error.link.to_s
+        assert_equal 'ftp://server.com/foo.html', error.uri.to_s
         raise
       end
     end

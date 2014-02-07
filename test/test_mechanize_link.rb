@@ -36,7 +36,7 @@ class TestMechanizeLink < Mechanize::TestCase
         link.click
       rescue Mechanize::UnsupportedSchemeError => error
           assert_equal 'javascript', error.scheme
-          assert_equal "javascript:new_page('1')", error.link.to_s
+          assert_equal "javascript:new_page('1')", error.uri.to_s
         raise
       end
     end

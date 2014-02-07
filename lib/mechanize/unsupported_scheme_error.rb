@@ -1,8 +1,8 @@
 class Mechanize::UnsupportedSchemeError < Mechanize::Error
-  attr_accessor :scheme, :link
+  attr_accessor :scheme, :uri
 
-  def initialize(scheme, link)
+  def initialize(scheme, uri)
     @scheme = scheme
-    @link   = link
+    @uri    = uri
   end
 end

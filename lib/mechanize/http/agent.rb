@@ -812,7 +812,7 @@ class Mechanize::HTTP::Agent
   ensure
     begin
       if Tempfile === body_io and
-         (StringIO === out_io or out_io.path != body_io.path) then
+         (StringIO === out_io or (out_io and out_io.path != body_io.path)) then
         body_io.close!
       end
     rescue IOError

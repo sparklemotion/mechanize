@@ -6,6 +6,7 @@
   * Allow passing a `Form::FileUpload` instance to `#post`. #350 by Sam
     Rawlins.
   * Capture link when scheme is unsupported. #362 by Jon Rowe.
+  * Support for mime-types 1.x is restored while keeping compatible with mime-types 2.x.
 
 === 2.7.3
 

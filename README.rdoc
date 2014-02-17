@@ -57,7 +57,7 @@ Copyright (c) 2011-2013:
 
 * {Eric Hodel}[http://blog.segment7.net] (drbrain@segment7.net)
 * {Akinori MUSHA}[http://blog.akinori.org] (knu@idaemons.org)
-* {Lee Jarvis}[http://aeroproof.com] (ljjarvis@gmail.com)
+* {Lee Jarvis}[http://twitter.com/lee_jarvis] (ljjarvis@gmail.com)
 
 This library comes with a shameless plug for employing me
 (Aaron[http://tenderlovemaking.com/]) programming Ruby, my favorite language!

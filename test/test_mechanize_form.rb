@@ -939,6 +939,7 @@ class TestMechanizeForm < Mechanize::TestCase
       %w[3 nobody@example],
       %w[2 TEXT],
       %w[3 2011-10],
+      %w[submit_button submitted]
     ]
 
     assert_equal expected, query

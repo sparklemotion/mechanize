@@ -14,6 +14,11 @@ end
 
 require 'minitest/autorun'
 
+begin
+  require 'minitest/pride'
+rescue LoadError
+end
+
 ##
 # A generic test case for testing mechanize.  Using a subclass of
 # Mechanize::TestCase for your tests will create an isolated mechanize

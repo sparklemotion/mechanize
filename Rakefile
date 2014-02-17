@@ -28,11 +28,17 @@ hoe = Hoe.spec 'mechanize' do
   self.extra_deps << ['domain_name',          '~> 0.5', '>= 0.5.1']
 
   self.extra_dev_deps << ['minitest', '~> 5.0']
+  self.extra_dev_deps << ['hoe',      '~> 3.7.3']
 
   self.spec_extras[:required_ruby_version] = '>= 1.9.2'
 end
 
-task :prerelease => [:clobber, :check_manifest, :test]
+desc "generate a gemspec from your Hoe.spec"
+task "gem:spec" do
+  File.open("#{hoe.name}.gemspec","w") { |f| f.write hoe.spec.to_ruby }
+end
+
+task :prerelease => [:clobber, :check_manifest, :test, "gem:spec"]
 
 desc "Update SSL Certificate"
 task('ssl_cert') do |p|
@@ -54,4 +60,3 @@ task 'travis_deps' do
            '--no-rdoc', '--no-ri')
   end
 end
-

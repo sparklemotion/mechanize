@@ -1,5 +1,4 @@
 require 'tempfile'
-require 'net/ntlm'
 require 'kconv'
 require 'webrobots'
 
@@ -185,9 +184,6 @@ class Mechanize::HTTP::Agent
   # Adds credentials +user+, +pass+ for +uri+.  If +realm+ is set the
   # credentials are used only for that realm.  If +realm+ is not set the
   # credentials become the default for any realm on that URI.
-  #
-  # +domain+ and +realm+ are exclusive as NTLM does not follow RFC 2617.  If
-  # +domain+ is given it is only used for NTLM authentication.
 
   def add_auth uri, user, password, realm = nil, domain = nil
     @auth_store.add_auth uri, user, password, realm, domain
@@ -200,8 +196,6 @@ class Mechanize::HTTP::Agent
   # Adds credentials +user+, +pass+ as the default authentication credentials.
   # If no other credentials are available  these will be returned from
   # credentials_for.
-  #
-  # If +domain+ is given it is only used for NTLM authentication.
 
   def add_default_auth user, password, domain = nil # :nodoc:
     @auth_store.add_default_auth user, password, domain
@@ -739,30 +733,6 @@ class Mechanize::HTTP::Agent
 
       existing_realms << realm
       @digest_challenges[realm] = challenge
-    elsif challenge = challenges.find { |c| c.scheme == 'NTLM' } then
-      existing_realms = @authenticate_methods[uri + '/'][:ntlm]
-
-      if existing_realms.include?(realm) and not challenge.params then
-        message = 'NTLM authentication failed'
-        raise Mechanize::UnauthorizedError.new(page, challenges, message)
-      end
-
-      existing_realms << realm
-
-      if challenge.params then
-        type_2 = Net::NTLM::Message.decode64 challenge.params
-
-        user, password, domain = @auth_store.credentials_for uri, nil
-
-        type_3 = type_2.response({ :user => user, :password => password,
-                                   :domain => domain },
-                                 { :ntlmv2 => true }).encode64
-
-        headers['Authorization'] = "NTLM #{type_3}"
-      else
-        type_1 = Net::NTLM::Message::Type1.new.encode64
-        headers['Authorization'] = "NTLM #{type_1}"
-      end
     elsif challenge = challenges.find { |c| c.scheme == 'Basic' } then
       realm = challenge.realm uri
 

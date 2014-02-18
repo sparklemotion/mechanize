@@ -85,22 +85,6 @@ class TestMechanizeHttpWwwAuthenticateParser < Mechanize::TestCase
     assert_equal expected, @parser.parse('Basic realm=foo,, Digest realm=bar')
   end
 
-  def test_parse_ntlm_init
-    expected = [
-      challenge('NTLM', nil, 'NTLM'),
-    ]
-
-    assert_equal expected, @parser.parse('NTLM')
-  end
-
-  def test_parse_ntlm_type_2_3
-    expected = [
-      challenge('NTLM', 'foo=', 'NTLM foo='),
-    ]
-
-    assert_equal expected, @parser.parse('NTLM foo=')
-  end
-
   def test_parse_realm_uppercase
     expected = [
       challenge('Basic', { 'realm' => 'foo' }, 'Basic ReAlM=foo'),

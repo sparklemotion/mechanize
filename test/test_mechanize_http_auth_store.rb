@@ -34,13 +34,6 @@ class TestMechanizeHttpAuthStore < Mechanize::TestCase
     }
 
     assert_equal expected, @store.auth_accounts
-
-    e = assert_raises ArgumentError do
-      @store.add_auth @uri, 'user3', 'pass', 'realm', 'domain'
-    end
-
-    assert_equal 'NTLM domain given with realm which NTLM does not use',
-                 e.message
   end
 
   def test_add_auth_realm

@@ -33,16 +33,9 @@ class Mechanize::HTTP::AuthStore
   # Adds credentials +user+, +pass+ for the server at +uri+.  If +realm+ is
   # set the credentials are used only for that realm.  If +realm+ is not set
   # the credentials become the default for any realm on that URI.
-  #
-  # +domain+ and +realm+ are exclusive as NTLM does not follow RFC
-  # 2617.  If +domain+ is given it is only used for NTLM authentication.
 
   def add_auth uri, user, pass, realm = nil, domain = nil
     uri = URI uri unless URI === uri
-
-    raise ArgumentError,
-          'NTLM domain given with realm which NTLM does not use' if
-      realm and domain
 
     uri += '/'
 
@@ -58,8 +51,6 @@ class Mechanize::HTTP::AuthStore
   # Adds credentials +user+, +pass+ as the default authentication credentials.
   # If no other credentials are available  these will be returned from
   # credentials_for.
-  #
-  # If +domain+ is given it is only used for NTLM authentication.
 
   def add_default_auth user, pass, domain = nil
     warn <<-WARN

@@ -51,7 +51,7 @@ class Mechanize::HTTP
     # The name of the realm for this challenge
 
     def realm_name
-      params['realm'] if Hash === params # NTLM has a string for params
+      params['realm']
     end
 
     ##

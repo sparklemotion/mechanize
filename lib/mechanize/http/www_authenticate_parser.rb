@@ -39,17 +39,7 @@ class Mechanize::HTTP::WWWAuthenticateParser
 
       space = spaces
 
-      if scheme == 'NTLM' then
-        if space then
-          challenge.params = @scanner.scan(/.*/)
-        end
-
-        challenge.raw = www_authenticate[start, @scanner.pos]
-        challenges << challenge
-        next
-      else
-        scheme.capitalize!
-      end
+      scheme.capitalize!
 
       next unless space
 
@@ -98,7 +88,7 @@ class Mechanize::HTTP::WWWAuthenticateParser
 
   ##
   # scans a comma followed by spaces
-  # needed for Negotiation, NTLM
+  # needed for Negotiation
   #
 
   def scan_comma_spaces

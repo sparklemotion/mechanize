@@ -12,7 +12,6 @@ require 'mechanize/test_case/infinite_refresh_servlet'
 require 'mechanize/test_case/many_cookies_as_string_servlet'
 require 'mechanize/test_case/many_cookies_servlet'
 require 'mechanize/test_case/modified_since_servlet'
-require 'mechanize/test_case/ntlm_servlet'
 require 'mechanize/test_case/one_cookie_no_spaces_servlet'
 require 'mechanize/test_case/one_cookie_servlet'
 require 'mechanize/test_case/quoted_value_cookie_servlet'
@@ -40,7 +39,6 @@ MECHANIZE_TEST_CASE_SERVLETS = {
   '/infinite_refresh'       => InfiniteRefreshServlet,
   '/many_cookies'           => ManyCookiesServlet,
   '/many_cookies_as_string' => ManyCookiesAsStringServlet,
-  '/ntlm'                   => NTLMServlet,
   '/one_cookie'             => OneCookieServlet,
   '/one_cookie_no_space'    => OneCookieNoSpacesServlet,
   '/quoted_value_cookie'    => QuotedValueCookieServlet,

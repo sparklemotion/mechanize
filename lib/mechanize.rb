@@ -1,3 +1,4 @@
+require 'mechanize/version'
 require 'fileutils'
 require 'forwardable'
 require 'mutex_m'

@@ -1,3 +1,4 @@
+require 'mechanize/version'
 require 'fileutils'
 require 'forwardable'
 require 'mutex_m'
@@ -67,11 +68,6 @@ require 'zlib'
 #   end
 
 class Mechanize
-
-  ##
-  # The version of Mechanize you are using.
-
-  VERSION = '2.7.4.beta1'
 
   ##
   # Base mechanize error class

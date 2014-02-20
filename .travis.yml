@@ -1,9 +1,4 @@
 ---
-after_script:
-- rake travis:after -t
-before_script:
-- gem install hoe-travis --no-rdoc --no-ri
-- rake travis:before -t
 language: ruby
 notifications:
   email:
@@ -17,7 +12,7 @@ rvm:
 - jruby-19mode
 - jruby-head
 - rbx-19mode
-script: rake travis
+script: rake test
 matrix:
   allow_failures:
     - rvm: ruby-head

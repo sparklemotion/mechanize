@@ -185,13 +185,17 @@ class Mechanize
   #    agent_2 = Mechanize.new 'conn2'
   #
 
-  def initialize(connection_name = 'mechanize')
+  def initialize(connection_name = 'mechanize', options = {})
     @agent = Mechanize::HTTP::Agent.new(connection_name)
     @agent.context = self
     @log = nil
 
     # attr_accessors
-    @agent.user_agent = AGENT_ALIASES['Mechanize']
+    if options[:user_agent_alias].nil? || AGENT_ALIASES[options[:user_agent_alias]].nil?
+      @agent.user_agent = AGENT_ALIASES['Mechanize']
+    else
+      @agent.user_agent = AGENT_ALIASES[options[:user_agent_alias]]
+    end
     @watch_for_set    = nil
     @history_added    = nil
 

@@ -70,9 +70,9 @@ class Mechanize::PluggableParser
   }
 
   InvalidContentTypeError =
-    if defined?(MIME::Types::InvalidContentType)
+    if defined?(MIME::Type::InvalidContentType)
       # For mime-types >=2.1
-      MIME::Types::InvalidContentType
+      MIME::Type::InvalidContentType
     else
       # For mime-types <2.1
       MIME::InvalidContentType

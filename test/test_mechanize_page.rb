@@ -8,6 +8,42 @@ class TestMechanizePage < Mechanize::TestCase
     @uri = URI 'http://example/'
   end
 
+  def test_selector_methods
+    page = html_page <<-BODY
+<html>
+  <meta>
+  <head><title></title>
+  <body>
+    <span class="name" id="out">Eamonn</span>
+    <span>/</span>
+    <span class="name" id="bloody">Esther</span>
+    <span>/</span>
+    <span class="name" id="rageous">Fletcher</span>
+  </body>
+</html>
+    BODY
+
+    # at(css_selector), % css_selector
+    assert_equal('Eamonn', page.at('#out').text)
+    assert_equal('Eamonn', (page % '#out').text)
+
+    # at(xpath_selector), % xpath_selector
+    assert_equal('Esther', page.at('//span[@id="bloody"]').text)
+    assert_equal('Esther', (page % '//span[@id="bloody"]').text)
+
+    # at_css()
+    assert_equal('Eamonn', page.at_css('#out').text)
+
+    # css()
+    assert_equal('Fletcher', page.css('.name')[2].text)
+
+    # at_xpath()
+    assert_equal('Esther', page.at_xpath('//span[@id="bloody"]').text)
+
+    # xpath()
+    assert_equal('Fletcher', page.xpath('//*[@class="name"]')[2].text)
+  end
+
   def test_initialize_good_content_type
     page = Mechanize::Page.new
     assert_equal('text/html', page.content_type)

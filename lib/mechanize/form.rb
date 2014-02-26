@@ -622,6 +622,8 @@ class Mechanize::Form
         "\r\n#{file.file_data}\r\n"
       end
 
+    file.file_data = nil
+
     body
   end
 end

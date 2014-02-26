@@ -427,10 +427,6 @@ but not <a href="/" rel="me nofollow">this</a>!
 
   def test_get_follow_meta_refresh_anywhere
     @mech.follow_meta_refresh = :anywhere
-    requests = []
-    @mech.pre_connect_hooks << lambda { |_, request|
-      requests << request
-    }
 
     @mech.get('http://localhost/tc_meta_in_body.html')
     assert_equal 2, requests.length
@@ -459,10 +455,6 @@ but not <a href="/" rel="me nofollow">this</a>!
 
   def test_get_follow_meta_refresh_in_body
     @mech.follow_meta_refresh = true
-    requests = []
-    @mech.pre_connect_hooks << lambda { |_, request|
-      requests << request
-    }
 
     @mech.get('http://localhost/tc_meta_in_body.html')
     assert_equal 1, requests.length
@@ -485,12 +477,6 @@ but not <a href="/" rel="me nofollow">this</a>!
 
   def test_get_follow_meta_refresh_referer_not_sent
     @mech.follow_meta_refresh = true
-
-    requests = []
-
-    @mech.pre_connect_hooks << lambda { |_, request|
-      requests << request
-    }
 
     @mech.get('http://localhost/tc_follow_meta.html')
 
@@ -572,12 +558,6 @@ but not <a href="/" rel="me nofollow">this</a>!
   def test_get_http_refresh
     @mech.follow_meta_refresh = true
 
-    requests = []
-
-    @mech.pre_connect_hooks << lambda { |_, request|
-      requests << request
-    }
-
     page = @mech.get('http://example/http_refresh?refresh_time=0')
 
     assert_equal('http://example/', page.uri.to_s)
@@ -650,11 +630,6 @@ but not <a href="/" rel="me nofollow">this</a>!
   end
 
   def test_get_referer_none
-    requests = []
-    @mech.pre_connect_hooks << lambda { |_, request|
-      requests << request
-    }
-
     @mech.get('http://localhost/')
     @mech.get('http://localhost/')
     assert_equal(2, requests.length)

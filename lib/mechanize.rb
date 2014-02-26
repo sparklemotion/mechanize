@@ -407,6 +407,9 @@ class Mechanize
   ##
   # DELETE +uri+ with +query_params+, and setting +headers+:
   #
+  # +query_params+ is formatted into a query string using
+  # Mechanize::Util.build_query_string, which see.
+  #
   #   delete('http://example/', {'q' => 'foo'}, {})
 
   def delete(uri, query_params = {}, headers = {})
@@ -420,6 +423,9 @@ class Mechanize
   # +headers+.
   #
   # The +referer+ may be a URI or a page.
+  #
+  # +parameters+ is formatted into a query string using
+  # Mechanize::Util.build_query_string, which see.
 
   def get(uri, parameters = [], referer = nil, headers = {})
     method = :get
@@ -460,6 +466,9 @@ class Mechanize
   ##
   # HEAD +uri+ with +query_params+ and +headers+:
   #
+  # +query_params+ is formatted into a query string using
+  # Mechanize::Util.build_query_string, which see.
+  #
   #   head('http://example/', {'q' => 'foo'}, {})
 
   def head(uri, query_params = {}, headers = {})
@@ -471,9 +480,13 @@ class Mechanize
   end
 
   ##
-  # POST to the given +uri+ with the given +query+.  The query is specified by
-  # either a string, or a list of key-value pairs represented by a hash or an
-  # array of arrays.
+  # POST to the given +uri+ with the given +query+.
+  #
+  # +query+ is processed using Mechanize::Util.each_parameter (which
+  # see), and then encoded into an entity body.  If any IO/FileUpload
+  # object is specified as a field value the "enctype" will be
+  # multipart/form-data, or application/x-www-form-urlencoded
+  # otherwise.
   #
   # Examples:
   #   agent.post 'http://example.com/', "foo" => "bar"
@@ -496,7 +509,7 @@ class Mechanize
 
     form = Form.new(node)
 
-    query.each { |k, v|
+    Mechanize::Util.each_parameter(query) { |k, v|
       if v.is_a?(IO)
         form.enctype = 'multipart/form-data'
         ul = Form::FileUpload.new({'name' => k.to_s},::File.basename(v.path))

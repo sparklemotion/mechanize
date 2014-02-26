@@ -3,6 +3,9 @@
 === Unreleased
 
 * New Features
+  * Accept array-like and hash-like values as query/parameter value.
+    A new utility method Mechanize::Util.each_parameter is added, and Mechanize::Util.build_query_string is enhanced
+    for this feature.
   * Allow passing a `Form::FileUpload` instance to `#post`. #350 by Sam
     Rawlins.
   * Capture link when scheme is unsupported. #362 by Jon Rowe.

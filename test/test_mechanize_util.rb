@@ -98,5 +98,75 @@ class TestMechanizeUtil < Mechanize::TestCase
     assert_equal "%",   @MU.uri_escape("%", /[^%]/)
   end
 
+  def test_build_query_string_simple
+    query = @MU.build_query_string([[:ids, 1], [:action, 'delete'], [:ids, 5]])
+
+    parsed_params = URI.decode_www_form(query)
+
+    assert_equal 3, parsed_params.size
+
+    action = nil
+    ids = []
+
+    parsed_params.each { |k, v|
+      case k
+      when 'action'
+        action = v
+      when 'ids'
+        ids << v
+      else
+        raise
+      end
+    }
+
+    assert_equal 'delete', action
+    assert_equal %w[1 5], ids
+  end
+
+  def test_build_query_string_complex
+    input_params = {
+      number: 7,
+      name: "\u{6B66}\u{8005}",
+      "ids[]" => [1, 3, 5, 7],
+      words: ["Sing", "Now!"],
+      params: { x: "50%", y: "100%", t: [80, 160] },
+    }
+
+    query = @MU.build_query_string(input_params)
+
+    parsed_params = URI.decode_www_form(query)
+
+    assert_equal 10, parsed_params.size
+
+    number = name = nil
+    ids = []
+    words = []
+    params = {}
+
+    parsed_params.each { |k, v|
+      case k
+      when 'number'
+        number = v
+      when 'name'
+        name = v
+      when 'ids[]'
+        ids << v
+      when 'words'
+        words << v
+      when /\Aparams\[(.+)\]\z/
+        params[$1.to_sym] = v
+      when /\Aparams\[(.+)\][(.+)]\z/
+        (params[$1.to_sym] ||= {})[$2.to_sym] = v
+      else
+        raise
+      end
+    }
+
+    assert_equal input_params[:number].to_s, number
+    assert_equal input_params[:name], name
+    assert_equal input_params['ids[]'].map(&:to_s), ids
+    assert_equal input_params[:words], words
+    assert_equal input_params[:params], params
+  end
 end
 

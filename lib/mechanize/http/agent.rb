@@ -213,6 +213,10 @@ class Mechanize::HTTP::Agent
   # +method+ is used to retrieve it, along with the HTTP +headers+, request
   # +params+ and HTTP +referer+.
   #
+  # The final URI to access is built with +uri+ and +params+, the
+  # latter of which is formatted into a string using
+  # Mechanize::Util.build_query_string, which see.
+  #
   # +redirects+ tracks the number of redirects experienced when retrieving the
   # page.  If it is over the redirection_limit an error will be raised.
 

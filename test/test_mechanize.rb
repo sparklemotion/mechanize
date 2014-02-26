@@ -586,6 +586,12 @@ but not <a href="/" rel="me nofollow">this</a>!
   def test_get_query
     page = @mech.get('http://localhost/', { :q => 'hello' })
     assert_equal('http://localhost/?q=hello', page.uri.to_s)
+
+    page = @mech.get('http://localhost/', { :q => %w[hello world]})
+    assert_equal('http://localhost/?q=hello&q=world', page.uri.to_s)
+
+    page = @mech.get('http://localhost/', { :paging => { start: 1, limit: 25 } })
+    assert_equal('http://localhost/?paging%5Bstart%5D=1&paging%5Blimit%5D=25', page.uri.to_s)
   end
 
   def test_get_redirect

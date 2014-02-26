@@ -9,6 +9,8 @@
   * Pre-defined User-Agent stings are updated to those of more recent versions, and new aliases for IE 10/11 are added.
   * Support for mime-types 1.x is restored while keeping compatible with mime-types 2.x.
   * Mechanize::Page now responds to #xpath, #css, #at_xpath, #at_css, and #%.
+  * element(s)_with methods now accept :xpath and :css options for doing xpath/css
+    selector searching.
 
 === 2.7.3
 

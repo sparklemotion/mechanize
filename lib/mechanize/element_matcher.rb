@@ -3,17 +3,28 @@ module Mechanize::ElementMatcher
   def elements_with singular, plural = "#{singular}s"
     class_eval <<-CODE
       def #{plural}_with criteria = {}
-        criteria = if String === criteria then
-                     {:name => criteria}
-                   else
-                     Hash[criteria.map do |k, v|
-                            k = :dom_id if k.to_sym == :id
-                            k = :dom_class if k.to_sym == :class
-                            [k, v]
-                          end]
-                   end
+        selector = method = nil
+        if String === criteria then
+          criteria = {:name => criteria}
+        else
+          criteria = criteria.each_with_object({}) { |(k, v), h|
+            case k = k.to_sym
+            when :id
+              h[:dom_id] = v
+            when :class
+              h[:dom_class] = v
+            when :search, :xpath, :css
+              if v
+                selector = v
+                method = k
+              end
+            else
+              h[k] = v
+            end
+          }
+        end
 
-        f = select_#{plural}(criteria.delete(:search)).find_all do |thing|
+        f = select_#{plural}(selector, method).find_all do |thing|
           criteria.all? do |k,v|
             v === thing.send(k)
           end
@@ -35,11 +46,11 @@ module Mechanize::ElementMatcher
         f
       end
 
-      def select_#{plural} selector
+      def select_#{plural} selector, method = :search
         if selector.nil? then
           #{plural}
         else
-          nodes = search(selector)
+          nodes = __send__(method, selector)
           #{plural}.find_all do |element|
             nodes.include?(element.node)
           end

@@ -210,6 +210,7 @@ class TestMechanizePage < Mechanize::TestCase
   <meta>
   <head><title></title>
   <body>
+    <img src="1.jpg" class="unpretty">
     <img src="a.jpg" class="pretty">
     <img src="b.jpg">
     <img src="c.png" class="pretty">
@@ -217,14 +218,24 @@ class TestMechanizePage < Mechanize::TestCase
 </html>
     BODY
 
-    images = page.images_with(:search => "//img[@class='pretty']")
+    {
+      :search => "//img[@class='pretty']",
+      :xpath => "//img[@class='pretty']",
+      :css => "img.pretty",
+      :class => "pretty",
+      :dom_class => "pretty",
+    }.each { |key, expr|
+      images = page.images_with(key => expr)
 
-    assert_equal 2, images.size
-    assert_equal "pretty", images[0].dom_class
-    assert_equal "a.jpg", images[0].src
+      message = "selecting with #{key.inspect}"
 
-    assert_equal "pretty", images[1].dom_class
-    assert_equal "c.png", images[1].src
+      assert_equal 2, images.size
+      assert_equal "pretty", images[0].dom_class, message
+      assert_equal "a.jpg", images[0].src, message
+
+      assert_equal "pretty", images[1].dom_class, message
+      assert_equal "c.png", images[1].src, message
+    }
   end
 
   def test_search_bad_selectors

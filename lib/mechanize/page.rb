@@ -194,39 +194,71 @@ class Mechanize::Page < Mechanize::File
   ##
   # :method: search
   #
-  # Search for +paths+ in the page using Nokogiri's #search.  The +paths+ can
-  # be XPath or CSS and an optional Hash of namespaces may be appended.
+  # Shorthand for +parser.search+.
   #
-  # See Nokogiri::XML::Node#search for further details.
+  # See Nokogiri::XML::Node#search for details.
 
-  def_delegator :parser, :search, :search
+  ##
+  # :method: css
+  #
+  # Shorthand for +parser.css+.
+  #
+  # See also Nokogiri::XML::Node#css for details.
 
-  alias / search
+  ##
+  # :method: xpath
+  #
+  # Shorthand for +parser.xpath+.
+  #
+  # See also Nokogiri::XML::Node#xpath for details.
 
   ##
   # :method: at
   #
-  # Search through the page for +path+ under +namespace+ using Nokogiri's #at.
-  # The +path+ may be either a CSS or XPath expression.
+  # Shorthand for +parser.at+.
   #
-  # See also Nokogiri::XML::Node#at
+  # See also Nokogiri::XML::Node#at for details.
 
-  def_delegator :parser, :at, :at
+  ##
+  # :method: at_css
+  #
+  # Shorthand for +parser.at_css+.
+  #
+  # See also Nokogiri::XML::Node#at_css for details.
+
+  ##
+  # :method: at_xpath
+  #
+  # Shorthand for +parser.at_xpath+.
+  #
+  # See also Nokogiri::XML::Node#at_xpath for details.
+
+  def_delegators :parser, :search, :css, :xpath, :at, :at_css, :at_xpath
+
+  alias / search
+  alias % at
 
   ##
   # :method: form_with
   #
   # :call-seq:
   #   form_with(criteria)
+  #   form_with(criteria) { |form| ... }
   #
-  # Find a single form matching +criteria+.
-  # Example:
-  #   page.form_with(:action => '/post/login.php') do |f|
+  # Find a single form matching +criteria+.  See +forms_with+ for
+  # details of +criteria+.
+  #
+  # Examples:
+  #   page.form_with(action: '/post/login.php') do |f|
   #     ...
   #   end
 
   ##
-  # :mehtod: form_with!(criteria)
+  # :method: form_with!(criteria)
+  #
+  # :call-seq:
+  #   form_with!(criteria)
+  #   form_with!(criteria) { |form| ... }
   #
   # Same as +form_with+ but raises an ElementNotFoundError if no button matches
   # +criteria+
@@ -234,11 +266,33 @@ class Mechanize::Page < Mechanize::File
   ##
   # :method: forms_with
   #
-  # :call-seq: forms_with(criteria)
+  # :call-seq:
+  #   forms_with(name)
+  #   forms_with(name: name_matcher, id: id_matcher, class: class_matcher,
+  #              search: search_expression, xpath: xpath_expression, css: css_expression,
+  #              action: action_matcher, ...)
   #
-  # Find all forms form matching +criteria+.
+  # Find all forms form matching criteria.  If a string is given, it
+  # is taken as a name attribute value.  If a hash is given, forms
+  # are narrowed by the key-value pairs as follows.
+  #
+  # :id, :dom_id: selects forms with a #dom_id value that matches this
+  # value.
+  #
+  # :class, :dom_class: selects forms with a #dom_class value that
+  # matches this value.
+  #
+  # :search: only selects forms matching this selector expression.
+  #
+  # :xpath: only selects forms matching this XPath expression.
+  #
+  # :css: only selects forms matching this CSS selector expression.
+  #
+  # :action, :method, etc.: narrows forms by a given attribute value
+  # using the === operator.
+  #
   # Example:
-  #   page.forms_with(:action => '/post/login.php').each do |f|
+  #   page.forms_with(css: '#content table.login_box form', method: /\APOST\z/i, ).each do |f|
   #     ...
   #   end
 
@@ -247,14 +301,22 @@ class Mechanize::Page < Mechanize::File
   ##
   # :method: link_with
   #
-  # :call-seq: link_with(criteria)
+  # :call-seq:
+  #   link_with(criteria)
+  #   link_with(criteria) { |link| ... }
   #
-  # Find a single link matching +criteria+.
+  # Find a single link matching +criteria+.  See +forms_with+ for
+  # details of +criteria+, where for "form(s)" read "link(s)".
+  #
   # Example:
-  #   page.link_with(:href => /foo/).click
+  #   page.link_with(href: /foo/).click
 
   ##
-  # :mehtod: link_with!(criteria)
+  # :method: link_with!
+  #
+  # :call-seq:
+  #   link_with!(criteria)
+  #   link_with!(criteria) { |link| ... }
   #
   # Same as +link_with+ but raises an ElementNotFoundError if no button matches
   # +criteria+
@@ -265,9 +327,11 @@ class Mechanize::Page < Mechanize::File
   # :call-seq:
   #   links_with(criteria)
   #
-  # Find all links matching +criteria+.
+  # Find all links matching +criteria+.  See +forms_with+ for details
+  # of +criteria+, where for "form(s)" read "link(s)".
+  #
   # Example:
-  #   page.links_with(:href => /foo/).each do |link|
+  #   page.links_with(href: /foo/).each do |link|
   #     puts link.href
   #   end
 
@@ -276,14 +340,22 @@ class Mechanize::Page < Mechanize::File
   ##
   # :method: base_with
   #
-  # :call-seq: base_with(criteria)
+  # :call-seq:
+  #   base_with(criteria)
+  #   base_with(criteria) { |base| ... }
   #
-  # Find a single base tag matching +criteria+.
+  # Find a single base tag matching +criteria+.  See +forms_with+ for
+  # details of +criteria+, where for "form(s)" read "base tag(s)".
+  #
   # Example:
-  #   page.base_with(:href => /foo/).click
+  #   page.base_with(href: /foo/).click
 
   ##
-  # :mehtod: base_with!(criteria)
+  # :method: base_with!(criteria)
+  #
+  # :call-seq:
+  #   base_with!(criteria)
+  #   base_with!(criteria) { |base| ... }
   #
   # Same as +base_with+ but raises an ElementNotFoundError if no button matches
   # +criteria+
@@ -293,9 +365,11 @@ class Mechanize::Page < Mechanize::File
   #
   # :call-seq: bases_with(criteria)
   #
-  # Find all base tags matching +criteria+.
+  # Find all base tags matching +criteria+.  See +forms_with+ for
+  # details of +criteria+, where for "form(s)" read "base tag(s)".
+  #
   # Example:
-  #   page.bases_with(:href => /foo/).each do |base|
+  #   page.bases_with(href: /foo/).each do |base|
   #     puts base.href
   #   end
 
@@ -304,14 +378,22 @@ class Mechanize::Page < Mechanize::File
   ##
   # :method: frame_with
   #
-  # :call-seq: frame_with(criteria)
+  # :call-seq:
+  #   frame_with(criteria)
+  #   frame_with(criteria) { |frame| ... }
   #
-  # Find a single frame tag matching +criteria+.
+  # Find a single frame tag matching +criteria+.  See +forms_with+ for
+  # details of +criteria+, where for "form(s)" read "frame tag(s)".
+  #
   # Example:
-  #   page.frame_with(:src => /foo/).click
+  #   page.frame_with(src: /foo/).click
 
   ##
-  # :mehtod: frame_with!(criteria)
+  # :method: frame_with!
+  #
+  # :call-seq:
+  #   frame_with!(criteria)
+  #   frame_with!(criteria) { |frame| ... }
   #
   # Same as +frame_with+ but raises an ElementNotFoundError if no button matches
   # +criteria+
@@ -321,9 +403,11 @@ class Mechanize::Page < Mechanize::File
   #
   # :call-seq: frames_with(criteria)
   #
-  # Find all frame tags matching +criteria+.
+  # Find all frame tags matching +criteria+.  See +forms_with+ for
+  # details of +criteria+, where for "form(s)" read "frame tag(s)".
+  #
   # Example:
-  #   page.frames_with(:src => /foo/).each do |frame|
+  #   page.frames_with(src: /foo/).each do |frame|
   #     p frame.src
   #   end
 
@@ -332,14 +416,22 @@ class Mechanize::Page < Mechanize::File
   ##
   # :method: iframe_with
   #
-  # :call-seq: iframe_with(criteria)
+  # :call-seq:
+  #   iframe_with(criteria)
+  #   iframe_with(criteria) { |iframe| ... }
   #
-  # Find a single iframe tag matching +criteria+.
+  # Find a single iframe tag matching +criteria+.  See +forms_with+ for
+  # details of +criteria+, where for "form(s)" read "iframe tag(s)".
+  #
   # Example:
-  #   page.iframe_with(:src => /foo/).click
+  #   page.iframe_with(src: /foo/).click
 
   ##
-  # :mehtod: iframe_with!(criteria)
+  # :method: iframe_with!
+  #
+  # :call-seq:
+  #   iframe_with!(criteria)
+  #   iframe_with!(criteria) { |iframe| ... }
   #
   # Same as +iframe_with+ but raises an ElementNotFoundError if no button
   # matches +criteria+
@@ -349,9 +441,11 @@ class Mechanize::Page < Mechanize::File
   #
   # :call-seq: iframes_with(criteria)
   #
-  # Find all iframe tags matching +criteria+.
+  # Find all iframe tags matching +criteria+.  See +forms_with+ for
+  # details of +criteria+, where for "form(s)" read "iframe tag(s)".
+  #
   # Example:
-  #   page.iframes_with(:src => /foo/).each do |iframe|
+  #   page.iframes_with(src: /foo/).each do |iframe|
   #     p iframe.src
   #   end
 
@@ -360,14 +454,22 @@ class Mechanize::Page < Mechanize::File
   ##
   # :method: image_with
   #
-  # :call-seq: image_with(criteria)
+  # :call-seq:
+  #   image_with(criteria)
+  #   image_with(criteria) { |image| ... }
   #
-  # Find a single image matching +criteria+.
+  # Find a single image matching +criteria+.  See +forms_with+ for
+  # details of +criteria+, where for "form(s)" read "image(s)".
+  #
   # Example:
-  #   page.image_with(:alt => /main/).fetch.save
+  #   page.image_with(alt: /main/).fetch.save
 
   ##
-  # :mehtod: image_with!(criteria)
+  # :method: image_with!
+  #
+  # :call-seq:
+  #   image_with!(criteria)
+  #   image_with!(criteria) { |image| ... }
   #
   # Same as +image_with+ but raises an ElementNotFoundError if no button matches
   # +criteria+
@@ -377,9 +479,11 @@ class Mechanize::Page < Mechanize::File
   #
   # :call-seq: images_with(criteria)
   #
-  # Find all images matching +criteria+.
+  # Find all images matching +criteria+.  See +forms_with+ for
+  # details of +criteria+, where for "form(s)" read "image(s)".
+  #
   # Example:
-  #   page.images_with(:src => /jpg\Z/).each do |img|
+  #   page.images_with(src: /jpg\Z/).each do |img|
   #     img.fetch.save
   #   end
 

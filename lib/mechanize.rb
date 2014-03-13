@@ -541,6 +541,8 @@ class Mechanize
   def request_with_entity(verb, uri, entity, headers = {})
     cur_page = current_page || Page.new
 
+    log.debug("query: #{ entity.inspect }") if log
+
     headers = {
       'Content-Type' => 'application/octet-stream',
       'Content-Length' => entity.size.to_s,

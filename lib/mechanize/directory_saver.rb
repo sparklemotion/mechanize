@@ -16,7 +16,8 @@ class Mechanize::DirectorySaver < Mechanize::Download
   # Creates a DirectorySaver subclass that will save responses to the given
   # +directory+. If +options+ includes a +decode_filename+ value set to +true+
   # then the downloaded filename will be ran through +CGI.unescape+ before
-  # being saved.
+  # being saved. If +options+ includes a +overwrite+ value set to +true+ then
+  # downloaded file will be overwritten if two files with the same names exist.
 
   def self.save_to directory, options = {}
     directory = File.expand_path directory
@@ -42,6 +43,13 @@ class Mechanize::DirectorySaver < Mechanize::Download
   end
 
   ##
+  # Checks if +overwrite+ parameter is set to true
+
+  def self.overwrite?
+    @options[:overwrite]
+  end
+
+  ##
   # Saves the +body_io+ into the directory specified for this DirectorySaver
   # by save_to.  The filename is chosen by Mechanize::Parser#extract_filename.
 
@@ -58,7 +66,11 @@ class Mechanize::DirectorySaver < Mechanize::Download
     @filename = CGI.unescape(@filename) if self.class.decode_filename?
     path = File.join directory, @filename
 
-    save path
+    if self.class.overwrite?
+      save! path
+    else
+      save path
+    end
   end
 
 end

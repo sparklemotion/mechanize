@@ -93,6 +93,8 @@ only to a particular server you specify.
     uri = URI uri unless URI === uri
 
     uri += '/'
+    uri.user = nil
+    uri.password = nil
 
     realms = @auth_accounts[uri]
 

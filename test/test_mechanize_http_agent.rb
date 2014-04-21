@@ -492,6 +492,12 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     assert_match %r%^Digest %, @req['Authorization']
     assert_match %r%qop=auth%, @req['Authorization']
+
+    @req['Authorization'] = nil
+    @agent.request_auth @req, @uri
+
+    assert_match %r%^Digest %, @req['Authorization']
+    assert_match %r%qop=auth%, @req['Authorization']
   end
 
   def test_request_auth_iis_digest

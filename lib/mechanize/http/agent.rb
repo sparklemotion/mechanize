@@ -536,9 +536,7 @@ class Mechanize::HTTP::Agent
   def request_auth_digest request, uri, realm, base_uri, iis
     challenge = @digest_challenges[realm]
 
-    user, password, = @auth_store.credentials_for uri, realm.realm
-    uri.user     = user
-    uri.password = password
+    uri.user, uri.password, = @auth_store.credentials_for uri, realm.realm
 
     auth = @digest_auth.auth_header uri, challenge.to_s, request.method, iis
     request['Authorization'] = auth

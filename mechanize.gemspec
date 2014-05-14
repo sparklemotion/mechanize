@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
       'aaronp@rubyforge.org',
       'mike.dalessio@gmail.com',
       'knu@idaemons.org',
-     'ljjarvis@gmail.com'
+      'ljjarvis@gmail.com'
     ]
 
   spec.rubyforge_project = "mechanize"

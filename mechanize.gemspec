@@ -6,7 +6,7 @@ require 'mechanize/version'
 Gem::Specification.new do |spec|
   spec.name          = "mechanize"
   spec.version       = Mechanize::VERSION
-  spec.homepage      = "http://mechanize.rubyforge.org"
+  spec.homepage      = "http://docs.seattlerb.org/mechanize/"
   spec.summary       = %q{The Mechanize library is used for automating interaction with websites}
   spec.description   =
     [

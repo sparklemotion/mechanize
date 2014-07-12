@@ -15,7 +15,7 @@ example, <code>do ... end.submit</code> is the same as <code>{ ...
   }
 
   a.get('http://google.com/') do |page|
-    search_result = page.form_with(:name => 'gbqf') do |search|
+    search_result = page.form_with(:id => 'gbqf') do |search|
       search.q = 'Hello world'
     end.submit
 

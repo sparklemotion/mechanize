@@ -734,7 +734,7 @@ class Mechanize::HTTP::Agent
 
       if existing_realms.include? realm
         message = 'Digest authentication failed'
-        raise Mechanize::UnauthorizedError.new(page, challeges, message)
+        raise Mechanize::UnauthorizedError.new(page, challenges, message)
       end
 
       existing_realms << realm

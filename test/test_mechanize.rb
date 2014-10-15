@@ -106,6 +106,22 @@ class TestMechanize < Mechanize::TestCase
     assert_equal '/index.html', requests.first.path
   end
 
+  def test_click_image_button
+    page = @mech.get("http://localhost/form_test.html")
+    get_form = page.forms.find { |f| f.name == "get_form1" }
+    image_button = get_form.buttons.first
+    new_page = @mech.click(image_button)
+    assert_equal "http://localhost/form_post?first_name=&button.x=0&button.y=0", new_page.uri.to_s
+  end
+
+  def test_click_submit_button
+    page = @mech.get("http://localhost/form_test.html")
+    get_form = page.forms.find { |f| f.name == "get_form1" }
+    submit_button = get_form.submits.first
+    new_page = @mech.click(submit_button)
+    assert_equal "http://localhost/form_post?first_name=", new_page.uri.to_s
+  end
+
   def test_click_frame
     frame = node 'frame', 'src' => '/index.html'
     frame = Mechanize::Page::Frame.new frame, @mech, fake_page

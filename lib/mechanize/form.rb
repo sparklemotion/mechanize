@@ -330,6 +330,13 @@ class Mechanize::Form
     @clicked_buttons << button
   end
 
+  # This method allows the same form to be submitted second time
+  # with the different submit button being clicked.
+  def reset
+    # In the future, should add more functionality here to reset the form values to their defaults.
+    @clicked_buttons = []
+  end
+
   # This method calculates the request data to be sent back to the server
   # for this form, depending on if this is a regular post, get, or a
   # multi-part post,

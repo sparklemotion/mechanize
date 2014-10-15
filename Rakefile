@@ -2,6 +2,7 @@ require 'rubygems'
 require "bundler/gem_tasks"
 
 require 'rdoc/task'
+require 'rake/testtask'
 
 task :prerelease => [:clobber_rdoc, :test]
 
@@ -24,6 +25,7 @@ RDoc::Task.new do |rdoc|
 end
 
 desc "Run tests"
-task "test" do
-  ruby "-I'lib:test' " + FileList['test/**/test*.rb'].join(' ')
-end
+Rake::TestTask.new { |t|
+  t.test_files = Dir['test/**/test*.rb']
+  t.verbose = true
+}

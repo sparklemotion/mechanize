@@ -349,12 +349,21 @@ class Mechanize
         click real_link
       else
         button = nil
+        # Note that this will not work if we have since navigated to a different page.
+        # Should rather make each button aware of its parent form.
         form = page.forms.find do |f|
           button = f.button_with(:value => link)
           button.is_a? Form::Submit
         end
         submit form, button if form
       end
+    when Form::Submit, Form::ImageButton then
+      # Note that this will not work if we have since navigated to a different page.
+      # Should rather make each button aware of its parent form.
+      form = page.forms.find do |f|
+        f.buttons.include?(link)
+      end
+      submit form, link if form
     else
       referer = current_page()
       href = link.respond_to?(:href) ? link.href :

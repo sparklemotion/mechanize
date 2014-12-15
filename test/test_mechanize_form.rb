@@ -651,6 +651,25 @@ class TestMechanizeForm < Mechanize::TestCase
            "Image button missing")
   end
 
+  def test_reset
+    page = @mech.get("http://localhost/form_test.html")
+    get_form = page.forms.find { |f| f.name == "get_form1" }
+
+    image_button = get_form.buttons.first
+    submit_button = get_form.submits.first
+
+    new_page = @mech.submit(get_form, submit_button)
+    assert_equal "http://localhost/form_post?first_name=", new_page.uri.to_s
+
+    new_page = @mech.submit(get_form, image_button)
+    assert_equal "http://localhost/form_post?first_name=&button.x=0&button.y=0", new_page.uri.to_s
+
+    get_form.reset
+
+    new_page = @mech.submit(get_form, submit_button)
+    assert_equal "http://localhost/form_post?first_name=", new_page.uri.to_s
+  end
+
   def test_post_with_space_in_action
     page = @mech.get("http://localhost/form_test.html")
     post_form = page.forms.find { |f| f.name == "post_form2" }

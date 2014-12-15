@@ -14,7 +14,7 @@ a history.
 == Dependencies
 
 * ruby 1.9.2 or newer
-* nokogiri[http://nokogiri.rubyforge.org]
+* nokogiri[https://github.com/sparklemotion/nokogiri]
 
 == Support:
 

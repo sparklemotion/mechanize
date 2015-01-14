@@ -35,3 +35,5 @@ end
 task publish_docs: %w[rdoc] do
   sh 'rsync', '-avzO', '--delete', 'doc/', 'docs-push.seattlerb.org:/data/www/docs.seattlerb.org/mechanize/'
 end
+
+task default: :test

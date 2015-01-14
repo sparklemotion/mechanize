@@ -1,5 +1,9 @@
 require 'rubygems'
-require "bundler/gem_tasks"
+
+begin
+  require "bundler/gem_tasks"
+rescue LoadError
+end
 
 require 'rdoc/task'
 

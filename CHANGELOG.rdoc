@@ -15,6 +15,10 @@
   * element(s)_with methods now accept :xpath and :css options for doing xpath/css
     selector searching.
 
+* Bug fix
+  * Don't raise an exception if a connection has set a {read,open}_timeout and
+    a `file://` request is made. (#397)
+
 === 2.7.3
 
 * New Features

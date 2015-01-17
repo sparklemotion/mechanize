@@ -14,6 +14,7 @@
   * Mechanize::Page now responds to #xpath, #css, #at_xpath, #at_css, and #%.
   * element(s)_with methods now accept :xpath and :css options for doing xpath/css
     selector searching.
+  * Pass URI information to Nokogiri where applicable. #405 @lulalala
 
 * Bug fix
   * Don't raise an exception if a connection has set a {read,open}_timeout and

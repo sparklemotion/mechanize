@@ -8,10 +8,13 @@ notifications:
 rvm:
 - 1.9.3
 - 2.0.0
+- 2.1
+- 2.2
 - ruby-head
 - jruby-19mode
 - jruby-head
 - rbx-19mode
+- rbx-2
 script: rake test
 matrix:
   allow_failures:

@@ -111,21 +111,17 @@ class Mechanize::Page < Mechanize::File
 
   def parser
     return @parser if @parser
-    return nil unless @body
+    return unless @body
 
-    if @uri.nil?
-      uri_string = nil
-    else
-      uri_string = @uri.to_s
-    end
+    url = @uri && @uri.to_s
 
-    if @encoding then
-      @parser = @mech.html_parser.parse html_body, uri_string, @encoding
-    elsif mech.force_default_encoding then
-      @parser = @mech.html_parser.parse html_body, uri_string, @mech.default_encoding
+    if @encoding
+      @parser = mech.html_parser.parse html_body, url, @encoding
+    elsif mech.force_default_encoding
+      @parser = mech.html_parser.parse html_body, url, @mech.default_encoding
     else
       @encodings.reverse_each do |encoding|
-        @parser = @mech.html_parser.parse html_body, uri_string, encoding
+        @parser = mech.html_parser.parse html_body, url, encoding
 
         break unless encoding_error? @parser
       end

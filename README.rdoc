@@ -29,12 +29,11 @@ the EXAMPLES[http://docs.seattlerb.org/mechanize/EXAMPLES_rdoc.html] file.
 
 == Developers
 
-To run the tests for the first time:
+Use bundler to install dependencies:
 
   bundle install
 
-This will install all the required dependencies for running the tests.  For
-subsequent test runs:
+Run all tests with:
 
   rake test
 
@@ -52,7 +51,7 @@ Copyright (c) 2006-2011:
 * {Aaron Patterson}[http://tenderlovemaking.com] (aaronp@rubyforge.org)
 * {Mike Dalessio}[http://mike.daless.io] (mike@csa.net)
 
-Copyright (c) 2011-2013:
+Copyright (c) 2011-2015:
 
 * {Eric Hodel}[http://blog.segment7.net] (drbrain@segment7.net)
 * {Akinori MUSHA}[http://blog.akinori.org] (knu@idaemons.org)

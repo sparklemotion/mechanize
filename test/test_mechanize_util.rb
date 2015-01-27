@@ -135,8 +135,7 @@ class TestMechanizeUtil < Mechanize::TestCase
     query = @MU.build_query_string(input_params)
 
     parsed_params = URI.decode_www_form(query)
-
-    assert_equal 10, parsed_params.size
+    assert_equal 12, parsed_params.size
 
     number = name = nil
     ids = []
@@ -154,7 +153,14 @@ class TestMechanizeUtil < Mechanize::TestCase
       when 'words'
         words << v
       when /\Aparams\[(.+)\]\z/
-        params[$1.to_sym] = v
+        kk = $1.to_sym
+
+        if params[kk].nil? then
+          params[kk] = v
+        else
+          params[kk] = [params[kk]] unless params[kk].is_a?(Array)
+          params[kk] << v
+        end
       when /\Aparams\[(.+)\][(.+)]\z/
         (params[$1.to_sym] ||= {})[$2.to_sym] = v
       else

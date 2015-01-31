@@ -6,6 +6,7 @@ rescue LoadError
 end
 
 require 'rdoc/task'
+require 'rake/testtask'
 
 task :prerelease => [:clobber_rdoc, :test]
 
@@ -28,12 +29,9 @@ RDoc::Task.new do |rdoc|
 end
 
 desc "Run tests"
-task "test" do
-  ruby "-I'lib:test' " + FileList['test/**/test*.rb'].join(' ')
-end
+Rake::TestTask.new { |t|
+  t.test_files = Dir['test/**/test*.rb']
+  t.verbose = true
+}
 
-task publish_docs: %w[rdoc] do
-  sh 'rsync', '-avzO', '--delete', 'doc/', 'docs-push.seattlerb.org:/data/www/docs.seattlerb.org/mechanize/'
-end
-
-task default: :test
+task :default => :test

@@ -34,4 +34,8 @@ Rake::TestTask.new { |t|
   t.verbose = true
 }
 
-task :default => :test
+task publish_docs: %w[rdoc] do
+  sh 'rsync', '-avzO', '--delete', 'doc/', 'docs-push.seattlerb.org:/data/www/docs.seattlerb.org/mechanize/'
+end
+
+task default: :test

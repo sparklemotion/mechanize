@@ -34,7 +34,6 @@ Gem::Specification.new do |spec|
       'ljjarvis@gmail.com'
     ]
 
-  spec.rubyforge_project = "mechanize"
   spec.license           = "MIT"
 
   spec.require_paths = ["lib"]

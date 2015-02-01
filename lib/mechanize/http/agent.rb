@@ -252,9 +252,13 @@ class Mechanize::HTTP::Agent
       request['If-Modified-Since'] = last_modified
     end if @conditional_requests
 
-    # Specify timeouts if given
-    connection.open_timeout = @open_timeout if @open_timeout
-    connection.read_timeout = @read_timeout if @read_timeout
+    # Specify timeouts if supplied and our connection supports them
+    if @open_timeout && connection.respond_to?(:open_timeout=)
+      connection.open_timeout = @open_timeout
+    end
+    if @read_timeout && connection.respond_to?(:read_timeout=)
+      connection.read_timeout = @read_timeout
+    end
 
     request_log request
 

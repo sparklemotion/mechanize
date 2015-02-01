@@ -8,6 +8,8 @@ notifications:
 rvm:
 - 1.9.3
 - 2.0.0
+- 2.1
+- 2.2
 - ruby-head
 - jruby-19mode
 - jruby-head

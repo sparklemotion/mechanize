@@ -1,5 +1,9 @@
 require 'rubygems'
-require "bundler/gem_tasks"
+
+begin
+  require "bundler/gem_tasks"
+rescue LoadError
+end
 
 require 'rdoc/task'
 require 'rake/testtask'
@@ -29,3 +33,9 @@ Rake::TestTask.new { |t|
   t.test_files = Dir['test/**/test*.rb']
   t.verbose = true
 }
+
+task publish_docs: %w[rdoc] do
+  sh 'rsync', '-avzO', '--delete', 'doc/', 'docs-push.seattlerb.org:/data/www/docs.seattlerb.org/mechanize/'
+end
+
+task default: :test

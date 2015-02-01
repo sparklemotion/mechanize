@@ -10,11 +10,12 @@ mech.log = Logger.new $stderr
 mech.agent.http.debug_output = $stderr
 
 # Load the rubyforge website
-page = mech.get('http://rubyforge.org/')
-page = mech.click page.link_with(:text => /Log In/) # Click the login link
+page = mech.get('https://rubygems.org/')
+page = mech.click page.link_with(:text => /Sign in/) # Click the login link
 form = page.forms[1] # Select the first form
-form.form_loginname = ARGV[0]
-form.form_pw        = ARGV[1]
+form["session[who]"] = ARGV[0]
+form["session[password]"] = ARGV[1]
+form["commit"] = "Sign in"
 
 # Submit the form
 page = form.submit form.buttons.first

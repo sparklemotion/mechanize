@@ -99,28 +99,21 @@ class TestMechanizeUtil < Mechanize::TestCase
   end
 
   def test_build_query_string_simple
-    query = @MU.build_query_string([[:ids, 1], [:action, 'delete'], [:ids, 5]])
+    input_params = [
+      [:ids, 1],
+      [:action, 'delete'],
+      [:ids, 5],
+    ]
 
-    parsed_params = URI.decode_www_form(query)
+    expected_params = [
+      ['ids', '1'],
+      ['action', 'delete'],
+      ['ids', '5'],
+    ]
 
-    assert_equal 3, parsed_params.size
+    query = @MU.build_query_string(input_params)
 
-    action = nil
-    ids = []
-
-    parsed_params.each { |k, v|
-      case k
-      when 'action'
-        action = v
-      when 'ids'
-        ids << v
-      else
-        raise
-      end
-    }
-
-    assert_equal 'delete', action
-    assert_equal %w[1 5], ids
+    assert_equal expected_params, URI.decode_www_form(query)
   end
 
   def test_build_query_string_complex
@@ -132,41 +125,19 @@ class TestMechanizeUtil < Mechanize::TestCase
       params: { x: "50%", y: "100%", t: [80, 160] },
     }
 
+    expected_params = [
+      ['number', '7'],
+      ['name', "\u{6B66}\u{8005}"],
+      ['ids[]', '1'], ['ids[]', '3'], ['ids[]', '5'], ['ids[]', '7'],
+      ['words', 'Sing'], ['words', 'Now!'],
+      ['params[x]', '50%'],
+      ['params[y]', '100%'],
+      ['params[t]', '80'], ['params[t]', '160'],
+    ]
+
     query = @MU.build_query_string(input_params)
 
-    parsed_params = URI.decode_www_form(query)
-
-    assert_equal 10, parsed_params.size
-
-    number = name = nil
-    ids = []
-    words = []
-    params = {}
-
-    parsed_params.each { |k, v|
-      case k
-      when 'number'
-        number = v
-      when 'name'
-        name = v
-      when 'ids[]'
-        ids << v
-      when 'words'
-        words << v
-      when /\Aparams\[(.+)\]\z/
-        params[$1.to_sym] = v
-      when /\Aparams\[(.+)\][(.+)]\z/
-        (params[$1.to_sym] ||= {})[$2.to_sym] = v
-      else
-        raise
-      end
-    }
-
-    assert_equal input_params[:number].to_s, number
-    assert_equal input_params[:name], name
-    assert_equal input_params['ids[]'].map(&:to_s), ids
-    assert_equal input_params[:words], words
-    assert_equal input_params[:params], params
+    assert_equal expected_params, URI.decode_www_form(query)
   end
 end
 

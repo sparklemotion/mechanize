@@ -133,6 +133,14 @@ class TestMechanizeHttpWwwAuthenticateParser < Mechanize::TestCase
     assert_equal expected, @parser.parse('Basic realm = "foo"')
   end
 
+  def test_parse_bad_single_quote
+    expected = [
+      challenge('Basic', { 'realm' => "'foo" }, "Basic realm='foo"),
+    ]
+
+    assert_equal expected, @parser.parse("Basic realm='foo bar', qop='baz'")
+  end
+
   def test_quoted_string
     @parser.scanner = StringScanner.new '"text"'
 

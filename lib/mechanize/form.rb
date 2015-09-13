@@ -264,8 +264,16 @@ class Mechanize::Form
         if f.checked
           successful_controls << f
         end
-      when Mechanize::Form::Field
-        successful_controls << f
+        when Mechanize::Form::Field
+          if @mech.nil? || @mech.agent.allow_empty_query_values
+            successful_controls << f
+          else
+            if f.kind_of?(Mechanize::Form::Text)
+              successful_controls << f if f.value != ''
+            else
+              successful_controls << f
+            end
+          end
       end
     end
 

@@ -117,6 +117,9 @@ class Mechanize::HTTP::Agent
   # enabling this as it may cause data loss.
   attr_accessor :ignore_bad_chunking
 
+  # Prevents empty query string values from being included
+  attr_accessor :allow_empty_query_values
+
   # Handlers for various URI schemes
   attr_accessor :scheme_handlers
 
@@ -150,6 +153,7 @@ class Mechanize::HTTP::Agent
     @robots                   = false
     @user_agent               = nil
     @webrobots                = nil
+    @allow_empty_query_values = true
 
     # HTTP Authentication
     @auth_store           = Mechanize::HTTP::AuthStore.new

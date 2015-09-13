@@ -1299,6 +1299,13 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
     @agent.shutdown
   end
 
+  ##
+  # Allow Query Parameter values to be empty
+
+  def allow_empty_query_values allow_empty
+    @agent.allow_empty_query_values = allow_empty
+  end
+
   private
 
   ##

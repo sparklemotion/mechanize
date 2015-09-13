@@ -1005,4 +1005,22 @@ class TestMechanizeForm < Mechanize::TestCase
     assert_equal 'order_matters=0&order_matters=1&order_matters=2&mess_it_up=asdf', submitted.parser.at('#query').text
   end
 
+  def test_prevent_empty_query_params
+    page = @mech.get("http://localhost/form_test.html")
+    @mech.agent.allow_empty_query_values = false
+    get_form = page.forms.find { |f| f.name == "get_form1" }
+    image_button = get_form.buttons.first
+    new_page = @mech.click(image_button)
+    assert_equal "http://localhost/form_post?button.x=0&button.y=0", new_page.uri.to_s
+  end
+
+  def test_allow_empty_query_params
+    page = @mech.get("http://localhost/form_test.html")
+    @mech.agent.allow_empty_query_values = true
+    get_form = page.forms.find { |f| f.name == "get_form1" }
+    image_button = get_form.buttons.first
+    new_page = @mech.click(image_button)
+    assert_equal "http://localhost/form_post?first_name=&button.x=0&button.y=0", new_page.uri.to_s
+  end
+
 end

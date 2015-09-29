@@ -153,6 +153,15 @@ class Mechanize::Form
     fields << Field.new({'name' => field_name}, value)
   end
 
+  # Add a file upload with +field_name+ and a file named +file_name+, with
+  # contents +file_data+, and MIME type +mime_type.
+  def add_file_upload!(field_name, file_name, file_data = nil, mime_type = nil)
+    upload = FileUpload.new({'name' => field_name }, file_name)
+    upload.file_data = file_data
+    upload.mime_type = mime_type
+    file_uploads << upload
+  end
+
   ##
   # This method sets multiple fields on the form.  It takes a list of +fields+
   # which are name, value pairs.
@@ -365,7 +374,12 @@ class Mechanize::Form
 
   # Removes all fields with name +field_name+.
   def delete_field!(field_name)
-    @fields.delete_if{ |f| f.name == field_name}
+    @fields.delete_if { |f| f.name == field_name}
+  end
+
+  # Removes all file upload fields with name +field_name+.
+  def delete_file_upload!(field_name)
+    @file_uploads.delete_if { |f| f.name == field_name}
   end
 
   ##

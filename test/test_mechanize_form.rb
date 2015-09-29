@@ -919,6 +919,34 @@ class TestMechanizeForm < Mechanize::TestCase
     assert(form.has_field?('intarweb'))
   end
 
+  def test_add_file_upload
+    page = @mech.get("http://localhost/file_upload.html")
+    form = page.form_with(:name => 'value_test')
+
+    number_of_uploads = form.file_uploads.length
+
+    assert form.add_file_upload!('ham', '/etc/passwd', 'ohnoes', 'text/plain')
+    assert_equal(number_of_uploads + 1, form.file_uploads.length)
+
+    upload = form.file_upload_with(:name => 'ham')
+    assert upload
+    assert_equal '/etc/passwd', upload.file_name
+    assert_equal 'ohnoes', upload.file_data
+    assert_equal 'text/plain', upload.mime_type
+  end
+
+  def test_delete_file_upload
+    page = @mech.get("http://localhost/file_upload.html")
+    form = page.form_with(:name => 'value_test')
+
+    number_of_uploads = form.file_uploads.length
+    assert_equal 1, number_of_uploads
+
+    form.delete_file_upload!('green[eggs]')
+    assert_nil(form.file_upload_with(:name => 'green[eggs]'))
+    assert_equal(number_of_uploads - 1, form.file_uploads.length)
+  end
+
   def test_fill_unexisting_form
     page = @mech.get("http://localhost/empty_form.html")
     assert_raises(NoMethodError) {

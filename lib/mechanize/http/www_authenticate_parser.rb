@@ -128,7 +128,7 @@ class Mechanize::HTTP::WWWAuthenticateParser
 
   def auth_param
     return nil unless name = token
-    return nil unless @scanner.scan(/=/)
+    return nil unless @scanner.scan(/ *= */)
 
     value = if @scanner.peek(1) == '"' then
               quoted_string

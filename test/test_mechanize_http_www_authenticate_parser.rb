@@ -117,6 +117,14 @@ class TestMechanizeHttpWwwAuthenticateParser < Mechanize::TestCase
     assert_equal expected, @parser.parse('BaSiC realm=foo')
   end
 
+  def test_parse_bad_whitespace_around_auth_param
+    expected = [
+      challenge('Basic', { 'realm' => 'foo' }, 'Basic realm = "foo"'),
+    ]
+
+    assert_equal expected, @parser.parse('Basic realm = "foo"')
+  end
+
   def test_quoted_string
     @parser.scanner = StringScanner.new '"text"'
 

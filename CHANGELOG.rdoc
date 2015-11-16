@@ -20,6 +20,7 @@
   * Don't raise an exception if a connection has set a {read,open}_timeout and
     a `file://` request is made. (#397)
   * Fix whitespace bug in WWW-Authenticate. #451, #450, by Rasmus Bergholdt
+  * Don't allow redirect from a non-file URL to a file URL for security reasons. (#455)
 
 === 2.7.3
 

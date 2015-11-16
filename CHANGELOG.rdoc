@@ -19,6 +19,7 @@
 * Bug fix
   * Don't raise an exception if a connection has set a {read,open}_timeout and
     a `file://` request is made. (#397)
+  * Don't allow redirect from a non-file URL to a file URL for security reasons.
 
 === 2.7.3
 

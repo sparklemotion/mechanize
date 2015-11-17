@@ -5,6 +5,7 @@ notifications:
   - drbrain@segment7.net
   - ljjarvis@gmail.com
   - knu@idaemons.org
+sudo: false
 rvm:
 - 1.9.3
 - 2.0.0

@@ -99,9 +99,33 @@ class Mechanize::Util
     }
   end
 
+  case NKF::BINARY
+  when Encoding
+    def self.guess_encoding(src)
+      NKF.guess(src)
+    end
+  else
+    # Old NKF from 1.8, still bundled with JRuby and Rubinius
+    NKF_ENCODING_MAP = {
+      NKF::UNKNOWN => Encoding::US_ASCII,
+      NKF::BINARY  => Encoding::ASCII_8BIT,
+      NKF::ASCII   => Encoding::US_ASCII,
+      NKF::JIS     => Encoding::ISO_2022_JP,
+      NKF::EUC     => Encoding::EUC_JP,
+      NKF::SJIS    => Encoding::Shift_JIS,
+      NKF::UTF8    => Encoding::UTF_8,
+      NKF::UTF16   => Encoding::UTF_16BE,
+      NKF::UTF32   => Encoding::UTF_32BE,
+    }
+
+    def self.guess_encoding(src)
+      NKF_ENCODING_MAP[NKF.guess(src)]
+    end
+  end
+
   def self.detect_charset(src)
     if src
-      NKF.guess(src).name.upcase
+      guess_encoding(src).name.upcase
     else
       Encoding::ISO8859_1.name
     end

@@ -1197,6 +1197,24 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     end
   end
 
+  def test_response_meta_refresh_with_insecure_url
+    uri = URI.parse 'http://example/#id+1'
+
+    body = <<-BODY
+<title></title>
+<meta http-equiv="refresh" content="0; url=file:///dev/zero">
+    BODY
+
+    page = Mechanize::Page.new(uri, nil, body, 200, @mech)
+
+    @agent.follow_meta_refresh = true
+
+    assert_raises Mechanize::Error do
+      @agent.response_follow_meta_refresh(@res, uri, page,
+                                          @agent.redirection_limit)
+    end
+  end
+
   def test_response_parse
     body = '<title>hi</title>'
     @res.instance_variable_set :@header, 'content-type' => %w[text/html]
@@ -1479,6 +1497,16 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal URI('http://fake.example/index.html?q=%E3%81%82'), page.uri
 
     assert_equal 'http://example/referer', requests.first['Referer']
+  end
+
+  def test_response_redirect_insecure
+    @agent.redirect_ok = true
+    referer = page 'http://example/referer'
+
+    assert_raises Mechanize::Error do
+      @agent.response_redirect({ 'Location' => 'file:///etc/passwd' }, :get,
+                               fake_page, 0, {}, referer)
+    end
   end
 
   def test_response_redirect_limit

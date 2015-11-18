@@ -692,6 +692,18 @@ class Mechanize::HTTP::Agent
     uri
   end
 
+  def secure_resolve!(uri, referer = current_page)
+    new_uri = resolve(uri, referer)
+
+    if (referer_uri = referer && referer.uri) &&
+       referer_uri.scheme != 'file'.freeze &&
+       new_uri.scheme == 'file'.freeze
+      raise Mechanize::Error, "insecure redirect to a file URI"
+    end
+
+    new_uri
+  end
+
   def resolve_parameters uri, method, parameters
     case method
     when :head, :get, :delete, :trace then
@@ -874,7 +886,7 @@ class Mechanize::HTTP::Agent
   def response_follow_meta_refresh response, uri, page, redirects
     delay, new_url = get_meta_refresh(response, uri, page)
     return nil unless delay
-    new_url = new_url ? resolve(new_url, page) : uri
+    new_url = new_url ? secure_resolve!(new_url, page) : uri
 
     raise Mechanize::RedirectLimitReachedError.new(page, redirects) if
       redirects + 1 > @redirection_limit
@@ -982,8 +994,9 @@ class Mechanize::HTTP::Agent
       headers.delete key
     end
 
+    new_uri = secure_resolve! response['Location'].to_s, page
+
     @history.push(page, page.uri)
-    new_uri = resolve response['Location'].to_s, page
 
     fetch new_uri, redirect_method, headers, [], referer, redirects + 1
   end

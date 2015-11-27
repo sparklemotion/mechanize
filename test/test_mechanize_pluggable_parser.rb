@@ -36,7 +36,16 @@ class TestMechanizePluggableParser < Mechanize::TestCase
   def test_parser_mime
     @pp['image/png'] = :png
 
-    assert_equal :png, @pp.parser('x-image/x-png')
+    if Gem::Version.new(MIME::Types::VERSION) < Gem::Version.new('3.0')
+      # This is no longer true under mime-types 3 because the x- prefix has
+      # been deprecated by IANA. It is no longer safe to say that x-png and png
+      # are the same.
+      assert_equal :png, @pp.parser('x-image/x-png')
+    else
+      assert_equal Mechanize::File, @pp.parser('x-image/x-png')
+      @pp['x-image/x-png'] = :png
+      assert_equal :png, @pp.parser('x-image/x-png')
+    end
     assert_equal :png, @pp.parser('image/png')
     assert_equal Mechanize::Image, @pp.parser('image')
   end

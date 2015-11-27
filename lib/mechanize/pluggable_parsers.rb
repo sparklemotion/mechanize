@@ -2,7 +2,13 @@ require 'mechanize/file'
 require 'mechanize/file_saver'
 require 'mechanize/page'
 require 'mechanize/xml_file'
-require 'mime/types'
+
+begin
+  # Take advantage of the lower-memory mode available from mime-types >= 2.6.
+  require 'mime/types/columnar'
+rescue LoadError
+  require 'mime/types'
+end
 
 ##
 # Mechanize allows different parsers for different content types.  Mechanize

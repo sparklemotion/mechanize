@@ -4,23 +4,41 @@
 
 * New Features
   * Accept array-like and hash-like values as query/parameter value.
-    A new utility method Mechanize::Util.each_parameter is added, and Mechanize::Util.build_query_string is enhanced
-    for this feature.
-  * Allow passing a `Form::FileUpload` instance to `#post`. #350 by Sam
+    A new utility method Mechanize::Util.each_parameter is added, and
+    Mechanize::Util.build_query_string is enhanced for this feature.
+  * Allow passing a +Form::FileUpload+ instance to <tt>#post</tt>. #350 by Sam
     Rawlins.
   * Capture link when scheme is unsupported. #362 by Jon Rowe.
-  * Pre-defined User-Agent stings are updated to those of more recent versions, and new aliases for IE 10/11 are added.
-  * Support for mime-types 1.x is restored while keeping compatible with mime-types 2.x.
+  * Pre-defined User-Agent stings are updated to those of more recent versions,
+    and new aliases for IE 10/11 are added.
+  * Support for mime-types 1.x is restored while keeping compatible with
+    mime-types 2 and higher.
+  * Added support for mime-types 3.x. Support for mime-types 3.x has two
+    effects:
+
+    * For types that were previously considered experimental (e.g.,
+      <tt>text/x-csv</tt>) type simplification no longer removes the
+      <tt>x-</tt> prefix per {RFC 6648}[http://tools.ietf.org/html/rfc6648].
+      Types of this form that had previously registered parsers automatically
+      assigned through this change should now be explicitly registered:
+
+	 mechanize.pluggable_parser.register_parser 'image/x-png',
+	   Mechanize::Image
+
+    * For users that *require* Ruby 1.9 support, your Gemfile must restrict
+      mime-types to <tt>< 3.0</tt>. mime-types 3 requires Ruby 2.0 or higher.
+
   * Mechanize::Page now responds to #xpath, #css, #at_xpath, #at_css, and #%.
-  * element(s)_with methods now accept :xpath and :css options for doing xpath/css
-    selector searching.
+  * element(s)_with methods now accept :xpath and :css options for doing
+    xpath/css selector searching.
   * Pass URI information to Nokogiri where applicable. #405 @lulalala
 
 * Bug fix
   * Don't raise an exception if a connection has set a {read,open}_timeout and
     a `file://` request is made. (#397)
   * Fix whitespace bug in WWW-Authenticate. #451, #450, by Rasmus Bergholdt
-  * Don't allow redirect from a non-file URL to a file URL for security reasons. (#455)
+  * Don't allow redirect from a non-file URL to a file URL for security
+    reasons. (#455)
 
 === 2.7.3
 

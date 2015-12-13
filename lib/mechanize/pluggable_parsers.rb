@@ -107,6 +107,8 @@ class Mechanize::PluggableParser
 
     parser = @parsers[mime_type.to_s] ||
              @parsers[mime_type.simplified] ||
+             # Starting from mime-types 3.0 x-prefix is deprecated as per IANA
+             (@parsers[MIME::Type.simplified(mime_type.to_s, remove_x_prefix: true)] rescue nil) ||
              @parsers[mime_type.media_type] ||
              default
   rescue InvalidContentTypeError

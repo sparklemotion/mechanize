@@ -31,6 +31,16 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     realm
   end
 
+  def jruby_zlib?
+    if RUBY_ENGINE == 'jruby'
+      meth = caller[0][/`(\w+)/, 1]
+      warn "#{meth}: skipped because how Zlib handles error is different in JRuby"
+      true
+    else
+      false
+    end
+  end
+
   def test_agent_is_named
     assert_equal 'mechanize', Mechanize::HTTP::Agent.new.http.name
     assert_equal 'unique', Mechanize::HTTP::Agent.new('unique').http.name
@@ -917,6 +927,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     body_io = StringIO.new \
       "\037\213\b\0002\002\225M\000\003+H,*\001"
 
+    return if jruby_zlib?
+
     e = assert_raises Mechanize::Error do
       @agent.response_content_encoding @res, body_io
     end
@@ -948,6 +960,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert body_io.closed?
 
     assert_match %r%invalid compressed data -- crc error%, log.string
+  rescue IOError
+    raise unless jruby_zlib?
   end
 
   def test_response_content_encoding_gzip_checksum_corrupt_length
@@ -964,6 +978,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert body_io.closed?
 
     assert_match %r%invalid compressed data -- length error%, log.string
+  rescue IOError
+    raise unless jruby_zlib?
   end
 
   def test_response_content_encoding_gzip_checksum_truncated
@@ -980,6 +996,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert body_io.closed?
 
     assert_match %r%unable to gunzip response: footer is not found%, log.string
+  rescue IOError
+    raise unless jruby_zlib?
   end
 
   def test_response_content_encoding_gzip_empty
@@ -1019,6 +1037,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'part', body.read
 
     assert body_io.closed?
+  rescue IOError
+    raise unless jruby_zlib?
   end
 
   def test_response_content_encoding_none

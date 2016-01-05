@@ -1,5 +1,13 @@
 = Mechanize CHANGELOG
 
+=== Unreleased
+
+* New Features
+  * All 4xx responses and RedirectLimitReachedError when fetching robots.txt are treated as full allow just like Googlebot does.
+
+* Bug fix
+  * Don't cause infinite loop when `GET /robots.txt` redirects. (#457)
+
 === 2.7.4
 
 * New Features

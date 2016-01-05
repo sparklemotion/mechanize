@@ -80,6 +80,9 @@ class Mechanize::HTTP::Agent
   # When true, this agent will consult the site's robots.txt for each access.
   attr_reader :robots
 
+  # Mutex used when fetching robots.txt
+  attr_reader :robots_mutex
+
   # :section: SSL
 
   # OpenSSL key password
@@ -148,6 +151,7 @@ class Mechanize::HTTP::Agent
     @redirection_limit        = 20
     @request_headers          = {}
     @robots                   = false
+    @robots_mutex             = Mutex.new
     @user_agent               = nil
     @webrobots                = nil
 
@@ -988,17 +992,26 @@ class Mechanize::HTTP::Agent
 
   # :section: Robots
 
+  RobotsKey = :__mechanize_get_robots__
+
   def get_robots(uri) # :nodoc:
-    fetch(uri).body
-  rescue Mechanize::ResponseCodeError => e
-    case e.response_code
-    when /\A4\d\d\z/
-      ''
-    else
-      raise e
+    robots_mutex.synchronize do
+      Thread.current[RobotsKey] = true
+      begin
+        fetch(uri).body
+      rescue Mechanize::ResponseCodeError => e
+        case e.response_code
+        when /\A4\d\d\z/
+          ''
+        else
+          raise e
+        end
+      rescue Mechanize::RedirectLimitReachedError
+        ''
+      ensure
+        Thread.current[RobotsKey] = false
+      end
     end
-  rescue Mechanize::RedirectLimitReachedError
-    ''
   end
 
   def robots= value
@@ -1012,7 +1025,7 @@ class Mechanize::HTTP::Agent
   # robots.txt.
 
   def robots_allowed? uri
-    return true if uri.request_uri == '/robots.txt'
+    return true if Thread.current[RobotsKey]
 
     webrobots.allowed? uri
   end

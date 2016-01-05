@@ -1604,6 +1604,17 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     end
   end
 
+  def test_robots_infinite_loop
+    @agent.robots = true
+    @agent.redirect_ok = true
+
+    assert_raises Mechanize::RobotsDisallowedError do
+      @agent.fetch URI('http://301/norobots.html')
+    end
+
+    @agent.fetch URI('http://301/robots.html')
+  end
+
   def test_set_proxy
     @agent.set_proxy 'www.example.com', 9001, 'joe', 'lol'
 

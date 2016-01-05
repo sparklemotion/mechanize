@@ -19,6 +19,7 @@ rvm:
 script: rake test
 matrix:
   allow_failures:
+    - rvm: 2.3
     - rvm: ruby-head
     - rvm: jruby-19mode
     - rvm: jruby-head

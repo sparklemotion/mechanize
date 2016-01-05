@@ -57,6 +57,20 @@ class TestMechanizeHttpAuthStore < Mechanize::TestCase
     assert_equal expected, @store.auth_accounts
   end
 
+  def test_add_auth_realm_case
+    @store.add_auth @uri, 'user1', 'pass', 'realm'
+    @store.add_auth @uri, 'user2', 'pass', 'Realm'
+
+    expected = {
+      @uri => {
+        'realm' => ['user1', 'pass', nil],
+        'Realm' => ['user2', 'pass', nil],
+      }
+    }
+
+    assert_equal expected, @store.auth_accounts
+  end
+
   def test_add_auth_string
     @store.add_auth "#{@uri}/path", 'user', 'pass'
 
@@ -143,6 +157,14 @@ class TestMechanizeHttpAuthStore < Mechanize::TestCase
     assert_equal ['user1', 'pass', nil], @store.credentials_for(@uri, 'other')
   end
 
+  def test_credentials_for_realm_case
+    @store.add_auth @uri, 'user1', 'pass', 'realm'
+    @store.add_auth @uri, 'user2', 'pass', 'Realm'
+
+    assert_equal ['user1', 'pass', nil], @store.credentials_for(@uri, 'realm')
+    assert_equal ['user2', 'pass', nil], @store.credentials_for(@uri, 'Realm')
+  end
+
   def test_credentials_for_path
     @store.add_auth @uri, 'user', 'pass', 'realm'
 
@@ -177,6 +199,21 @@ class TestMechanizeHttpAuthStore < Mechanize::TestCase
     expected = {
       @uri => {
         nil => ['user1', 'pass', nil]
+      }
+    }
+
+    assert_equal expected, @store.auth_accounts
+  end
+
+  def test_remove_auth_realm_case
+    @store.add_auth @uri, 'user1', 'pass', 'realm'
+    @store.add_auth @uri, 'user2', 'pass', 'Realm'
+
+    @store.remove_auth @uri, 'Realm'
+
+    expected = {
+      @uri => {
+        'realm' => ['user1', 'pass', nil]
       }
     }
 

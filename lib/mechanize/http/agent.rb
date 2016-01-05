@@ -991,8 +991,14 @@ class Mechanize::HTTP::Agent
   def get_robots(uri) # :nodoc:
     fetch(uri).body
   rescue Mechanize::ResponseCodeError => e
-    return '' if e.response_code == '404'
-    raise e
+    case e.response_code
+    when /\A4\d\d\z/
+      ''
+    else
+      raise e
+    end
+  rescue Mechanize::RedirectLimitReachedError
+    ''
   end
 
   def robots= value

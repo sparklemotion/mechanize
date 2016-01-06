@@ -374,6 +374,14 @@ but not <a href="/" rel="me nofollow">this</a>!
     end
   end
 
+  def test_get_auth
+    @mech.add_auth @uri, 'user', 'pass'
+
+    page = @mech.get @uri + '/basic_auth'
+
+    assert_equal 'You are authenticated', page.body
+  end
+
   def test_get_auth_bad
     @mech.add_auth(@uri, 'aaron', 'aaron')
 
@@ -390,6 +398,14 @@ but not <a href="/" rel="me nofollow">this</a>!
     end
 
     assert_equal("401", e.response_code)
+  end
+
+  def test_get_auth_realm
+    @mech.add_auth @uri, 'user', 'pass', 'Blah'
+
+    page = @mech.get @uri + '/basic_auth'
+
+    assert_equal 'You are authenticated', page.body
   end
 
   def test_get_conditional

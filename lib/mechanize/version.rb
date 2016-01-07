@@ -1,3 +1,3 @@
 class Mechanize
-  VERSION = "2.7.4.beta3"
+  VERSION = "2.7.4"
 end

@@ -102,10 +102,11 @@ class Mechanize::Util
   case NKF::BINARY
   when Encoding
     def self.guess_encoding(src)
-      NKF.guess(src)
+      # NKF.guess of JRuby may return nil
+      NKF.guess(src) || Encoding::US_ASCII
     end
   else
-    # Old NKF from 1.8, still bundled with JRuby and Rubinius
+    # Old NKF from 1.8, still bundled with Rubinius
     NKF_ENCODING_MAP = {
       NKF::UNKNOWN => Encoding::US_ASCII,
       NKF::BINARY  => Encoding::ASCII_8BIT,

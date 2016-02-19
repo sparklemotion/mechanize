@@ -7,6 +7,7 @@
 
 * Bug fix
   * Don't cause infinite loop when `GET /robots.txt` redirects. (#457)
+  * Fix basic authentication for a realm that contains uppercase characters. (#458, #459)
 
 === 2.7.4
 

@@ -14,7 +14,10 @@ class TestMechanizeHttpAuthRealm < Mechanize::TestCase
     assert_equal 'r', @realm.realm
 
     realm = @AR.new 'Digest', @uri, 'R'
-    assert_equal 'r', realm.realm
+    refute_equal 'r', realm.realm
+
+    realm = @AR.new 'Digest', @uri, 'R'
+    assert_equal 'R', realm.realm
 
     realm = @AR.new 'Digest', @uri, nil
     assert_nil realm.realm
@@ -28,6 +31,9 @@ class TestMechanizeHttpAuthRealm < Mechanize::TestCase
     refute_equal @realm, other
 
     other = @AR.new 'Digest', URI('http://other.example/'), 'r'
+    refute_equal @realm, other
+
+    other = @AR.new 'Digest', @uri, 'R'
     refute_equal @realm, other
 
     other = @AR.new 'Digest', @uri, 's'

@@ -586,6 +586,15 @@ class Mechanize::Form
     end
   end
 
+  unless ::String.method_defined?(:b)
+    # Define String#b for Ruby < 2.0
+    class ::String
+      def b
+        dup.force_encoding(Encoding::ASCII_8BIT)
+      end
+    end
+  end
+
   def rand_string(len = 10)
     chars = ("a".."z").to_a + ("A".."Z").to_a
     string = ""
@@ -594,13 +603,13 @@ class Mechanize::Form
   end
 
   def mime_value_quote(str)
-    str.gsub(/(["\r\\])/){|s| '\\' + s}
+    str.b.gsub(/(["\r\\])/, '\\\\\1')
   end
 
   def param_to_multipart(name, value)
     return "Content-Disposition: form-data; name=\"" +
       "#{mime_value_quote(name)}\"\r\n" +
-      "\r\n#{value}\r\n"
+      "\r\n#{value.b}\r\n"
   end
 
   def file_to_multipart(file)
@@ -621,14 +630,17 @@ class Mechanize::Form
       body << "Content-Type: #{file.mime_type}\r\n"
     end
 
-    body <<
-      if file.file_data.respond_to? :read
-        "\r\n#{file.file_data.read}\r\n"
-      else
-        "\r\n#{file.file_data}\r\n"
-      end
+    body << "\r\n"
 
-    body
+    if file_data = file.file_data
+      if file_data.respond_to? :read
+        body << file_data.read.force_encoding(Encoding::ASCII_8BIT)
+      else
+        body << file_data.b
+      end
+    end
+
+    body << "\r\n"
   end
 end
 

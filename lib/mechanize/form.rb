@@ -605,6 +605,7 @@ class Mechanize::Form
 
   def file_to_multipart(file)
     file_name = file.file_name ? ::File.basename(file.file_name) : ''
+    file_name.force_encoding(Encoding::ASCII_8BIT)
     body =  "Content-Disposition: form-data; name=\"" +
       "#{mime_value_quote(file.name)}\"; " +
       "filename=\"#{mime_value_quote(file_name)}\"\r\n" +
@@ -627,6 +628,8 @@ class Mechanize::Form
       else
         "\r\n#{file.file_data}\r\n"
       end
+
+    file.file_data = nil
 
     body
   end

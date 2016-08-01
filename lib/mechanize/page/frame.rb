@@ -1,4 +1,4 @@
-# A Frame object wrapse a frame HTML element.  Frame objects can be treated
+# A Frame object wraps a frame HTML element.  Frame objects can be treated
 # just like Link objects.  They contain #src, the #link they refer to and a
 # #name, the name of the frame they refer to.  #src and #name are aliased to
 # #href and #text respectively so that a Frame object can be treated just like

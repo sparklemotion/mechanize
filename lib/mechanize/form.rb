@@ -337,6 +337,8 @@ class Mechanize::Form
     @clicked_buttons = []
   end
 
+  CRLF = "\r\n".freeze
+
   # This method calculates the request data to be sent back to the server
   # for this form, depending on if this is a regular post, get, or a
   # multi-part post,
@@ -348,16 +350,23 @@ class Mechanize::Form
       boundary = rand_string(20)
       @enctype = "multipart/form-data; boundary=#{boundary}"
 
-      params = query_params.map do |k,v|
-        param_to_multipart(k, v) if k
-      end.compact
+      delimiter = "--#{boundary}\r\n"
 
-      params.concat @file_uploads.map { |f| file_to_multipart(f) }
+      data = ::String.new
 
-      params.map do |part|
-        "--#{boundary}\r\n#{part.force_encoding(Encoding::ASCII_8BIT)}"
-      end.join('') +
-        "--#{boundary}--\r\n"
+      query_params.each do |k,v|
+        if k
+          data << delimiter
+          param_to_multipart(k, v, data)
+        end
+      end
+
+      @file_uploads.each do |f|
+        data << delimiter
+        file_to_multipart(f, data)
+      end
+
+      data << "--#{boundary}--\r\n"
     else
       Mechanize::Util.build_query_string(query_params)
     end
@@ -597,7 +606,7 @@ class Mechanize::Form
 
   def rand_string(len = 10)
     chars = ("a".."z").to_a + ("A".."Z").to_a
-    string = ""
+    string = ::String.new
     1.upto(len) { |i| string << chars[rand(chars.size-1)] }
     string
   end
@@ -606,18 +615,24 @@ class Mechanize::Form
     str.b.gsub(/(["\r\\])/, '\\\\\1')
   end
 
-  def param_to_multipart(name, value)
-    return "Content-Disposition: form-data; name=\"" +
-      "#{mime_value_quote(name)}\"\r\n" +
-      "\r\n#{value.b}\r\n"
+  def param_to_multipart(name, value, buf = ::String.new)
+    buf <<
+      "Content-Disposition: form-data; name=\"".freeze <<
+      mime_value_quote(name) <<
+      "\"\r\n\r\n".freeze <<
+      value.b <<
+      CRLF
   end
 
-  def file_to_multipart(file)
+  def file_to_multipart(file, buf = ::String.new)
     file_name = file.file_name ? ::File.basename(file.file_name) : ''
-    body =  "Content-Disposition: form-data; name=\"" +
-      "#{mime_value_quote(file.name)}\"; " +
-      "filename=\"#{mime_value_quote(file_name)}\"\r\n" +
-      "Content-Transfer-Encoding: binary\r\n"
+
+    body = buf <<
+           "Content-Disposition: form-data; name=\"".freeze <<
+           mime_value_quote(file.name) <<
+           "\"; filename=\"".freeze <<
+           mime_value_quote(file_name) <<
+           "\"\r\nContent-Transfer-Encoding: binary\r\n".freeze
 
     if file.file_data.nil? and file.file_name
       file.file_data = File.binread(file.file_name)
@@ -627,10 +642,10 @@ class Mechanize::Form
     end
 
     if file.mime_type
-      body << "Content-Type: #{file.mime_type}\r\n"
+      body << "Content-Type: ".freeze << file.mime_type << CRLF
     end
 
-    body << "\r\n"
+    body << CRLF
 
     if file_data = file.file_data
       if file_data.respond_to? :read
@@ -640,7 +655,7 @@ class Mechanize::Form
       end
     end
 
-    body << "\r\n"
+    body << CRLF
   end
 end
 

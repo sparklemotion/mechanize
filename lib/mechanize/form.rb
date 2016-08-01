@@ -207,7 +207,7 @@ class Mechanize::Form
 
   # Treat form fields like accessors.
   def method_missing(meth, *args)
-    method = meth.to_s.gsub(/=$/, '')
+    (method = meth.to_s).chomp!('=')
 
     if field(method)
       return field(method).value if args.empty?

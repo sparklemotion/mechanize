@@ -611,7 +611,7 @@ class Mechanize::Form
       "Content-Transfer-Encoding: binary\r\n"
 
     if file.file_data.nil? and file.file_name
-      file.file_data = open(file.file_name, "rb") { |f| f.read }
+      file.file_data = File.binread(file.file_name)
       file.mime_type =
         WEBrick::HTTPUtils.mime_type(file.file_name,
                                      WEBrick::HTTPUtils::DefaultMimeTypes)

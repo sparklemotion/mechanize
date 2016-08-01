@@ -71,7 +71,10 @@ class Mechanize::HTTP::Agent
 
   # :section: Allowed error codes
 
-  # List of error codes to handle without raising an exception.
+  # List of error codes (in String or Integer) to handle without
+  # raising Mechanize::ResponseCodeError, defaulted to an empty array.
+  # Note that 2xx, 3xx and 401 status codes will be handled without
+  # checking this list.
 
   attr_accessor :allowed_error_codes
 

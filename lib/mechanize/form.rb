@@ -67,12 +67,12 @@ class Mechanize::Form
 
   # Returns all field names (keys) for this form
   def keys
-    fields.map { |f| f.name }
+    fields.map(&:name)
   end
 
   # Returns all field values for this form
   def values
-    fields.map { |f| f.value }
+    fields.map(&:value)
   end
 
   # Returns all buttons of type Submit
@@ -278,10 +278,10 @@ class Mechanize::Form
 
     # take one radio button from each group
     radio_groups.each_value do |g|
-      checked = g.select {|f| f.checked}
+      checked = g.select(&:checked)
 
       if checked.uniq.size > 1 then
-        values = checked.map { |button| button.value }.join(', ').inspect
+        values = checked.map(&:value).join(', ').inspect
         name = checked.first.name.inspect
         raise Mechanize::Error,
               "radiobuttons #{values} are checked in the #{name} group, " \

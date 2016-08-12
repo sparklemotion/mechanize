@@ -47,7 +47,11 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "net-http-digest_auth", [ ">= 1.1.1", "~> 1.1" ]
   spec.add_runtime_dependency "net-http-persistent",  [ ">= 2.5.2", "~> 2.5" ]
-  spec.add_runtime_dependency "mime-types",           [ ">= 1.17.2", "< 3" ]
+  if RUBY_VERSION >= "2.0"
+    spec.add_runtime_dependency "mime-types", [ ">= 1.17.2" ]
+  else
+    spec.add_runtime_dependency "mime-types", [ ">= 1.17.2", "< 3" ]
+  end
   spec.add_runtime_dependency "http-cookie",          [ "~> 1.0" ]
   spec.add_runtime_dependency "nokogiri",             [ "~> 1.6" ]
   spec.add_runtime_dependency "ntlm-http",            [ ">= 0.1.1", "~> 0.1"   ]

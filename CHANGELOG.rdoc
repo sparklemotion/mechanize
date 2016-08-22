@@ -1,6 +1,6 @@
 = Mechanize CHANGELOG
 
-=== Unreleased
+=== 2.7.5
 
 * New Features
   * All 4xx responses and RedirectLimitReachedError when fetching robots.txt are treated as full allow just like Googlebot does.

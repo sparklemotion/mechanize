@@ -11,7 +11,7 @@ class Mechanize::UnauthorizedError < Mechanize::ResponseCodeError
     out = super
 
     if @challenges then
-      realms = @challenges.map { |challenge| challenge.realm_name }.join ', '
+      realms = @challenges.map(&:realm_name).join ', '
       out << " -- available realms: #{realms}"
     end
 

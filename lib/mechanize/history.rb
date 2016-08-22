@@ -16,7 +16,7 @@ class Mechanize::History < Array
   end
 
   def inspect # :nodoc:
-    uris = map { |page| page.uri }.join ', '
+    uris = map(&:uri).join ', '
 
     "[#{uris}]"
   end

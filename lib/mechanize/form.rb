@@ -67,12 +67,12 @@ class Mechanize::Form
 
   # Returns all field names (keys) for this form
   def keys
-    fields.map { |f| f.name }
+    fields.map(&:name)
   end
 
   # Returns all field values for this form
   def values
-    fields.map { |f| f.value }
+    fields.map(&:value)
   end
 
   # Returns all buttons of type Submit
@@ -278,10 +278,10 @@ class Mechanize::Form
 
     # take one radio button from each group
     radio_groups.each_value do |g|
-      checked = g.select {|f| f.checked}
+      checked = g.select(&:checked)
 
       if checked.uniq.size > 1 then
-        values = checked.map { |button| button.value }.join(', ').inspect
+        values = checked.map(&:value).join(', ').inspect
         name = checked.first.name.inspect
         raise Mechanize::Error,
               "radiobuttons #{values} are checked in the #{name} group, " \
@@ -337,6 +337,8 @@ class Mechanize::Form
     @clicked_buttons = []
   end
 
+  CRLF = "\r\n".freeze
+
   # This method calculates the request data to be sent back to the server
   # for this form, depending on if this is a regular post, get, or a
   # multi-part post,
@@ -348,16 +350,23 @@ class Mechanize::Form
       boundary = rand_string(20)
       @enctype = "multipart/form-data; boundary=#{boundary}"
 
-      params = query_params.map do |k,v|
-        param_to_multipart(k, v) if k
-      end.compact
+      delimiter = "--#{boundary}\r\n"
 
-      params.concat @file_uploads.map { |f| file_to_multipart(f) }
+      data = ::String.new
 
-      params.map do |part|
-        "--#{boundary}\r\n#{part.force_encoding(Encoding::ASCII_8BIT)}"
-      end.join('') +
-        "--#{boundary}--\r\n"
+      query_params.each do |k,v|
+        if k
+          data << delimiter
+          param_to_multipart(k, v, data)
+        end
+      end
+
+      @file_uploads.each do |f|
+        data << delimiter
+        file_to_multipart(f, data)
+      end
+
+      data << "--#{boundary}--\r\n"
     else
       Mechanize::Util.build_query_string(query_params)
     end
@@ -586,49 +595,67 @@ class Mechanize::Form
     end
   end
 
+  unless ::String.method_defined?(:b)
+    # Define String#b for Ruby < 2.0
+    class ::String
+      def b
+        dup.force_encoding(Encoding::ASCII_8BIT)
+      end
+    end
+  end
+
   def rand_string(len = 10)
     chars = ("a".."z").to_a + ("A".."Z").to_a
-    string = ""
+    string = ::String.new
     1.upto(len) { |i| string << chars[rand(chars.size-1)] }
     string
   end
 
   def mime_value_quote(str)
-    str.gsub(/(["\r\\])/){|s| '\\' + s}
+    str.b.gsub(/(["\r\\])/, '\\\\\1')
   end
 
-  def param_to_multipart(name, value)
-    return "Content-Disposition: form-data; name=\"" +
-      "#{mime_value_quote(name)}\"\r\n" +
-      "\r\n#{value}\r\n"
+  def param_to_multipart(name, value, buf = ::String.new)
+    buf <<
+      "Content-Disposition: form-data; name=\"".freeze <<
+      mime_value_quote(name) <<
+      "\"\r\n\r\n".freeze <<
+      value.b <<
+      CRLF
   end
 
-  def file_to_multipart(file)
+  def file_to_multipart(file, buf = ::String.new)
     file_name = file.file_name ? ::File.basename(file.file_name) : ''
-    body =  "Content-Disposition: form-data; name=\"" +
-      "#{mime_value_quote(file.name)}\"; " +
-      "filename=\"#{mime_value_quote(file_name)}\"\r\n" +
-      "Content-Transfer-Encoding: binary\r\n"
+
+    body = buf <<
+           "Content-Disposition: form-data; name=\"".freeze <<
+           mime_value_quote(file.name) <<
+           "\"; filename=\"".freeze <<
+           mime_value_quote(file_name) <<
+           "\"\r\nContent-Transfer-Encoding: binary\r\n".freeze
 
     if file.file_data.nil? and file.file_name
-      file.file_data = open(file.file_name, "rb") { |f| f.read }
+      file.file_data = File.binread(file.file_name)
       file.mime_type =
         WEBrick::HTTPUtils.mime_type(file.file_name,
                                      WEBrick::HTTPUtils::DefaultMimeTypes)
     end
 
     if file.mime_type
-      body << "Content-Type: #{file.mime_type}\r\n"
+      body << "Content-Type: ".freeze << file.mime_type << CRLF
     end
 
-    body <<
-      if file.file_data.respond_to? :read
-        "\r\n#{file.file_data.read}\r\n"
-      else
-        "\r\n#{file.file_data}\r\n"
-      end
+    body << CRLF
 
-    body
+    if file_data = file.file_data
+      if file_data.respond_to? :read
+        body << file_data.read.force_encoding(Encoding::ASCII_8BIT)
+      else
+        body << file_data.b
+      end
+    end
+
+    body << CRLF
   end
 end
 

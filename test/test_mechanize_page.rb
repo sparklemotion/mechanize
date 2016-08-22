@@ -123,7 +123,7 @@ class TestMechanizePage < Mechanize::TestCase
     assert_equal "frame4",            page.iframes.first.name
     assert_equal "/file_upload.html", page.iframes.first.src
     assert_equal "File Upload Form",  page.iframes.first.content.title
-  end
+  end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse IFRAME
 
   def test_image_with
     page = html_page <<-BODY

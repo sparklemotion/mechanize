@@ -92,7 +92,7 @@ class TestMechanize < Mechanize::TestCase
 
     assert_equal("http://localhost/form_test.html",
                  @mech.history.last.uri.to_s)
-  end
+  end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse body of NOFRAMES
 
   def test_click_bogus_link_with_cookies
     @mech.cookie_jar = cookie_jar("a=b")
@@ -149,7 +149,7 @@ class TestMechanize < Mechanize::TestCase
 
     assert_equal("http://localhost/form_test.html",
                  @mech.history.last.uri.to_s)
-  end
+  end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse body of NOFRAMES
 
   def test_click_link
     link = node 'a', 'href' => '/index.html'

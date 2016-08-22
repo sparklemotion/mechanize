@@ -10,7 +10,7 @@ class TestMechanizeLink < Mechanize::TestCase
     page = link.click
     assert_equal("http://localhost/form_test.html",
       @mech.history.last.uri.to_s)
-  end
+  end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse body of NOFRAMES
 
   def test_click_bang
     page = @mech.get("http://localhost/frame_test.html")
@@ -20,7 +20,7 @@ class TestMechanizeLink < Mechanize::TestCase
     page = link.click
     assert_equal("http://localhost/form_test.html",
       @mech.history.last.uri.to_s)
-  end
+  end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse body of NOFRAMES
 
   def test_click_base
     page = @mech.get("http://google.com/tc_base_link.html")
@@ -103,7 +103,7 @@ class TestMechanizeLink < Mechanize::TestCase
     page = page.link_with(:text => 'just the query string').click
     assert_equal('http://localhost/relative/tc_relative_links.html?a=b',
                  page.uri.to_s)
-  end
+  end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse IFRAME
 
   def test_uri_weird
     doc = Nokogiri::HTML::Document.new
@@ -122,6 +122,6 @@ class TestMechanizeLink < Mechanize::TestCase
 
     assert_equal "/form_test.html", link.uri.to_s
     assert_equal "http://localhost/form_test.html", link.resolved_uri.to_s
-  end
+  end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse body of NOFRAMES
 end
 

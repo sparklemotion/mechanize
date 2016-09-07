@@ -11,6 +11,8 @@ class Mechanize::Page::Frame < Mechanize::Page::Link
   attr_reader :text
   alias :name :text
 
+  attr_reader :node
+
   def initialize(node, mech, referer)
     super(node, mech, referer)
     @node = node

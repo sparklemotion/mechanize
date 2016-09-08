@@ -108,6 +108,8 @@ class TestMechanizePage < Mechanize::TestCase
     assert_equal "frame3",            page.frames[2].name
     assert_equal "/file_upload.html", page.frames[2].src
     assert_equal "File Upload Form",  page.frames[2].content.title
+
+    assert_equal %w[/google.html /file_upload.html], page.frames_with(search: '*[name=frame1], *[name=frame3]').map(&:src)
   end
 
   def test_iframes

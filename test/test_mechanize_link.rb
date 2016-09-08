@@ -2,6 +2,25 @@ require 'mechanize/test_case'
 
 class TestMechanizeLink < Mechanize::TestCase
 
+  def test_search
+    page = @mech.get("http://localhost/find_link.html")
+    link = page.link_with(text: "Form Test")
+
+    assert_equal('Form Test', link.text)
+
+    link_with_search = page.link_with(search: "//*[text()='Form Test']")
+    assert_equal(link, link_with_search)
+
+    link_with_xpath = page.link_with(xpath: "//*[text()='Form Test']")
+    assert_equal(link, link_with_xpath)
+
+    link_with_css = page.link_with(css: ".formtest")
+    assert_equal(link, link_with_css)
+
+    link_with_class = page.link_with(class: "formtest")
+    assert_equal(link, link_with_class)
+  end
+
   def test_click
     page = @mech.get("http://localhost/frame_test.html")
     link = page.link_with(:text => "Form Test")

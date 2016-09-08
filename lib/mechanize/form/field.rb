@@ -14,6 +14,8 @@
 #   field.value = "foo"
 
 class Mechanize::Form::Field
+  extend Forwardable
+
   attr_accessor :name, :value, :node, :type
 
   # This fields value before it's sent through Util.html_unescape.
@@ -66,6 +68,50 @@ class Mechanize::Form::Field
   def dom_class
     node['class']
   end
+
+  ##
+  # :method: search
+  #
+  # Shorthand for +node.search+.
+  #
+  # See Nokogiri::XML::Node#search for details.
+
+  ##
+  # :method: css
+  #
+  # Shorthand for +node.css+.
+  #
+  # See also Nokogiri::XML::Node#css for details.
+
+  ##
+  # :method: xpath
+  #
+  # Shorthand for +node.xpath+.
+  #
+  # See also Nokogiri::XML::Node#xpath for details.
+
+  ##
+  # :method: at
+  #
+  # Shorthand for +node.at+.
+  #
+  # See also Nokogiri::XML::Node#at for details.
+
+  ##
+  # :method: at_css
+  #
+  # Shorthand for +node.at_css+.
+  #
+  # See also Nokogiri::XML::Node#at_css for details.
+
+  ##
+  # :method: at_xpath
+  #
+  # Shorthand for +node.at_xpath+.
+  #
+  # See also Nokogiri::XML::Node#at_xpath for details.
+
+  def_delegators :node, :search, :css, :xpath, :at, :at_css, :at_xpath
 
   def inspect # :nodoc:
     "[%s:0x%x type: %s name: %s value: %s]" % [

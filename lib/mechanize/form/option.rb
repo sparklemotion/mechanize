@@ -8,12 +8,13 @@
 #   select_list.first.tick
 
 class Mechanize::Form::Option
-  attr_reader :value, :selected, :text, :select_list
+  attr_reader :value, :selected, :text, :select_list, :node
 
   alias :to_s :value
   alias :selected? :selected
 
   def initialize(node, select_list)
+    @node     = node
     @text     = node.inner_text
     @value    = Mechanize::Util.html_unescape(node['value'] || node.inner_text)
     @selected = node.has_attribute? 'selected'

@@ -16,7 +16,7 @@ require 'mechanize/element_matcher'
 #   puts form['name']
 
 class Mechanize::Form
-
+  extend Forwardable
   extend Mechanize::ElementMatcher
 
   attr_accessor :method, :action, :name
@@ -35,12 +35,13 @@ class Mechanize::Form
 
   alias :elements :fields
 
-  attr_reader :form_node
+  attr_reader :node
+  alias form_node node  # for backward compatibility
   attr_reader :page
 
   def initialize(node, mech = nil, page = nil)
     @enctype = node['enctype'] || 'application/x-www-form-urlencoded'
-    @form_node        = node
+    @node             = node
     @action           = Mechanize::Util.html_unescape(node['action'])
     @method           = (node['method'] || 'GET').upcase
     @name             = node['name']
@@ -136,7 +137,7 @@ class Mechanize::Form
   # Note that you can also use +:id+ to get to this method:
   #   page.form_with(:id => "foorm")
   def dom_id
-    form_node['id']
+    @node['id']
   end
 
   # This method is a shortcut to get form's DOM class.
@@ -145,8 +146,52 @@ class Mechanize::Form
   # Note that you can also use +:class+ to get to this method:
   #   page.form_with(:class => "foorm")
   def dom_class
-    form_node['class']
+    @node['class']
   end
+
+  ##
+  # :method: search
+  #
+  # Shorthand for +node.search+.
+  #
+  # See Nokogiri::XML::Node#search for details.
+
+  ##
+  # :method: css
+  #
+  # Shorthand for +node.css+.
+  #
+  # See also Nokogiri::XML::Node#css for details.
+
+  ##
+  # :method: xpath
+  #
+  # Shorthand for +node.xpath+.
+  #
+  # See also Nokogiri::XML::Node#xpath for details.
+
+  ##
+  # :method: at
+  #
+  # Shorthand for +node.at+.
+  #
+  # See also Nokogiri::XML::Node#at for details.
+
+  ##
+  # :method: at_css
+  #
+  # Shorthand for +node.at_css+.
+  #
+  # See also Nokogiri::XML::Node#at_css for details.
+
+  ##
+  # :method: at_xpath
+  #
+  # Shorthand for +node.at_xpath+.
+  #
+  # See also Nokogiri::XML::Node#at_xpath for details.
+
+  def_delegators :node, :search, :css, :xpath, :at, :at_css, :at_xpath
 
   # Add a field with +field_name+ and +value+
   def add_field!(field_name, value = nil)
@@ -319,7 +364,7 @@ class Mechanize::Form
   # This method adds a button to the query.  If the form needs to be
   # submitted with multiple buttons, pass each button to this method.
   def add_button_to_query(button)
-    unless button.node.document == @form_node.document then
+    unless button.node.document == @node.document then
       message =
         "#{button.inspect} does not belong to the same page as " \
         "the form #{@name.inspect} in #{@page.uri}"
@@ -535,7 +580,7 @@ class Mechanize::Form
     @checkboxes   = []
 
     # Find all input tags
-    form_node.search('input').each do |node|
+    @node.search('input').each do |node|
       type = (node['type'] || 'text').downcase
       name = node['name']
       next if name.nil? && !%w[submit button image].include?(type)
@@ -566,13 +611,13 @@ class Mechanize::Form
     end
 
     # Find all textarea tags
-    form_node.search('textarea').each do |node|
+    @node.search('textarea').each do |node|
       next unless node['name']
       @fields << Textarea.new(node, node.inner_text)
     end
 
     # Find all select tags
-    form_node.search('select').each do |node|
+    @node.search('select').each do |node|
       next unless node['name']
       if node.has_attribute? 'multiple'
         @fields << MultiSelectList.new(node)
@@ -583,14 +628,14 @@ class Mechanize::Form
 
     # Find all submit button tags
     # FIXME: what can I do with the reset buttons?
-    form_node.search('button').each do |node|
+    @node.search('button').each do |node|
       type = (node['type'] || 'submit').downcase
       next if type == 'reset'
       @buttons << Button.new(node)
     end
 
     # Find all keygen tags
-    form_node.search('keygen').each do |node|
+    @node.search('keygen').each do |node|
       @fields << Keygen.new(node, node['value'] || '')
     end
   end

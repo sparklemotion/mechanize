@@ -12,19 +12,15 @@
 #   list.value = 'one'
 
 class Mechanize::Form::MultiSelectList < Mechanize::Form::Field
-
   extend Mechanize::ElementMatcher
 
   attr_accessor :options
 
   def initialize node
     value = []
-    @options = []
-
-    # parse
-    node.search('option').each do |n|
-      @options << Mechanize::Form::Option.new(n, self)
-    end
+    @options = node.search('option').map { |n|
+      Mechanize::Form::Option.new(n, self)
+    }
 
     super node, value
   end

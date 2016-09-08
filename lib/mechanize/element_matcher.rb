@@ -29,7 +29,7 @@ module Mechanize::ElementMatcher
 
         f = select_#{plural}(selector, method).find_all do |thing|
           criteria.all? do |k,v|
-            v === thing.send(k)
+            v === thing.__send__(k)
           end
         end
         yield f if block_given?

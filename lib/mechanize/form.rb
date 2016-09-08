@@ -145,6 +145,9 @@ class Mechanize::Form
   #   page.form_with(:dom_class => "foorm")
   # Note that you can also use +:class+ to get to this method:
   #   page.form_with(:class => "foorm")
+  # However, attribute values are compared literally as string, so
+  # form_with(class: "a") does not match a form with class="a b".
+  # Use form_with(css: "form.a") instead.
   def dom_class
     @node['class']
   end

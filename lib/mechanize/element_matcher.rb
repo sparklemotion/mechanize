@@ -15,6 +15,9 @@ module Mechanize::ElementMatcher
               h[:dom_class] = v
             when :search, :xpath, :css
               if v
+                if method
+                  warn "multiple search selectors are given; previous selector (\#{method}: \#{selector.inspect}) is ignored."
+                end
                 selector = v
                 method = k
               end

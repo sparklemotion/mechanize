@@ -1,4 +1,4 @@
-= Mechanize {<img src="https://secure.travis-ci.org/sparklemotion/mechanize.svg?rvm=2.3.1" />}[http://travis-ci.org/sparklemotion/mechanize]
+= Mechanize {<img src="https://secure.travis-ci.org/sparklemotion/mechanize.svg?rvm=2.3.3" />}[http://travis-ci.org/sparklemotion/mechanize]
 
 * http://docs.seattlerb.org/mechanize
 * https://github.com/sparklemotion/mechanize

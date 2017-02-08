@@ -5,25 +5,31 @@ notifications:
   - drbrain@segment7.net
   - ljjarvis@gmail.com
   - knu@idaemons.org
+
 sudo: false
+
 # bundler is missing for jruby-head in travis-ci
 # https://github.com/travis-ci/travis-ci/issues/5861
-before_install: gem install --conservative bundler
-rvm:
-- 1.9.3
-- 2.0.0
-- 2.1
-- 2.2
-- 2.3.1
-- ruby-head
-- jruby-1.7.26
-- jruby-9.1.5.0
-- jruby-head
+before_install:
+  - gem install --conservative bundler -v'1.13.7'
+
 script: rake test
+
 matrix:
-  allow_failures:
+  include:
     - rvm: 1.9.3
     - rvm: 2.0.0
+    - rvm: 2.1
+    - rvm: 2.2
+    - rvm: 2.3.3
+    - rvm: 2.4.0
     - rvm: ruby-head
-    - rvm: jruby-9.1.5.0
+    - rvm: jruby-1.7.26
+      env: JRUBY_OPTS=--debug
+    - rvm: jruby-9.1.7.0
+      env: JRUBY_OPTS=--debug
+    - rvm: jruby-head
+      env: JRUBY_OPTS=--debug    
+  allow_failures:
+    - rvm: jruby-9.1.7.0
     - rvm: jruby-head

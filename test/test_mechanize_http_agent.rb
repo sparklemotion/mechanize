@@ -682,6 +682,14 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'absolute URL needed (not google)', e.message
   end
 
+  def test_resolve_uri_without_path
+    e = assert_raises ArgumentError do
+      @agent.resolve 'http:%5C%5Cfoo'
+    end
+
+    assert_equal 'hierarchical URL needed (not http:%5C%5Cfoo)', e.message
+  end
+
   def test_resolve_utf8
     uri = 'http://example?q=ü'
 

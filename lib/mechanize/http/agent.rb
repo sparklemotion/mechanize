@@ -673,7 +673,12 @@ class Mechanize::HTTP::Agent
       raise ArgumentError, "unsupported scheme: #{uri.scheme}"
     end
 
-    uri.path = '/' if uri.path.empty?
+    case uri.path
+    when nil
+      raise ArgumentError, "hierarchical URL needed (not #{uri})"
+    when ''.freeze
+      uri.path = '/'
+    end
 
     uri
   end

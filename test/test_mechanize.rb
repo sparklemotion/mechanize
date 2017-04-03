@@ -965,6 +965,20 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert_send [page.body.bytesize, :>, File.size(__FILE__)]
   end
 
+  def test_post_multipart_from_readable
+    name = 'some_file.txt'
+    contents = 'some file contents'
+    readable = Minitest::Mock.new.expect(:read, contents).expect(:path, name)
+
+    page = @mech.post('http://localhost/file_upload', :userfile1 => readable)
+
+    assert_match(
+      "Content-Disposition: form-data; name=\"userfile1\"; filename=\"#{name}\"",
+      page.body
+    )
+    assert_match contents, page.body
+  end
+
   def test_post_file_upload
     name = File.basename(__FILE__)
     file_upload = Mechanize::Form::FileUpload.new({'name' => 'userfile1'}, name)

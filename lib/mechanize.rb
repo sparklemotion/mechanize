@@ -521,7 +521,7 @@ class Mechanize
     form = Form.new(node)
 
     Mechanize::Util.each_parameter(query) { |k, v|
-      if v.is_a?(IO)
+      if v.respond_to?(:path) && v.respond_to?(:read)
         form.enctype = 'multipart/form-data'
         ul = Form::FileUpload.new({'name' => k.to_s},::File.basename(v.path))
         ul.file_data = v.read

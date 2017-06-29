@@ -162,6 +162,16 @@ class TestMechanizeParser < Mechanize::TestCase
     end
   end
 
+  def test_extract_filename_content_disposition_empty
+    @parser.uri = URI 'http://example'
+
+    @parser.response = {
+      'content-disposition' => 'inline; filename="/"'
+    }
+
+    assert_equal '', @parser.extract_filename
+  end
+
   def test_extract_filename_host
     @parser.response = {}
     @parser.uri = URI 'http://example'

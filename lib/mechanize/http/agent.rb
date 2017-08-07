@@ -183,7 +183,13 @@ class Mechanize::HTTP::Agent
     @scheme_handlers['relative']  = @scheme_handlers['http']
     @scheme_handlers['file']      = @scheme_handlers['http']
 
-    @http = Net::HTTP::Persistent.new connection_name
+    @http =
+      if defined?(Net::HTTP::Persistent::DEFAULT_POOL_SIZE)
+        Net::HTTP::Persistent.new(name: connection_name)
+      else
+        # net-http-persistent < 3.0
+        Net::HTTP::Persistent.new(connection_name)
+      end
     @http.idle_timeout = 5
     @http.keep_alive   = 300
   end

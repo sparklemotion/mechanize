@@ -438,7 +438,7 @@ class Mechanize
   # +parameters+ is formatted into a query string using
   # Mechanize::Util.build_query_string, which see.
 
-  def get(uri, parameters = [], referer = nil, headers = {})
+  def get(uri, parameters = [], referer = nil, headers = {}, no_default_headers = false)
     method = :get
 
     referer ||=
@@ -461,7 +461,7 @@ class Mechanize
 
     # fetch the page
     headers ||= {}
-    page = @agent.fetch uri, method, headers, parameters, referer
+    page = @agent.fetch uri, method, headers, parameters, referer, no_default_headers
     add_to_history(page)
     yield page if block_given?
     page
@@ -507,7 +507,7 @@ class Mechanize
   #   agent.post('http://example.com/', "<message>hello</message>",
   #              'Content-Type' => 'application/xml')
 
-  def post(uri, query = {}, headers = {})
+  def post(uri, query = {}, headers = {}, no_default_headers = false)
     return request_with_entity(:post, uri, query, headers) if String === query
 
     node = {}
@@ -1306,7 +1306,7 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
   ##
   # Posts +form+ to +uri+
 
-  def post_form(uri, form, headers = {})
+  def post_form(uri, form, headers = {}, no_default_headers = false)
     cur_page = form.page || current_page ||
       Page.new
 
@@ -1320,7 +1320,7 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
     }.merge headers
 
     # fetch the page
-    page = @agent.fetch uri, :post, headers, [request_data], cur_page
+    page = @agent.fetch uri, :post, headers, [request_data], cur_page, no_default_headers
     add_to_history(page)
     page
   end

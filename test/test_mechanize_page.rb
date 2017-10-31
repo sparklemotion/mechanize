@@ -250,5 +250,31 @@ class TestMechanizePage < Mechanize::TestCase
     assert_empty page.links_with(:search => '//img')
   end
 
+	def test_multiple_titles
+		page = html_page <<-BODY
+<!doctype html>
+<html>
+	<head>
+		<title>HTMLTITLE</title>
+	</head>
+	<body>
+		<svg>
+			<title>SVGTITLE</title>
+			<metadata id="metadata5">
+				<rdf:RDF>
+					<cc:Work>
+						<dc:title>RDFDCTITLE</dc:title>
+					</cc:Work>
+				</rdf:RDF>
+			</metadata>
+			<g></g>
+		</svg>
+	</body>
+</html>
+		BODY
+
+		assert_equal page.title, "HTMLTITLE"
+	end
+
 end
 

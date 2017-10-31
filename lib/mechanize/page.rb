@@ -58,7 +58,7 @@ class Mechanize::Page < Mechanize::File
   def title
     @title ||=
       if doc = parser
-        title = doc.search('title').inner_text
+        title = doc.search('html > head > title').inner_text
         title.empty? ? nil : title
       end
   end

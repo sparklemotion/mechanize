@@ -2,6 +2,11 @@
 
 === Unreleased
 
+* Bug fix
+  * Fix element(s)_with(search: selector) methods not working for forms, form fields and frames. (#444)
+
+=== 2.7.5
+
 * New Features
   * All 4xx responses and RedirectLimitReachedError when fetching robots.txt are treated as full allow just like Googlebot does.
   * Enable support for mime-types > 3.
@@ -9,6 +14,7 @@
 * Bug fix
   * Don't cause infinite loop when `GET /robots.txt` redirects. (#457)
   * Fix basic authentication for a realm that contains uppercase characters. (#458, #459)
+  * Fix encoding error when uploading a file which name is non-ASCII. (#333)
 
 === 2.7.4
 

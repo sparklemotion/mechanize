@@ -2,6 +2,25 @@ require 'mechanize/test_case'
 
 class TestMechanizeLink < Mechanize::TestCase
 
+  def test_search
+    page = @mech.get("http://localhost/find_link.html")
+    link = page.link_with(text: "Form Test")
+
+    assert_equal('Form Test', link.text)
+
+    link_with_search = page.link_with(search: "//*[text()='Form Test']")
+    assert_equal(link, link_with_search)
+
+    link_with_xpath = page.link_with(xpath: "//*[text()='Form Test']")
+    assert_equal(link, link_with_xpath)
+
+    link_with_css = page.link_with(css: ".formtest")
+    assert_equal(link, link_with_css)
+
+    link_with_class = page.link_with(class: "formtest")
+    assert_equal(link, link_with_class)
+  end
+
   def test_click
     page = @mech.get("http://localhost/frame_test.html")
     link = page.link_with(:text => "Form Test")
@@ -10,7 +29,7 @@ class TestMechanizeLink < Mechanize::TestCase
     page = link.click
     assert_equal("http://localhost/form_test.html",
       @mech.history.last.uri.to_s)
-  end
+  end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse body of NOFRAMES
 
   def test_click_bang
     page = @mech.get("http://localhost/frame_test.html")
@@ -20,7 +39,7 @@ class TestMechanizeLink < Mechanize::TestCase
     page = link.click
     assert_equal("http://localhost/form_test.html",
       @mech.history.last.uri.to_s)
-  end
+  end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse body of NOFRAMES
 
   def test_click_base
     page = @mech.get("http://google.com/tc_base_link.html")
@@ -103,7 +122,7 @@ class TestMechanizeLink < Mechanize::TestCase
     page = page.link_with(:text => 'just the query string').click
     assert_equal('http://localhost/relative/tc_relative_links.html?a=b',
                  page.uri.to_s)
-  end
+  end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse IFRAME
 
   def test_uri_weird
     doc = Nokogiri::HTML::Document.new
@@ -122,6 +141,6 @@ class TestMechanizeLink < Mechanize::TestCase
 
     assert_equal "/form_test.html", link.uri.to_s
     assert_equal "http://localhost/form_test.html", link.resolved_uri.to_s
-  end
+  end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse body of NOFRAMES
 end
 

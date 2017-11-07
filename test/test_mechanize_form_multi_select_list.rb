@@ -32,9 +32,13 @@ class TestMechanizeFormMultiSelectList < Mechanize::TestCase
   end
 
   def test_option_with
-    option = @select.option_with :value => '1'
+    option = @select.option_with value: '1'
 
     assert_equal '1', option.value
+
+    option = @select.option_with search: 'option[@selected]'
+
+    assert_equal '2', option.value
   end
 
   def test_options_with

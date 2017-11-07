@@ -290,7 +290,7 @@ class TestMechanizePageLink < Mechanize::TestCase
   def test_links
     page = @mech.get("http://localhost/find_link.html")
     assert_equal(18, page.links.length)
-  end
+  end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse FRAME outside of FRAMESET
 
   def test_links_with_bold
     page = @mech.get("http://localhost/tc_links.html")

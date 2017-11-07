@@ -92,7 +92,7 @@ class TestMechanize < Mechanize::TestCase
 
     assert_equal("http://localhost/form_test.html",
                  @mech.history.last.uri.to_s)
-  end
+  end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse body of NOFRAMES
 
   def test_click_bogus_link_with_cookies
     @mech.cookie_jar = cookie_jar("a=b")
@@ -149,7 +149,7 @@ class TestMechanize < Mechanize::TestCase
 
     assert_equal("http://localhost/form_test.html",
                  @mech.history.last.uri.to_s)
-  end
+  end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse body of NOFRAMES
 
   def test_click_link
     link = node 'a', 'href' => '/index.html'
@@ -943,7 +943,26 @@ but not <a href="/" rel="me nofollow">this</a>!
       "Content-Disposition: form-data; name=\"userfile1\"; filename=\"#{name}\"",
       page.body
     )
-    assert page.body.length > File.read(__FILE__).length
+    assert_send [page.body.bytesize, :>, File.size(__FILE__)]
+  end
+
+  def test_post_file_upload_nonascii
+    name = 'ユーザファイル1'
+    file_upload = Mechanize::Form::FileUpload.new({'name' => 'userfile1'}, name)
+    file_upload.file_data = File.read(__FILE__)
+    file_upload.mime_type = 'application/zip'
+
+    page = @mech.post('http://localhost/file_upload', {
+      :name       => 'Some file',
+      :userfile1  => file_upload
+    })
+
+    assert_match(
+      "Content-Disposition: form-data; name=\"userfile1\"; filename=\"#{name}\"".force_encoding(Encoding::ASCII_8BIT),
+      page.body
+    )
+    assert_match("Content-Type: application/zip", page.body)
+    assert_send [page.body.bytesize, :>, File.size(__FILE__)]
   end
 
   def test_post_file_upload
@@ -962,7 +981,7 @@ but not <a href="/" rel="me nofollow">this</a>!
       page.body
     )
     assert_match("Content-Type: application/zip", page.body)
-    assert page.body.length > File.read(__FILE__).length
+    assert_send [page.body.bytesize, :>, File.size(__FILE__)]
   end
 
   def test_post_redirect
@@ -1156,7 +1175,7 @@ but not <a href="/" rel="me nofollow">this</a>!
 
     page = @mech.submit(form)
 
-    contents = File.read __FILE__
+    contents = File.binread __FILE__
     basename = File.basename __FILE__
 
     assert_match(
@@ -1176,7 +1195,7 @@ but not <a href="/" rel="me nofollow">this</a>!
 
     page = @mech.submit(form)
 
-    contents = File.read __FILE__
+    contents = File.binread __FILE__
     basename = File.basename __FILE__
     assert_match(
       "Content-Disposition: form-data; name=\"green[eggs]\"; filename=\"#{basename}\"",

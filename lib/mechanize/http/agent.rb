@@ -659,14 +659,6 @@ class Mechanize::HTTP::Agent
     scheme = uri.relative? ? 'relative' : uri.scheme.downcase
     uri = @scheme_handlers[scheme].call(uri, referer)
 
-    if referer_uri
-      if uri.path.length == 0 && uri.relative?
-        uri.path = referer_uri.path
-      end
-    end
-
-    uri.path = '/' if uri.path.length == 0
-
     if uri.relative?
       raise ArgumentError, "absolute URL needed (not #{uri})" unless
         referer_uri
@@ -694,6 +686,13 @@ class Mechanize::HTTP::Agent
 
     unless ['http', 'https', 'file'].include?(uri.scheme.downcase)
       raise ArgumentError, "unsupported scheme: #{uri.scheme}"
+    end
+
+    case uri.path
+    when nil
+      raise ArgumentError, "hierarchical URL needed (not #{uri})"
+    when ''.freeze
+      uri.path = '/'
     end
 
     uri

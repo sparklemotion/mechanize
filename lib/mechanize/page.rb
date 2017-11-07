@@ -282,7 +282,9 @@ class Mechanize::Page < Mechanize::File
   # value.
   #
   # :class, :dom_class: selects forms with a #dom_class value that
-  # matches this value.
+  # matches this value.  Note that class attribute values are compared
+  # literally as string, so forms_with(class: "a") does not match a
+  # form with class="a b".  Use forms_with(css: "form.a") instead.
   #
   # :search: only selects forms matching this selector expression.
   #

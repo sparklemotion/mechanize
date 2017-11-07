@@ -12,19 +12,15 @@
 #   list.value = 'one'
 
 class Mechanize::Form::MultiSelectList < Mechanize::Form::Field
-
   extend Mechanize::ElementMatcher
 
   attr_accessor :options
 
   def initialize node
     value = []
-    @options = []
-
-    # parse
-    node.search('option').each do |n|
-      @options << Mechanize::Form::Option.new(n, self)
-    end
+    @options = node.search('option').map { |n|
+      Mechanize::Form::Option.new(n, self)
+    }
 
     super node, value
   end
@@ -64,18 +60,18 @@ class Mechanize::Form::MultiSelectList < Mechanize::Form::Field
   # Select no options
   def select_none
     @value = []
-    options.each { |o| o.untick }
+    options.each(&:untick)
   end
 
   # Select all options
   def select_all
     @value = []
-    options.each { |o| o.tick }
+    options.each(&:tick)
   end
 
   # Get a list of all selected options
   def selected_options
-    @options.find_all { |o| o.selected? }
+    @options.find_all(&:selected?)
   end
 
   def value=(values)
@@ -91,10 +87,7 @@ class Mechanize::Form::MultiSelectList < Mechanize::Form::Field
   end
 
   def value
-    value = []
-    value.concat @value
-    value.concat selected_options.map { |o| o.value }
-    value
+    @value + selected_options.map(&:value)
   end
 
 end

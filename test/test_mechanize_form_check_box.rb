@@ -8,6 +8,16 @@ class TestMechanizeFormCheckBox < Mechanize::TestCase
     @page = @mech.get('http://localhost/tc_checkboxes.html')
   end
 
+  def test_search
+    form = @page.forms.first
+
+    checkbox = form.checkbox_with(name: 'green')
+    assert_equal('green', checkbox.name)
+
+    assert_equal(checkbox, form.checkbox_with('green'))
+    assert_equal(checkbox, form.checkbox_with(search: 'input[@type=checkbox][@name=green]'))
+  end
+
   def test_check
     form = @page.forms.first
 

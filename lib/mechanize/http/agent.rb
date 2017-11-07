@@ -2,6 +2,8 @@ require 'tempfile'
 require 'net/ntlm'
 require 'kconv'
 require 'webrobots'
+require "socksify"
+require 'socksify/http'
 
 ##
 # An HTTP (and local disk access) user agent.  This class is an implementation
@@ -323,6 +325,19 @@ class Mechanize::HTTP::Agent
         raise Mechanize::ResponseCodeError.new(page, 'unhandled response')
       end
     end
+  end
+
+  def set_socks addr, port
+    set_http unless @http
+    class << @http
+      attr_accessor :socks_addr, :socks_port
+ 
+      def http_class
+        Net::HTTP.SOCKSProxy(socks_addr, socks_port)
+      end
+    end
+    @http.socks_addr = addr
+    @http.socks_port = port
   end
 
   # URI for a proxy connection

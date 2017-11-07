@@ -21,6 +21,7 @@ require 'mechanize/test_case/referer_servlet'
 require 'mechanize/test_case/refresh_with_empty_url'
 require 'mechanize/test_case/refresh_without_url'
 require 'mechanize/test_case/response_code_servlet'
+require 'mechanize/test_case/robots_txt_servlet'
 require 'mechanize/test_case/send_cookies_servlet'
 require 'mechanize/test_case/verb_servlet'
 
@@ -49,6 +50,8 @@ MECHANIZE_TEST_CASE_SERVLETS = {
   '/refresh_with_empty_url' => RefreshWithEmptyUrl,
   '/refresh_without_url'    => RefreshWithoutUrl,
   '/response_code'          => ResponseCodeServlet,
+  '/robots.txt'             => RobotsTxtServlet,
+  '/robots_txt'             => RobotsTxtServlet,
   '/send_cookies'           => SendCookiesServlet,
   '/verb'                   => VerbServlet,
 }

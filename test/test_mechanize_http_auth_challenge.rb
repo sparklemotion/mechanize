@@ -25,6 +25,14 @@ class TestMechanizeHttpAuthChallenge < Mechanize::TestCase
     assert_equal expected, @challenge.realm(@uri + '/foo')
   end
 
+  def test_realm_digest_case
+    challenge = @AC.new 'Digest', { 'realm' => 'R' }, 'Digest realm=R'
+
+    expected = @AR.new 'Digest', @uri, 'R'
+
+    assert_equal expected, challenge.realm(@uri + '/foo')
+  end
+
   def test_realm_unknown
     @challenge.scheme = 'Unknown'
 
@@ -37,6 +45,12 @@ class TestMechanizeHttpAuthChallenge < Mechanize::TestCase
 
   def test_realm_name
     assert_equal 'r', @challenge.realm_name
+  end
+
+  def test_realm_name_case
+    challenge = @AC.new 'Digest', { 'realm' => 'R' }, 'Digest realm=R'
+
+    assert_equal 'R', challenge.realm_name
   end
 
   def test_realm_name_ntlm

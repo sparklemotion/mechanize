@@ -2,6 +2,8 @@ require 'tempfile'
 require 'net/ntlm'
 require 'kconv'
 require 'webrobots'
+require "socksify"
+require 'socksify/http'
 
 ##
 # An HTTP (and local disk access) user agent.  This class is an implementation
@@ -71,7 +73,10 @@ class Mechanize::HTTP::Agent
 
   # :section: Allowed error codes
 
-  # List of error codes to handle without raising an exception.
+  # List of error codes (in String or Integer) to handle without
+  # raising Mechanize::ResponseCodeError, defaulted to an empty array.
+  # Note that 2xx, 3xx and 401 status codes will be handled without
+  # checking this list.
 
   attr_accessor :allowed_error_codes
 
@@ -79,6 +84,9 @@ class Mechanize::HTTP::Agent
 
   # When true, this agent will consult the site's robots.txt for each access.
   attr_reader :robots
+
+  # Mutex used when fetching robots.txt
+  attr_reader :robots_mutex
 
   # :section: SSL
 
@@ -148,6 +156,7 @@ class Mechanize::HTTP::Agent
     @redirection_limit        = 20
     @request_headers          = {}
     @robots                   = false
+    @robots_mutex             = Mutex.new
     @user_agent               = nil
     @webrobots                = nil
 
@@ -316,6 +325,19 @@ class Mechanize::HTTP::Agent
         raise Mechanize::ResponseCodeError.new(page, 'unhandled response')
       end
     end
+  end
+
+  def set_socks addr, port
+    set_http unless @http
+    class << @http
+      attr_accessor :socks_addr, :socks_port
+ 
+      def http_class
+        Net::HTTP.SOCKSProxy(socks_addr, socks_port)
+      end
+    end
+    @http.socks_addr = addr
+    @http.socks_port = port
   end
 
   # URI for a proxy connection
@@ -988,11 +1010,26 @@ class Mechanize::HTTP::Agent
 
   # :section: Robots
 
+  RobotsKey = :__mechanize_get_robots__
+
   def get_robots(uri) # :nodoc:
-    fetch(uri).body
-  rescue Mechanize::ResponseCodeError => e
-    return '' if e.response_code == '404'
-    raise e
+    robots_mutex.synchronize do
+      Thread.current[RobotsKey] = true
+      begin
+        fetch(uri).body
+      rescue Mechanize::ResponseCodeError => e
+        case e.response_code
+        when /\A4\d\d\z/
+          ''
+        else
+          raise e
+        end
+      rescue Mechanize::RedirectLimitReachedError
+        ''
+      ensure
+        Thread.current[RobotsKey] = false
+      end
+    end
   end
 
   def robots= value
@@ -1006,7 +1043,7 @@ class Mechanize::HTTP::Agent
   # robots.txt.
 
   def robots_allowed? uri
-    return true if uri.request_uri == '/robots.txt'
+    return true if Thread.current[RobotsKey]
 
     webrobots.allowed? uri
   end

@@ -109,6 +109,14 @@ class TestMechanizeHttpWwwAuthenticateParser < Mechanize::TestCase
     assert_equal expected, @parser.parse('Basic ReAlM=foo')
   end
 
+  def test_parse_realm_value_case
+    expected = [
+      challenge('Basic', { 'realm' => 'Foo' }, 'Basic realm=Foo'),
+    ]
+
+    assert_equal expected, @parser.parse('Basic realm=Foo')
+  end
+
   def test_parse_scheme_uppercase
     expected = [
       challenge('Basic', { 'realm' => 'foo' }, 'BaSiC realm=foo'),

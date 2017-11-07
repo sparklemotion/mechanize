@@ -3,13 +3,23 @@
 === Unreleased
 
 * New Features
+  * All 4xx responses and RedirectLimitReachedError when fetching robots.txt are treated as full allow just like Googlebot does.
+  * Enable support for mime-types > 3.
+
+* Bug fix
+  * Don't cause infinite loop when `GET /robots.txt` redirects. (#457)
+  * Fix basic authentication for a realm that contains uppercase characters. (#458, #459)
+
+=== 2.7.4
+
+* New Features
   * Accept array-like and hash-like values as query/parameter value.
     A new utility method Mechanize::Util.each_parameter is added, and Mechanize::Util.build_query_string is enhanced
     for this feature.
   * Allow passing a `Form::FileUpload` instance to `#post`. #350 by Sam
     Rawlins.
   * Capture link when scheme is unsupported. #362 by Jon Rowe.
-  * Pre-defined User-Agent stings are updated to those of more recent versions, and new aliases for IE 10/11 are added.
+  * Pre-defined User-Agent stings are updated to those of more recent versions, and new aliases for IE 10/11 and Edge are added.
   * Support for mime-types 1.x is restored while keeping compatible with mime-types 2.x.
   * Mechanize::Page now responds to #xpath, #css, #at_xpath, #at_css, and #%.
   * element(s)_with methods now accept :xpath and :css options for doing xpath/css

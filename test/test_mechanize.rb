@@ -943,7 +943,7 @@ but not <a href="/" rel="me nofollow">this</a>!
       "Content-Disposition: form-data; name=\"userfile1\"; filename=\"#{name}\"",
       page.body
     )
-    assert_send [page.body.bytesize, :>, File.size(__FILE__)]
+    assert_operator page.body.bytesize, :>, File.size(__FILE__)
   end
 
   def test_post_file_upload_nonascii
@@ -962,7 +962,7 @@ but not <a href="/" rel="me nofollow">this</a>!
       page.body
     )
     assert_match("Content-Type: application/zip", page.body)
-    assert_send [page.body.bytesize, :>, File.size(__FILE__)]
+    assert_operator page.body.bytesize, :>, File.size(__FILE__)
   end
 
   def test_post_file_upload
@@ -981,7 +981,7 @@ but not <a href="/" rel="me nofollow">this</a>!
       page.body
     )
     assert_match("Content-Type: application/zip", page.body)
-    assert_send [page.body.bytesize, :>, File.size(__FILE__)]
+    assert_operator page.body.bytesize, :>, File.size(__FILE__)
   end
 
   def test_post_redirect

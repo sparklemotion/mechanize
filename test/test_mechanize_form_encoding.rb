@@ -67,7 +67,7 @@ class TestMechanizeFormEncoding < Mechanize::TestCase
     node['enctype'] = 'application/x-www-form-urlencoded'
     form = Mechanize::Form.new(node)
 
-    assert_equal nil, form.encoding
+    assert_nil form.encoding
   end
 
   def test_post_form_with_form_encoding

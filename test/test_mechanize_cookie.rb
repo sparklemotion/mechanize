@@ -18,13 +18,20 @@ module Enumerable
 end
 
 class TestMechanizeCookie < Mechanize::TestCase
-  def silently
-    warn_level = $VERBOSE
-    $VERBOSE = false
-    res = yield
-    $VERBOSE = warn_level
-    res
+  def assert_cookie_parse url, cookie_text, &block
+    cookie = nil
+
+    block ||= proc { |p_cookie| cookie = p_cookie }
+
+    exp_re = /The call of Mechanize::Cookie.parse/
+    assert_output "", exp_re do
+      Mechanize::Cookie.parse(url, cookie_text, &block)
+    end
+
+    cookie
   end
+
+  alias silently capture_io
 
   def test_parse_dates
     url = URI.parse('http://localhost/')
@@ -64,7 +71,7 @@ class TestMechanizeCookie < Mechanize::TestCase
 
     uri = URI.parse 'http://example'
 
-    Mechanize::Cookie.parse uri, cookie_str do |cookie|
+    assert_cookie_parse uri, cookie_str do |cookie|
       assert_equal 'a', cookie.name
       assert_equal 'b', cookie.value
     end
@@ -75,7 +82,7 @@ class TestMechanizeCookie < Mechanize::TestCase
 
     uri = URI.parse 'http://example'
 
-    Mechanize::Cookie.parse uri, cookie_str do |cookie|
+    assert_cookie_parse uri, cookie_str do |cookie|
       assert_equal 'foo',               cookie.name
       assert_equal 'bar',               cookie.value
       assert_equal '/',                 cookie.path
@@ -89,7 +96,7 @@ class TestMechanizeCookie < Mechanize::TestCase
 
     uri = URI.parse 'http://example'
 
-    Mechanize::Cookie.parse uri, cookie_str do |cookie|
+    assert_cookie_parse uri, cookie_str do |cookie|
       assert_equal 'quoted', cookie.name
       assert_equal 'value', cookie.value
     end
@@ -98,35 +105,37 @@ class TestMechanizeCookie < Mechanize::TestCase
   def test_parse_weird_cookie
     cookie = 'n/a, ASPSESSIONIDCSRRQDQR=FBLDGHPBNDJCPCGNCPAENELB; path=/'
     url = URI.parse('http://www.searchinnovation.com/')
-    Mechanize::Cookie.parse(url, cookie) { |c|
+    assert_cookie_parse url, cookie do |c|
       assert_equal('ASPSESSIONIDCSRRQDQR', c.name)
       assert_equal('FBLDGHPBNDJCPCGNCPAENELB', c.value)
-    }
+    end
   end
 
   def test_double_semicolon
     double_semi = 'WSIDC=WEST;; domain=.williams-sonoma.com; path=/'
     url = URI.parse('http://williams-sonoma.com/')
-    Mechanize::Cookie.parse(url, double_semi) { |cookie|
+    assert_cookie_parse url, double_semi do |cookie|
       assert_equal('WSIDC', cookie.name)
       assert_equal('WEST', cookie.value)
-    }
+    end
   end
 
   def test_parse_bad_version
     bad_cookie = 'PRETANET=TGIAqbFXtt; Name=/PRETANET; Path=/; Version=1.2; Content-type=text/html; Domain=192.168.6.196; expires=Friday, 13-November-2026  23:01:46 GMT;'
     url = URI.parse('http://localhost/')
-    Mechanize::Cookie.parse(url, bad_cookie) { |cookie|
+
+    assert_cookie_parse url, bad_cookie do |cookie|
       assert_nil(cookie.version)
-    }
+    end
   end
 
   def test_parse_bad_max_age
     bad_cookie = 'PRETANET=TGIAqbFXtt; Name=/PRETANET; Path=/; Max-Age=1.2; Content-type=text/html; Domain=192.168.6.196; expires=Friday, 13-November-2026  23:01:46 GMT;'
     url = URI.parse('http://localhost/')
-    Mechanize::Cookie.parse(url, bad_cookie) { |cookie|
+
+    assert_cookie_parse url, bad_cookie do |cookie|
       assert_nil(cookie.max_age)
-    }
+    end
   end
 
   def test_parse_date_fail
@@ -151,7 +160,7 @@ class TestMechanizeCookie < Mechanize::TestCase
 
     cookie_str = 'a=b; domain=.example.com'
 
-    cookie = Mechanize::Cookie.parse(url, cookie_str).first
+    cookie = assert_cookie_parse url, cookie_str
 
     assert_equal 'example.com', cookie.domain
     assert cookie.for_domain?
@@ -162,7 +171,7 @@ class TestMechanizeCookie < Mechanize::TestCase
 
     cookie_str = 'a=b; domain=example.com'
 
-    cookie = Mechanize::Cookie.parse(url, cookie_str).first
+    cookie = assert_cookie_parse url, cookie_str
 
     assert_equal 'example.com', cookie.domain
     assert cookie.for_domain?
@@ -173,7 +182,7 @@ class TestMechanizeCookie < Mechanize::TestCase
 
     cookie_str = 'a=b;'
 
-    cookie = Mechanize::Cookie.parse(url, cookie_str).first
+    cookie = assert_cookie_parse url, cookie_str
 
     assert_equal 'example.com', cookie.domain
     assert !cookie.for_domain?
@@ -184,17 +193,23 @@ class TestMechanizeCookie < Mechanize::TestCase
 
     date = 'Mon, 19 Feb 2012 19:26:04 GMT'
 
-    cookie = Mechanize::Cookie.parse(url, "name=Akinori; expires=#{date}").first
+    cookie_text = "name=Akinori; expires=#{date}"
+    cookie = assert_cookie_parse url, cookie_text
     assert_equal Time.at(1329679564), cookie.expires
 
-    cookie = Mechanize::Cookie.parse(url, 'name=Akinori; max-age=3600').first
+    cookie_text = 'name=Akinori; max-age=3600'
+    cookie = assert_cookie_parse url, cookie_text
     assert_in_delta Time.now + 3600, cookie.expires, 1
 
     # Max-Age has precedence over Expires
-    cookie = Mechanize::Cookie.parse(url, "name=Akinori; max-age=3600; expires=#{date}").first
+    cookie_text = "name=Akinori; max-age=3600; expires=#{date}"
+    cookie = assert_cookie_parse url, cookie_text
+
     assert_in_delta Time.now + 3600, cookie.expires, 1
 
-    cookie = Mechanize::Cookie.parse(url, "name=Akinori; expires=#{date}; max-age=3600").first
+    cookie_text = "name=Akinori; expires=#{date}; max-age=3600"
+    cookie = assert_cookie_parse url, cookie_text
+
     assert_in_delta Time.now + 3600, cookie.expires, 1
   end
 
@@ -208,7 +223,7 @@ class TestMechanizeCookie < Mechanize::TestCase
       'name=Akinori; expires=',
       'name=Akinori; max-age=',
     ].each { |str|
-      cookie = Mechanize::Cookie.parse(url, str).first
+      cookie = assert_cookie_parse url, str
       assert cookie.session, str
     }
 
@@ -216,7 +231,7 @@ class TestMechanizeCookie < Mechanize::TestCase
       'name=Akinori; expires=Mon, 19 Feb 2012 19:26:04 GMT',
       'name=Akinori; max-age=3600',
     ].each { |str|
-      cookie = Mechanize::Cookie.parse(url, str).first
+      cookie = assert_cookie_parse url, str
       assert !cookie.session, str
     }
   end
@@ -237,7 +252,8 @@ class TestMechanizeCookie < Mechanize::TestCase
       "no_domain2=no_domain; Expires=Sun, 06 Nov 2011 00:29:53 GMT; no_expires=nope; Domain, " \
       "no_domain3=no_domain; Expires=Sun, 06 Nov 2011 00:29:53 GMT; no_expires=nope; Domain="
 
-    cookies = Mechanize::Cookie.parse url, cookie_str
+    cookies = nil
+    silently { cookies = Mechanize::Cookie.parse url, cookie_str }
     assert_equal 13, cookies.length
 
     name = cookies.find { |c| c.name == 'name' }
@@ -293,8 +309,8 @@ class TestMechanizeCookie < Mechanize::TestCase
           cookie_text << "#{cookie_params[key]}; "
         end
       end
-      cookie = nil
-      Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
+
+      cookie = assert_cookie_parse url, cookie_text
 
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('/', cookie.path)
@@ -328,8 +344,7 @@ class TestMechanizeCookie < Mechanize::TestCase
           cookie_text << "#{cookie_params[key]}; "
         end
       end
-      cookie = nil
-      Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
+      cookie = assert_cookie_parse url, cookie_text
 
       assert_equal('12345%7D=', cookie.to_s)
       assert_equal('', cookie.value)
@@ -366,8 +381,8 @@ class TestMechanizeCookie < Mechanize::TestCase
           cookie_text << "#{cookie_params[key]}; "
         end
       end
-      cookie = nil
-      Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
+
+      cookie = assert_cookie_parse url, cookie_text
 
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('/', cookie.path)
@@ -403,8 +418,8 @@ class TestMechanizeCookie < Mechanize::TestCase
           cookie_text << "#{cookie_params[key]}; "
         end
       end
-      cookie = nil
-      Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
+
+      cookie = assert_cookie_parse url, cookie_text
 
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('/', cookie.path)
@@ -439,8 +454,8 @@ class TestMechanizeCookie < Mechanize::TestCase
           cookie_text << "#{cookie_params[key]};"
         end
       end
-      cookie = nil
-      Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie }
+
+      cookie = assert_cookie_parse url, cookie_text
 
       assert_equal('12345%7D=ASDFWEE345%3DASda', cookie.to_s)
       assert_equal('/', cookie.path)
@@ -478,7 +493,7 @@ class TestMechanizeCookie < Mechanize::TestCase
     url = URI.parse('http://host.dom.example.com:8080/')
 
     cookie_str = 'a=b; domain=Example.Com'
-    cookie = Mechanize::Cookie.parse(url, cookie_str).first
+    cookie = assert_cookie_parse url, cookie_str
     assert 'example.com', cookie.domain
 
     cookie.domain = DomainName(url.host)
@@ -512,8 +527,8 @@ class TestMechanizeCookie < Mechanize::TestCase
           cookie_text << "#{cookie_params[key]}; "
         end
       end
-      cookie = nil
-      Mechanize::Cookie.parse(url, cookie_text) { |p_cookie| cookie = p_cookie; }
+
+      cookie = assert_cookie_parse url, cookie_text
 
       assert_equal(true, cookie.httponly)
 

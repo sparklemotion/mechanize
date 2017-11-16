@@ -6,6 +6,30 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     super
 
     @jar = Mechanize::CookieJar.new
+
+    @jar.extend Minitest::Assertions
+
+    def @jar.add(*args)
+      capture_io { super }
+    end
+
+    def @jar.jar(*args)
+      result = nil
+      capture_io { result = super }
+      result
+    end
+
+    def @jar.save_as(*args)
+      result = nil
+      capture_io { result = super }
+      result
+    end
+
+    def @jar.clear!(*args)
+      result = nil
+      capture_io { result = super }
+      result
+    end
   end
 
   def cookie_values(options = {})

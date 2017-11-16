@@ -294,8 +294,7 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     # Add one cookie with an expiration date in the future
     cookie = Mechanize::Cookie.new(cookie_values)
     s_cookie = Mechanize::Cookie.new(cookie_values(:name => 'Bar',
-                                              :expires => nil,
-                                              :session => true))
+                                              :expires => nil))
 
     @jar.add(url, cookie)
     @jar.add(url, s_cookie)
@@ -321,8 +320,7 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     # Add one cookie with an expiration date in the future
     cookie = Mechanize::Cookie.new(cookie_values)
     s_cookie = Mechanize::Cookie.new(cookie_values(:name => 'Bar',
-                                              :expires => nil,
-                                              :session => true))
+                                              :expires => nil))
 
     @jar.add(url, cookie)
     @jar.add(url, s_cookie)
@@ -348,8 +346,7 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     # Add one cookie with an expiration date in the future
     cookie = Mechanize::Cookie.new(cookie_values)
     s_cookie = Mechanize::Cookie.new(cookie_values(:name => 'Bar',
-                                              :expires => nil,
-                                              :session => true))
+                                              :expires => nil))
 
     @jar.add(url, cookie)
     @jar.add(url, s_cookie)

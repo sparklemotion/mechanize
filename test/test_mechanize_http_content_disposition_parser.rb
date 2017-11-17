@@ -128,5 +128,11 @@ class TestMechanizeHttpContentDispositionParser < Mechanize::TestCase
     assert_equal 'value',      content_disposition.filename
   end
 
-end
+  def test_parse_filename_starting_with_escaped_quote
+    content_disposition = @parser.parse \
+      'content-disposition: attachment; Filename="\"value\""', true
 
+    assert_equal '"value"', content_disposition.filename
+  end
+
+end

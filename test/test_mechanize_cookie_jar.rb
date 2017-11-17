@@ -6,6 +6,30 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     super
 
     @jar = Mechanize::CookieJar.new
+
+    @jar.extend Minitest::Assertions
+
+    def @jar.add(*args)
+      capture_io { super }
+    end
+
+    def @jar.jar(*args)
+      result = nil
+      capture_io { result = super }
+      result
+    end
+
+    def @jar.save_as(*args)
+      result = nil
+      capture_io { result = super }
+      result
+    end
+
+    def @jar.clear!(*args)
+      result = nil
+      capture_io { result = super }
+      result
+    end
   end
 
   def cookie_values(options = {})
@@ -270,8 +294,7 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     # Add one cookie with an expiration date in the future
     cookie = Mechanize::Cookie.new(cookie_values)
     s_cookie = Mechanize::Cookie.new(cookie_values(:name => 'Bar',
-                                              :expires => nil,
-                                              :session => true))
+                                              :expires => nil))
 
     @jar.add(url, cookie)
     @jar.add(url, s_cookie)
@@ -297,8 +320,7 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     # Add one cookie with an expiration date in the future
     cookie = Mechanize::Cookie.new(cookie_values)
     s_cookie = Mechanize::Cookie.new(cookie_values(:name => 'Bar',
-                                              :expires => nil,
-                                              :session => true))
+                                              :expires => nil))
 
     @jar.add(url, cookie)
     @jar.add(url, s_cookie)
@@ -324,8 +346,7 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     # Add one cookie with an expiration date in the future
     cookie = Mechanize::Cookie.new(cookie_values)
     s_cookie = Mechanize::Cookie.new(cookie_values(:name => 'Bar',
-                                              :expires => nil,
-                                              :session => true))
+                                              :expires => nil))
 
     @jar.add(url, cookie)
     @jar.add(url, s_cookie)

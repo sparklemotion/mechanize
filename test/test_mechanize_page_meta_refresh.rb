@@ -112,7 +112,7 @@ class TestMechanizePageMetaRefresh < Mechanize::TestCase
     page = util_page 5, nil
     link = util_meta_refresh page
     assert_equal 5, link.delay
-    assert_equal nil, link.href
+    assert_nil link.href
 
     page = util_page 5, @uri
     link = util_meta_refresh page

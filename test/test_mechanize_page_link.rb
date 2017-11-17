@@ -72,7 +72,7 @@ class TestMechanizePageLink < Mechanize::TestCase
     assert_equal(URI("http://localhost/canonical_uri"), page.canonical_uri)
 
     page = @mech.get("http://localhost/file_upload.html")
-    assert_equal(nil, page.canonical_uri)
+    assert_nil page.canonical_uri
   end
 
   def test_canonical_uri_unescaped
@@ -339,7 +339,7 @@ class TestMechanizePageLink < Mechanize::TestCase
   def test_title_none
     page = util_page '' # invalid HTML
 
-    assert_equal(nil, page.title)
+    assert_nil(page.title)
   end
 
   def test_page_decoded_with_charset

@@ -27,7 +27,7 @@ class TestMechanizeUtil < Mechanize::TestCase
 
   def test_from_native_charset_returns_nil_when_no_string
     @result = @MU.from_native_charset(nil, CONTENT_ENCODING)
-    assert_equal nil, @result
+    assert_nil @result
   end
 
   def test_from_native_charset_doesnot_convert_when_no_encoding

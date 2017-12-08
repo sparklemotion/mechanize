@@ -1211,9 +1211,9 @@ class Mechanize::HTTP::Agent
   end
 
   ##
-  # Sets the proxy address, port, user, and password +addr+ should be a host,
-  # with no "http://", +port+ may be a port number, service name or port
-  # number string.
+  # Sets the proxy address, port, user, and password. +addr+ should be a host,
+  # with or without "http://", +port+ may be a port number, service name or
+  # port number string.
 
   def set_proxy addr, port, user = nil, pass = nil
     unless addr and port then
@@ -1234,7 +1234,8 @@ class Mechanize::HTTP::Agent
       end
     end
 
-    proxy_uri = URI "http://#{addr}"
+    addr = "http://#{addr}" unless addr =~ %r(^https?://)
+    proxy_uri = URI addr
     proxy_uri.port = port
     proxy_uri.user     = user if user
     proxy_uri.password = pass if pass

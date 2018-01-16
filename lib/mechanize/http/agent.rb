@@ -816,7 +816,7 @@ class Mechanize::HTTP::Agent
     return body_io if length.zero?
 
     out_io = case response['Content-Encoding']
-             when nil, 'none', '7bit', "" then
+             when nil, 'none', '7bit', 'identity', "" then
                body_io
              when 'deflate' then
                content_encoding_inflate body_io

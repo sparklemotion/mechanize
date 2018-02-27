@@ -6,4 +6,3 @@ class HttpRefreshServlet < WEBrick::HTTPServlet::AbstractServlet
     res['Refresh'] = " #{refresh_time};url=#{refresh_url}";
   end
 end
-

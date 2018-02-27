@@ -1087,25 +1087,21 @@ but not <a href="/" rel="me nofollow">this</a>!
 
     assert_match(/Hello World/, @mech.current_page.body)
     refute_empty @mech.cookies
-    refute_empty Thread.current[@mech.agent.http.request_key]
 
     @mech.shutdown
 
-    assert_nil Thread.current[@mech.agent.http.request_key]
     assert_empty @mech.history
     assert_empty @mech.cookies
   end
 
   def test_start
-    body, id = nil
+    body = nil
 
     Mechanize.start do |m|
       body = m.get("http://localhost/").body
-      id = m.agent.http.request_key
     end
 
     assert_match(/Hello World/, body)
-    assert_nil Thread.current[id]
   end
 
   def test_submit_bad_form_method
@@ -1363,4 +1359,3 @@ but not <a href="/" rel="me nofollow">this</a>!
     end
   end
 end
-

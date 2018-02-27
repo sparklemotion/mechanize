@@ -3,7 +3,6 @@ class HttpRefreshServlet < WEBrick::HTTPServlet::AbstractServlet
     res['Content-Type'] = req.query['ct'] || "text/html"
     refresh_time = req.query['refresh_time'] || 0
     refresh_url = req.query['refresh_url'] || '/'
-    res['Refresh'] = " #{refresh_time};url=#{refresh_url}\r\n";
+    res['Refresh'] = " #{refresh_time};url=#{refresh_url}";
   end
 end
-

@@ -56,14 +56,14 @@ class Mechanize::Form
 
   # Returns whether or not the form contains a field with +field_name+
   def has_field?(field_name)
-    !!fields.find { |f| f.name == field_name }
+    fields.any? { |f| f.name == field_name }
   end
 
   alias :has_key? :has_field?
 
   # Returns whether or not the form contains a field with +value+
   def has_value?(value)
-    !!fields.find { |f| f.value == value }
+    fields.any? { |f| f.value == value }
   end
 
   # Returns all field names (keys) for this form

@@ -4,6 +4,7 @@
 
 * Bug fix
   * Fix element(s)_with(search: selector) methods not working for forms, form fields and frames. (#444)
+  * Support 
 
 === 2.7.5
 

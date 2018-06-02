@@ -214,7 +214,7 @@ class TestMechanizeForm < Mechanize::TestCase
 
     @form['name'] = 'Aaron'
 
-    assert @form.has_field?('name')
+    assert_equal true, @form.has_field?('name')
   end
 
   def test_has_value_eh
@@ -222,7 +222,7 @@ class TestMechanizeForm < Mechanize::TestCase
 
     @form['name'] = 'Aaron'
 
-    assert @form.has_value?('Aaron')
+    assert_equal true, @form.has_value?('Aaron')
   end
 
   def test_keys
@@ -918,9 +918,9 @@ class TestMechanizeForm < Mechanize::TestCase
     page = @mech.get("http://localhost/form_multival.html")
     form = page.form_with(:name => 'post_form')
 
-    assert(!form.has_field?('intarweb'))
+    assert_equal false, form.has_field?('intarweb')
     assert form.add_field!('intarweb')
-    assert(form.has_field?('intarweb'))
+    assert_equal true, form.has_field?('intarweb')
   end
 
   def test_fill_unexisting_form

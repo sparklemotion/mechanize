@@ -1,6 +1,6 @@
 = Mechanize CHANGELOG
 
-=== Unreleased
+=== 2.7.6
 
 * New Features
   * Mechanize#set_proxy accepts an HTTP URL/URI. (#513)

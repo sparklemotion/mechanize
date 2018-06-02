@@ -536,8 +536,8 @@ class Mechanize::HTTP::Agent
 
   def request_auth request, uri
     base_uri = uri + '/'
-    base_uri.user     = nil
-    base_uri.password = nil
+    base_uri.user     &&= nil
+    base_uri.password &&= nil
     schemes = @authenticate_methods[base_uri]
 
     if realm = schemes[:digest].find { |r| r.uri == base_uri } then

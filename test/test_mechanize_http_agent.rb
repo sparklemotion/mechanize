@@ -1065,6 +1065,14 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'part', body.read
   end
 
+  def test_response_content_encoding_identity
+    @res.instance_variable_set :@header, 'content-encoding' => %w[identity]
+
+    body = @agent.response_content_encoding @res, StringIO.new('part')
+
+    assert_equal 'part', body.read
+  end
+
   def test_response_content_encoding_tempfile_7_bit
     body_io = tempfile 'part'
 

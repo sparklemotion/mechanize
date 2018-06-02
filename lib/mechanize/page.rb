@@ -58,7 +58,7 @@ class Mechanize::Page < Mechanize::File
   def title
     @title ||=
       if doc = parser
-        title = doc.search('html > head > title').inner_text
+        title = doc.xpath('string(((/html/head | /html | /head | /)/title)[1])').to_s
         title.empty? ? nil : title
       end
   end

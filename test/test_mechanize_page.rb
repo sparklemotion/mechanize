@@ -255,7 +255,7 @@ class TestMechanizePage < Mechanize::TestCase
 <!doctype html>
 <html>
 	<head>
-		<title>HTMLTITLE</title>
+		<title>HTML&gt;TITLE</title>
 	</head>
 	<body>
 		<svg>
@@ -273,7 +273,7 @@ class TestMechanizePage < Mechanize::TestCase
 </html>
 		BODY
 
-		assert_equal page.title, "HTMLTITLE"
+		assert_equal page.title, "HTML>TITLE"
 	end
 
 end

@@ -1217,31 +1217,39 @@ class Mechanize::HTTP::Agent
   end
 
   ##
-  # Sets the proxy address, port, user, and password +addr+ should be a host,
-  # with no "http://", +port+ may be a port number, service name or port
-  # number string.
+  # Sets the proxy address, port, user, and password. +addr+ may be
+  # an HTTP URL/URI or a host name, +port+ may be a port number, service
+  # name or port number string.
 
-  def set_proxy addr, port, user = nil, pass = nil
-    unless addr and port then
+  def set_proxy addr, port = nil, user = nil, pass = nil
+    case addr
+    when URI::HTTP
+      proxy_uri = addr.dup
+    when %r{\Ahttps?://}i
+      proxy_uri = URI addr
+    when String
+      proxy_uri = URI "http://#{addr}"
+    when nil
       @http.proxy = nil
-
       return
     end
 
-    unless Integer === port then
+    case port
+    when Integer
+      proxy_uri.port = port
+    when nil
+    else
       begin
-        port = Socket.getservbyname port
+        proxy_uri.port = Socket.getservbyname port
       rescue SocketError
         begin
-          port = Integer port
+          proxy_uri.port = Integer port
         rescue ArgumentError
           raise ArgumentError, "invalid value for port: #{port.inspect}"
         end
       end
     end
 
-    proxy_uri = URI "http://#{addr}"
-    proxy_uri.port = port
     proxy_uri.user     = user if user
     proxy_uri.password = pass if pass
 

@@ -147,7 +147,7 @@ class TestMechanizePageImage < Mechanize::TestCase
 
     assert_equal 'https', page.uri.scheme
     assert_equal false, page.images.first.relative?
-    assert_equal nil, requests.first['Referer']
+    assert_nil requests.first['Referer']
   end
 
   def test_image_referer_http_page_abs_src

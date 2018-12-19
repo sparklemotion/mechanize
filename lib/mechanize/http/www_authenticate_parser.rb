@@ -34,7 +34,7 @@ class Mechanize::HTTP::WWWAuthenticateParser
         scan_comma_spaces
       end
 
-      next unless scheme
+      break unless scheme
       challenge.scheme = scheme
 
       space = spaces

@@ -943,7 +943,7 @@ but not <a href="/" rel="me nofollow">this</a>!
       "Content-Disposition: form-data; name=\"userfile1\"; filename=\"#{name}\"",
       page.body
     )
-    assert_send [page.body.bytesize, :>, File.size(__FILE__)]
+    assert_operator page.body.bytesize, :>, File.size(__FILE__)
   end
 
   def test_post_file_upload_nonascii
@@ -962,7 +962,7 @@ but not <a href="/" rel="me nofollow">this</a>!
       page.body
     )
     assert_match("Content-Type: application/zip", page.body)
-    assert_send [page.body.bytesize, :>, File.size(__FILE__)]
+    assert_operator page.body.bytesize, :>, File.size(__FILE__)
   end
 
   def test_post_file_upload
@@ -981,7 +981,7 @@ but not <a href="/" rel="me nofollow">this</a>!
       page.body
     )
     assert_match("Content-Type: application/zip", page.body)
-    assert_send [page.body.bytesize, :>, File.size(__FILE__)]
+    assert_operator page.body.bytesize, :>, File.size(__FILE__)
   end
 
   def test_post_redirect
@@ -1087,25 +1087,21 @@ but not <a href="/" rel="me nofollow">this</a>!
 
     assert_match(/Hello World/, @mech.current_page.body)
     refute_empty @mech.cookies
-    refute_empty Thread.current[@mech.agent.http.request_key]
 
     @mech.shutdown
 
-    assert_nil Thread.current[@mech.agent.http.request_key]
     assert_empty @mech.history
     assert_empty @mech.cookies
   end
 
   def test_start
-    body, id = nil
+    body = nil
 
     Mechanize.start do |m|
       body = m.get("http://localhost/").body
-      id = m.agent.http.request_key
     end
 
     assert_match(/Hello World/, body)
-    assert_nil Thread.current[id]
   end
 
   def test_submit_bad_form_method
@@ -1363,4 +1359,3 @@ but not <a href="/" rel="me nofollow">this</a>!
     end
   end
 end
-

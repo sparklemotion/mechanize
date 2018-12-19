@@ -1065,6 +1065,14 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal 'part', body.read
   end
 
+  def test_response_content_encoding_identity
+    @res.instance_variable_set :@header, 'content-encoding' => %w[identity]
+
+    body = @agent.response_content_encoding @res, StringIO.new('part')
+
+    assert_equal 'part', body.read
+  end
+
   def test_response_content_encoding_tempfile_7_bit
     body_io = tempfile 'part'
 
@@ -1656,6 +1664,42 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     end
 
     assert_equal 'invalid value for port: "nonexistent service"', e.message
+  end
+
+  def test_set_proxy_with_scheme
+    @agent.set_proxy 'http://www.example.com', 9001, 'joe', 'lol'
+
+    assert_equal @agent.proxy_uri.host,     'www.example.com'
+    assert_equal @agent.proxy_uri.port,     9001
+    assert_equal @agent.proxy_uri.user,     'joe'
+    assert_equal @agent.proxy_uri.password, 'lol'
+  end
+
+  def test_set_proxy_url
+    @agent.set_proxy 'http://joe:lol@www.example.com:9001'
+
+    assert_equal @agent.proxy_uri.host,     'www.example.com'
+    assert_equal @agent.proxy_uri.port,     9001
+    assert_equal @agent.proxy_uri.user,     'joe'
+    assert_equal @agent.proxy_uri.password, 'lol'
+  end
+
+  def test_set_proxy_uri
+    @agent.set_proxy URI('http://joe:lol@www.example.com:9001')
+
+    assert_equal @agent.proxy_uri.host,     'www.example.com'
+    assert_equal @agent.proxy_uri.port,     9001
+    assert_equal @agent.proxy_uri.user,     'joe'
+    assert_equal @agent.proxy_uri.password, 'lol'
+  end
+
+  def test_set_proxy_url_and_credentials
+    @agent.set_proxy 'http://www.example.com:9001', nil, 'joe', 'lol'
+
+    assert_equal @agent.proxy_uri.host,     'www.example.com'
+    assert_equal @agent.proxy_uri.port,     9001
+    assert_equal @agent.proxy_uri.user,     'joe'
+    assert_equal @agent.proxy_uri.password, 'lol'
   end
 
   def test_setting_agent_name

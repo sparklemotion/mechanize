@@ -183,7 +183,13 @@ class Mechanize::HTTP::Agent
     @scheme_handlers['relative']  = @scheme_handlers['http']
     @scheme_handlers['file']      = @scheme_handlers['http']
 
-    @http = Net::HTTP::Persistent.new connection_name
+    @http =
+      if defined?(Net::HTTP::Persistent::DEFAULT_POOL_SIZE)
+        Net::HTTP::Persistent.new(name: connection_name)
+      else
+        # net-http-persistent < 3.0
+        Net::HTTP::Persistent.new(connection_name)
+      end
     @http.idle_timeout = 5
     @http.keep_alive   = 300
   end
@@ -530,8 +536,8 @@ class Mechanize::HTTP::Agent
 
   def request_auth request, uri
     base_uri = uri + '/'
-    base_uri.user     = nil
-    base_uri.password = nil
+    base_uri.user     &&= nil
+    base_uri.password &&= nil
     schemes = @authenticate_methods[base_uri]
 
     if realm = schemes[:digest].find { |r| r.uri == base_uri } then
@@ -816,7 +822,7 @@ class Mechanize::HTTP::Agent
     return body_io if length.zero?
 
     out_io = case response['Content-Encoding']
-             when nil, 'none', '7bit', "" then
+             when nil, 'none', '7bit', 'identity', "" then
                body_io
              when 'deflate' then
                content_encoding_inflate body_io
@@ -1211,31 +1217,39 @@ class Mechanize::HTTP::Agent
   end
 
   ##
-  # Sets the proxy address, port, user, and password +addr+ should be a host,
-  # with no "http://", +port+ may be a port number, service name or port
-  # number string.
+  # Sets the proxy address, port, user, and password. +addr+ may be
+  # an HTTP URL/URI or a host name, +port+ may be a port number, service
+  # name or port number string.
 
-  def set_proxy addr, port, user = nil, pass = nil
-    unless addr and port then
+  def set_proxy addr, port = nil, user = nil, pass = nil
+    case addr
+    when URI::HTTP
+      proxy_uri = addr.dup
+    when %r{\Ahttps?://}i
+      proxy_uri = URI addr
+    when String
+      proxy_uri = URI "http://#{addr}"
+    when nil
       @http.proxy = nil
-
       return
     end
 
-    unless Integer === port then
+    case port
+    when Integer
+      proxy_uri.port = port
+    when nil
+    else
       begin
-        port = Socket.getservbyname port
+        proxy_uri.port = Socket.getservbyname port
       rescue SocketError
         begin
-          port = Integer port
+          proxy_uri.port = Integer port
         rescue ArgumentError
           raise ArgumentError, "invalid value for port: #{port.inspect}"
         end
       end
     end
 
-    proxy_uri = URI "http://#{addr}"
-    proxy_uri.port = port
     proxy_uri.user     = user if user
     proxy_uri.password = pass if pass
 

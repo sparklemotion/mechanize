@@ -118,13 +118,13 @@ module Mechanize::Parser
     end
 
     # Set the filename
-    if disposition = @response['content-disposition'] then
+    if (disposition = @response['content-disposition'])
       content_disposition =
         Mechanize::HTTP::ContentDispositionParser.parse disposition
 
-      if content_disposition && content_disposition.filename && content_disposition.filename != '' then
+      if content_disposition && content_disposition.filename && content_disposition.filename != ''
         filename = content_disposition.filename
-        filename = filename.split(/[\\\/]/).last
+        filename = filename.rpartition(/[\\\/]/).last
         handled = true
       end
     end

@@ -1,9 +1,16 @@
 = Mechanize CHANGELOG
 
-=== Unreleased
+=== 2.7.6
+
+* New Features
+  * Mechanize#set_proxy accepts an HTTP URL/URI. (#513)
 
 * Bug fix
   * Fix element(s)_with(search: selector) methods not working for forms, form fields and frames. (#444)
+  * Improve the filename parser for the `Content-Disposition` header. (#496, #517)
+  * Accept `Content-Encoding: identity`. (#515)
+  * Mechanize::Page#title no longer picks a title in an embeded SVG/RDF element. (#503)
+  * Make Mechanize::Form#has_field? boolean. (#501)
 
 === 2.7.5
 

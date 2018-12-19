@@ -24,12 +24,13 @@ matrix:
     - rvm: 2.3.3
     - rvm: 2.4.0
     - rvm: ruby-head
-    - rvm: jruby-1.7.26
-      env: JRUBY_OPTS=--debug
-    - rvm: jruby-9.1.7.0
-      env: JRUBY_OPTS=--debug
+    - rvm: jruby-1.7.27
+    - rvm: jruby-9.2.0.0
     - rvm: jruby-head
-      env: JRUBY_OPTS=--debug    
   allow_failures:
-    - rvm: jruby-9.1.7.0
+    - rvm: jruby-9.2.0.0
     - rvm: jruby-head
+
+env:
+  global:
+    - JRUBY_OPTS="--debug"

@@ -99,10 +99,10 @@ class TestMechanizeParser < Mechanize::TestCase
     @parser.uri = URI 'http://example'
 
     @parser.response = {
-      'content-disposition' => 'attachment; filename="some \"file\""'
+      'content-disposition' => 'attachment; filename="\"some \"file\""'
     }
 
-    assert_equal 'some__file_', @parser.extract_filename
+    assert_equal '_some__file_', @parser.extract_filename
   end
 
   def test_extract_filename_content_disposition_special
@@ -160,6 +160,16 @@ class TestMechanizeParser < Mechanize::TestCase
 
       assert_equal "_#{special}", @parser.extract_filename
     end
+  end
+
+  def test_extract_filename_content_disposition_empty
+    @parser.uri = URI 'http://example'
+
+    @parser.response = {
+      'content-disposition' => 'inline; filename="/"'
+    }
+
+    assert_equal '', @parser.extract_filename
   end
 
   def test_extract_filename_host

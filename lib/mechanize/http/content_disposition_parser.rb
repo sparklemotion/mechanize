@@ -141,7 +141,10 @@ class Mechanize::HTTP::ContentDispositionParser
           text << " "
         end
       else
-        if '"' == @scanner.peek(1) then
+        if '\\"' == @scanner.peek(2) then
+          @scanner.skip(/\\/)
+          text << @scanner.get_byte
+        elsif '"' == @scanner.peek(1) then
           @scanner.get_byte
           break
         else

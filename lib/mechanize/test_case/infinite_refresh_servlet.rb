@@ -7,4 +7,3 @@ class InfiniteRefreshServlet < WEBrick::HTTPServlet::AbstractServlet
     res['Refresh'] = "0;url=http://#{address}/infinite_refresh?q=#{number + 1}";
   end
 end
-

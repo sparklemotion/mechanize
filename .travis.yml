@@ -15,14 +15,10 @@ script: rake test
 
 matrix:
   include:
-    - rvm: 1.9.3
-    - rvm: 2.0.0
-    - rvm: 2.1
-    - rvm: 2.2
-    - rvm: 2.3.3
-    - rvm: 2.4.0
+    - rvm: 2.3.8
+    - rvm: 2.4.5
+    - rvm: 2.5.3
     - rvm: ruby-head
-    - rvm: jruby-1.7.27
     - rvm: jruby-9.2.5.0
     - rvm: jruby-head
   allow_failures:

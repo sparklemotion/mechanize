@@ -1551,6 +1551,44 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     end
   end
 
+  def test_response_redirect_to_cross_site_with_credential
+    @agent.redirect_ok = true
+
+    headers = {
+      'Range' => 'bytes=0-9999',
+      'Content-Type' => 'application/x-www-form-urlencoded',
+      'Content-Length' => '9999',
+      'Authorization' => 'Basic xxx',
+      'Cookie' => 'name=value',
+    }
+
+    page = html_page ''
+    @agent.response_redirect({ 'Location' => 'http://trap' }, :get,
+                             page, 0, headers)
+
+    assert !(headers.keys.include? 'Authorization')
+    assert !(headers.keys.include? 'Cookie')
+  end
+
+  def test_response_redirect_to_same_site_with_credential
+    @agent.redirect_ok = true
+
+    headers = {
+      'Range' => 'bytes=0-9999',
+      'Content-Type' => 'application/x-www-form-urlencoded',
+      'Content-Length' => '9999',
+      'Authorization' => 'Basic xxx',
+      'Cookie' => 'name=value',
+    }
+
+    page = html_page ''
+    @agent.response_redirect({ 'Location' => 'http://example' }, :get,
+                             page, 0, headers)
+
+    assert headers.keys.include? 'Authorization'
+    assert headers.keys.include? 'Cookie'
+  end
+
   def test_response_redirect_not_ok
     @agent.redirect_ok = false
 

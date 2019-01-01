@@ -10,6 +10,8 @@ require 'webrobots'
 
 class Mechanize::HTTP::Agent
 
+  CREDENTIAL_HEADERS = ['Authorization', 'Cookie']
+
   # :section: Headers
 
   # Disables If-Modified-Since conditional requests (enabled by default)
@@ -995,6 +997,12 @@ class Mechanize::HTTP::Agent
     new_uri = secure_resolve! response['Location'].to_s, page
 
     @history.push(page, page.uri)
+
+    if new_uri.host != page.uri.host
+      CREDENTIAL_HEADERS.each do |ch|
+        headers.delete_if{ |h| h.downcase == ch.downcase }
+      end
+    end
 
     fetch new_uri, redirect_method, headers, [], referer, redirects + 1
   end

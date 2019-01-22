@@ -23,8 +23,7 @@ class TestMechanizeCookie < Mechanize::TestCase
 
     block ||= proc { |p_cookie| cookie = p_cookie }
 
-    exp_re = /The call of Mechanize::Cookie.parse/
-    assert_output "", exp_re do
+    assert_output "" do
       Mechanize::Cookie.parse(url, cookie_text, &block)
     end
 

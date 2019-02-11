@@ -6,12 +6,8 @@ notifications:
   - ljjarvis@gmail.com
   - knu@idaemons.org
 
-# bundler is missing for jruby-head in travis-ci
-# https://github.com/travis-ci/travis-ci/issues/5861
 before_install:
-  - gem install --conservative bundler -v'1.13.7'
-
-script: rake test
+  - gem install --conservative bundler -v'< 2'
 
 matrix:
   include:

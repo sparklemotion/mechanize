@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.email =
     [
       'drbrain@segment7.net',
-      'aaronp@rubyforge.org',
+      'aaron.patterson@gmail.com',
       'mike.dalessio@gmail.com',
       'knu@idaemons.org',
       'ljjarvis@gmail.com'

@@ -313,7 +313,6 @@ class Mechanize::Form
           successful_controls << f
         end
       when Mechanize::Form::Field
-        next if (f.name == '') # Do not populate fields with blank name
         successful_controls << f
       end
     end

@@ -65,6 +65,18 @@ class TestMechanizeForm < Mechanize::TestCase
     assert query.all? { |x| x[1] == '' }
   end
 
+  def test_build_query_blank_input_name
+    html = Nokogiri::HTML <<-HTML
+<form>
+  <input type="text" name="" value="foo" />
+</form>
+    HTML
+
+    form = Mechanize::Form.new html.at('form'), @mech, @page
+
+    assert_equal [], form.build_query
+  end
+
   def test_build_query_radio_button_duplicate
     html = Nokogiri::HTML <<-HTML
 <form>

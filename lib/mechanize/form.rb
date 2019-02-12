@@ -305,7 +305,7 @@ class Mechanize::Form
     successful_controls = []
 
     (fields + checkboxes).reject do |f|
-      f.node["disabled"]
+      f.node["disabled"] || f.node["name"] == ""
     end.sort.each do |f|
       case f
       when Mechanize::Form::CheckBox

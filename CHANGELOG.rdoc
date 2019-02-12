@@ -1,5 +1,10 @@
 = Mechanize CHANGELOG
 
+=== Unreleased
+
+* Bug fix
+  * Ignore input fields with blank names (#542, #536)
+
 === 2.7.6
 
 * New Features

@@ -15,10 +15,10 @@ matrix:
     - rvm: 2.4.5
     - rvm: 2.5.3
     - rvm: ruby-head
-    - rvm: jruby-9.2.5.0
+    - rvm: jruby-9.2.6.0
     - rvm: jruby-head
   allow_failures:
-    - rvm: jruby-9.2.5.0
+    - rvm: jruby-9.2.6.0
     - rvm: jruby-head
 
 env:

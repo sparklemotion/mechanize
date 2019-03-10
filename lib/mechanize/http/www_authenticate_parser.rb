@@ -51,9 +51,19 @@ class Mechanize::HTTP::WWWAuthenticateParser
         scheme.capitalize!
       end
 
-      next unless space
-
       params = {}
+
+      # Handles 'Basic' auth without realms
+      # https://tools.ietf.org/html/rfc7235#appendix-A
+      #   > The "realm" parameter is no longer always required on challenges;
+      unless space
+        if scheme == 'Basic'
+          challenge.params = params
+          challenge.raw = www_authenticate[start, @scanner.pos]
+          challenges << challenge
+        end
+        next
+      end
 
       while true do
         pos = @scanner.pos

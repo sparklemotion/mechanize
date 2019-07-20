@@ -65,7 +65,7 @@ class Mechanize
   class CookieJar < ::HTTP::CookieJar
     def save(output, *options)
       output.respond_to?(:write) or
-        return open(output, 'w') { |io| save(io, *options) }
+        return ::File.open(output, 'w') { |io| save(io, *options) }
 
       opthash = {
         :format => :yaml,
@@ -119,7 +119,7 @@ class Mechanize
 
     def load(input, *options)
       input.respond_to?(:write) or
-        return open(input, 'r') { |io| load(io, *options) }
+        return ::File.open(input, 'r') { |io| load(io, *options) }
 
       opthash = {
         :format => :yaml,

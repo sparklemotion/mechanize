@@ -1,4 +1,5 @@
 require 'mechanize/test_case'
+require 'fileutils'
 
 class TestMechanizeCookieJar < Mechanize::TestCase
 
@@ -498,6 +499,35 @@ class TestMechanizeCookieJar < Mechanize::TestCase
     end
 
     assert_equal(0, @jar.cookies(url).length)
+  end
+
+  def test_prevent_command_injection_when_saving
+    url = URI 'http://rubygems.org/'
+    path = '| ruby -rfileutils -e \'FileUtils.touch("vul.txt")\''
+
+    @jar.add(url, Mechanize::Cookie.new(cookie_values))
+
+    in_tmpdir do
+      @jar.save_as(path, :cookiestxt)
+      assert_equal(false, File.exist?('vul.txt'))
+    end
+  end
+
+  def test_prevent_command_injection_when_loading
+    url = URI 'http://rubygems.org/'
+    path = '| ruby -rfileutils -e \'FileUtils.touch("vul.txt")\''
+
+    @jar.add(url, Mechanize::Cookie.new(cookie_values))
+
+    in_tmpdir do
+      @jar.save_as("cookies.txt", :cookiestxt)
+      @jar.clear!
+
+      assert_raises Errno::ENOENT do
+        @jar.load(path, :cookiestxt)
+      end
+      assert_equal(false, File.exist?('vul.txt'))
+    end
   end
 
   def test_save_and_read_expired_cookies

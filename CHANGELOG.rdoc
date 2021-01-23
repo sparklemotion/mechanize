@@ -2,6 +2,9 @@
 
 === Unreleased
 
+* New Features
+  * Support for Ruby 3.0 by adding `webrick` as a runtime dependency. (#557) @pvalena
+
 * Bug fix
   * Ignore input fields with blank names (#542, #536)
 

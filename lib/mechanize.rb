@@ -175,7 +175,7 @@ class Mechanize
   # as SSL parameters or proxies:
   #
   #   agent = Mechanize.new do |a|
-  #     a.proxy_host = 'proxy.example'
+  #     a.proxy_addr = 'proxy.example'
   #     a.proxy_port = 8080
   #   end
   #

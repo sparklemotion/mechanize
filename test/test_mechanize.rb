@@ -689,9 +689,7 @@ but not <a href="/" rel="me nofollow">this</a>!
   end
 
   def test_get_space
-    page = nil
-
-    page = @mech.get("http://localhost/tc_bad_links.html ")
+    @mech.get("http://localhost/tc_bad_links.html ")
 
     assert_match(/tc_bad_links.html$/, @mech.history.last.uri.to_s)
 

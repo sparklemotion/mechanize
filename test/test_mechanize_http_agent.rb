@@ -935,7 +935,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     body_io = StringIO.new \
       "\037\213\b\0002\002\225M\000\003+H,*\001"
 
-    return if jruby_zlib?
+    skip if jruby_zlib?
 
     e = assert_raises Mechanize::Error do
       @agent.response_content_encoding @res, body_io

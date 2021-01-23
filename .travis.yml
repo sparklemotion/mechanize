@@ -7,7 +7,7 @@ notifications:
   - knu@idaemons.org
 
 before_install:
-  - gem install --conservative bundler -v'< 2'
+  - gem install --conservative bundler -v '~> 2.2'
 
 matrix:
   include:

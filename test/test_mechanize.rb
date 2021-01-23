@@ -1056,6 +1056,11 @@ but not <a href="/" rel="me nofollow">this</a>!
   end
 
   def test_retry_change_requests_equals
+    unless Gem::Requirement.new("< 4.0.0").satisfied_by?(Gem::Version.new(Net::HTTP::Persistent::VERSION))
+      # see https://github.com/drbrain/net-http-persistent/pull/100
+      skip("net-http-persistent 4.0.0 and later does not support retry_change_requests")
+    end
+
     refute @mech.retry_change_requests
 
     @mech.retry_change_requests = true

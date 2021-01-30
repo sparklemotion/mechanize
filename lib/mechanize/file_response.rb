@@ -15,7 +15,7 @@ class Mechanize::FileResponse
     if directory?
       yield dir_body
     else
-      open @file_path, 'rb' do |io|
+      ::File.open(@file_path, 'rb') do |io|
         yield io.read
       end
     end

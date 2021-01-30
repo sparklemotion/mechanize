@@ -396,7 +396,7 @@ class Mechanize
     io = if io_or_filename.respond_to? :write then
            io_or_filename
          else
-           open io_or_filename, 'wb'
+           ::File.open(io_or_filename, 'wb')
          end
 
     case page

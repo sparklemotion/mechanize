@@ -46,6 +46,18 @@ class TestMechanizeDownload < Mechanize::TestCase
     end
   end
 
+  def test_save_bang_does_not_allow_command_injection
+    uri = URI.parse 'http://example/foo.html'
+    body_io = StringIO.new '0123456789'
+
+    download = @parser.new uri, nil, body_io
+
+    in_tmpdir do
+      download.save!('| ruby -rfileutils -e \'FileUtils.touch("vul.txt")\'')
+      refute_operator(File, :exist?, "vul.txt")
+    end
+  end
+
   def test_save_tempfile
     uri = URI.parse 'http://example/foo.html'
     Tempfile.open @NAME do |body_io|
@@ -84,6 +96,5 @@ class TestMechanizeDownload < Mechanize::TestCase
 
     assert_equal "foo.html", download.filename
   end
-
 end
 

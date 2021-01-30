@@ -103,5 +103,14 @@ class TestMechanizeFile < Mechanize::TestCase
     end
   end
 
+  def test_save_bang_does_not_allow_command_injection
+    uri = URI 'http://example/test.html'
+    page = Mechanize::File.new uri, nil, ''
+
+    in_tmpdir do
+      page.save!('| ruby -rfileutils -e \'FileUtils.touch("vul.txt")\'')
+      refute_operator(File, :exist?, "vul.txt")
+    end
+  end
 end
 

@@ -82,7 +82,7 @@ class Mechanize::File
     dirname = File.dirname filename
     FileUtils.mkdir_p dirname
 
-    open filename, 'wb' do |f|
+    ::File.open(filename, 'wb')do |f|
       f.write body
     end
 

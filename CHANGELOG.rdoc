@@ -2,7 +2,7 @@
 
 === Unreleased
 
-* Security
+* Security fixes for CVE-2021-21289
 
   Mechanize `>= v2.0`, `< v2.7.7` allows for OS commands to be injected into several classes'
   methods via implicit use of Ruby's `Kernel.open` method. Exploitation is possible only if
@@ -18,11 +18,14 @@
   See https://github.com/sparklemotion/mechanize/security/advisories/GHSA-qrqm-fpv6-6r8g for more
   information.
 
+  Also see #547, #548. Thank you, @kyoshidajp!
+
 * New Features
   * Support for Ruby 3.0 by adding `webrick` as a runtime dependency. (#557) @pvalena
 
 * Bug fix
   * Ignore input fields with blank names (#542, #536)
+
 
 === 2.7.6
 

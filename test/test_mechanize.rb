@@ -345,6 +345,14 @@ but not <a href="/" rel="me nofollow">this</a>!
     end
   end
 
+  def test_download_does_not_allow_command_injection
+    in_tmpdir do
+      @mech.download('http://example', '| ruby -rfileutils -e \'FileUtils.touch("vul.txt")\'')
+
+      refute_operator(File, :exist?, "vul.txt")
+    end
+  end
+
   def test_get
     uri = URI 'http://localhost'
 

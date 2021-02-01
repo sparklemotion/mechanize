@@ -71,7 +71,7 @@ class Mechanize::Download
     dirname = File.dirname filename
     FileUtils.mkdir_p dirname
 
-    open filename, 'wb' do |io|
+    ::File.open(filename, 'wb')do |io|
       until @body_io.eof? do
         io.write @body_io.read 16384
       end

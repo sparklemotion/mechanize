@@ -230,9 +230,9 @@ class Net::HTTP # :nodoc:
     else
       filename = "htdocs#{path.gsub(/[^\/\\.\w\s]/, '_')}"
       unless PAGE_CACHE[filename]
-        open("#{Mechanize::TestCase::TEST_DIR}/#{filename}", 'rb') { |io|
+        ::File.open("#{Mechanize::TestCase::TEST_DIR}/#{filename}", 'rb') do |io|
           PAGE_CACHE[filename] = io.read
-        }
+        end
       end
 
       res.body = PAGE_CACHE[filename]

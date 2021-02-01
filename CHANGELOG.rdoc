@@ -2,6 +2,22 @@
 
 === Unreleased
 
+* Security
+
+  Mechanize `>= v2.0`, `< v2.7.7` allows for OS commands to be injected into several classes'
+  methods via implicit use of Ruby's `Kernel.open` method. Exploitation is possible only if
+  untrusted input is used as a local filename and passed to any of these calls:
+
+  - `Mechanize::CookieJar#load`: since v2.0 (see 208e3ed)
+  - `Mechanize::CookieJar#save_as`: since v2.0 (see 5b776a4)
+  - `Mechanize#download`: since v2.2 (see dc91667)
+  - `Mechanize::Download#save` and `#save!` since v2.1 (see 98b2f51, bd62ff0)
+  - `Mechanize::File#save` and `#save_as`: since v2.1 (see 2bf7519)
+  - `Mechanize::FileResponse#read_body`: since v2.0 (see 01039f5)
+
+  See https://github.com/sparklemotion/mechanize/security/advisories/GHSA-qrqm-fpv6-6r8g for more
+  information.
+
 * New Features
   * Support for Ruby 3.0 by adding `webrick` as a runtime dependency. (#557) @pvalena
 

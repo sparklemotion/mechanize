@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 warn 'mechanize/cookie will be deprecated.  Please migrate to the http-cookie APIs.' if $VERBOSE
 
 require 'http/cookie'
@@ -49,19 +50,6 @@ class Mechanize
   end
 
   Cookie = ::HTTP::Cookie
-
-  # Compatibility for Ruby 1.8/1.9
-  unless Cookie.respond_to?(:prepend, true)
-    require 'mechanize/prependable'
-
-    class Cookie
-      extend Prependable
-
-      class << self
-        extend Prependable
-      end
-    end
-  end
 
   class Cookie
     prepend CookieIMethods

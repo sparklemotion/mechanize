@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # This class encapsulates an XML file. If Mechanize finds a content-type
 # of 'text/xml' or 'application/xml' this class will be instantiated and

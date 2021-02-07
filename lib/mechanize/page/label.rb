@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # A form label on an HTML page
 

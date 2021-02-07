@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Mechanize::Headers < Hash
   def [](key)
     super(key.downcase)

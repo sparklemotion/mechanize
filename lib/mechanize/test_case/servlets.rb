@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'mechanize/test_case/bad_chunking_servlet'
 require 'mechanize/test_case/basic_auth_servlet'
 require 'mechanize/test_case/content_type_servlet'

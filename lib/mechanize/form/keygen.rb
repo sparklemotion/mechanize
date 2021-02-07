@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # This class represents a keygen (public / private key generator) found in a
 # Form. The field will automatically generate a key pair and compute its own

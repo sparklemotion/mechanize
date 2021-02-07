@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # This class represents a file upload field found in a form.  To use this
 # class, set FileUpload#file_data= to the data of the file you want to upload
 # and FileUpload#mime_type= to the appropriate mime type of the file.

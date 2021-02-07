@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'mechanize'
 require 'logger'
 require 'tempfile'
@@ -57,12 +58,12 @@ class Mechanize::TestCase < Minitest::Test
 
   def fake_page agent = @mech
     uri = URI 'http://fake.example/'
-    html = <<-END
-<html>
-<body>
-<form><input type="submit" value="submit" /></form>
-</body>
-</html>
+    html = String.new(<<~END)
+      <html>
+      <body>
+      <form><input type="submit" value="submit" /></form>
+      </body>
+      </html>
     END
 
     Mechanize::Page.new uri, nil, html, 200, agent
@@ -124,7 +125,7 @@ class Mechanize::TestCase < Minitest::Test
   # Creates a Mechanize::Page for the given +uri+ with the given
   # +content_type+, response +body+ and HTTP status +code+
 
-  def page uri, content_type = 'text/html', body = '', code = 200
+  def page uri, content_type = 'text/html', body = String.new, code = 200
     uri = URI uri unless URI::Generic === uri
 
     Mechanize::Page.new(uri, { 'content-type' => content_type }, body, code,
@@ -312,7 +313,7 @@ class Response # :nodoc:
 
     def initialize
       @header = {}
-      @body = ''
+      @body = String.new
       @code = nil
       @query = nil
       @cookies = []

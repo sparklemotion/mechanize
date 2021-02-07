@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # Fake response for dealing with file:/// requests
 

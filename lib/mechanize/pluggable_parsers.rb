@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'mechanize/file'
 require 'mechanize/file_saver'
 require 'mechanize/page'

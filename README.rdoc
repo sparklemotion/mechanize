@@ -13,7 +13,7 @@ a history.
 
 == Dependencies
 
-* ruby 1.9.2 or newer
+* ruby 2.5 or newer
 * nokogiri[https://github.com/sparklemotion/nokogiri]
 
 == Support:

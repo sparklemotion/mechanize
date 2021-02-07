@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # This is the base class for the Pluggable Parsers.  If Mechanize cannot find
 # an appropriate class to use for the content type, this class will be used.

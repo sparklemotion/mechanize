@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # This class represents a radio button found in a Form.  To activate the
 # RadioButton in the Form, set the checked method to true.

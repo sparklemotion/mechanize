@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # A credential store for HTTP authentication.
 #

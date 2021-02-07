@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # Raised when a POST, PUT, or DELETE request results in a redirect
 # see RFC 2616 10.3.2, 10.3.3 http://www.ietf.org/rfc/rfc2616.txt

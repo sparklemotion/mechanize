@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # This class encapsulates links.  It contains the text and the URI for
 # 'a' tags parsed out of an HTML page.  If the link contains an image,

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # This class represents a field in a form.  It handles the following input
 # tags found in a form:

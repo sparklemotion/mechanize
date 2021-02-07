@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'mechanize/element_matcher'
 
 # This class encapsulates a form parsed out of an HTML page.  Each type of
@@ -640,15 +641,6 @@ class Mechanize::Form
     # Find all keygen tags
     @node.search('keygen').each do |node|
       @fields << Keygen.new(node, node['value'] || '')
-    end
-  end
-
-  unless ::String.method_defined?(:b)
-    # Define String#b for Ruby < 2.0
-    class ::String
-      def b
-        dup.force_encoding(Encoding::ASCII_8BIT)
-      end
     end
   end
 

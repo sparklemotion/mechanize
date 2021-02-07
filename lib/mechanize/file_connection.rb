@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # Wrapper to make a file URI work like an http URI
 

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # coding: BINARY
 
 require 'strscan'
@@ -125,7 +126,7 @@ class Mechanize::HTTP::ContentDispositionParser
   def rfc_2045_quoted_string
     return nil unless @scanner.scan(/"/)
 
-    text = ''
+    text = String.new
 
     while true do
       chunk = @scanner.scan(/[\000-\014\016-\041\043-\133\135-\177]+/) # not \r "

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # Unlike Mechanize::FileSaver, the directory saver places all downloaded files
 # in a single pre-specified directory.

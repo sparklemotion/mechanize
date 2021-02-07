@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # This error is raised when Mechanize encounters a response code it does not
 # know how to handle.  Currently, this exception will be thrown if Mechanize
 # encounters response codes other than 200, 301, or 302.  Any other response
@@ -16,7 +17,7 @@ class Mechanize::ResponseCodeError < Mechanize::Error
 
   def to_s
     response_class = Net::HTTPResponse::CODE_TO_OBJ[@response_code]
-    out = "#{@response_code} => #{response_class} "
+    out = String.new("#{@response_code} => #{response_class} ")
     out << "for #{@page.uri} " if @page.respond_to? :uri # may be HTTPResponse
     out << "-- #{super}"
   end

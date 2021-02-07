@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class RedirectServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     res['Content-Type'] = req.query['ct'] || 'text/html'

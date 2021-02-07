@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 warn 'mechanize/cookie_jar will be deprecated.  Please migrate to the http-cookie APIs.' if $VERBOSE
 
 require 'http/cookie_jar'
@@ -148,7 +149,7 @@ class Mechanize
       return super(input, opthash) if opthash[:format] != :yaml
 
       begin
-        data = YAML.load(input)
+        data = YAML.load(input) # rubocop:disable Security/YAMLLoad
       rescue ArgumentError
         @logger.warn "unloadable YAML cookie data discarded" if @logger
         return self
@@ -172,15 +173,6 @@ class Mechanize
         @logger.warn "incompatible YAML cookie data discarded" if @logger
         return self
       end
-    end
-  end
-
-  # Compatibility for Ruby 1.8/1.9
-  unless ::HTTP::CookieJar.respond_to?(:prepend, true)
-    require 'mechanize/prependable'
-
-    class ::HTTP::CookieJar
-      extend Prependable
     end
   end
 

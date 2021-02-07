@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # This is a pluggable parser that automatically saves every file it
 # encounters.  Unlike Mechanize::DirectorySaver, the file saver saves the

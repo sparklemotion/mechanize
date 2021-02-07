@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # This class contains an option found within SelectList.  A SelectList can
 # have many Option classes associated with it.  An option can be selected by

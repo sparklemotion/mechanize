@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # Raised when Mechanize encounters an error while reading the response body
 # from the server.  Contains the response headers and the response body up to

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Mechanize::ElementMatcher
 
   def elements_with singular, plural = "#{singular}s"

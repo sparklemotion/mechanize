@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # A wrapper for a file URI that makes a request that works like a
 # Net::HTTPRequest

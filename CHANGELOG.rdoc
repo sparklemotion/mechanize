@@ -1,6 +1,9 @@
 = Mechanize CHANGELOG
 
-=== next / unreleased
+=== 2.8.0 / unreleased
+
+* Requirements
+  * Mechanize now requires Ruby 2.5 or newer.
 
 * New Features
   * Page::Link#uri now handles non-ASCII `href`s. (#569) @terryyin

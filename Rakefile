@@ -38,4 +38,9 @@ task publish_docs: %w[rdoc] do
   sh 'rsync', '-avzO', '--delete', 'doc/', 'docs-push.seattlerb.org:/data/www/docs.seattlerb.org/mechanize/'
 end
 
-task default: :test
+desc "Run rubocop security check"
+task :rubocop_security do
+  sh "rubocop lib --only Security"
+end
+
+task default: [:rubocop_security, :test]

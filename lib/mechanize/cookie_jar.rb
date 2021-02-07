@@ -148,7 +148,7 @@ class Mechanize
       return super(input, opthash) if opthash[:format] != :yaml
 
       begin
-        data = YAML.load(input)
+        data = YAML.load(input) # rubocop:disable Security/YAMLLoad
       rescue ArgumentError
         @logger.warn "unloadable YAML cookie data discarded" if @logger
         return self

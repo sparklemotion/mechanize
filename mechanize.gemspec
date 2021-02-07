@@ -56,4 +56,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency("webrobots", ["< 0.2", ">= 0.0.9"])
   spec.add_runtime_dependency('addressable', "~> 2.7")
   spec.add_runtime_dependency('webrick', "~> 1.7")
+
+  spec.add_development_dependency("rubocop", "~> 1.7")
 end

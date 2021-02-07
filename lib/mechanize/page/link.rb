@@ -97,7 +97,7 @@ class Mechanize::Page::Link
                  URI.parse @href
                rescue URI::InvalidURIError
                  begin
-                   URI.parse Addressable::URI.escape @href
+                   URI.parse(Addressable::URI.escape(@href))
                  rescue Addressable::URI::InvalidURIError
                    raise URI::InvalidURIError
                  end

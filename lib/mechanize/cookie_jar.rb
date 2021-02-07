@@ -175,15 +175,6 @@ class Mechanize
     end
   end
 
-  # Compatibility for Ruby 1.8/1.9
-  unless ::HTTP::CookieJar.respond_to?(:prepend, true)
-    require 'mechanize/prependable'
-
-    class ::HTTP::CookieJar
-      extend Prependable
-    end
-  end
-
   class ::HTTP::CookieJar
     prepend CookieJarIMethods
   end

@@ -50,19 +50,6 @@ class Mechanize
 
   Cookie = ::HTTP::Cookie
 
-  # Compatibility for Ruby 1.8/1.9
-  unless Cookie.respond_to?(:prepend, true)
-    require 'mechanize/prependable'
-
-    class Cookie
-      extend Prependable
-
-      class << self
-        extend Prependable
-      end
-    end
-  end
-
   class Cookie
     prepend CookieIMethods
 

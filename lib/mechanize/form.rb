@@ -643,15 +643,6 @@ class Mechanize::Form
     end
   end
 
-  unless ::String.method_defined?(:b)
-    # Define String#b for Ruby < 2.0
-    class ::String
-      def b
-        dup.force_encoding(Encoding::ASCII_8BIT)
-      end
-    end
-  end
-
   def rand_string(len = 10)
     chars = ("a".."z").to_a + ("A".."Z").to_a
     string = ::String.new

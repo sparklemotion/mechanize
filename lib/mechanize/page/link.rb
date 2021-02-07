@@ -8,6 +8,8 @@
 #   <a href="http://example">Hello World</a>
 #   <a href="http://example"><img src="test.jpg" alt="Hello World"></a>
 
+require 'addressable/uri'
+
 class Mechanize::Page::Link
   attr_reader :node
   attr_reader :href
@@ -94,7 +96,11 @@ class Mechanize::Page::Link
                begin
                  URI.parse @href
                rescue URI::InvalidURIError
-                 URI.parse WEBrick::HTTPUtils.escape @href
+                 begin
+                   URI.parse(Addressable::URI.escape(@href))
+                 rescue Addressable::URI::InvalidURIError
+                   raise URI::InvalidURIError
+                 end
                end
              end
   end

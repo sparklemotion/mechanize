@@ -59,4 +59,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "webrobots",            [ "< 0.2",    ">= 0.0.9" ]
   spec.add_runtime_dependency "domain_name",          [ ">= 0.5.1", "~> 0.5"   ]
   spec.add_runtime_dependency 'webrick', "~> 1.7"
+  spec.add_runtime_dependency 'addressable', "~> 2.7"
 end

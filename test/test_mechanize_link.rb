@@ -135,6 +135,30 @@ class TestMechanizeLink < Mechanize::TestCase
     assert_equal 'http://foo.bar/%20baz', link.uri.to_s
   end
 
+  def test_uri_weird_with_fragment
+    doc = Nokogiri::HTML::Document.new
+
+    node = Nokogiri::XML::Node.new('foo', doc)
+    node['href'] = 'http://foo.bar/ baz#уважение'
+
+    link = Mechanize::Page::Link.new(node, nil, nil)
+
+    assert_equal '%D1%83%D0%B2%D0%B0%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5', link.uri.fragment
+  end
+
+  def test_bad_uri_raise_compatible_exception
+    doc = Nokogiri::HTML::Document.new
+
+    node = Nokogiri::XML::Node.new('foo', doc)
+    node['href'] = 'http://http:foo.bar/ baz'
+
+    link = Mechanize::Page::Link.new(node, nil, nil)
+
+    assert_raises URI::InvalidURIError do
+      link.uri
+    end
+  end
+
   def test_resolving_full_uri
     page = @mech.get("http://localhost/frame_test.html")
     link = page.link_with(:text => "Form Test")

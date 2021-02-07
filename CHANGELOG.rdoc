@@ -1,5 +1,11 @@
 = Mechanize CHANGELOG
 
+=== next / unreleased
+
+* New Features
+  * Page::Link#uri now handles non-ASCII `href`s. (#569) @terryyin
+
+
 === 2.7.7 / 2021-02-01
 
 * Security fixes for CVE-2021-21289

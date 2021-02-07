@@ -151,10 +151,10 @@ class Mechanize::HTTP::WWWAuthenticateParser
   def quoted_string
     return nil unless @scanner.scan(/"/)
 
-    text = ''
+    text = String.new
 
     while true do
-      chunk = @scanner.scan(/[\r\n \t\041\043-\176\200-\377]+/) # not "
+      chunk = @scanner.scan(/[\r\n \t\x21\x23-\x7e\u0080-\u00ff]+/) # not " which is \x22
 
       if chunk then
         text << chunk

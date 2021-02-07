@@ -17,7 +17,7 @@ class Mechanize::ResponseCodeError < Mechanize::Error
 
   def to_s
     response_class = Net::HTTPResponse::CODE_TO_OBJ[@response_code]
-    out = "#{@response_code} => #{response_class} "
+    out = String.new("#{@response_code} => #{response_class} ")
     out << "for #{@page.uri} " if @page.respond_to? :uri # may be HTTPResponse
     out << "-- #{super}"
   end

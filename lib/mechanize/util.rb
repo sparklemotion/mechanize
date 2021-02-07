@@ -16,7 +16,7 @@ class Mechanize::Util
     def build_query_string(parameters, enc = nil)
       each_parameter(parameters).inject(nil) { |s, (k, v)|
         # WEBrick::HTTP.escape* has some problems about m17n on ruby-1.9.*.
-        (s.nil? ? '' : s << '&') << [CGI.escape(k.to_s), CGI.escape(v.to_s)].join('=')
+        (s.nil? ? String.new : s << '&') << [CGI.escape(k.to_s), CGI.escape(v.to_s)].join('=')
       } || ''
     end
 

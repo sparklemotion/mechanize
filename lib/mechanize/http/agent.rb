@@ -839,7 +839,7 @@ class Mechanize::HTTP::Agent
 
     out_io
   rescue Zlib::Error => e
-    message = "error handling content-encoding #{response['Content-Encoding']}:"
+    message = String.new("error handling content-encoding #{response['Content-Encoding']}:")
     message << " #{e.message} (#{e.class})"
     raise Mechanize::Error, message
   ensure

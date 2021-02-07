@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # Download is a pluggable parser for downloading files without loading them
 # into memory first.  You may subclass this class to handle content types you

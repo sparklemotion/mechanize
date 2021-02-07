@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'mechanize/element_matcher'
 
 # This class encapsulates a form parsed out of an HTML page.  Each type of

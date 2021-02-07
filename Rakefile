@@ -38,9 +38,19 @@ task publish_docs: %w[rdoc] do
   sh 'rsync', '-avzO', '--delete', 'doc/', 'docs-push.seattlerb.org:/data/www/docs.seattlerb.org/mechanize/'
 end
 
-desc "Run rubocop security check"
-task :rubocop_security do
-  sh "rubocop lib --only Security"
+desc "Run rubocop checks"
+task :rubocop => ["rubocop:security", "rubocop:frozen_string_literals"]
+
+namespace "rubocop" do
+  desc "Run rubocop security check"
+  task :security do
+    sh "rubocop lib --only Security"
+  end
+
+  desc "Run rubocop string literals check"
+  task :frozen_string_literals do
+    sh "rubocop lib --auto-correct-all --only Style/FrozenStringLiteralComment"
+  end
 end
 
-task default: [:rubocop_security, :test]
+task default: [:rubocop, :test]

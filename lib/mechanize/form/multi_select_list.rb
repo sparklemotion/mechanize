@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # This class represents a select list where multiple values can be selected.
 # MultiSelectList#value= accepts an array, and those values are used as

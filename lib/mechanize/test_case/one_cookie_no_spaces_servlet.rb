@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class OneCookieNoSpacesServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     cookie = WEBrick::Cookie.new("foo", "bar")

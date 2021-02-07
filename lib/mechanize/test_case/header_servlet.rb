@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class HeaderServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     res.content_type = "text/plain"

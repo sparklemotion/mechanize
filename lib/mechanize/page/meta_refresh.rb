@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # This class encapsulates a meta element with a refresh http-equiv.  Mechanize
 # treats meta refresh elements just like 'a' tags.  MetaRefresh objects will

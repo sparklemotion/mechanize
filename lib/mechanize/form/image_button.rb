@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # This class represents an image button in a form.  Use the x and y methods to
 # set the x and y positions for where the mouse "clicked".

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # Exception that is raised when an access to a resource is disallowed by
 # robots.txt or by HTML document itself.
 

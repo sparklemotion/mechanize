@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # This class manages history for your mechanize object.
 

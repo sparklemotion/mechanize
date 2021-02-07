@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class FileUploadServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_POST req, res
     res.body = req.body

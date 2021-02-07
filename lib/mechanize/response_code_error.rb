@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # This error is raised when Mechanize encounters a response code it does not
 # know how to handle.  Currently, this exception will be thrown if Mechanize
 # encounters response codes other than 200, 301, or 302.  Any other response

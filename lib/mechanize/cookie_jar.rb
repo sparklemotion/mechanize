@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 warn 'mechanize/cookie_jar will be deprecated.  Please migrate to the http-cookie APIs.' if $VERBOSE
 
 require 'http/cookie_jar'

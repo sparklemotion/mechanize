@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # This class represents a select list or drop down box in a Form.  Set the
 # value for the list by calling SelectList#value=.  SelectList contains a list
 # of Option that were found.  After finding the correct option, set the select

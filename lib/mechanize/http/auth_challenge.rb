@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Mechanize::HTTP
 
   AuthChallenge = Struct.new :scheme, :params, :raw

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class ModifiedSinceServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     s_time = 'Fri, 04 May 2001 00:00:38 GMT'

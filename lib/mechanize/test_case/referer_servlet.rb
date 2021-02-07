@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class RefererServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     res['Content-Type'] = "text/html"

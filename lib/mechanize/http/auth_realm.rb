@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Mechanize::HTTP::AuthRealm
 
   attr_reader :scheme

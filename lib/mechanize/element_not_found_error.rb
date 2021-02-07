@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # Raised when an an element was not found on the Page
 

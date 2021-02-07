@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # Fake implementation of prepend(), which does not support overriding
 # inherited methods nor methods that are formerly overridden by
 # another invocation of prepend().

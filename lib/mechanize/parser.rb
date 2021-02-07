@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # The parser module provides standard methods for accessing the headers and
 # content of a response that are shared across pluggable parsers.

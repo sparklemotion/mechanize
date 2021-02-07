@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'logger'
 
 class DigestAuthServlet < WEBrick::HTTPServlet::AbstractServlet

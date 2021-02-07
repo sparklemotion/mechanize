@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'tempfile'
 require 'net/ntlm'
 require 'kconv'

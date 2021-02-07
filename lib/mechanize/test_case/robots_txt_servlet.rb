@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class RobotsTxtServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     if /301/ === req['Host'] && req.path == '/robots.txt'

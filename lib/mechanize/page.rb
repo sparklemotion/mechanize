@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ##
 # This class encapsulates an HTML page.  If Mechanize finds a content
 # type of 'text/html', this class will be instantiated and returned.

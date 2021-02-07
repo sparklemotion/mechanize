@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # A Frame object wraps a frame HTML element.  Frame objects can be treated
 # just like Link objects.  They contain #src, the #link they refer to and a
 # #name, the name of the frame they refer to.  #src and #name are aliased to

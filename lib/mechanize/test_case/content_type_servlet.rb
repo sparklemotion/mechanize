@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class ContentTypeServlet < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     ct = req.query['ct'] || "text/html; charset=utf-8"

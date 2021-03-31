@@ -188,6 +188,12 @@ UQIBATANBgkqhkiG9w0BAQUFAANBAAAB////////////////////////////////
   def windows?
     ::RUBY_PLATFORM =~ /mingw|mswin/
   end
+
+  ##
+  # Return the contents of the file without Windows carriage returns
+  def file_contents_without_cr(path)
+    File.read(path).gsub(/\r\n/, "\n")
+  end
 end
 
 require 'mechanize/test_case/servlets'

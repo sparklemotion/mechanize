@@ -201,7 +201,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     page = @agent.fetch uri
 
-    assert_equal File.read(foo), page.body
+    assert_equal File.read(foo), page.body.gsub(/\r\n/, "\n")
     assert_kind_of Mechanize::Page, page
   end
 

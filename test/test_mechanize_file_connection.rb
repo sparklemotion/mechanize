@@ -16,7 +16,7 @@ class TestMechanizeFileConnection < Mechanize::TestCase
       end
     end
 
-    assert_equal File.read(__FILE__), body
+    assert_equal File.read(__FILE__), body.gsub(/\r\n/, "\n")
   end
 
   def test_request_on_uri_with_windows_drive
@@ -37,4 +37,3 @@ class TestMechanizeFileConnection < Mechanize::TestCase
     assert_equal(expected_file_path, yielded_file_path)
   end
 end
-

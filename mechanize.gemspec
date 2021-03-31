@@ -46,16 +46,19 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 2.5.0"
 
+  spec.add_runtime_dependency("addressable", "~> 2.7")
   spec.add_runtime_dependency("domain_name", ">= 0.5.20190701", "~> 0.5")
   spec.add_runtime_dependency("http-cookie", ">= 1.0.3", "~> 1.0")
   spec.add_runtime_dependency("mime-types", "~> 3.0")
   spec.add_runtime_dependency("net-http-digest_auth", ">= 1.4.1", "~> 1.4")
   spec.add_runtime_dependency("net-http-persistent", ">= 4.0.1", "~> 4.0")
-  spec.add_runtime_dependency("nokogiri", ">= 1.11.1", "~> 1.11")
+  spec.add_runtime_dependency("nokogiri", ">= 1.11.2", "~> 1.11")
   spec.add_runtime_dependency("ntlm-http", ">= 0.1.1", "~> 0.1")
-  spec.add_runtime_dependency("webrobots", "~> 0.1.2")
-  spec.add_runtime_dependency("addressable", "~> 2.7")
   spec.add_runtime_dependency("webrick", "~> 1.7")
+  spec.add_runtime_dependency("webrobots", "~> 0.1.2")
 
-  spec.add_development_dependency("rubocop", ">= 1.9.1", "~> 1.9")
+  spec.add_development_dependency("minitest", "~> 5.14")
+  spec.add_development_dependency("rake", "~> 13.0")
+  spec.add_development_dependency("rdoc", "~> 6.3")
+  spec.add_development_dependency("rubocop", "~> 1.12")
 end

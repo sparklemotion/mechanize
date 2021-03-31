@@ -9,8 +9,19 @@ The Mechanize library is used for automating interaction with websites. Mechaniz
 
 ## Dependencies
 
-* ruby 2.5 or newer
-* [nokogiri](https://github.com/sparklemotion/nokogiri)
+* Ruby >= 2.5
+* Gems:
+  * `addressable`
+  * `domain_name`
+  * `http-cookie`
+  * `mime-types`
+  * `net-http-digest_auth`
+  * `net-http-persistent`
+  * `nokogiri`
+  * `ntlm-http`
+  * `webrick`
+  * `webrobots`
+
 
 ## Support:
 

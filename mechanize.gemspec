@@ -53,7 +53,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency("net-http-digest_auth", ">= 1.4.1", "~> 1.4")
   spec.add_runtime_dependency("net-http-persistent", ">= 4.0.1", "~> 4.0")
   spec.add_runtime_dependency("nokogiri", ">= 1.11.2", "~> 1.11")
-  spec.add_runtime_dependency("ntlm-http", ">= 0.1.1", "~> 0.1")
+  spec.add_runtime_dependency("rubyntlm", ">= 0.6.3", "~> 0.6")
   spec.add_runtime_dependency("webrick", "~> 1.7")
   spec.add_runtime_dependency("webrobots", "~> 0.1.2")
 

@@ -1,6 +1,11 @@
 require 'mechanize/test_case'
 
 class TestMechanizeFileResponse < Mechanize::TestCase
+  def test_file_path
+    res = Mechanize::FileResponse.new("/path/to/foo.html")
+    assert_equal("/path/to/foo.html", res.file_path)
+  end
+
   def test_content_type
     Tempfile.open %w[pi .nothtml] do |tempfile|
       res = Mechanize::FileResponse.new tempfile.path
@@ -31,6 +36,7 @@ class TestMechanizeFileResponse < Mechanize::TestCase
   end
 
   def test_read_body_does_not_allow_command_injection
+    skip if windows?
     in_tmpdir do
       FileUtils.touch('| ruby -rfileutils -e \'FileUtils.touch("vul.txt")\'')
       res = Mechanize::FileResponse.new('| ruby -rfileutils -e \'FileUtils.touch("vul.txt")\'')

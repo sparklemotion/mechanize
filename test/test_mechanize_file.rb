@@ -104,6 +104,7 @@ class TestMechanizeFile < Mechanize::TestCase
   end
 
   def test_save_bang_does_not_allow_command_injection
+    skip if windows?
     uri = URI 'http://example/test.html'
     page = Mechanize::File.new uri, nil, ''
 

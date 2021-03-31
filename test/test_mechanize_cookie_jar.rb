@@ -502,6 +502,7 @@ class TestMechanizeCookieJar < Mechanize::TestCase
   end
 
   def test_prevent_command_injection_when_saving
+    skip if windows?
     url = URI 'http://rubygems.org/'
     path = '| ruby -rfileutils -e \'FileUtils.touch("vul.txt")\''
 
@@ -514,6 +515,7 @@ class TestMechanizeCookieJar < Mechanize::TestCase
   end
 
   def test_prevent_command_injection_when_loading
+    skip if windows?
     url = URI 'http://rubygems.org/'
     path = '| ruby -rfileutils -e \'FileUtils.touch("vul.txt")\''
 

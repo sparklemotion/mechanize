@@ -346,6 +346,7 @@ but not <a href="/" rel="me nofollow">this</a>!
   end
 
   def test_download_does_not_allow_command_injection
+    skip if windows?
     in_tmpdir do
       @mech.download('http://example', '| ruby -rfileutils -e \'FileUtils.touch("vul.txt")\'')
 
@@ -949,7 +950,7 @@ but not <a href="/" rel="me nofollow">this</a>!
       "Content-Disposition: form-data; name=\"userfile1\"; filename=\"#{name}\"",
       page.body
     )
-    assert_operator page.body.bytesize, :>, File.size(__FILE__)
+    assert_operator page.body.bytesize, :>, file_contents_without_cr(__FILE__).length
   end
 
   def test_post_file_upload_nonascii
@@ -968,7 +969,7 @@ but not <a href="/" rel="me nofollow">this</a>!
       page.body
     )
     assert_match("Content-Type: application/zip", page.body)
-    assert_operator page.body.bytesize, :>, File.size(__FILE__)
+    assert_operator page.body.bytesize, :>, file_contents_without_cr(__FILE__).length
   end
 
   def test_post_file_upload
@@ -987,7 +988,7 @@ but not <a href="/" rel="me nofollow">this</a>!
       page.body
     )
     assert_match("Content-Type: application/zip", page.body)
-    assert_operator page.body.bytesize, :>, File.size(__FILE__)
+    assert_operator page.body.bytesize, :>, file_contents_without_cr(__FILE__).length
   end
 
   def test_post_redirect
@@ -1182,7 +1183,7 @@ but not <a href="/" rel="me nofollow">this</a>!
 
     page = @mech.submit(form)
 
-    contents = File.binread __FILE__
+    contents = File.binread(__FILE__).gsub(/\r\n/, "\n")
     basename = File.basename __FILE__
 
     assert_match(

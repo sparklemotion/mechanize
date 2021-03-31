@@ -8,6 +8,7 @@
 
 * New Features
   * Page::Link#uri now handles non-ASCII `href`s. (#569) @terryyin
+  * FileConnection supports Windows drive letters (#483)
 
 
 === 2.7.7 / 2021-02-01

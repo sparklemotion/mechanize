@@ -22,7 +22,7 @@ The Mechanize library is used for automating interaction with websites. Mechaniz
   * `net-http-digest_auth`
   * `net-http-persistent`
   * `nokogiri`
-  * `ntlm-http`
+  * `rubyntlm`
   * `webrick`
   * `webrobots`
 

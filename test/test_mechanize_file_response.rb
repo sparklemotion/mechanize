@@ -1,6 +1,11 @@
 require 'mechanize/test_case'
 
 class TestMechanizeFileResponse < Mechanize::TestCase
+  def test_file_path
+    res = Mechanize::FileResponse.new("/path/to/foo.html")
+    assert_equal("/path/to/foo.html", res.file_path)
+  end
+
   def test_content_type
     Tempfile.open %w[pi .nothtml] do |tempfile|
       res = Mechanize::FileResponse.new tempfile.path

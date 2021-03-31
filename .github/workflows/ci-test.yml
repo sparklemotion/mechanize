@@ -11,18 +11,35 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         ruby-version: ["2.5", "2.6", "2.7", "3.0", "jruby"]
 
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby-version }}
+        bundler-cache: true
+    - name: Run tests
+      run: bundle exec rake
+
+  test-platform:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ["windows-latest", "macos-latest"]
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.0
         bundler-cache: true
     - name: Run tests
       run: bundle exec rake

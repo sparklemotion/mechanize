@@ -4,6 +4,7 @@
 
 * Requirements
   * Mechanize now requires Ruby 2.5 or newer.
+  * Move from `ntlm-http` to `rubyntlm` gem. (#495, #574)
 
 * New Features
   * Page::Link#uri now handles non-ASCII `href`s. (#569) @terryyin

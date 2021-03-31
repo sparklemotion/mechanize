@@ -183,6 +183,11 @@ UQIBATANBgkqhkiG9w0BAQUFAANBAAAB////////////////////////////////
     body_io
   end
 
+  ##
+  # Returns true if the current platform is a Windows platform
+  def windows?
+    ::RUBY_PLATFORM =~ /mingw|mswin/
+  end
 end
 
 require 'mechanize/test_case/servlets'

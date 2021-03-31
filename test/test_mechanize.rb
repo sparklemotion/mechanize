@@ -346,6 +346,7 @@ but not <a href="/" rel="me nofollow">this</a>!
   end
 
   def test_download_does_not_allow_command_injection
+    skip if windows?
     in_tmpdir do
       @mech.download('http://example', '| ruby -rfileutils -e \'FileUtils.touch("vul.txt")\'')
 

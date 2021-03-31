@@ -47,6 +47,7 @@ class TestMechanizeDownload < Mechanize::TestCase
   end
 
   def test_save_bang_does_not_allow_command_injection
+    skip if windows?
     uri = URI.parse 'http://example/foo.html'
     body_io = StringIO.new '0123456789'
 

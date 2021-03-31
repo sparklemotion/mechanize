@@ -36,6 +36,7 @@ class TestMechanizeFileResponse < Mechanize::TestCase
   end
 
   def test_read_body_does_not_allow_command_injection
+    skip if windows?
     in_tmpdir do
       FileUtils.touch('| ruby -rfileutils -e \'FileUtils.touch("vul.txt")\'')
       res = Mechanize::FileResponse.new('| ruby -rfileutils -e \'FileUtils.touch("vul.txt")\'')

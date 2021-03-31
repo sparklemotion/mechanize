@@ -10,6 +10,7 @@
 
 The Mechanize library is used for automating interaction with websites. Mechanize automatically stores and sends cookies, follows redirects, and can follow links and submit forms.  Form fields can be populated and submitted. Mechanize also keeps track of the sites that you have visited as a history.
 
+
 ## Dependencies
 
 * Ruby >= 2.5
@@ -32,9 +33,11 @@ The bug tracker is available here:
 
 * https://github.com/sparklemotion/mechanize/issues
 
+
 ## Examples
 
 If you are just starting, check out the [GUIDE](http://docs.seattlerb.org/mechanize/GUIDE_rdoc.html) or the [EXAMPLES](http://docs.seattlerb.org/mechanize/EXAMPLES_rdoc.html) file.
+
 
 ## Developers
 
@@ -47,12 +50,11 @@ bundle install
 Run all tests with:
 
 ```
-rake test
+bundle exec rake test
 ```
 
-You can also use `autotest` from the ZenTest gem to run tests.
-
 See also Mechanize::TestCase to read about the built-in testing infrastructure.
+
 
 ## Authors
 

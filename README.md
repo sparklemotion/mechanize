@@ -42,20 +42,12 @@ See also Mechanize::TestCase to read about the built-in testing infrastructure.
 
 ## Authors
 
-Copyright (c) 2005 by Michael Neumann (mneumann@ntecs.de)
+* Eric Hodel
+* Akinori MUSHA
+* Aaron Patterson
+* Lee Jarvis
+* Mike Dalessio
 
-Copyright (c) 2006-2011:
-
-* [Aaron Patterson](http://tenderlovemaking.com) (aaron.patterson@gmail.com)
-* [Mike Dalessio](http://mike.daless.io) (mike@csa.net)
-
-Copyright (c) 2011-2015:
-
-* [Eric Hodel](http://blog.segment7.net) (drbrain@segment7.net)
-* [Akinori MUSHA](http://blog.akinori.org) (knu@idaemons.org)
-* [Lee Jarvis](http://twitter.com/lee_jarvis) (ljjarvis@gmail.com)
-
-This library comes with a shameless plug for employing me ([Aaron](http://tenderlovemaking.com/)) programming Ruby, my favorite language!
 
 ## Acknowledgments
 

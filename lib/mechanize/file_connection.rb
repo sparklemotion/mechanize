@@ -11,8 +11,7 @@ class Mechanize::FileConnection
   end
 
   def request uri, request
-    yield Mechanize::FileResponse.new Mechanize::Util.uri_unescape uri.path
+    file_path = uri.path
+    yield Mechanize::FileResponse.new(Mechanize::Util.uri_unescape(file_path))
   end
-
 end
-

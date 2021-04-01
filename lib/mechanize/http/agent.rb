@@ -9,6 +9,9 @@ require 'webrobots'
 
 class Mechanize::HTTP::Agent
 
+  CREDENTIAL_HEADERS = ['Authorization', 'Cookie']
+  POST_HEADERS = ['Content-Length', 'Content-MD5', 'Content-Type']
+
   # :section: Headers
 
   # Disables If-Modified-Since conditional requests (enabled by default)
@@ -986,14 +989,20 @@ class Mechanize::HTTP::Agent
 
     redirect_method = method == :head ? :head : :get
 
+    new_uri = secure_resolve!(response['Location'].to_s, page)
+    @history.push(page, page.uri)
+
     # Make sure we are not copying over the POST headers from the original request
-    ['Content-Length', 'Content-MD5', 'Content-Type'].each do |key|
-      headers.delete key
+    POST_HEADERS.each do |key|
+      headers.delete_if { |h| h.casecmp?(key) }
     end
 
-    new_uri = secure_resolve! response['Location'].to_s, page
-
-    @history.push(page, page.uri)
+    # Make sure we clear credential headers if being redirected to another site
+    if new_uri.host != page.uri.host
+      CREDENTIAL_HEADERS.each do |ch|
+        headers.delete_if { |h| h.casecmp?(ch) }
+      end
+    end
 
     fetch new_uri, redirect_method, headers, [], referer, redirects + 1
   end

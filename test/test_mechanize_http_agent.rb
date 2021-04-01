@@ -1504,7 +1504,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     headers = {
       'Range' => 'bytes=0-9999',
       'Content-Type' => 'application/x-www-form-urlencoded',
-      'Content-Length' => '9999',
+      'CONTENT-LENGTH' => '9999',
+      'content-md5' => '14758f1afd44c09b7992073ccf00b43d',
     }
 
     page = fake_page
@@ -1516,6 +1517,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_match 'range|bytes=0-9999', page.body
     refute_match 'content-type|application/x-www-form-urlencoded', page.body
     refute_match 'content-length|9999', page.body
+    refute_match 'content-md5|14758f1afd44c09b7992073ccf00b43d', page.body
   end
 
   def test_response_redirect_malformed
@@ -1549,6 +1551,48 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
       @agent.response_redirect({ 'Location' => '/index.html' }, :get,
                                fake_page, @agent.redirection_limit, {}, referer)
     end
+  end
+
+  def test_response_redirect_to_cross_site_with_credential
+    @agent.redirect_ok = true
+
+    headers = {
+      'Range' => 'bytes=0-9999',
+      'AUTHORIZATION' => 'Basic xxx',
+      'cookie' => 'name=value',
+    }
+
+    page = html_page ''
+    page = @agent.response_redirect({ 'Location' => 'http://trap/http_headers' }, :get,
+                                    page, 0, headers)
+
+    refute_includes(headers.keys, "AUTHORIZATION")
+    refute_includes(headers.keys, "cookie")
+
+    assert_match 'range|bytes=0-9999', page.body
+    refute_match("authorization|Basic xxx", page.body)
+    refute_match("cookie|name=value", page.body)
+  end
+
+  def test_response_redirect_to_same_site_with_credential
+    @agent.redirect_ok = true
+
+    headers = {
+      'Range' => 'bytes=0-9999',
+      'AUTHORIZATION' => 'Basic xxx',
+      'cookie' => 'name=value',
+    }
+
+    page = html_page ''
+    page = @agent.response_redirect({ 'Location' => '/http_headers' }, :get,
+                                    page, 0, headers)
+
+    assert_includes(headers.keys, "AUTHORIZATION")
+    assert_includes(headers.keys, "cookie")
+
+    assert_match 'range|bytes=0-9999', page.body
+    assert_match("authorization|Basic xxx", page.body)
+    assert_match("cookie|name=value", page.body)
   end
 
   def test_response_redirect_not_ok

@@ -10,6 +10,7 @@
   * Page::Link#uri now handles non-ASCII `href`s. (#569) @terryyin
   * FileConnection supports Windows drive letters (#483)
   * Credential headers 'Authorization' and 'Cookie' are deleted on cross-origin redirects. (#538) @kyoshidajp
+  * ContentDispositionParser handles ISO8601 date headers, to be robust with websites that ignore RFC2183. (#554) @reitermarkus
 
 * Bug fix
   * POST headers 'Content-Length', 'Content-MD5', and 'Content-Type' are deleted in a case-insensitive manner on redirects. Previously these headers were treated as case-sensitive.

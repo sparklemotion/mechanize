@@ -30,6 +30,33 @@ class TestMechanizeHttpContentDispositionParser < Mechanize::TestCase
     assert_equal expected,     content_disposition.parameters
   end
 
+  def test_parse_date_iso8601_fallback
+    now = Time.at Time.now.to_i
+
+    content_disposition = @parser.parse \
+      'attachment;' \
+      'filename=value;' \
+      "creation-date=\"#{now.iso8601}\";" \
+      "modification-date=\"#{(now + 1).iso8601}\""
+
+    assert_equal 'attachment', content_disposition.type
+    assert_equal 'value',      content_disposition.filename
+    assert_equal now,          content_disposition.creation_date
+    assert_equal((now + 1),    content_disposition.modification_date)
+  end
+
+  def test_parse_date_invalid
+    now = Time.at Time.now.to_i
+
+    content_disposition = @parser.parse \
+      'attachment;' \
+      'filename=value;' \
+      "creation-date=\"#{now.to_s}\";" \
+      "modification-date=\"#{(now + 1).to_s}\""
+
+    assert_nil content_disposition
+  end
+
   def test_parse_header
     content_disposition = @parser.parse \
       'content-disposition: attachment;filename=value', true

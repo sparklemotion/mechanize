@@ -1556,18 +1556,20 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     headers = {
       'Range' => 'bytes=0-9999',
-      'Content-Type' => 'application/x-www-form-urlencoded',
-      'Content-Length' => '9999',
-      'Authorization' => 'Basic xxx',
-      'Cookie' => 'name=value',
+      'AUTHORIZATION' => 'Basic xxx',
+      'cookie' => 'name=value',
     }
 
     page = html_page ''
-    @agent.response_redirect({ 'Location' => 'http://trap' }, :get,
-                             page, 0, headers)
+    page = @agent.response_redirect({ 'Location' => 'http://trap/http_headers' }, :get,
+                                    page, 0, headers)
 
-    assert !(headers.keys.include? 'Authorization')
-    assert !(headers.keys.include? 'Cookie')
+    refute_includes(headers.keys, "AUTHORIZATION")
+    refute_includes(headers.keys, "cookie")
+
+    assert_match 'range|bytes=0-9999', page.body
+    refute_match("authorization|Basic xxx", page.body)
+    refute_match("cookie|name=value", page.body)
   end
 
   def test_response_redirect_to_same_site_with_credential
@@ -1575,18 +1577,20 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     headers = {
       'Range' => 'bytes=0-9999',
-      'Content-Type' => 'application/x-www-form-urlencoded',
-      'Content-Length' => '9999',
-      'Authorization' => 'Basic xxx',
-      'Cookie' => 'name=value',
+      'AUTHORIZATION' => 'Basic xxx',
+      'cookie' => 'name=value',
     }
 
     page = html_page ''
-    @agent.response_redirect({ 'Location' => 'http://example' }, :get,
-                             page, 0, headers)
+    page = @agent.response_redirect({ 'Location' => '/http_headers' }, :get,
+                                    page, 0, headers)
 
-    assert headers.keys.include? 'Authorization'
-    assert headers.keys.include? 'Cookie'
+    assert_includes(headers.keys, "AUTHORIZATION")
+    assert_includes(headers.keys, "cookie")
+
+    assert_match 'range|bytes=0-9999', page.body
+    assert_match("authorization|Basic xxx", page.body)
+    assert_match("cookie|name=value", page.body)
   end
 
   def test_response_redirect_not_ok

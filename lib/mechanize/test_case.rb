@@ -88,11 +88,9 @@ class Mechanize::TestCase < Minitest::Test
   # Creates a Mechanize::CookieJar by parsing the given +str+
 
   def cookie_jar str, uri = URI('http://example')
-    jar = Mechanize::CookieJar.new
-
-    jar.parse str, uri
-
-    jar
+    Mechanize::CookieJar.new.tap do |jar|
+      jar.parse str, uri
+    end
   end
 
   ##
@@ -110,15 +108,11 @@ class Mechanize::TestCase < Minitest::Test
   # Creates a Nokogiri Node +element+ with the given +attributes+
 
   def node element, attributes = {}
-    doc = Nokogiri::HTML::Document.new
-
-    node = Nokogiri::XML::Node.new element, doc
-
-    attributes.each do |name, value|
-      node[name] = value
+    Nokogiri::XML::Node.new(element, Nokogiri::HTML::Document.new).tap do |node|
+      attributes.each do |name, value|
+        node[name] = value
+      end
     end
-
-    node
   end
 
   ##
@@ -174,13 +168,12 @@ UQIBATANBgkqhkiG9w0BAQUFAANBAAAB////////////////////////////////
   # Creates a Tempfile with +content+ that is immediately unlinked
 
   def tempfile content
-    body_io = Tempfile.new @NAME
-    body_io.unlink
-    body_io.write content
-    body_io.flush
-    body_io.rewind
-
-    body_io
+    Tempfile.new(@NAME).tap do |body_io|
+      body_io.unlink
+      body_io.write content
+      body_io.flush
+      body_io.rewind
+    end
   end
 
   ##

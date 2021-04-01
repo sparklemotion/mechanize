@@ -1504,7 +1504,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     headers = {
       'Range' => 'bytes=0-9999',
       'Content-Type' => 'application/x-www-form-urlencoded',
-      'Content-Length' => '9999',
+      'CONTENT-LENGTH' => '9999',
+      'content-md5' => '14758f1afd44c09b7992073ccf00b43d',
     }
 
     page = fake_page
@@ -1516,6 +1517,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_match 'range|bytes=0-9999', page.body
     refute_match 'content-type|application/x-www-form-urlencoded', page.body
     refute_match 'content-length|9999', page.body
+    refute_match 'content-md5|14758f1afd44c09b7992073ccf00b43d', page.body
   end
 
   def test_response_redirect_malformed

@@ -11,6 +11,7 @@ require 'webrobots'
 class Mechanize::HTTP::Agent
 
   CREDENTIAL_HEADERS = ['Authorization', 'Cookie']
+  POST_HEADERS = ['Content-Length', 'Content-MD5', 'Content-Type']
 
   # :section: Headers
 
@@ -993,8 +994,8 @@ class Mechanize::HTTP::Agent
     @history.push(page, page.uri)
 
     # Make sure we are not copying over the POST headers from the original request
-    ['Content-Length', 'Content-MD5', 'Content-Type'].each do |key|
-      headers.delete key
+    POST_HEADERS.each do |key|
+      headers.delete_if { |h| h.casecmp?(key) }
     end
 
     # Make sure we clear credential headers if being redirected to another site

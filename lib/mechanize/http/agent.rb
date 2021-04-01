@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 require 'tempfile'
 require 'net/ntlm'
-require 'kconv'
 require 'webrobots'
 
 ##
@@ -1279,4 +1278,3 @@ class Mechanize::HTTP::Agent
 end
 
 require 'mechanize/http/auth_store'
-

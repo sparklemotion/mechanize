@@ -74,6 +74,4 @@ Thank you to Michael Neumann for starting the Ruby version. Thanks to everyone w
 
 ## License
 
-This library is distributed under the MIT license. Please see the [LICENSE](http://docs.seattlerb.org/mechanize/LICENSE_rdoc.html) file.
-
-
+This library is distributed under the MIT license. Please see [LICENSE.txt](https://github.com/sparklemotion/mechanize/blob/main/LICENSE.txt).

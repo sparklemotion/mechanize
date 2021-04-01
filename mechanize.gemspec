@@ -51,7 +51,12 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency("http-cookie", ">= 1.0.3", "~> 1.0")
   spec.add_runtime_dependency("mime-types", "~> 3.0")
   spec.add_runtime_dependency("net-http-digest_auth", ">= 1.4.1", "~> 1.4")
-  spec.add_runtime_dependency("net-http-persistent", ">= 4.0.1", "~> 4.0")
+
+  # careful! some folks are relying on older versions of net-http-persistent
+  # - see the socks proxy patch in use at #507 and #464
+  # - see use of retry_change_requests that was removed at #558
+  spec.add_runtime_dependency("net-http-persistent", ">= 2.5.2", "< 5.0.dev")
+
   spec.add_runtime_dependency("nokogiri", ">= 1.11.2", "~> 1.11")
   spec.add_runtime_dependency("rubyntlm", ">= 0.6.3", "~> 0.6")
   spec.add_runtime_dependency("webrick", "~> 1.7")

@@ -23,9 +23,9 @@ task('ssl_cert') do |p|
 end
 
 RDoc::Task.new do |rdoc|
-  rdoc.main = "README.rdoc"
+  rdoc.main = "README.md"
   rdoc.rdoc_dir = 'doc'
-  rdoc.rdoc_files.include( "CHANGELOG.rdoc", "EXAMPLES.rdoc", "GUIDE.rdoc", "LICENSE.rdoc", "README.rdoc", "lib/**/*.rb")
+  rdoc.rdoc_files.include( "CHANGELOG.md", "EXAMPLES.rdoc", "GUIDE.rdoc", "LICENSE.txt", "README.md", "lib/**/*.rb")
 end
 
 desc "Run tests"

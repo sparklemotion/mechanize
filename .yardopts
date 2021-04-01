@@ -1,0 +1,8 @@
+--main=README.md
+lib/**/*.rb
+-
+README.md
+LICENSE.txt
+CHANGELOG.md
+GUIDE.rdoc
+EXAMPLES.rdoc

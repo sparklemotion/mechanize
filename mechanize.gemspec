@@ -41,8 +41,8 @@ Gem::Specification.new do |spec|
   spec.files = %x(git ls-files).split($/)
   spec.test_files = spec.files.grep(%r{^test/})
 
-  spec.extra_rdoc_files += Dir['*.rdoc']
-  spec.rdoc_options = ["--main", "README.rdoc"]
+  spec.extra_rdoc_files += Dir['*.rdoc', '*.md']
+  spec.rdoc_options = ["--main", "README.md"]
 
   spec.required_ruby_version = ">= 2.5.0"
 

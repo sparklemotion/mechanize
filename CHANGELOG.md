@@ -1,6 +1,6 @@
-= Mechanize CHANGELOG
+# Mechanize CHANGELOG
 
-=== 2.8.0 / unreleased
+## 2.8.0 / unreleased
 
 * Requirements
   * Mechanize now requires Ruby 2.5 or newer.
@@ -15,7 +15,7 @@
 * Bug fix
   * POST headers 'Content-Length', 'Content-MD5', and 'Content-Type' are deleted in a case-insensitive manner on redirects. Previously these headers were treated as case-sensitive.
 
-=== 2.7.7 / 2021-02-01
+## 2.7.7 / 2021-02-01
 
 * Security fixes for CVE-2021-21289
 
@@ -42,7 +42,7 @@
   * Ignore input fields with blank names (#542, #536)
 
 
-=== 2.7.6
+## 2.7.6
 
 * New Features
   * Mechanize#set_proxy accepts an HTTP URL/URI. (#513)
@@ -54,7 +54,7 @@
   * Mechanize::Page#title no longer picks a title in an embeded SVG/RDF element. (#503)
   * Make Mechanize::Form#has_field? boolean. (#501)
 
-=== 2.7.5
+## 2.7.5
 
 * New Features
   * All 4xx responses and RedirectLimitReachedError when fetching robots.txt are treated as full allow just like Googlebot does.
@@ -65,7 +65,7 @@
   * Fix basic authentication for a realm that contains uppercase characters. (#458, #459)
   * Fix encoding error when uploading a file which name is non-ASCII. (#333)
 
-=== 2.7.4
+## 2.7.4
 
 * New Features
   * Accept array-like and hash-like values as query/parameter value.
@@ -87,7 +87,7 @@
   * Fix whitespace bug in WWW-Authenticate. #451, #450, by Rasmus Bergholdt
   * Don't allow redirect from a non-file URL to a file URL for security reasons. (#455)
 
-=== 2.7.3
+## 2.7.3
 
 * New Features
   * Allow net-http-persistent instance to be named. #324, John Weir.
@@ -98,20 +98,20 @@
   * Ensure Download#save! defaults back to original filename if
     none is provided (#300)
 
-=== 2.7.2
+## 2.7.2
 
 * Bug fix
   * API compatibility issues with Mechanize::CookieJar cookies has been
     addressed.  https://github.com/sparklemotion/http-cookie/issues/2 #326
 
-=== 2.7.1
+## 2.7.1
 
 * Bug fix
   * Ensure images with no "src" attribute still return correct URLs. #317
   * Fixes Mechanize::Parser#extract_filename where an empty string filename
     in the response caused unhandled exception. #318
 
-=== 2.7.0
+## 2.7.0
 
 * New Features
   * Mechanize::Agent#response_read will now raise a
@@ -125,7 +125,7 @@
   * Ensure page URLs with whitespace in them are escaped #313 @pacop.
   * Added a workaround for a bug of URI#+ that led to failure in resolving a relative path containing double slash like "/../http://.../". #304
 
-=== 2.6.0
+## 2.6.0
 
 * New Features
   * Mechanize#start and Mechanize#shutdown (Thanks, Damian Janowski!)
@@ -159,7 +159,7 @@
   * Mechanize now writes cookiestxt with a prefixed dot for wildcard domain
     handling. #295 by Mike Morearty.
 
-=== 2.5.2
+## 2.5.2
 
 * New Features
   * Mechanize::CookieJar#save_as takes a keyword option "session" to say
@@ -178,13 +178,13 @@
   * Fixed Content-Disposition parameter parser to be case insensitive. #233
   * Fixed redirection counting in following meta refresh. #240
 
-=== 2.5.1
+## 2.5.1
 
 * Bug fix
   * Mechanize no longer copies POST requests during a redirect which was
     introduced by #215.  Pull request #229 by Godfrey Chan.
 
-=== 2.5
+## 2.5
 
 * Minor enhancements
   * Added Mechanize#ignore_bad_chunking for working around servers that don't
@@ -210,7 +210,7 @@
   * Worked around ruby 1.8 run with -Ku and ISO-8859-1 encoded characters in
     URIs.  Issue #228 by Stanislav O.Pogrebnyak
 
-=== 2.4
+## 2.4
 
 * Security fix:
 
@@ -233,7 +233,7 @@
   * Improved exception messages for 401 Unauthorized responses.  Mechanize now
     tells you if you were missing credentials, had an incorrect password, etc.
 
-=== 2.3 / 2012-02-20
+## 2.3 / 2012-02-20
 
 * Minor enhancements
   * Add support for the Max-Age attribute in the Set-Cookie header.
@@ -253,14 +253,14 @@
   * Cookies with an empty Expires attribute value were stored as session
     cookies but cookies without the Expires attribute were not.  Issue #78
 
-=== 2.2.1 / 2012-02-13
+## 2.2.1 / 2012-02-13
 
 * Bug fixes
   * Add missing file to the gem, ensure that missing files won't cause
     failures again.  Issue #201 by Alex
   * Fix minor grammar issue in README.  Issue #200 by Shane Becker.
 
-=== 2.2 / 2012-02-12
+## 2.2 / 2012-02-12
 
 * API changes
   * MetaRefresh#href is not normalized to an absolute URL, but set to the
@@ -295,7 +295,7 @@
   * A link with an empty href is now resolved correctly where previously the
     query part was dropped.
 
-=== 2.1.1 / 2012-02-03
+## 2.1.1 / 2012-02-03
 
 * Bug fixes
   * Set missing idle_timeout default.  Issue #196
@@ -323,7 +323,7 @@
   * Documented how to convert a Mechanize::ResponseReadError into a File or
     Page, along with a new method #force_parse.  Issue #176
 
-=== 2.1 / 2011-12-20
+## 2.1 / 2011-12-20
 
 * Deprecations
   * Mechanize#get no longer accepts an options hash.
@@ -406,7 +406,7 @@
     #129 by kitamomonga
   * Fixed proxy example in EXAMPLE.  Issue #146 by NielsKSchjoedt
 
-=== 2.0.1 / 2011-06-28
+## 2.0.1 / 2011-06-28
 
 Mechanize now uses minitest to avoid 1.9 vs 1.8 assertion availability in
 test/unit
@@ -417,7 +417,7 @@ test/unit
   * Mechanize#keep_alive_time no longer crashes but does nothing as
     net-http-persistent does not support HTTP/1.0 keep-alive extensions.
 
-=== 2.0 / 2011-06-27
+## 2.0 / 2011-06-27
 
 Mechanize is now under the MIT license
 
@@ -525,7 +525,7 @@ Mechanize is now under the MIT license
   * Mechanize::Page::Link#uri now handles both escaped and unescaped hrefs.
     GH #107
 
-=== 1.0.0
+## 1.0.0
 
 * New Features:
 
@@ -543,7 +543,7 @@ Mechanize is now under the MIT license
   * Fixing default values with serialized cookies. GH #3
   * Checkboxes and fields are sorted by page appearance before submitting. #11
 
-=== 0.9.3
+## 0.9.3
 
 * Bug Fixes:
 
@@ -561,7 +561,7 @@ Mechanize is now under the MIT license
   * Fixed a bug with double semi-colons in Content-Disposition headers
   * Properly handling cookies that specify a path.  RF #25259
 
-=== 0.9.2 / 2009/03/05
+## 0.9.2 / 2009/03/05
 
 * New Features:
   * Mechanize#submit and Form#submit take arbitrary headers(thanks penguincoder)
@@ -574,7 +574,7 @@ Mechanize is now under the MIT license
   * Made Content-Type match case insensitive (Thanks Kelly Reynolds)
   * Non-string form parameters work
 
-=== 0.9.1 2009/02/23
+## 0.9.1 2009/02/23
 
 * New Features:
   * Encoding may be specified for a page: Page#encoding=
@@ -590,7 +590,7 @@ Mechanize is now under the MIT license
   * WAP content types will now be parsed
   * Rescued poorly formatted cookies.  Thanks Kelley Reynolds!
 
-=== 0.9.0
+## 0.9.0
 
 * Deprecations
   * WWW::Mechanize::List is gone!
@@ -600,7 +600,7 @@ Mechanize is now under the MIT license
 * Bug Fixes:
   * Nil check on page when base tag is used #23021
 
-=== 0.8.5
+## 0.8.5
 
 * Deprecations
   * WWW::Mechanize::List will be deprecated in 0.9.0, and warnings have
@@ -624,28 +624,28 @@ Mechanize is now under the MIT license
   * Mechanize#get requests no longer send a referer unless they are relative
     requests.
 
-=== 0.8.4
+## 0.8.4
 
 * Bug Fixes:
   * Setting the port number on the host header.
   * Fixing Authorization headers for picky servers
 
-=== 0.8.3
+## 0.8.3
 
 * Bug Fixes:
   * Making sure logger is set during SSL connections.
 
-=== 0.8.2
+## 0.8.2
 
 * Bug Fixes:
   * Doh!  I was accidentally setting headers twice.
 
-=== 0.8.1
+## 0.8.1
 
 * Bug Fixes:
   * Fixed problem with nil pointer when logger is set
 
-=== 0.8.0
+## 0.8.0
 
 * New Features:
   * Lifecycle hooks.  Mechanize#pre_connect_hooks, Mechanize#post_connect_hooks
@@ -659,7 +659,7 @@ Mechanize is now under the MIT license
   * Only setting headers once
   * Adding IIS authentication support
 
-=== 0.7.8
+## 0.7.8
 
 * Bug Fixes:
   * Fixed bug when receiving a 304 response (HTTPNotModified) on a page not
@@ -667,7 +667,7 @@ Mechanize is now under the MIT license
   * #21428 Default to HTML parser for 'application/xhtml+xml' content-type.
   * Fixed an issue where redirects were resending posted data
 
-=== 0.7.7
+## 0.7.7
 
 * New Features:
   * Page#form_with takes a +criteria+ hash.
@@ -688,7 +688,7 @@ Mechanize is now under the MIT license
   * #21233 Smarter multipart boundry. Thanks Todd Willey!
   * #20097 Supporting meta tag cookies.
 
-=== 0.7.6
+## 0.7.6
 
 * New Features:
   * Added support for reading Mozilla cookie jars.  Thanks Chris Riddoch!
@@ -711,32 +711,32 @@ Mechanize is now under the MIT license
   * Supporting blank strings for option values.
     http://rubyforge.org/tracker/index.php?func=detail&aid=19975&group_id=1453&atid=5709
 
-=== 0.7.5
+## 0.7.5
 
 * Fixed a bug when fetching files and not pages.  Thanks Mat Schaffer!
 
-=== 0.7.4
+## 0.7.4
 
 * doh!
 
-=== 0.7.3
+## 0.7.3
 
 * Pages are now yielded to a blocks given to WWW::Mechanize#get
 * WWW::Mechanize#get now takes hash arguments for uri parameters.
 * WWW::Mechanize#post takes an IO object as a parameter and posts correctly.
 * Fixing a strange zlib inflate problem on windows
 
-=== 0.7.2
+## 0.7.2
 
 * Handling gzipped responses with no Content-Length header
 
-=== 0.7.1
+## 0.7.1
 
 * Added iPhone to the user agent aliases. [#17572]
 * Fixed a bug with EOF errors in net/http.  [#17570]
 * Handling 0 length gzipped responses. [#17471]
 
-=== 0.7.0
+## 0.7.0
 
 * Removed Ruby 1.8.2 support
 * Changed parser to lazily parse links
@@ -744,7 +744,7 @@ Mechanize is now under the MIT license
 * Adding verify_callback for SSL requests.  Thanks Mike Dalessio!
 * Fixed a bug with Accept-Language header.  Thanks Bill Siggelkow.
 
-=== 0.6.11
+## 0.6.11
 
 * Detecting single quotes in meta redirects.
 * Adding pretty inspect for ruby versions > 1.8.4 (Thanks Joel Kociolek)
@@ -755,7 +755,7 @@ Mechanize is now under the MIT license
 * Added a FAQ
   http://rubyforge.org/tracker/?func=detail&aid=15772&group_id=1453&atid=5709
 
-=== 0.6.10
+## 0.6.10
 
 * Made digest authentication work with POSTs.
 * Made sure page was HTML before following meta refreshes.
@@ -774,7 +774,7 @@ Mechanize is now under the MIT license
 * Aliasing inspect to pretty_inspect.  Thanks Eric Promislow.
   http://rubyforge.org/pipermail/mechanize-users/2007-July/000157.html
 
-=== 0.6.9
+## 0.6.9
 
 * Updating UTF-8 support for urls
 * Adding AREA tags to the links list.
@@ -786,7 +786,7 @@ Mechanize is now under the MIT license
 * Added Digest Authentication support.  Thanks to Ryan Davis and Eric Hodel,
   you get a gold star!
 
-=== 0.6.8
+## 0.6.8
 
 * Keep alive can be shut off now with WWW::Mechanize#keep_alive
 * Conditional requests can be shut off with WWW::Mechanize#conditional_requests
@@ -797,12 +797,12 @@ Mechanize is now under the MIT license
 * Updating compatability with hpricot
 * Added more unit tests
 
-=== 0.6.7
+## 0.6.7
 
 * Fixed a bug with keep-alive requests
 * [#9549] fixed problem with cookie paths
 
-=== 0.6.6
+## 0.6.6
 
 * Removing hpricot overrides
 * Fixed a bug where alt text can be nil.  Thanks Yannick!
@@ -812,7 +812,7 @@ Mechanize is now under the MIT license
 * [#9434] Fixed bug where html entities weren't decoded
 * [#9150] Updated mechanize history to deal with redirects
 
-=== 0.6.5
+## 0.6.5
 
 * Copying headers to a hash to prevent memory leaks
 * Speeding up page parsing
@@ -827,7 +827,7 @@ Mechanize is now under the MIT license
   http://rubyforge.org/tracker/?func=detail&aid=7563&group_id=1453&atid=5709
 * Added MSIE 7.0 user agent string
 
-=== 0.6.4
+## 0.6.4
 
 * Adding the "redirect_ok" method to Mechanize to stop mechanize from
   following redirects.
@@ -844,7 +844,7 @@ Mechanize is now under the MIT license
 * Fixed bug [#6548].  Input type of 'button' was not being added as a button.
 * Fixed bug [#7139]. REXML parser calls hpricot parser by accident
 
-=== 0.6.3
+## 0.6.3
 
 * Added keys and values methods to Form
 * Added has_value? to Form
@@ -859,7 +859,7 @@ Mechanize is now under the MIT license
 * Fixed a bug where '#' symbols are encoded
   http://rubyforge.org/forum/message.php?msg_id=14747
 
-=== 0.6.2
+## 0.6.2
 
 * Added a yield to Page#form so that dealing with forms can be more DSL like.
 * Added the parsed page to the ResponseCodeError so that the parsed results
@@ -867,7 +867,7 @@ Mechanize is now under the MIT license
   http://rubyforge.org/pipermail/mechanize-users/2006-September/000007.html
 * Updated documentation (Thanks to Paul Smith)
 
-=== 0.6.1
+## 0.6.1
 
 * Added a method to Form called "submit".  Now forms can be submitted by
   calling a method on the form.
@@ -885,7 +885,7 @@ Mechanize is now under the MIT license
 * Fixed a bug with loading text in to links.
   http://rubyforge.org/pipermail/mechanize-users/2006-September/000000.html
 
-=== 0.6.0
+## 0.6.0
 
 * Changed main parser to use hpricot
 * Made WWW::Mechanize::Page class searchable like hpricot
@@ -897,7 +897,7 @@ Mechanize is now under the MIT license
 * Removed REXML helper methods since the main parser is now hpricot
 * Overhauled cookie parser to use WEBrick::Cookie
 
-=== 0.5.4
+## 0.5.4
 
 * Added WWW::Mechanize#trasact for saving history state between in a
   transaction.  See the EXAMPLES file.  Thanks Johan Kiviniemi.
@@ -912,7 +912,7 @@ Mechanize is now under the MIT license
 * Fixed a bug with saving files on windows
 * Fixed a bug with the filename being set in forms
 
-=== 0.5.3
+## 0.5.3
 
 * Mechanize#click will now act on the first element of an array.  So if an
   array of links is passed to WWW::Mechanize#click, the first link is clicked.
@@ -930,7 +930,7 @@ Mechanize is now under the MIT license
 * Updated log4r support for a speed increase.  Thanks Yinon Bentor
 * Added inspect methods and pretty printing
 
-=== 0.5.2
+## 0.5.2
 
 * Fixed a bug with input names that are nil
 * Added a warning when using attr_finder because attr_finder will be deprecated
@@ -947,12 +947,12 @@ Mechanize is now under the MIT license
   WWW::Mechanize::Form#set_fields.  Which can be used like so:
    form.set_fields( :foo => 'bar', :name => 'Aaron' )
 
-=== 0.5.1
+## 0.5.1
 
 * Fixed bug with file uploads
 * Added performance tweaks to the cookie class
 
-=== 0.5.0
+## 0.5.0
 
 * Added pluggable parsers. (Thanks to Eric Kolve for the idea)
 * Changed namespace so all classes are under WWW::Mechanize.
@@ -967,7 +967,7 @@ Mechanize is now under the MIT license
 * Removed support for body filters in favor of pluggable parsers.
 * Fixed cookie bug adding a '/' when the url is missing one (Thanks Nick Dainty)
 
-=== 0.4.7
+## 0.4.7
 
 * Fixed bug with no action in forms.  Thanks to Adam Wiggins
 * Setting a default user-agent string
@@ -976,7 +976,7 @@ Mechanize is now under the MIT license
   (thanks to Gregory Brown)
 * Added WWW::Mechanize#get_file for fetching non text/html files
 
-=== 0.4.6
+## 0.4.6
 
 * Added support for proxies
 * Added a uri field to WWW::Link
@@ -987,7 +987,7 @@ Mechanize is now under the MIT license
   allows syntax as such:    form.fields.name('q').value = 'xyz'
   Before it was like this:  form.fields.name('q').first.value = 'xyz'
 
-=== 0.4.5
+## 0.4.5
 
 * Added support for multiple values of the same name
 * Updated build_query_string to take an array of arrays (Thanks Michal Janeczek)
@@ -997,13 +997,13 @@ Mechanize is now under the MIT license
 * Fixed a bug with empty select lists
 * Fixing a problem with cookies not handling no spaces after semicolons
 
-=== 0.4.4
+## 0.4.4
 
 * Fixed error in method signature, basic_authetication is now basic_auth
 * Fixed bug with encoding names in file uploads (Big thanks to Alex Young)
 * Added options to the select list
 
-=== 0.4.3
+## 0.4.3
 
 * Added syntactic sugar for finding things
 * Fixed bug with HttpOnly option in cookies
@@ -1011,21 +1011,21 @@ Mechanize is now under the MIT license
 * Defaulted dropdown lists to the first element
 * Added unit tests
 
-=== 0.4.2
+## 0.4.2
 
 * Added support for iframes
 * Made mechanize dependant on ruby-web rather than narf
 * Added unit tests
 * Fixed a bunch of warnings
 
-=== 0.4.1
+## 0.4.1
 
 * Added support for file uploading
 * Added support for frames (Thanks Gabriel[mailto:leerbag@googlemail.com])
 * Added more unit tests
 * Fixed some bugs
 
-=== 0.4.0
+## 0.4.0
 
 * Added more unit tests
 * Added a cookie jar with better cookie support, included expiration of cookies

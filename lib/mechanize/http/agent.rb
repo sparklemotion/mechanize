@@ -989,18 +989,18 @@ class Mechanize::HTTP::Agent
 
     redirect_method = method == :head ? :head : :get
 
+    new_uri = secure_resolve!(response['Location'].to_s, page)
+    @history.push(page, page.uri)
+
     # Make sure we are not copying over the POST headers from the original request
     ['Content-Length', 'Content-MD5', 'Content-Type'].each do |key|
       headers.delete key
     end
 
-    new_uri = secure_resolve! response['Location'].to_s, page
-
-    @history.push(page, page.uri)
-
+    # Make sure we clear credential headers if being redirected to another site
     if new_uri.host != page.uri.host
       CREDENTIAL_HEADERS.each do |ch|
-        headers.delete_if{ |h| h.downcase == ch.downcase }
+        headers.delete_if { |h| h.casecmp?(ch) }
       end
     end
 

@@ -117,8 +117,7 @@
   * Mechanize::Agent#response_read will now raise a
     Mechanize::ResponseReadError instead of an EOFError and avoid losing
     requested content. #296.
-  * Depend on http-cookie, add backwards compatible deprecations.
-    #257 Akinori MUSHA.
+  * Depend on http-cookie, add backwards compatible deprecations. #257 Akinori MUSHA.
   * Added `Download#save!` for overwriting existing files. #300 Sean Kim.
 
 * Bug fix
@@ -147,13 +146,10 @@
   * Added iPad and Android user agents.  #277 by sambit, #278 by seansay.
 
 * Bug fix
-  * Mechanize#cert and Mechanize#key now return the values set by
-    #cert= and #key=. #244, #245 (Thanks, Robert Gogolok!)
-  * Mechanize no longer submits disabled form fields.  #276 by Bogdan Gusiev,
-    #279 by Ricardo Valeriano.
+  * Mechanize#cert and Mechanize#key now return the values set by #cert= and #key=. #244, #245 (Thanks, Robert Gogolok!)
+  * Mechanize no longer submits disabled form fields.  #276 by Bogdan Gusiev, #279 by Ricardo Valeriano.
   * Mechanize::File#save now behaves like Mechanize::Download#save in
-    that it will create the parent directory before saving.
-    #272, #280 by Ryan Kowalick
+    that it will create the parent directory before saving. #272, #280 by Ryan Kowalick
   * Ensure `application/xml` is registered as an XML parser in
     `PluggableParser`, not just `text/xml`. #266 James Gregory
   * Mechanize now writes cookiestxt with a prefixed dot for wildcard domain
@@ -173,8 +169,7 @@
     In mechanize 3 the old "Mac FireFox" user-agent alias will be removed.
     Pull request #231 by Gavin Miller.
   * Mechanize now authenticates using the raw challenge, not a reconstructed
-    one, to avoid dealing with quoting rules of RFC 2617.  Fixes failures in
-    #231 due to net-http-digest_auth 1.2.1
+    one, to avoid dealing with quoting rules of RFC 2617.  Fixes failures in #231 due to net-http-digest_auth 1.2.1
   * Fixed Content-Disposition parameter parser to be case insensitive. #233
   * Fixed redirection counting in following meta refresh. #240
 
@@ -205,8 +200,7 @@
     terminate chunked transfer-encoding properly.  Issue #116
   * Mechanize no longer raises an exception when multiple identical
     radiobuttons are checked.  Issue #214 by Matthias Guenther
-  * Fixed documentation for pre_connect_hooks and post_connect_hooks.  Issue
-    #226 by Robert Poor
+  * Fixed documentation for pre_connect_hooks and post_connect_hooks.  Issue #226 by Robert Poor
   * Worked around ruby 1.8 run with -Ku and ISO-8859-1 encoded characters in
     URIs.  Issue #228 by Stanislav O.Pogrebnyak
 
@@ -272,8 +266,7 @@
   * SSL parameters and proxy may now be set at any time.  Issue #194 by
     dsisnero.
   * Improved Mechanize::Page with #image_with and #images_with and
-    Mechanize::Page::Image various img element attribute accessors, #caption,
-    #extname, #mime_type and #fetch.  Pull request #173 by kitamomonga
+    Mechanize::Page::Image various img element attribute accessors, #caption, #extname, #mime_type and #fetch.  Pull request #173 by kitamomonga
   * Added MIME type parsing for content-types in Mechanize::PluggableParser
     for fine-grained parser choices.  Parsers will be chosen based on exact
     match, simplified type or media type in that order.  See
@@ -336,8 +329,7 @@
   * SSL connections will be verified against the system certificate store by
     default.
   * Added Mechanize#retry_change_requests to allow mechanize to retry POST and
-    other non-idempotent requests when you know it is safe to do so.  Issue
-    #123
+    other non-idempotent requests when you know it is safe to do so.  Issue #123
   * Mechanize can now stream files directly to disk without loading them into
     memory first through Mechanize::Download, a pluggable parser for
     downloading files.
@@ -352,8 +344,7 @@
       agent.pluggable_parser.default = Mechanize::Download
   * Added Mechanize#content_encoding_hooks which allow handling of
     non-standard content encodings like "agzip".  Patch #125 by kitamomonga
-  * Added dom_class to elements and the element matcher like dom_id.  Patch
-    #156 by Dan Hansen.
+  * Added dom_class to elements and the element matcher like dom_id.  Patch #156 by Dan Hansen.
   * Added support for the HTML5 keygen form element.  See
     http://dev.w3.org/html5/spec/Overview.html#the-keygen-element  Patch #157
     by Victor Costan.
@@ -402,8 +393,7 @@
   * The original Referer value persists on redirection.  Issue #150
   * Do not send a referer on a Refresh header based redirection.
   * Fixed encoding error in tests when LANG=C.  Patch #142 by jinschoi.
-  * The order of items in a form submission now match the DOM order.  Patch
-    #129 by kitamomonga
+  * The order of items in a form submission now match the DOM order.  Patch #129 by kitamomonga
   * Fixed proxy example in EXAMPLE.  Issue #146 by NielsKSchjoedt
 
 ## 2.0.1 / 2011-06-28
@@ -471,8 +461,7 @@ Mechanize is now under the MIT license
   * Mechanize now implements session cookies.  GH #78
   * Mechanize now implements deflate decoding.  GH #40
   * Mechanize now allows a certificate and key to be passed directly.  GH #71
-  * Mechanize::Form::MultiSelectList now implements #option_with and
-    #options_with.  GH #42
+  * Mechanize::Form::MultiSelectList now implements #option_with and #options_with.  GH #42
   * Add Mechanize::Page::Link#rel and #rel?(kind) to read and test the rel
     attribute.
   * Add Mechanize::Page#canonical_uri to read a </tt><link

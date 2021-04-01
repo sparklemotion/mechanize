@@ -36,7 +36,7 @@ The bug tracker is available here:
 
 ## Examples
 
-If you are just starting, check out the [GUIDE](http://docs.seattlerb.org/mechanize/GUIDE_rdoc.html) or the [EXAMPLES](http://docs.seattlerb.org/mechanize/EXAMPLES_rdoc.html) file.
+If you are just starting, check out [GUIDE.rdoc](https://github.com/sparklemotion/mechanize/blob/main/GUIDE.rdoc) or [EXAMPLES.rdoc](https://github.com/sparklemotion/mechanize/blob/main/EXAMPLES.rdoc).
 
 
 ## Developers

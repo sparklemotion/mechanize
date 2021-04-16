@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby-version: ["2.5", "2.6", "2.7", "3.0", "jruby"]
+        ruby-version: ["2.5", "2.6", "2.7", "3.0", "jruby", "truffleruby-head"]
 
     runs-on: ubuntu-latest
     steps:

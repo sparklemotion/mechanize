@@ -1,19 +1,30 @@
 # Mechanize CHANGELOG
 
+## next / unreleased
+
+### Fix
+
+* Gracefully handle parsing errors that contain an invalid byte sequence. Previously, if libxml2 registered a parsing error that itself contained invalid encoding, an exception might be raised. (#553)
+
+
 ## 2.8.0 / 2021-04-01
 
-* Requirements
-  * Mechanize now requires Ruby 2.5 or newer.
-  * Move from `ntlm-http` to `rubyntlm` gem. (#495, #574)
+### Requirements
 
-* New Features
-  * Page::Link#uri now handles non-ASCII `href`s. (#569) @terryyin
-  * FileConnection supports Windows drive letters (#483)
-  * Credential headers 'Authorization' and 'Cookie' are deleted on cross-origin redirects. (#538) @kyoshidajp
-  * ContentDispositionParser handles ISO8601 date headers, to be robust with websites that ignore RFC2183. (#554) @reitermarkus
+* Mechanize now requires Ruby 2.5 or newer.
+* Move from `ntlm-http` to `rubyntlm` gem. (#495, #574)
 
-* Bug fix
-  * POST headers 'Content-Length', 'Content-MD5', and 'Content-Type' are deleted in a case-insensitive manner on redirects. Previously these headers were treated as case-sensitive.
+### New Features
+
+* Page::Link#uri now handles non-ASCII `href`s. (#569) @terryyin
+* FileConnection supports Windows drive letters (#483)
+* Credential headers 'Authorization' and 'Cookie' are deleted on cross-origin redirects. (#538) @kyoshidajp
+* ContentDispositionParser handles ISO8601 date headers, to be robust with websites that ignore RFC2183. (#554) @reitermarkus
+
+### Bug fix
+
+* POST headers 'Content-Length', 'Content-MD5', and 'Content-Type' are deleted in a case-insensitive manner on redirects. Previously these headers were treated as case-sensitive.
+
 
 ## 2.7.7 / 2021-02-01
 

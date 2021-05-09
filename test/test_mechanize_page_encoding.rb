@@ -183,5 +183,27 @@ class TestMechanizePageEncoding < Mechanize::TestCase
     assert_equal Encoding::UTF_8, result.text.encoding
   end
 
-end
+  def test_parser_error_message_containing_encoding_errors
+    # https://github.com/sparklemotion/mechanize/issues/553
+    body = <<~EOF
+      <html>
+      <body>
+      <!--
+      ## メモ
+      処理の一般化, 二重ループ, 多重ループ
+      wzxhzdk:25
+      -->
+    EOF
+    page = util_page body
 
+    # this should not raise an "invalid byte sequence in UTF-8" error while processing parsing errors
+    page.search("body")
+
+    # let's assert on the setup: a libxml2-returned parsing error itself contains an invalid character
+    assert(error = page.parser.errors.find { |e| e.message.include?("Comment not terminated") })
+    exception = assert_raises(ArgumentError) do
+      error.message =~ /any regex just to trigger encoding error/
+    end
+    assert_includes(exception.message, "invalid byte sequence in UTF-8")
+  end unless RUBY_ENGINE == 'jruby' # this is a libxml2-specific condition
+end

@@ -1,6 +1,6 @@
 # Mechanize CHANGELOG
 
-## next / unreleased
+## 2.8.1 / 2021-05-09
 
 ### Fix
 

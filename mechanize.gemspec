@@ -35,6 +35,15 @@ Gem::Specification.new do |spec|
       'ljjarvis@gmail.com',
     ]
 
+  spec.metadata = {
+    'yard.run'          => 'yard',
+    'bug_tracker_uri'   => 'https://github.com/sparklemotion/mechanize/issues',
+    'changelog_uri'     => 'https://github.com/sparklemotion/mechanize/blob/main/CHANGELOG.md',
+    'documentation_uri' => 'https://www.rubydoc.info/gems/mechanize',
+    'homepage_uri'      => 'https://github.com/sparklemotion/mechanize',
+    'source_code_uri'   => 'https://github.com/sparklemotion/mechanize'
+  }
+
   spec.license = "MIT"
 
   spec.require_paths = ["lib"]

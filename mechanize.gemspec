@@ -53,7 +53,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 2.5.0"
 
-  spec.add_runtime_dependency("addressable", "~> 2.7")
+  spec.add_runtime_dependency("addressable", "~> 2.8")
   spec.add_runtime_dependency("domain_name", ">= 0.5.20190701", "~> 0.5")
   spec.add_runtime_dependency("http-cookie", ">= 1.0.3", "~> 1.0")
   spec.add_runtime_dependency("mime-types", "~> 3.0")

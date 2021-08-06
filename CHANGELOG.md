@@ -1,5 +1,12 @@
 # Mechanize CHANGELOG
 
+## next / unreleased
+
+### Dependencies
+
+* Update dependency on Addressable from `~>2.7` to `~>2.8`.
+
+
 ## 2.8.1 / 2021-05-09
 
 ### Fix

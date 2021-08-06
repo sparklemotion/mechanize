@@ -4,7 +4,7 @@
 
 ### Dependencies
 
-* Update dependency on Addressable from `~>2.7` to `~>2.8`.
+* Update dependency on Addressable from `~>2.7` to `~>2.8`. (#584) @yidingww
 
 
 ## 2.8.1 / 2021-05-09

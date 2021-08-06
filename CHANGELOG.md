@@ -1,6 +1,6 @@
 # Mechanize CHANGELOG
 
-## next / unreleased
+## 2.8.2 / 2021-08-06
 
 ### Dependencies
 

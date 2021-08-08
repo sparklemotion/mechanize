@@ -952,6 +952,21 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
   end
 
   ##
+  # Length of time to wait for data to be sent to the server
+
+  def write_timeout
+    @agent.write_timeout
+  end
+
+  ##
+  # Sets the timeout for each chunk of data to be sent to the server to
+  # +write_timeout+.  A single request may write many chunks of data.
+
+  def write_timeout= write_timeout
+    @agent.write_timeout = write_timeout
+  end
+
+  ##
   # Controls how mechanize deals with redirects.  The following values are
   # allowed:
   #

@@ -1020,6 +1020,12 @@ but not <a href="/" rel="me nofollow">this</a>!
     assert_equal 5, @mech.read_timeout
   end
 
+  def test_write_timeout_equals
+    @mech.write_timeout = 7
+
+    assert_equal 7, @mech.write_timeout
+  end
+
   def test_timeouts_for_file_connection
     uri = URI.parse "file://#{File.expand_path __FILE__}"
     @mech.read_timeout = 5

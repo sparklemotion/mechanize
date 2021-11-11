@@ -1,5 +1,12 @@
 # Mechanize CHANGELOG
 
+## 2.8.3 / 2021-11-11
+
+### Update
+
+* Update the "Linux Firefox" user agent string to rev94 (#587) Thank you, @ncs1!
+
+
 ## 2.8.2 / 2021-08-06
 
 ### Dependencies

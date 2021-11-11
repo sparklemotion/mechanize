@@ -115,7 +115,7 @@ class Mechanize
 
   AGENT_ALIASES = {
     'Mechanize' => "Mechanize/#{VERSION} Ruby/#{ruby_version} (http://github.com/sparklemotion/mechanize/)",
-    'Linux Firefox' => 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:43.0) Gecko/20100101 Firefox/43.0',
+    'Linux Firefox' => 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:94.0) Gecko/20100101 Firefox/94.0',
     'Linux Konqueror' => 'Mozilla/5.0 (compatible; Konqueror/3; Linux)',
     'Linux Mozilla' => 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.4) Gecko/20030624',
     'Mac Firefox' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:43.0) Gecko/20100101 Firefox/43.0',

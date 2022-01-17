@@ -1,5 +1,12 @@
 # Mechanize CHANGELOG
 
+## 2.8.4 / 2022-01-17
+
+### Fix
+
+* `Mechanize::CookieJar#load` calls `Psych.safe_load` when using Psych >= 3.1
+
+
 ## 2.8.3 / 2021-11-11
 
 ### Update

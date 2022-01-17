@@ -149,7 +149,7 @@ class Mechanize
       return super(input, opthash) if opthash[:format] != :yaml
 
       begin
-        data = YAML.load(input) # rubocop:disable Security/YAMLLoad
+        data = load_yaml(input)
       rescue ArgumentError
         @logger.warn "unloadable YAML cookie data discarded" if @logger
         return self
@@ -172,6 +172,18 @@ class Mechanize
       else
         @logger.warn "incompatible YAML cookie data discarded" if @logger
         return self
+      end
+    end
+
+    private
+
+    if YAML.name == "Psych" && Gem::Requirement.new(">= 3.1").satisfied_by?(Gem::Version.new(Psych::VERSION))
+      def load_yaml(yaml)
+        YAML.safe_load(yaml, aliases: true, permitted_classes: ["Mechanize::Cookie", "Time"])
+      end
+    else
+      def load_yaml(yaml)
+        YAML.load(yaml) # rubocop:disable Security/YAMLLoad
       end
     end
   end

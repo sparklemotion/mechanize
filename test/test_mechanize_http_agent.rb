@@ -1569,7 +1569,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     refute_includes(headers.keys, "AUTHORIZATION")
     refute_includes(headers.keys, "cookie")
 
-    assert_match 'range|bytes=0-9999', page.body
+    assert_match("range|bytes=0-9999", page.body)
     refute_match("authorization|Basic xxx", page.body)
     refute_match("cookie|name=value", page.body)
   end
@@ -1590,8 +1590,29 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_includes(headers.keys, "AUTHORIZATION")
     assert_includes(headers.keys, "cookie")
 
-    assert_match 'range|bytes=0-9999', page.body
+    assert_match("range|bytes=0-9999", page.body)
     assert_match("authorization|Basic xxx", page.body)
+    assert_match("cookie|name=value", page.body)
+  end
+
+  def test_response_redirect_to_same_site_diff_port_with_credential
+    @agent.redirect_ok = true
+
+    headers = {
+      'Range' => 'bytes=0-9999',
+      'AUTHORIZATION' => 'Basic xxx',
+      'cookie' => 'name=value',
+    }
+
+    page = html_page ''
+    page = @agent.response_redirect({ 'Location' => 'http://example:81/http_headers' }, :get,
+                                    page, 0, headers)
+
+    refute_includes(headers.keys, "AUTHORIZATION")
+    assert_includes(headers.keys, "cookie")
+
+    assert_match("range|bytes=0-9999", page.body)
+    refute_match("authorization|Basic xxx", page.body)
     assert_match("cookie|name=value", page.body)
   end
 

@@ -9,7 +9,8 @@ require 'webrobots'
 
 class Mechanize::HTTP::Agent
 
-  CREDENTIAL_HEADERS = ['Authorization', 'Cookie']
+  CREDENTIAL_HEADERS = ['Authorization']
+  COOKIE_HEADERS = ['Cookie']
   POST_HEADERS = ['Content-Length', 'Content-MD5', 'Content-Type']
 
   # :section: Headers
@@ -998,10 +999,14 @@ class Mechanize::HTTP::Agent
     end
 
     # Make sure we clear credential headers if being redirected to another site
-    if new_uri.host != page.uri.host
-      CREDENTIAL_HEADERS.each do |ch|
-        headers.delete_if { |h| h.casecmp?(ch) }
+    if new_uri.host == page.uri.host
+      if new_uri.port != page.uri.port
+        # https://datatracker.ietf.org/doc/html/rfc6265#section-8.5
+        # cookies are OK to be shared across ports on the same host
+        CREDENTIAL_HEADERS.each { |ch| headers.delete_if { |h| h.casecmp?(ch) } }
       end
+    else
+      (COOKIE_HEADERS + CREDENTIAL_HEADERS).each { |ch| headers.delete_if { |h| h.casecmp?(ch) } }
     end
 
     fetch new_uri, redirect_method, headers, [], referer, redirects + 1

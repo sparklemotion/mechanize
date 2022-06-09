@@ -1,5 +1,12 @@
 # Mechanize CHANGELOG
 
+## 2.8.5 / 2022-06-09
+
+### Security
+
+Fixes low-severity CVE-2022-31033, "Authorization header leak on port redirect." See [GHSA-64qm-hrgp-pgr9](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-64qm-hrgp-pgr9) for more details.
+
+
 ## 2.8.4 / 2022-01-17
 
 ### Fix

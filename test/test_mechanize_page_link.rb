@@ -51,13 +51,10 @@ class TestMechanizePageLink < Mechanize::TestCase
     Mechanize::Page.new @uri, res, body && body.force_encoding(Encoding::BINARY), 200, @mech
   end
 
-  def nkf_dependency?
-    if RUBY_ENGINE == 'ruby'
-      false
-    else
+  def skip_if_nkf_dependency
+    if RUBY_ENGINE == 'jruby'
       meth = caller[0][/`(\w+)/, 1]
-      warn "#{meth}: skipped because this feature currently depends on NKF"
-      true
+      skip "#{meth}: skipped because this feature currently depends on NKF"
     end
   end
 
@@ -112,7 +109,7 @@ class TestMechanizePageLink < Mechanize::TestCase
   end
 
   def test_encoding_charset_after_title_bad
-    return if nkf_dependency?
+    skip_if_nkf_dependency
 
     page = util_page UTF8
 
@@ -122,7 +119,7 @@ class TestMechanizePageLink < Mechanize::TestCase
   end
 
   def test_encoding_charset_after_title_double_bad
-    return if nkf_dependency?
+    skip_if_nkf_dependency
 
     page = util_page SJIS_BAD_AFTER_TITLE
 
@@ -132,7 +129,7 @@ class TestMechanizePageLink < Mechanize::TestCase
   end
 
   def test_encoding_charset_bad
-    return if nkf_dependency?
+    skip_if_nkf_dependency
 
     page = util_page "<title>#{UTF8_TITLE}</title>"
     page.encodings.replace %w[

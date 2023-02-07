@@ -58,10 +58,10 @@ class WikipediaLinksToPhilosophy
   # the article.
 
   def follow_first_link
-    puts @title
+    puts "#{@title} (#{@page.uri})"
 
     # > p > a rejects italics
-    links = @page.root.css('.mw-content-ltr > p > a[href^="/wiki/"]')
+    links = @page.root.css('.mw-content-ltr p > a[href^="/wiki/"]')
 
     # reject disambiguation and special pages, images and files
     links = links.reject do |link_node|
@@ -74,10 +74,9 @@ class WikipediaLinksToPhilosophy
 
     link = links.first
 
-    unless link then
-      # disambiguation page? try the first item in the list
-      link =
-        @page.root.css('.mw-content-ltr > ul > li > a[href^="/wiki/"]').first
+    if link.nil?
+      puts "Could not parse #{@page.uri}"
+      exit 1
     end
 
     # convert a Nokogiri HTML element back to a mechanize link

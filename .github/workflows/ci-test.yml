@@ -1,5 +1,9 @@
 name: "ci"
 
+concurrency:
+  group: "${{github.workflow}}-${{github.ref}}"
+  cancel-in-progress: true
+
 on:
   push:
     branches:
@@ -8,6 +12,8 @@ on:
     types: [opened, synchronize]
     branches:
       - main
+  schedule:
+    - cron: "0 8 * * 5" # At 08:00 on Friday # https://crontab.guru/#0_8_*_*_5
 
 jobs:
   rubocop:

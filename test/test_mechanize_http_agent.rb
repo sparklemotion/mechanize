@@ -823,7 +823,11 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     @res.instance_variable_set(:@header,
                                'www-authenticate' => ['Negotiate, NTLM'])
 
-    page = @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
+    begin
+      page = @agent.response_authenticate @res, nil, @uri, @req, {}, nil, nil
+    rescue OpenSSL::Digest::DigestError
+      skip "It looks like OpenSSL is not configured to support MD4"
+    end
 
     assert_equal 'ok', page.body # lame test
   end

@@ -40,6 +40,7 @@ jobs:
       with:
         ruby-version: ${{matrix.ruby-version}}
         bundler-cache: true
+        bundler: 2.3.26 # https://github.com/rubygems/rubygems/issues/6435
     - run: bundle exec rake test
 
   test-platform:
@@ -56,4 +57,5 @@ jobs:
       with:
         ruby-version: "3.2"
         bundler-cache: true
+        bundler: latest
     - run: bundle exec rake test

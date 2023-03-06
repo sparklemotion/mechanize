@@ -31,9 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # TODO update jruby once 9.4.1.0 is out
-        # 9.4.0.0 is affected by https://github.com/jruby/jruby/issues/7481
-        ruby-version: ["2.5", "2.6", "2.7", "3.0", "3.1", "3.2", "head", "jruby-9.3", "truffleruby-head"]
+        ruby-version: ["2.5", "2.6", "2.7", "3.0", "3.1", "3.2", "head", "jruby-9.4", "truffleruby-head"]
 
     runs-on: ubuntu-latest
     steps:
@@ -42,6 +40,7 @@ jobs:
       with:
         ruby-version: ${{matrix.ruby-version}}
         bundler-cache: true
+        bundler: 2.3.26 # https://github.com/rubygems/rubygems/issues/6435
     - run: bundle exec rake test
 
   test-platform:
@@ -58,4 +57,5 @@ jobs:
       with:
         ruby-version: "3.2"
         bundler-cache: true
+        bundler: latest
     - run: bundle exec rake test

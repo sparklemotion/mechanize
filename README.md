@@ -13,7 +13,7 @@ The Mechanize library is used for automating interaction with websites. Mechaniz
 
 ## Dependencies
 
-* Ruby >= 2.5
+* Ruby >= 2.6
 * Gems:
   * `addressable`
   * `domain_name`

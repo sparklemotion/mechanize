@@ -51,7 +51,7 @@ Gem::Specification.new do |spec|
   spec.extra_rdoc_files += Dir['*.rdoc', '*.md']
   spec.rdoc_options = ["--main", "README.md"]
 
-  spec.required_ruby_version = ">= 2.5.0"
+  spec.required_ruby_version = ">= 2.6.0"
 
   spec.add_runtime_dependency("addressable", "~> 2.8")
   spec.add_runtime_dependency("domain_name", ">= 0.5.20190701", "~> 0.5")

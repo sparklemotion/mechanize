@@ -1,5 +1,12 @@
 # Mechanize CHANGELOG
 
+## next / unreleased
+
+### Requirements
+
+* Mechanize now requires Ruby 2.6 or newer.
+
+
 ## 2.8.5 / 2022-06-09
 
 ### Security

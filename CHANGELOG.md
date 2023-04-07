@@ -7,6 +7,11 @@
 * Mechanize now requires Ruby 2.6 or newer.
 
 
+### Improvement
+
+* Mechanize can now parse frozen strings. (#610)
+
+
 ## 2.8.5 / 2022-06-09
 
 ### Security

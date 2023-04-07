@@ -276,5 +276,19 @@ class TestMechanizePage < Mechanize::TestCase
 		assert_equal page.title, "HTML>TITLE"
 	end
 
+  def test_frozen_string_body
+    html = (<<~HTML).freeze
+      <html>
+        <head>
+          <title>Page Title</title>
+        </head>
+        <body>
+          <p>Hello World</p>
+        </body>
+      </html>
+    HTML
+
+    html_page(html) # refute_raises
+  end
 end
 

@@ -1,6 +1,6 @@
 # Mechanize CHANGELOG
 
-## next / unreleased
+## 2.9.0 / 2023-04-07
 
 ### Requirements
 

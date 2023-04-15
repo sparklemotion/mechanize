@@ -1,5 +1,10 @@
 # Mechanize CHANGELOG
 
+## next / unreleased
+
+* Updated User-Agent strings to represent modern browser versions. (#612) Thank you, @takatea!
+
+
 ## 2.9.0 / 2023-04-07
 
 ### Requirements

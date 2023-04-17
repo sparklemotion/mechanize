@@ -1,6 +1,8 @@
 # Mechanize CHANGELOG
 
-## next / unreleased
+## 2.9.1 / 2023-04-17
+
+### Update
 
 * Updated User-Agent strings to represent modern browser versions. (#612) Thank you, @takatea!
 

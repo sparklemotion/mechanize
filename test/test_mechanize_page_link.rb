@@ -1,5 +1,7 @@
 # coding: utf-8
 
+puts "Nokogiri::VERSION_INFO: #{Nokogiri::VERSION_INFO}"
+
 require 'mechanize/test_case'
 
 class TestMechanizePageLink < Mechanize::TestCase
@@ -111,11 +113,15 @@ class TestMechanizePageLink < Mechanize::TestCase
   def test_encoding_charset_after_title_bad
     skip_if_nkf_dependency
 
+    # https://gitlab.gnome.org/GNOME/libxml2/-/issues/543
+    skip if Nokogiri.uses_libxml?([">= 2.11.0", "<= 2.11.4"])
+    expected_encoding = Nokogiri.uses_libxml?("< 2.11.0") ? 'UTF-8' : 'Shift_JIS'
+
     page = util_page UTF8
 
     assert_equal false, page.encoding_error?
 
-    assert_equal 'UTF-8', page.encoding
+    assert_equal expected_encoding, page.encoding
   end
 
   def test_encoding_charset_after_title_double_bad
@@ -131,6 +137,10 @@ class TestMechanizePageLink < Mechanize::TestCase
   def test_encoding_charset_bad
     skip_if_nkf_dependency
 
+    # https://gitlab.gnome.org/GNOME/libxml2/-/issues/543
+    skip if Nokogiri.uses_libxml?([">= 2.11.0", "<= 2.11.4"])
+    expected_encoding = Nokogiri.uses_libxml?("< 2.11.0") ? 'UTF-8' : 'Shift_JIS'
+
     page = util_page "<title>#{UTF8_TITLE}</title>"
     page.encodings.replace %w[
       UTF-8
@@ -139,7 +149,7 @@ class TestMechanizePageLink < Mechanize::TestCase
 
     assert_equal false, page.encoding_error?
 
-    assert_equal 'UTF-8', page.encoding
+    assert_equal expected_encoding, page.encoding
   end
 
   def test_encoding_meta_charset

@@ -114,7 +114,7 @@ class TestMechanizePageLink < Mechanize::TestCase
     skip_if_nkf_dependency
 
     # https://gitlab.gnome.org/GNOME/libxml2/-/issues/543
-    skip if Nokogiri.uses_libxml?([">= 2.11.0", "<= 2.11.4"])
+    skip if Nokogiri.uses_libxml?([">= 2.11.0", "< 2.12.0"])
     expected_encoding = Nokogiri.uses_libxml?("< 2.11.0") ? 'UTF-8' : 'Shift_JIS'
 
     page = util_page UTF8
@@ -138,7 +138,7 @@ class TestMechanizePageLink < Mechanize::TestCase
     skip_if_nkf_dependency
 
     # https://gitlab.gnome.org/GNOME/libxml2/-/issues/543
-    skip if Nokogiri.uses_libxml?([">= 2.11.0", "<= 2.11.4"])
+    skip if Nokogiri.uses_libxml?([">= 2.11.0", "< 2.12.0"])
     expected_encoding = Nokogiri.uses_libxml?("< 2.11.0") ? 'UTF-8' : 'Shift_JIS'
 
     page = util_page "<title>#{UTF8_TITLE}</title>"

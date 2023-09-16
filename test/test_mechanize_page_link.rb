@@ -1,8 +1,8 @@
 # coding: utf-8
 
-puts "Nokogiri::VERSION_INFO: #{Nokogiri::VERSION_INFO}"
-
 require 'mechanize/test_case'
+
+puts "Nokogiri::VERSION_INFO: #{Nokogiri::VERSION_INFO}"
 
 class TestMechanizePageLink < Mechanize::TestCase
 

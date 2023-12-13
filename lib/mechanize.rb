@@ -2,7 +2,6 @@
 require 'mechanize/version'
 require 'fileutils'
 require 'forwardable'
-require 'mutex_m'
 require 'net/http/digest_auth'
 require 'net/http/persistent'
 require 'nokogiri'

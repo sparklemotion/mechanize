@@ -1309,8 +1309,13 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     page = @agent.response_parse @res, body, @uri
 
     assert_instance_of Mechanize::Page, page
-    assert_equal 'UTF8', page.encoding
-    assert_equal 'UTF8', page.parser.encoding
+
+    # as of libxml 2.12.0, the result is dependent on how libiconv is built (which aliases are supported)
+    # if the alias "UTF8" is defined, then the result will be "UTF-8".
+    # if the alias "UTF8" is not defined, then the result will be "UTF8".
+    # note that this alias may be defined by Nokogiri itself in its EncodingHandler class.
+    assert_includes ["UTF8", "UTF-8"], page.encoding
+    assert_includes ["UTF8", "UTF-8"], page.parser.encoding
   end
 
   def test_response_parse_content_type_encoding_garbage

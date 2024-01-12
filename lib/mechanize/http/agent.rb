@@ -66,7 +66,7 @@ class Mechanize::HTTP::Agent
   # allowed:
   #
   # :all, true:: All 3xx redirects are followed (default)
-  # :permanent:: Only 301 Moved Permanantly redirects are followed
+  # :permanent:: Only 301 Moved Permanently redirects are followed
   # false:: No redirects are followed
   attr_accessor :redirect_ok
 

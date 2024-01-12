@@ -81,7 +81,7 @@ class Mechanize::HTTP::ContentDispositionParser
   end
 
   ##
-  # Extracts disposition-parm and returns a Hash.
+  # Extracts disposition-param and returns a Hash.
 
   def parse_parameters
     parameters = {}
@@ -200,4 +200,3 @@ class Mechanize::HTTP::ContentDispositionParser
   end
 
 end
-

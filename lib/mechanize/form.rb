@@ -482,7 +482,7 @@ class Mechanize::Form
   #   form.file_upload_with(:file_name => /picture/).value = 'foo'
 
   ##
-  # :mehtod: file_upload_with!(criteria)
+  # :method: file_upload_with!(criteria)
   #
   # Same as +file_upload_with+ but raises an ElementNotFoundError if no button
   # matches +criteria+
@@ -506,7 +506,7 @@ class Mechanize::Form
   #   form.radiobutton_with(:name => /woo/).check
 
   ##
-  # :mehtod: radiobutton_with!(criteria)
+  # :method: radiobutton_with!(criteria)
   #
   # Same as +radiobutton_with+ but raises an ElementNotFoundError if no button
   # matches +criteria+
@@ -530,7 +530,7 @@ class Mechanize::Form
   #   form.checkbox_with(:name => /woo/).check
 
   ##
-  # :mehtod: checkbox_with!(criteria)
+  # :method: checkbox_with!(criteria)
   #
   # Same as +checkbox_with+ but raises an ElementNotFoundError if no button
   # matches +criteria+

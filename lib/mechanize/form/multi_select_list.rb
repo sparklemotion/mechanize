@@ -36,7 +36,7 @@ class Mechanize::Form::MultiSelectList < Mechanize::Form::Field
   #   select_list.option_with(:value => '1').value = 'foo'
 
   ##
-  # :mehtod: option_with!(criteria)
+  # :method: option_with!(criteria)
   #
   # Same as +option_with+ but raises an ElementNotFoundError if no button
   # matches +criteria+

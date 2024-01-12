@@ -357,7 +357,7 @@ class TestMechanizeForm < Mechanize::TestCase
     assert_equal 'ticky=1&ticky=0', submitted.parser.at('#query').text
   end
 
-  def test_submit_takes_arbirary_headers
+  def test_submit_takes_arbitrary_headers
     page = @mech.get('http://localhost:2000/form_no_action.html')
     assert form = page.forms.first
     form.action = '/http_headers'

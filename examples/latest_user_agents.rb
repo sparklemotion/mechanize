@@ -1,5 +1,7 @@
 require 'mechanize'
 
+# LatestUAFetcher fetches latest user agents from `WhatIsMyBrowser.com`.
+# It can use to update `Mechanize::AGENT_ALIASES`.
 class LatestUAFetcher
   attr_reader :user_agents
 
@@ -11,36 +13,31 @@ class LatestUAFetcher
   end
 
   def run
+    return unless user_agents.empty?
+
     sleep_time = 1
 
-    puts 'get chrome UA...'
-    chrome
-    puts "sleeping... (#{sleep_time}s)"
-    sleep 1
-
-    puts 'get firefox UA...'
-    firefox
-    puts "sleeping... (#{sleep_time}s)"
-    sleep 1
-
-    puts 'get safari UA...'
-    safari
-    puts "sleeping... (#{sleep_time}s)"
-    sleep 1
-
-    puts 'get edge UA...'
-    edge
+    fetch_user_agents('chrome')
+    fetch_user_agents('firefox')
+    fetch_user_agents('safari')
+    fetch_user_agents('edge')
   end
 
   private
+
+  def fetch_user_agents(browser_name, sleep_time = 1)
+    puts "fetch #{browser_name} UA..."
+    send(browser_name)
+    puts "sleeping... (#{sleep_time}s)"
+    sleep sleep_time
+  end
 
   def edge
     page = @agent.get("#{BASE_URL}/edge")
 
     windows_dom = page.css("h2:contains('Latest Edge on Windows User Agents')")
-    @user_agents[:edge] = {
-      windows: windows_dom.css('+ .listing-of-useragents .code').first.text
-    }
+
+    @user_agents['Windows Edge'] = windows_dom.css('+ .listing-of-useragents .code').first.text
   end
 
   def firefox
@@ -49,11 +46,9 @@ class LatestUAFetcher
     desktop_dom = page.css("h2:contains('Latest Firefox on Desktop User Agents')")
     table_dom = desktop_dom.css('+ .listing-of-useragents')
 
-    @user_agents[:firefox] = {
-      windows: table_dom.css('td:contains("Windows")').css('+ td .code').text,
-      macOS: table_dom.css('td:contains("Macos")').css('+ td .code').text,
-      linux: table_dom.css('td:contains("Linux")').css("+ td .code:contains('Ubuntu; Linux x86_64')").text
-    }
+    @user_agents['Linux Firefox'] = table_dom.css('td:contains("Linux")').css("+ td .code:contains('Ubuntu; Linux x86_64')").text
+    @user_agents['Windows Firefox'] = table_dom.css('td:contains("Windows")').css('+ td .code').text
+    @user_agents['Mac Firefox'] = table_dom.css('td:contains("Macos")').css('+ td .code').text
   end
 
   def safari
@@ -62,30 +57,25 @@ class LatestUAFetcher
     macos_dom = page.css("h2:contains('Latest Safari on macOS User Agents')")
     ios_dom = page.css("h2:contains('Latest Safari on iOS User Agents')")
 
-    @user_agents[:safari] = {
-      mac_os: macos_dom.css('+ .listing-of-useragents .code').first.text,
-      iphone: ios_dom.css('+ .listing-of-useragents').css("tr:contains('Iphone') .code").text,
-      ipad: ios_dom.css('+ .listing-of-useragents').css("tr:contains('Ipad') .code").text
-    }
+    @user_agents['Mac Safari'] = macos_dom.css('+ .listing-of-useragents .code').first.text
+    @user_agents['iPhone'] = ios_dom.css('+ .listing-of-useragents').css("tr:contains('Iphone') .code").text
+    @user_agents['iPad'] = ios_dom.css('+ .listing-of-useragents').css("tr:contains('Ipad') .code").text
   end
 
   def chrome
     page = @agent.get("#{BASE_URL}/chrome")
 
     windows_dom = page.css("h2:contains('Latest Chrome on Windows 10 User Agents')")
-    linux_dom = page.css("h2:contains('Latest Chrome on Linux User Agents')")
-    macos_dom = page.css("h2:contains('Latest Chrome on macOS User Agents')")
     android_dom = page.css("h2:contains('Latest Chrome on Android User Agents')")
 
-    @user_agents[:chrome] = {
-      windows: windows_dom.css('+ .listing-of-useragents .code').first.text,
-      linux: linux_dom.css('+ .listing-of-useragents .code').first.text,
-      mac_os: macos_dom.css('+ .listing-of-useragents .code').first.text,
-      android: android_dom.css('+ .listing-of-useragents .code').first.text
-    }
+    @user_agents['Windows Chrome'] = windows_dom.css('+ .listing-of-useragents .code').first.text
+    @user_agents['Android'] = android_dom.css('+ .listing-of-useragents .code').first.text
   end
 end
 
-agent = LatestUAFetcher.new
-agent.run
-p agent.user_agents
+if $0 == __FILE__
+  agent = LatestUAFetcher.new
+  agent.run
+
+  pp agent.user_agents
+end

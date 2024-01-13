@@ -105,6 +105,7 @@ class Mechanize
   #
   # Windows User-Agent aliases:
   #
+  # * "Windows Chrome"
   # * "Windows Edge"
   # * "Windows Firefox"
   # * "Windows IE 6"
@@ -127,7 +128,6 @@ class Mechanize
   #   agent.user_agent_alias = 'Mac Safari'
   #
   AGENT_ALIASES = {
-    # TODO: use output from examples/latest_user_agents.rb as the underling data structure
     'Mechanize' => "Mechanize/#{VERSION} Ruby/#{ruby_version} (http://github.com/sparklemotion/mechanize/)",
 
     'Linux Firefox' => 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/121.0',

@@ -95,7 +95,7 @@ class Mechanize::Page < Mechanize::File
   end
 
   # Return whether parser result has errors related to encoding or not.
-  # false indicates just parser has no encoding errors, not encoding is vaild.
+  # false indicates just parser has no encoding errors, not encoding is valid.
   def encoding_error?(parser=nil)
     parser = self.parser unless parser
     return false if parser.errors.empty?

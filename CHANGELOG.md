@@ -109,7 +109,7 @@ Fixes low-severity CVE-2022-31033, "Authorization header leak on port redirect."
   * Fix element(s)_with(search: selector) methods not working for forms, form fields and frames. (#444)
   * Improve the filename parser for the `Content-Disposition` header. (#496, #517)
   * Accept `Content-Encoding: identity`. (#515)
-  * Mechanize::Page#title no longer picks a title in an embeded SVG/RDF element. (#503)
+  * Mechanize::Page#title no longer picks a title in an embedded SVG/RDF element. (#503)
   * Make Mechanize::Form#has_field? boolean. (#501)
 
 ## 2.7.5
@@ -415,8 +415,8 @@ Fixes low-severity CVE-2022-31033, "Authorization header leak on port redirect."
   * When given multiple HTTP authentication options mechanize now picks the
     strongest method.
   * Improvements to HTTP authorization:
-    * mechanize raises Mechanize::UnathorizedError for 401 responses which is
-      a sublcass of Mechanize::ResponseCodeError.
+    * mechanize raises Mechanize::UnauthorizedError for 401 responses which is
+      a subclass of Mechanize::ResponseCodeError.
     * Added support for NTLM authentication, but this has not been tested.
   * Mechanize::Cookie.new accepts attributes in a hash.
   * Mechanize::CookieJar#<<(cookie) (alias: add!) is added.  Issue #139
@@ -507,7 +507,7 @@ Mechanize is now under the MIT license
 
 * New Features
 
-  * Add header reference methods to Mechanize::File so that a reponse
+  * Add header reference methods to Mechanize::File so that a response
     object gets compatible with Net::HTTPResponse.
   * Mechanize#click accepts a regexp or string to click a button/link in the
     current page. It works as expected when not passed a string or regexp.
@@ -732,7 +732,7 @@ Mechanize is now under the MIT license
     http://d.hatena.ne.jp/kitamomonga/20080410/ruby_mechanize_percent_url_bug
   * #21132 Not checking for EOF errors on redirect
   * Fixed a weird gzipping error.
-  * #21233 Smarter multipart boundry. Thanks Todd Willey!
+  * #21233 Smarter multipart boundary. Thanks Todd Willey!
   * #20097 Supporting meta tag cookies.
 
 ## 0.7.6
@@ -841,7 +841,7 @@ Mechanize is now under the MIT license
 * [#9877] Moved last request time.  Thanks Max Stepanov
 * Added WWW::Mechanize::File#save
 * Defaulting file name to URI or Content-Disposition
-* Updating compatability with hpricot
+* Updating compatibility with hpricot
 * Added more unit tests
 
 ## 0.6.7
@@ -853,7 +853,7 @@ Mechanize is now under the MIT license
 
 * Removing hpricot overrides
 * Fixed a bug where alt text can be nil.  Thanks Yannick!
-* Unparseable expiration dates in cookies are now treated as session cookies
+* Unparsable expiration dates in cookies are now treated as session cookies
 * Caching connections
 * Requests now default to keep alive
 * [#9434] Fixed bug where html entities weren't decoded
@@ -919,7 +919,7 @@ Mechanize is now under the MIT license
 * Added a method to Form called "submit".  Now forms can be submitted by
   calling a method on the form.
 * Added a click method to links
-* Added an REXML pluggable parser for backwards compatability.  To use it,
+* Added an REXML pluggable parser for backwards compatibility.  To use it,
   just do this:
    agent.pluggable_parser.html = WWW::Mechanize::REXMLPage
 * Fixed a bug with referrers by adding a page attribute to forms and links.
@@ -1046,7 +1046,7 @@ Mechanize is now under the MIT license
 
 ## 0.4.4
 
-* Fixed error in method signature, basic_authetication is now basic_auth
+* Fixed error in method signature, basic_authentication is now basic_auth
 * Fixed bug with encoding names in file uploads (Big thanks to Alex Young)
 * Added options to the select list
 

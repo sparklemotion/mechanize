@@ -200,7 +200,7 @@ class Mechanize
   #
   # If you need segregated SSL connections give each agent a unique
   # name.  Otherwise the connections will be shared.  This is
-  # particularly important if you are using certifcates.
+  # particularly important if you are using certificates.
   #
   #    agent_1 = Mechanize.new 'conn1'
   #    agent_2 = Mechanize.new 'conn2'
@@ -956,7 +956,7 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
   # allowed:
   #
   # :all, true:: All 3xx redirects are followed (default)
-  # :permanent:: Only 301 Moved Permanantly redirects are followed
+  # :permanent:: Only 301 Moved Permanently redirects are followed
   # false:: No redirects are followed
 
   def redirect_ok

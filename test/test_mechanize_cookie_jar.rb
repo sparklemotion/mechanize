@@ -540,7 +540,7 @@ class TestMechanizeCookieJar < Mechanize::TestCase
 
     @jar.add url, Mechanize::Cookie.new(cookie_values)
 
-    # HACK no asertion
+    # HACK no assertion
   end
 
   def test_ssl_cookies

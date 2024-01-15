@@ -1,5 +1,11 @@
 # Mechanize CHANGELOG
 
+## 2.9.2 / 2024-01-15
+
+* Correct spelling errors in documentation. (#631) @p-linnane
+* Updated User-Agent strings to represent modern browser versions. (#632) @takatea
+
+
 ## 2.9.1 / 2023-04-17
 
 ### Update

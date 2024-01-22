@@ -65,9 +65,12 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency("net-http-persistent", ">= 2.5.2", "< 5.0.dev")
 
   spec.add_runtime_dependency("nokogiri", ">= 1.11.2", "~> 1.11")
-  spec.add_runtime_dependency("rubyntlm", ">= 0.6.3", "~> 0.6")
   spec.add_runtime_dependency("webrick", "~> 1.7")
   spec.add_runtime_dependency("webrobots", "~> 0.1.2")
+
+  spec.add_runtime_dependency("rubyntlm", ">= 0.6.3", "~> 0.6")
+  spec.add_runtime_dependency("base64") # removed from bundled gems in 3.4, and needed by rubyntlm (which doesn't declare this dependency)
+  spec.add_runtime_dependency("nkf") # removed from bundled gems in 3.4
 
   spec.add_development_dependency("minitest", "~> 5.14")
   spec.add_development_dependency("rake", "~> 13.0")

@@ -1,5 +1,10 @@
 # Mechanize CHANGELOG
 
+## 2.10.0 / 2024-01-22
+
+* Add `nkf` and `base64` as explicit dependencies, since they are being unbundled in Ruby 3.4. (#634) @flavorjones
+
+
 ## 2.9.2 / 2024-01-15
 
 * Correct spelling errors in documentation. (#631) @p-linnane

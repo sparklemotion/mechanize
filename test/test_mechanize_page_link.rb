@@ -55,7 +55,7 @@ class TestMechanizePageLink < Mechanize::TestCase
 
   def skip_if_nkf_dependency
     if RUBY_ENGINE == 'jruby'
-      meth = caller[0][/`(\w+)/, 1]
+      meth = caller_locations(1,1).first.base_label
       skip "#{meth}: skipped because this feature currently depends on NKF"
     end
   end

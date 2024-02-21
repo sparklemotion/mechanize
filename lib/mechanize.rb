@@ -717,10 +717,10 @@ class Mechanize
   # authentication.
 
   def auth user, password, domain = nil
-    caller.first =~ /(.*?):(\d+).*?$/
+    c = caller_locations(1,1).first
 
     warn <<-WARNING
-At #{$1} line #{$2}
+At #{c.absolute_path} line #{c.lineno}
 
 Use of #auth and #basic_auth are deprecated due to a security vulnerability.
 

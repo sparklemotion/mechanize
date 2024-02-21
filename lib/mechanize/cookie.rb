@@ -7,7 +7,7 @@ class Mechanize
   module CookieDeprecated
     def __deprecated__(to = nil)
       $VERBOSE or return
-      method = caller[0][/([^`]+)(?='$)/]
+      method = caller_locations(1,1).first.base_label
       to ||= method
       case self
       when Class
@@ -21,7 +21,7 @@ class Mechanize
         this = '%s#%s' % [klass, method]
         that = 'HTTP::%s#%s' % [lname, to]
       end
-      warn '%s: The call of %s needs to be fixed to follow the new API (%s).' % [caller[1], this, that]
+      warn '%s: The call of %s needs to be fixed to follow the new API (%s).' % [caller_locations(2,1).first, this, that]
     end
     private :__deprecated__
   end

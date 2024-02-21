@@ -29,7 +29,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
   def skip_if_jruby_zlib
     if RUBY_ENGINE == 'jruby'
-      meth = caller[0][/`(\w+)/, 1]
+      meth = caller_locations(1,1).first.base_label
       skip "#{meth}: skipped because how Zlib handles error is different in JRuby"
     end
   end

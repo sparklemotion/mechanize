@@ -502,12 +502,23 @@ class TestMechanizeCookie < Mechanize::TestCase
     cookie.domain = 'Dom.example.com'
     assert 'dom.example.com', cookie.domain
 
-    cookie.domain = Object.new.tap { |o|
+    new_domain = Object.new.tap { |o|
       def o.to_str
         'Example.com'
       end
     }
+    cookie.domain = new_domain
     assert 'example.com', cookie.domain
+
+    new_domain = Object.new.tap { |o|
+      def o.to_str
+        'Example2.com'
+      end
+    }
+    assert_output nil, /The call of Mechanize::Cookie#set_domain/ do
+      cookie.set_domain(new_domain)
+    end
+    assert 'example2.com', cookie.domain
   end
 
   def test_cookie_httponly

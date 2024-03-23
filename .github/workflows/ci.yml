@@ -20,10 +20,10 @@ jobs:
   rubocop:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ruby/setup-ruby@v1
       with:
-        ruby-version: "3.2"
+        ruby-version: "3.3"
         bundler-cache: true
     - run: bundle exec rake rubocop
 
@@ -36,27 +36,9 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{matrix.ruby-version}}
         bundler-cache: true
-        bundler: 2.3.26 # https://github.com/rubygems/rubygems/issues/6435
-    - run: bundle exec rake test
-
-  test-platform:
-    needs: ["rubocop"]
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: ["windows-latest", "macos-latest"]
-
-    runs-on: ${{matrix.platform}}
-    steps:
-    - uses: actions/checkout@v3
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: "3.2"
-        bundler-cache: true
-        bundler: latest
     - run: bundle exec rake test

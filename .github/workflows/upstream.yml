@@ -1,0 +1,25 @@
+name: "ci"
+
+concurrency:
+  group: "${{github.workflow}}-${{github.ref}}"
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * 5" # At 08:00 on Friday # https://crontab.guru/#0_8_*_*_5
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - main
+    paths:
+      - .github/workflows/upstream.yml # this file
+
+jobs:
+  skeleton:
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo "Hello, World!"

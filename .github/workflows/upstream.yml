@@ -1,4 +1,4 @@
-name: "ci"
+name: "upstream"
 
 concurrency:
   group: "${{github.workflow}}-${{github.ref}}"
@@ -19,7 +19,33 @@ on:
       - .github/workflows/upstream.yml # this file
 
 jobs:
-  skeleton:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby-version: ["head", "jruby-head", "truffleruby-head"]
     runs-on: ubuntu-latest
     steps:
-    - run: echo "Hello, World!"
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{matrix.ruby-version}}
+          bundler-cache: true
+      - run: bundle exec rake test
+
+  upstream:
+    name: "upstream (${{matrix.name}})"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: "nokogiri", git: "https://github.com/sparklemotion/nokogiri" }
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with: { ruby-version: "3.3" }
+      - run: |
+          bundle add ${{matrix.name}} --git="${{matrix.git}}"
+          bundle show
+      - run: bundle exec rake test

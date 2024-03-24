@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'mechanize/test_case'
 
 class TestMechanizeFileConnection < Mechanize::TestCase
@@ -7,7 +8,7 @@ class TestMechanizeFileConnection < Mechanize::TestCase
     uri = URI.parse "file://#{file_path}"
     conn = Mechanize::FileConnection.new
 
-    body = ''
+    body = +''
 
     conn.request uri, nil do |response|
       assert_equal(file_path, response.file_path)

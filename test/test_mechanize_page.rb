@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'mechanize/test_case'
 
 class TestMechanizePage < Mechanize::TestCase

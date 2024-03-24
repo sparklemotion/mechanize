@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# frozen_string_literal: true
 require 'mechanize/test_case'
 
 # tests for Page encoding and charset and parsing
@@ -12,7 +13,7 @@ class TestMechanizePageEncoding < Mechanize::TestCase
 
     @uri = URI('http://localhost/')
     @response_headers = { 'content-type' => 'text/html' }
-    @body = '<title>hi</title>'
+    @body = +'<title>hi</title>'
   end
 
   def util_page body = @body, headers = @response_headers
@@ -118,7 +119,7 @@ class TestMechanizePageEncoding < Mechanize::TestCase
   end
 
   def test_meta_charset
-    body = '<meta http-equiv="content-type" content="text/html;charset=META">'
+    body = +'<meta http-equiv="content-type" content="text/html;charset=META">'
     page = util_page body
 
     assert_equal ['META'], page.meta_charset
@@ -132,7 +133,7 @@ class TestMechanizePageEncoding < Mechanize::TestCase
 
   def test_encodings
     response = {'content-type' => 'text/html;charset=HEADER'}
-    body = '<meta http-equiv="content-type" content="text/html;charset=META">'
+    body = +'<meta http-equiv="content-type" content="text/html;charset=META">'
     @mech.default_encoding = 'DEFAULT'
     page = util_page body, response
 
@@ -175,7 +176,7 @@ class TestMechanizePageEncoding < Mechanize::TestCase
   def test_parser_encoding_when_searching_elements
     skip "Encoding not implemented" unless have_encoding?
 
-    body = '<span id="latin1">hi</span>'
+    body = +'<span id="latin1">hi</span>'
     page = util_page body, 'content-type' => 'text/html,charset=ISO-8859-1'
 
     result = page.search('#latin1')
@@ -187,7 +188,7 @@ class TestMechanizePageEncoding < Mechanize::TestCase
     skip if RUBY_ENGINE == 'jruby' # this is a libxml2-specific condition
 
     # https://github.com/sparklemotion/mechanize/issues/553
-    body = <<~EOF
+    body = +<<~EOF
       <html>
       <body>
       <!--

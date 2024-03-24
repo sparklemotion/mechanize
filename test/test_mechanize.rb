@@ -1,4 +1,5 @@
 # coding: utf-8
+# frozen_string_literal: true
 
 require 'mechanize/test_case'
 
@@ -965,7 +966,7 @@ but not <a href="/" rel="me nofollow">this</a>!
     })
 
     assert_match(
-      "Content-Disposition: form-data; name=\"userfile1\"; filename=\"#{name}\"".force_encoding(Encoding::ASCII_8BIT),
+      "Content-Disposition: form-data; name=\"userfile1\"; filename=\"#{name}\"".dup.force_encoding(Encoding::ASCII_8BIT),
       page.body
     )
     assert_match("Content-Type: application/zip", page.body)

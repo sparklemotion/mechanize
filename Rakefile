@@ -49,7 +49,7 @@ namespace "rubocop" do
 
   desc "Run rubocop string literals check"
   task :frozen_string_literals do
-    sh "rubocop lib --auto-correct-all --only Style/FrozenStringLiteralComment"
+    sh "rubocop lib test --auto-correct-all --only Style/FrozenStringLiteralComment"
   end
 end
 

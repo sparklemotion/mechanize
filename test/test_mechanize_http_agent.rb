@@ -1,4 +1,5 @@
 # coding: utf-8
+# frozen_string_literal: true
 
 require 'mechanize/test_case'
 
@@ -1027,7 +1028,7 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
     body = @agent.response_content_encoding @res, body_io
 
-    expected = "test\xB2"
+    expected = +"test\xB2"
     expected.force_encoding Encoding::BINARY if have_encoding?
 
     content = body.read
@@ -1432,11 +1433,11 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
       io = @agent.response_read res, req, uri
 
-      expected = "π\n".force_encoding(Encoding::BINARY)
+      expected = "π\n".dup.force_encoding(Encoding::BINARY)
 
       # Ruby 1.8.7 doesn't let us set the write mode of the tempfile to binary,
       # so we should expect an inserted carriage return on some platforms
-      expected_with_carriage_return = "π\r\n".force_encoding(Encoding::BINARY)
+      expected_with_carriage_return = "π\r\n".dup.force_encoding(Encoding::BINARY)
 
       body = io.read
       assert_match(/^(#{expected}|#{expected_with_carriage_return})$/m, body)

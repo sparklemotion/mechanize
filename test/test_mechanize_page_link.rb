@@ -1,4 +1,5 @@
 # coding: utf-8
+# frozen_string_literal: true
 
 require 'mechanize/test_case'
 
@@ -11,7 +12,7 @@ class TestMechanizePageLink < Mechanize::TestCase
 <title>hi</title>
   HTML
 
-  BAD = <<-HTML
+  BAD = <<-HTML.dup
 <meta http-equiv="content-type" content="text/html; charset=windows-1255">
 <title>Bia\xB3ystok</title>
   HTML
@@ -19,18 +20,16 @@ class TestMechanizePageLink < Mechanize::TestCase
 
   SJIS_TITLE = "\x83\x65\x83\x58\x83\x67"
 
-  SJIS_AFTER_TITLE = <<-HTML
+  SJIS_AFTER_TITLE = <<-HTML.dup
 <title>#{SJIS_TITLE}</title>
 <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
   HTML
-
   SJIS_AFTER_TITLE.force_encoding Encoding::BINARY if defined? Encoding
 
-  SJIS_BAD_AFTER_TITLE = <<-HTML
+  SJIS_BAD_AFTER_TITLE = <<-HTML.dup
 <title>#{SJIS_TITLE}</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   HTML
-
   SJIS_BAD_AFTER_TITLE.force_encoding Encoding::BINARY if defined? Encoding
 
   UTF8_TITLE = 'テスト'
@@ -46,7 +45,7 @@ class TestMechanizePageLink < Mechanize::TestCase
 
     @uri = URI('http://example')
     @res = { 'content-type' => 'text/html' }
-    @body = '<title>hi</title>'
+    @body = +'<title>hi</title>'
   end
 
   def util_page body = @body, res = @res
@@ -75,7 +74,7 @@ class TestMechanizePageLink < Mechanize::TestCase
   end
 
   def test_canonical_uri_unescaped
-    page = util_page <<-BODY
+    page = util_page(+<<-BODY)
 <head>
   <link rel="canonical" href="http://example/white space"/>
 </head>
@@ -97,7 +96,7 @@ class TestMechanizePageLink < Mechanize::TestCase
   end
 
   def test_encoding
-    page = util_page WINDOWS_1255
+    page = util_page WINDOWS_1255.dup
 
     assert_equal 'windows-1255', page.encoding
   end
@@ -117,7 +116,7 @@ class TestMechanizePageLink < Mechanize::TestCase
     skip if Nokogiri.uses_libxml?([">= 2.11.0", "< 2.12.0"])
     expected_encoding = Nokogiri.uses_libxml?("< 2.11.0") ? 'UTF-8' : 'Shift_JIS'
 
-    page = util_page UTF8
+    page = util_page UTF8.dup
 
     assert_equal false, page.encoding_error?
 
@@ -141,7 +140,7 @@ class TestMechanizePageLink < Mechanize::TestCase
     skip if Nokogiri.uses_libxml?([">= 2.11.0", "< 2.12.0"])
     expected_encoding = Nokogiri.uses_libxml?("< 2.11.0") ? 'UTF-8' : 'Shift_JIS'
 
-    page = util_page "<title>#{UTF8_TITLE}</title>"
+    page = util_page(+"<title>#{UTF8_TITLE}</title>")
     page.encodings.replace %w[
       UTF-8
       Shift_JIS
@@ -153,7 +152,7 @@ class TestMechanizePageLink < Mechanize::TestCase
   end
 
   def test_encoding_meta_charset
-    page = util_page "<meta charset='UTF-8'>"
+    page = util_page(+"<meta charset='UTF-8'>")
 
     assert_equal 'UTF-8', page.encoding
   end
@@ -344,7 +343,7 @@ class TestMechanizePageLink < Mechanize::TestCase
   end
 
   def test_title_none
-    page = util_page '' # invalid HTML
+    page = util_page(+'') # invalid HTML
 
     assert_nil(page.title)
   end

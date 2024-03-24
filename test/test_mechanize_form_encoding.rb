@@ -1,4 +1,5 @@
 # coding: utf-8
+# frozen_string_literal: true
 require 'mechanize/test_case'
 
 class TestMechanizeFormEncoding < Mechanize::TestCase
@@ -8,7 +9,7 @@ class TestMechanizeFormEncoding < Mechanize::TestCase
 
   INPUTTED_VALUE = "テスト" # "test" in Japanese UTF-8 encoding
   CONTENT_ENCODING = 'Shift_JIS' # one of Japanese encoding
-  encoded_value = "\x83\x65\x83\x58\x83\x67".force_encoding(::Encoding::SHIFT_JIS) # "test" in Japanese Shift_JIS encoding
+  encoded_value = "\x83\x65\x83\x58\x83\x67".dup.force_encoding(::Encoding::SHIFT_JIS) # "test" in Japanese Shift_JIS encoding
   EXPECTED_QUERY = "first_name=#{CGI.escape(encoded_value)}&first_name=&gender=&green%5Beggs%5D="
 
   ENCODING_ERRORS = [EncodingError, Encoding::ConverterNotFoundError] # and so on

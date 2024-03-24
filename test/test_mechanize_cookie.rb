@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'mechanize/test_case'
 
 module Enumerable
@@ -301,7 +302,7 @@ class TestMechanizeCookie < Mechanize::TestCase
     expires = Time.parse('Sun, 27-Sep-2037 00:00:00 GMT')
 
     cookie_params.keys.combine.each do |c|
-      cookie_text = "#{cookie_value}; "
+      cookie_text = +"#{cookie_value}; "
       c.each_with_index do |key, idx|
         if idx == (c.length - 1)
           cookie_text << "#{cookie_params[key]}"
@@ -336,7 +337,7 @@ class TestMechanizeCookie < Mechanize::TestCase
     expires = Time.parse('Sun, 27-Sep-2037 00:00:00 GMT')
 
     cookie_params.keys.combine.each do |c|
-      cookie_text = "#{cookie_value}; "
+      cookie_text = +"#{cookie_value}; "
       c.each_with_index do |key, idx|
         if idx == (c.length - 1)
           cookie_text << "#{cookie_params[key]}"
@@ -373,7 +374,7 @@ class TestMechanizeCookie < Mechanize::TestCase
 
     cookie_params.keys.combine.each do |c|
       next if c.find { |k| k == 'path' }
-      cookie_text = "#{cookie_value}; "
+      cookie_text = +"#{cookie_value}; "
       c.each_with_index do |key, idx|
         if idx == (c.length - 1)
           cookie_text << "#{cookie_params[key]}"
@@ -410,7 +411,7 @@ class TestMechanizeCookie < Mechanize::TestCase
 
     cookie_params.keys.combine.each do |c|
       next unless c.find { |k| k == 'secure' }
-      cookie_text = "#{cookie_value}; "
+      cookie_text = +"#{cookie_value}; "
       c.each_with_index do |key, idx|
         if idx == (c.length - 1)
           cookie_text << "#{cookie_params[key]}"
@@ -446,7 +447,7 @@ class TestMechanizeCookie < Mechanize::TestCase
     expires = Time.parse('Sun, 27-Sep-2037 00:00:00 GMT')
 
     cookie_params.keys.combine.each do |c|
-      cookie_text = "#{cookie_value};"
+      cookie_text = +"#{cookie_value};"
       c.each_with_index do |key, idx|
         if idx == (c.length - 1)
           cookie_text << "#{cookie_params[key]}"
@@ -530,7 +531,7 @@ class TestMechanizeCookie < Mechanize::TestCase
     expires = Time.parse('Sun, 27-Sep-2037 00:00:00 GMT')
 
     cookie_params.keys.combine.each do |c|
-      cookie_text = "#{cookie_value}; "
+      cookie_text = +"#{cookie_value}; "
       c.each_with_index do |key, idx|
         if idx == (c.length - 1)
           cookie_text << "#{cookie_params[key]}"

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'mechanize/test_case'
 
 class TestMechanizeHeaders < Mechanize::TestCase

@@ -1,4 +1,5 @@
 # coding: utf-8
+# frozen_string_literal: true
 
 require 'mechanize/test_case'
 
@@ -6,7 +7,7 @@ class TestMechanizeUtil < Mechanize::TestCase
 
   INPUTTED_VALUE = "テスト" # "test" in Japanese UTF-8 encoding
   CONTENT_ENCODING = 'Shift_JIS' # one of Japanese encoding
-  ENCODED_VALUE = "\x83\x65\x83\x58\x83\x67".force_encoding(::Encoding::SHIFT_JIS) # "test" in Japanese Shift_JIS encoding
+  ENCODED_VALUE = "\x83\x65\x83\x58\x83\x67".dup.force_encoding(::Encoding::SHIFT_JIS) # "test" in Japanese Shift_JIS encoding
 
   ENCODING_ERRORS = [EncodingError, Encoding::ConverterNotFoundError] # and so on
   ERROR_LOG_MESSAGE = /from_native_charset: Encoding::ConverterNotFoundError: form encoding: "UTF-eight"/
@@ -67,7 +68,7 @@ class TestMechanizeUtil < Mechanize::TestCase
   end
 
   def test_from_native_charset_logs_form_when_encoding_error_raised
-    sio = StringIO.new("")
+    sio = StringIO.new
     log = Logger.new(sio)
     log.level = Logger::DEBUG
 
@@ -79,7 +80,7 @@ class TestMechanizeUtil < Mechanize::TestCase
   end
 
   def test_from_native_charset_logs_form_when_encoding_error_is_ignored
-    sio = StringIO.new("")
+    sio = StringIO.new
     log = Logger.new(sio)
     log.level = Logger::DEBUG
 

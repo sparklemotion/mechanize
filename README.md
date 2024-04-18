@@ -3,7 +3,7 @@
 * https://www.rubydoc.info/gems/mechanize/
 * https://github.com/sparklemotion/mechanize
 
-[![Test suite](https://github.com/sparklemotion/mechanize/actions/workflows/ci-test.yml/badge.svg)](https://github.com/sparklemotion/mechanize/actions/workflows/ci-test.yml)
+[![Test suite](https://github.com/sparklemotion/mechanize/actions/workflows/ci.yml/badge.svg)](https://github.com/sparklemotion/mechanize/actions/workflows/ci.yml)
 
 
 ## Description

@@ -1,5 +1,10 @@
 # Mechanize CHANGELOG
 
+## 2.10.1 / 2024-06-12
+
+* Improve page encoding error recovery on pages with broken encoding when used with libxml2 >= 2.12.0. (#644) @flavorjones
+
+
 ## 2.10.0 / 2024-01-22
 
 * Add `nkf` and `base64` as explicit dependencies, since they are being unbundled in Ruby 3.4. (#634) @flavorjones

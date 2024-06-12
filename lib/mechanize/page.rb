@@ -101,6 +101,7 @@ class Mechanize::Page < Mechanize::File
     return false if parser.errors.empty?
     parser.errors.any? do |error|
       error.message.scrub =~ /(indicate\ encoding)|
+                              (Invalid\ bytes)|
                               (Invalid\ char)|
                               (input\ conversion\ failed)/x
     end

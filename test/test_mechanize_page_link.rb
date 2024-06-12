@@ -114,13 +114,12 @@ class TestMechanizePageLink < Mechanize::TestCase
 
     # https://gitlab.gnome.org/GNOME/libxml2/-/issues/543
     skip if Nokogiri.uses_libxml?([">= 2.11.0", "< 2.12.0"])
-    expected_encoding = Nokogiri.uses_libxml?("< 2.11.0") ? 'UTF-8' : 'Shift_JIS'
 
     page = util_page UTF8.dup
 
     assert_equal false, page.encoding_error?
 
-    assert_equal expected_encoding, page.encoding
+    assert_equal "UTF-8", page.encoding
   end
 
   def test_encoding_charset_after_title_double_bad
@@ -138,7 +137,6 @@ class TestMechanizePageLink < Mechanize::TestCase
 
     # https://gitlab.gnome.org/GNOME/libxml2/-/issues/543
     skip if Nokogiri.uses_libxml?([">= 2.11.0", "< 2.12.0"])
-    expected_encoding = Nokogiri.uses_libxml?("< 2.11.0") ? 'UTF-8' : 'Shift_JIS'
 
     page = util_page(+"<title>#{UTF8_TITLE}</title>")
     page.encodings.replace %w[
@@ -148,7 +146,7 @@ class TestMechanizePageLink < Mechanize::TestCase
 
     assert_equal false, page.encoding_error?
 
-    assert_equal expected_encoding, page.encoding
+    assert_equal 'UTF-8', page.encoding
   end
 
   def test_encoding_meta_charset

@@ -106,6 +106,9 @@ class Mechanize::HTTP::Agent
   # Length of time to attempt to read data from the server
   attr_accessor  :read_timeout
 
+  # Length of time to attempt to write data to the server
+  attr_accessor  :write_timeout
+
   # :section:
 
   # The cookies for this agent
@@ -161,6 +164,7 @@ class Mechanize::HTTP::Agent
     @robots_mutex             = Mutex.new
     @user_agent               = nil
     @webrobots                = nil
+    @write_timeout            = nil
 
     # HTTP Authentication
     @auth_store           = Mechanize::HTTP::AuthStore.new
@@ -273,6 +277,9 @@ class Mechanize::HTTP::Agent
     end
     if @read_timeout && connection.respond_to?(:read_timeout=)
       connection.read_timeout = @read_timeout
+    end
+    if @write_timeout && connection.respond_to?(:write_timeout=)
+      connection.write_timeout = @write_timeout
     end
 
     request_log request

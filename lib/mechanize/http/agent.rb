@@ -581,7 +581,6 @@ class Mechanize::HTTP::Agent
   end
 
   def request_language_charset request
-    request['accept-charset']  = 'ISO-8859-1,utf-8;q=0.7,*;q=0.7'
     request['accept-language'] = 'en-us,en;q=0.5'
   end
 

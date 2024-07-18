@@ -1,5 +1,10 @@
 # Mechanize CHANGELOG
 
+## next / unreleased
+
+* The `accept-charset` header is no longer sent. In early versions of Mechanize, circa 2007, this was a common header but now no modern browser sends it, and servers are instructed to ignore it. See #646 for an example of a server that is confused by its presence. (#647) @flavorjones
+
+
 ## 2.10.1 / 2024-06-12
 
 * Improve page encoding error recovery on pages with broken encoding when used with libxml2 >= 2.12.0. (#644) @flavorjones

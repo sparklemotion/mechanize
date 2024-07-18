@@ -576,8 +576,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   def test_request_language_charset
     @agent.request_language_charset @req
 
-    assert_equal 'en-us,en;q=0.5', @req['accept-language']
-    assert_equal 'ISO-8859-1,utf-8;q=0.7,*;q=0.7', @req['accept-charset']
+    assert_equal('en-us,en;q=0.5', @req['accept-language'])
+    assert_nil(@req['accept-charset'])
   end
 
   def test_request_referer

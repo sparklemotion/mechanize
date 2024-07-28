@@ -2,7 +2,6 @@
 require 'tempfile'
 require 'net/ntlm'
 require 'webrobots'
-require 'brotli'
 
 ##
 # An HTTP (and local disk access) user agent.  This class is an implementation
@@ -498,14 +497,24 @@ class Mechanize::HTTP::Agent
 
   ##
   # Decodes a Brotli-encoded +body_io+
+  #
+  # Although Mechanize will never request a Brotli-encoded response via `accept-encoding`, buggy
+  # servers may return brotli-encoded responses anyway. Let's try to handle that case if the Brotli
+  # gem is loaded.
 
   def content_encoding_brotli(body_io)
-    log.debug('deflate brotly body') if log
+    log.debug('deflate brotli body') if log
 
-    return StringIO.new(Brotli.inflate(body_io.read))
-  rescue Brotli::Error
-    log.error('unable to brotli-inflate response') if log
-    raise Mechanize::Error, "could not inflate brotli-encoded response"
+    unless defined?(::Brotli)
+      raise Mechanize::Error, "cannot deflate brotli-encoded response. Please install and require the 'brotli' gem."
+    end
+
+    begin
+      return StringIO.new(Brotli.inflate(body_io.read))
+    rescue Brotli::Error
+      log.error("unable to brotli-inflate response") if log
+      raise Mechanize::Error, "error inflating brotli-encoded response."
+    end
   ensure
     body_io.close
   end

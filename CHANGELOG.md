@@ -1,5 +1,10 @@
 # Mechanize CHANGELOG
 
+## next / unreleased
+
+* Introduce experimental support for handling Brotli-compressed responses (CRuby only). (#650) @weshatheleopard
+
+
 ## 2.11.0 / 2024-07-18
 
 * The `accept-charset` header is no longer sent. In early versions of Mechanize, circa 2007, this was a common header but now no modern browser sends it, and servers are instructed to ignore it. See #646 for an example of a server that is confused by its presence. (#647) @flavorjones

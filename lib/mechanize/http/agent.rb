@@ -498,10 +498,14 @@ class Mechanize::HTTP::Agent
   ##
   # Decodes a Brotli-encoded +body_io+
   #
-  # Although Mechanize will never request a Brotli-encoded response via `accept-encoding`, buggy
-  # servers may return brotli-encoded responses anyway. Let's try to handle that case if the Brotli
-  # gem is loaded.
-
+  # (Experimental, CRuby only) Although Mechanize will never request a Brotli-encoded response via
+  # `accept-encoding`, buggy servers may return brotli-encoded responses anyway. Let's try to handle
+  # that case if the Brotli gem is loaded.
+  #
+  # If you need to handle Brotli-encoded responses, install the 'brotli' gem and require it in your
+  # application. If the `Brotli` constant is defined, Mechanize will attempt to use it to inflate
+  # the response.
+  #
   def content_encoding_brotli(body_io)
     log.debug('deflate brotli body') if log
 

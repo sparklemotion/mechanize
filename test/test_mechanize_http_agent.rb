@@ -934,6 +934,19 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert(body_io.closed?)
   end
 
+  def test_response_content_encoding_br_corrupt
+    @res.instance_variable_set :@header, 'content-encoding' => %w[br]
+    body_io = StringIO.new("not a brotli payload")
+
+    e = assert_raises(Mechanize::Error) do
+      @agent.response_content_encoding(@res, body_io)
+    end
+    assert_includes(e.message, "could not inflate brotli-encoded response")
+    assert_kind_of(Brotli::Error, e.cause)
+
+    assert(body_io.closed?)
+  end
+
   def test_response_content_encoding_gzip_corrupt
     log = StringIO.new
     logger = Logger.new log

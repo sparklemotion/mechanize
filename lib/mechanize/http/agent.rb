@@ -503,6 +503,9 @@ class Mechanize::HTTP::Agent
     log.debug('deflate brotly body') if log
 
     return StringIO.new(Brotli.inflate(body_io.read))
+  rescue Brotli::Error
+    log.error('unable to brotli-inflate response') if log
+    raise Mechanize::Error, "could not inflate brotli-encoded response"
   ensure
     body_io.close
   end

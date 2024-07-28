@@ -499,8 +499,8 @@ class Mechanize::HTTP::Agent
   ##
   # Decodes a Brotli-encoded +body_io+
 
-  def content_encoding_brinflate body_io
-    log.debug('inflate body (Brotli)') if log
+  def content_encoding_brotli(body_io)
+    log.debug('deflate brotly body') if log
 
     return StringIO.new(Brotli.inflate(body_io.read))
   ensure
@@ -844,7 +844,7 @@ class Mechanize::HTTP::Agent
              when 'gzip', 'x-gzip' then
                content_encoding_gunzip body_io
              when 'br' then
-               content_encoding_brinflate body_io
+               content_encoding_brotli body_io
              else
                raise Mechanize::Error,
                  "unsupported content-encoding: #{response['Content-Encoding']}"

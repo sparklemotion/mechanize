@@ -926,14 +926,12 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
   def test_response_content_encoding_br
     @res.instance_variable_set :@header, 'content-encoding' => %w[br]
-    body_io = StringIO.new \
-      "\x8B\x01\x80part\x03"
+    body_io = StringIO.new(Brotli.deflate("this is compressed by brotli"))
 
-    body = @agent.response_content_encoding @res, body_io
+    body = @agent.response_content_encoding(@res, body_io)
 
-    assert_equal 'part', body.read
-
-    assert body_io.closed?
+    assert_equal("this is compressed by brotli", body.read)
+    assert(body_io.closed?)
   end
 
   def test_response_content_encoding_gzip_corrupt

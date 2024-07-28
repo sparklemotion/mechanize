@@ -58,6 +58,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency("http-cookie", ">= 1.0.3", "~> 1.0")
   spec.add_runtime_dependency("mime-types", "~> 3.0")
   spec.add_runtime_dependency("net-http-digest_auth", ">= 1.4.1", "~> 1.4")
+  spec.add_runtime_dependency("brotli", ">= 0.5")
 
   # careful! some folks are relying on older versions of net-http-persistent
   # - see the socks proxy patch in use at #507 and #464

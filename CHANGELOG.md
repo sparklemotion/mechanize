@@ -1,6 +1,6 @@
 # Mechanize CHANGELOG
 
-## next / unreleased
+## 2.12.0 / 2024-07-29
 
 * Introduce experimental support for handling Brotli-compressed responses (CRuby only). (#650) @weshatheleopard
 

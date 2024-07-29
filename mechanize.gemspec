@@ -71,9 +71,4 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency("rubyntlm", ">= 0.6.3", "~> 0.6")
   spec.add_runtime_dependency("base64") # removed from bundled gems in 3.4, and needed by rubyntlm (which doesn't declare this dependency)
   spec.add_runtime_dependency("nkf") # removed from bundled gems in 3.4
-
-  spec.add_development_dependency("minitest", "~> 5.14")
-  spec.add_development_dependency("rake", "~> 13.0")
-  spec.add_development_dependency("rdoc", "~> 6.3")
-  spec.add_development_dependency("rubocop", "~> 1.12")
 end

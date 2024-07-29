@@ -495,6 +495,34 @@ class Mechanize::HTTP::Agent
     body_io.close
   end
 
+  ##
+  # Decodes a Brotli-encoded +body_io+
+  #
+  # (Experimental, CRuby only) Although Mechanize will never request a Brotli-encoded response via
+  # `accept-encoding`, buggy servers may return brotli-encoded responses anyway. Let's try to handle
+  # that case if the Brotli gem is loaded.
+  #
+  # If you need to handle Brotli-encoded responses, install the 'brotli' gem and require it in your
+  # application. If the `Brotli` constant is defined, Mechanize will attempt to use it to inflate
+  # the response.
+  #
+  def content_encoding_brotli(body_io)
+    log.debug('deflate brotli body') if log
+
+    unless defined?(::Brotli)
+      raise Mechanize::Error, "cannot deflate brotli-encoded response. Please install and require the 'brotli' gem."
+    end
+
+    begin
+      return StringIO.new(Brotli.inflate(body_io.read))
+    rescue Brotli::Error
+      log.error("unable to brotli-inflate response") if log
+      raise Mechanize::Error, "error inflating brotli-encoded response."
+    end
+  ensure
+    body_io.close
+  end
+
   def disable_keep_alive request
     request['connection'] = 'close' unless @keep_alive
   end
@@ -831,6 +859,8 @@ class Mechanize::HTTP::Agent
                content_encoding_inflate body_io
              when 'gzip', 'x-gzip' then
                content_encoding_gunzip body_io
+             when 'br' then
+               content_encoding_brotli body_io
              else
                raise Mechanize::Error,
                  "unsupported content-encoding: #{response['Content-Encoding']}"

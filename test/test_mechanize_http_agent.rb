@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require 'mechanize/test_case'
+require "brotli" unless RUBY_PLATFORM == "java"
 
 class TestMechanizeHttpAgent < Mechanize::TestCase
 
@@ -922,6 +923,46 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     body = @agent.response_content_encoding @res, body_io
 
     assert_equal 'part', body.read
+  end
+
+  def test_response_content_encoding_brotli_when_brotli_not_loaded
+    skip("only test this on jruby which doesn't have brotli support") unless RUBY_ENGINE == 'jruby'
+
+    @res.instance_variable_set :@header, 'content-encoding' => %w[br]
+    body_io = StringIO.new("content doesn't matter for this test")
+
+    e = assert_raises(Mechanize::Error) do
+      @agent.response_content_encoding(@res, body_io)
+    end
+    assert_includes(e.message, "cannot deflate brotli-encoded response")
+
+    assert(body_io.closed?)
+  end
+
+  def test_response_content_encoding_brotli
+    skip("jruby does not have brotli support") if RUBY_ENGINE == 'jruby'
+
+    @res.instance_variable_set :@header, 'content-encoding' => %w[br]
+    body_io = StringIO.new(Brotli.deflate("this is compressed by brotli"))
+
+    body = @agent.response_content_encoding(@res, body_io)
+
+    assert_equal("this is compressed by brotli", body.read)
+    assert(body_io.closed?)
+  end
+
+  def test_response_content_encoding_brotli_corrupt
+    skip("jruby does not have brotli support") if RUBY_ENGINE == 'jruby'
+
+    @res.instance_variable_set :@header, 'content-encoding' => %w[br]
+    body_io = StringIO.new("not a brotli payload")
+
+    e = assert_raises(Mechanize::Error) do
+      @agent.response_content_encoding(@res, body_io)
+    end
+    assert_includes(e.message, "error inflating brotli-encoded response")
+    assert_kind_of(Brotli::Error, e.cause)
+    assert(body_io.closed?)
   end
 
   def test_response_content_encoding_gzip_corrupt

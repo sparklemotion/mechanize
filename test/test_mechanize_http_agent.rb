@@ -2,7 +2,10 @@
 # frozen_string_literal: true
 
 require 'mechanize/test_case'
-require "brotli" unless RUBY_PLATFORM == "java"
+unless RUBY_PLATFORM == 'java'
+  require 'brotli'
+  require 'zstd-ruby'
+end
 
 class TestMechanizeHttpAgent < Mechanize::TestCase
 
@@ -962,6 +965,46 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     end
     assert_includes(e.message, "error inflating brotli-encoded response")
     assert_kind_of(Brotli::Error, e.cause)
+    assert(body_io.closed?)
+  end
+
+  def test_response_content_encoding_zstd_when_zstd_not_loaded
+    skip("only test this on jruby which doesn't have zstd support") unless RUBY_ENGINE == 'jruby'
+
+    @res.instance_variable_set :@header, 'content-encoding' => %w[zstd]
+    body_io = StringIO.new("content doesn't matter for this test")
+
+    e = assert_raises(Mechanize::Error) do
+      @agent.response_content_encoding(@res, body_io)
+    end
+    assert_includes(e.message, 'cannot deflate zstd-encoded response')
+
+    assert(body_io.closed?)
+  end
+
+  def test_response_content_encoding_zstd
+    skip('jruby does not have zstd support') if RUBY_ENGINE == 'jruby'
+
+    @res.instance_variable_set :@header, 'content-encoding' => %w[zstd]
+    body_io = StringIO.new(Zstd.compress('this is compressed by zstd'))
+
+    body = @agent.response_content_encoding(@res, body_io)
+
+    assert_equal('this is compressed by zstd', body.read)
+    assert(body_io.closed?)
+  end
+
+  def test_response_content_encoding_zstd_corrupt
+    skip('jruby does not have zstd support') if RUBY_ENGINE == 'jruby'
+
+    @res.instance_variable_set :@header, 'content-encoding' => %w[zstd]
+    body_io = StringIO.new('not a zstd payload')
+
+    e = assert_raises(Mechanize::Error) do
+      @agent.response_content_encoding(@res, body_io)
+    end
+    assert_includes(e.message, 'error decompressing zstd-encoded response')
+    assert_kind_of(RuntimeError, e.cause)
     assert(body_io.closed?)
   end
 

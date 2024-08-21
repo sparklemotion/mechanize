@@ -1,5 +1,10 @@
 # Mechanize CHANGELOG
 
+## 2.12.1 / 2024-08-21
+
+* Introduce experimental support for handling Zstd-compressed responses (CRuby only). (#652) @adrianodennanni
+
+
 ## 2.12.0 / 2024-07-29
 
 * Introduce experimental support for handling Brotli-compressed responses (CRuby only). (#650) @weshatheleopard

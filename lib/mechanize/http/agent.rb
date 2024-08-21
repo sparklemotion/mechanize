@@ -523,6 +523,35 @@ class Mechanize::HTTP::Agent
     body_io.close
   end
 
+  ##
+  # Decodes a Zstd-encoded +body_io+
+  #
+  # (Experimental, CRuby only) Although Mechanize will never request a zstd-encoded response via
+  # `accept-encoding`, buggy servers may return zstd-encoded responses, or you might need to
+  # inform the zstd keyword on your Accept-Encoding headers. Let's try to handle those cases if
+  # the Zstd gem is loaded.
+  #
+  # If you need to handle Zstd-encoded responses, install the 'zstd-ruby' gem and require it in your
+  # application. If the `Zstd` constant is defined, Mechanize will attempt to use it to inflate
+  # the response.
+  #
+  def content_encoding_zstd(body_io)
+    log.debug('deflate zstd body') if log
+
+    unless defined?(::Zstd)
+      raise Mechanize::Error, "cannot deflate zstd-encoded response. Please install and require the 'zstd-ruby' gem."
+    end
+
+    begin
+      return StringIO.new(Zstd.decompress(body_io.read))
+    rescue StandardError
+      log.error("unable to zstd#decompress response") if log
+      raise Mechanize::Error, "error decompressing zstd-encoded response."
+    end
+  ensure
+    body_io.close
+  end
+
   def disable_keep_alive request
     request['connection'] = 'close' unless @keep_alive
   end
@@ -861,6 +890,8 @@ class Mechanize::HTTP::Agent
                content_encoding_gunzip body_io
              when 'br' then
                content_encoding_brotli body_io
+             when 'zstd' then
+               content_encoding_zstd body_io
              else
                raise Mechanize::Error,
                  "unsupported content-encoding: #{response['Content-Encoding']}"

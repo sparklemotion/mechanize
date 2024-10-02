@@ -104,7 +104,7 @@ class Mechanize::PluggableParser
 
     return parser if parser
 
-    mime_type = MIME::Type.new content_type
+    mime_type = MIME::Type.new "content-type" => content_type
 
     parser = @parsers[mime_type.to_s] ||
              @parsers[mime_type.simplified] ||

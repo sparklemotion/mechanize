@@ -1,5 +1,10 @@
 # Mechanize CHANGELOG
 
+## 2.12.2 / 2023-10-02
+
+* Quash warnings from `Mime::Type.new` in `mime-types` v3.6.0. (#655) @avk
+
+
 ## 2.12.1 / 2024-08-21
 
 * Introduce experimental support for handling Zstd-compressed responses (CRuby only). (#652) @adrianodennanni

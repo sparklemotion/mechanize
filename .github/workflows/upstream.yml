@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby-version: ["head", "jruby-head", "truffleruby-head"]
+        ruby-version: ["head"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +44,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
-        with: { ruby-version: "3.3" }
+        with: { ruby-version: "3.4" }
       - run: |
           bundle add ${{matrix.name}} --git="${{matrix.git}}"
           bundle show

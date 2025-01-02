@@ -1,6 +1,6 @@
 # Mechanize CHANGELOG
 
-## next / unreleased
+## 2.13.0 / 2025-01-02
 
 * Quash frozen string warnings in Ruby 3.4. (#661) @simpl1g
 * Quash URI::Parser warnings in Ruby 3.4. (#662) @flavorjones

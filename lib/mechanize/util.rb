@@ -134,29 +134,27 @@ class Mechanize::Util
   end
 
   def self.uri_escape str, unsafe = nil
-    @parser ||= begin
-                  URI::Parser.new
-                rescue NameError
-                  URI
-                end
-
-    if URI == @parser then
+    if URI == parser then
       unsafe ||= URI::UNSAFE
     else
-      unsafe ||= @parser.regexp[:UNSAFE]
+      unsafe ||= parser.regexp[:UNSAFE]
     end
 
-    @parser.escape str, unsafe
+    parser.escape str, unsafe
   end
 
   def self.uri_unescape str
-    @parser ||= begin
-                  URI::Parser.new
-                rescue NameError
-                  URI
-                end
-
-    @parser.unescape str
+    parser.unescape str
   end
 
+  def self.parser
+    @parser ||=
+      if defined?(URI::RFC2396_PARSER)
+        URI::RFC2396_PARSER
+      elsif defined?(URI::Parser)
+        URI::Parser.new
+      else
+        URI
+      end
+  end
 end

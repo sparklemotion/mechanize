@@ -1,5 +1,10 @@
 # Mechanize CHANGELOG
 
+## next / unreleased
+
+* Quash frozen string warnings in Ruby 3.4. (#661) @simpl1g
+
+
 ## 2.12.2 / 2023-10-02
 
 * Quash warnings from `Mime::Type.new` in `mime-types` v3.6.0. (#655) @avk

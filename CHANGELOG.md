@@ -3,6 +3,7 @@
 ## next / unreleased
 
 * Quash frozen string warnings in Ruby 3.4. (#661) @simpl1g
+* Quash URI::Parser warnings in Ruby 3.4. (#662) @flavorjones
 
 
 ## 2.12.2 / 2023-10-02

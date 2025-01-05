@@ -1,5 +1,10 @@
 # Mechanize CHANGELOG
 
+## next / unreleased
+
+* `Mechanize` exposes a `write_timeout` attribute, which is set on the connection if it's supported (e.g., Net::HTTP::Persistent.write_timeout). (#586) @maurycy
+
+
 ## 2.13.0 / 2025-01-02
 
 * Quash frozen string warnings in Ruby 3.4. (#661) @simpl1g

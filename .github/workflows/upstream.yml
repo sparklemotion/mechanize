@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby-version: ["head"]
+        ruby-version: ["head", "truffleruby-head"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

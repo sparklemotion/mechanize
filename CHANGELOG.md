@@ -1,5 +1,8 @@
 # Mechanize CHANGELOG
 
+## next (unreleased)
+* Reduce gem size by excluding test files
+
 ## 2.14.1 / 2026-08-22
 
 ### Security
@@ -1147,4 +1150,3 @@ Mechanize is now under the MIT license
 * Added a response code exception
 * Thanks to Brian Ellin (brianellin@gmail.com) for:
   Added support for CA files, and support for 301 response codes
-

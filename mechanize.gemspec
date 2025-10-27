@@ -45,7 +45,11 @@ Gem::Specification.new do |spec|
   spec.license = "MIT"
 
   spec.require_paths = ["lib"]
-  spec.files = %x(git ls-files).split($/)
+  spec.files = %x(git ls-files lib).split($/) + [
+    'CHANGELOG.md',
+    'LICENSE.txt',
+    'README.md'
+  ]
   spec.test_files = spec.files.grep(%r{^test/})
 
   spec.extra_rdoc_files += Dir['*.rdoc', '*.md']

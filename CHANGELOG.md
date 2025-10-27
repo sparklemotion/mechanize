@@ -1,5 +1,8 @@
 # Mechanize CHANGELOG
 
+## next (unreleased)
+* Reduce gem size by excluding test files
+
 ## 2.14.0 / 2025-01-05
 
 * `Mechanize` exposes a `write_timeout` attribute, which is set on the connection if it's supported (e.g., `Net::HTTP::Persistent.write_timeout`). (#586) @maurycy

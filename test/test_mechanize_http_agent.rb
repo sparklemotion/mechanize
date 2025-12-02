@@ -1369,8 +1369,13 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_instance_of Mechanize::Page, page
     assert_equal @mech, page.mech
 
-    assert_equal 'ISO-8859-1', page.encoding
-    assert_equal 'ISO-8859-1', page.parser.encoding
+    if Mechanize.html_parser == Nokogiri::HTML5
+      assert_equal 'UTF-8', page.encoding
+      assert_equal 'UTF-8', page.parser.encoding
+    else
+      assert_equal 'ISO-8859-1', page.encoding
+      assert_equal 'ISO-8859-1', page.parser.encoding
+    end
   end
 
   def test_response_parse_content_type_encoding_broken_iso_8859_1
@@ -1382,7 +1387,11 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     page = @agent.response_parse @res, body, @uri
 
     assert_instance_of Mechanize::Page, page
-    assert_equal 'ISO_8859-1', page.encoding
+    if Mechanize.html_parser == Nokogiri::HTML5
+      assert_equal 'UTF-8', page.encoding
+    else
+      assert_equal 'ISO_8859-1', page.encoding
+    end
   end
 
   def test_response_parse_content_type_encoding_broken_utf_8

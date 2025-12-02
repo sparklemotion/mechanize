@@ -72,7 +72,7 @@ class Mechanize::Util
   # Converts string +s+ from +code+ to UTF-8.
   def self.from_native_charset(s, code, ignore_encoding_error = false, log = nil)
     return s unless s && code
-    return s unless Mechanize.html_parser == Nokogiri::HTML
+    return s unless Mechanize.html_parser == Nokogiri::HTML || Mechanize.html_parser == Nokogiri::HTML5
 
     begin
       s.encode(code)
@@ -91,7 +91,7 @@ class Mechanize::Util
     s.gsub(/&(\w+|#[0-9]+);/) { |match|
       number = case match
                when /&(\w+);/
-                 Mechanize.html_parser::NamedCharacters[$1]
+                 (Mechanize.html_parser == Nokogiri::HTML5 ? Nokogiri::HTML::NamedCharacters : Mechanize.html_parser::NamedCharacters)[$1]
                when /&#([0-9]+);/
                  $1.to_i
                end

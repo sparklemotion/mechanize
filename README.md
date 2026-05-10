@@ -56,6 +56,13 @@ bundle exec rake test
 See also Mechanize::TestCase to read about the built-in testing infrastructure.
 
 
+### Security and Vulnerability Reporting
+
+Please report vulnerabilities at https://github.com/sparklemotion/mechanize/security
+
+See [SECURITY.md](SECURITY.md) for full information and description of our security policy.
+
+
 ## Authors
 
 * Eric Hodel

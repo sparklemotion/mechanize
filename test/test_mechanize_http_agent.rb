@@ -1705,6 +1705,40 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_match("cookie2|version=1", page.body)
   end
 
+  def test_response_redirect_to_cross_site_drops_agent_request_headers
+    @agent.redirect_ok = true
+    @agent.request_headers = { 'Authorization' => 'Bearer tokensecret', 'Cookie' => 'name=value' }
+
+    page = html_page ''
+    page = @agent.response_redirect({ 'Location' => 'http://trap/http_headers' }, :get,
+                                    page, 0, {})
+
+    refute_match("authorization|Bearer tokensecret", page.body)
+    refute_match("cookie|name=value", page.body)
+  end
+
+  def test_response_redirect_to_cross_site_keeps_insensitive_agent_request_headers
+    @agent.redirect_ok = true
+    @agent.request_headers = { 'X-Api-Key' => 'apikey' }
+
+    page = html_page ''
+    page = @agent.response_redirect({ 'Location' => 'http://trap/http_headers' }, :get,
+                                    page, 0, {})
+
+    assert_match("x-api-key|apikey", page.body)
+  end
+
+  def test_response_redirect_to_same_site_keeps_agent_request_headers
+    @agent.redirect_ok = true
+    @agent.request_headers = { 'Authorization' => 'Bearer tokensecret' }
+
+    page = html_page ''
+    page = @agent.response_redirect({ 'Location' => '/http_headers' }, :get,
+                                    page, 0, {})
+
+    assert_match("authorization|Bearer tokensecret", page.body)
+  end
+
   def test_response_redirect_to_same_site_with_credential
     @agent.redirect_ok = true
 

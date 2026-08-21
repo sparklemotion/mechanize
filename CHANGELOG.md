@@ -5,6 +5,7 @@
 ### Security
 
 * `CREDENTIAL_HEADERS` gains `Proxy-Authorization` and `COOKIE_HEADERS` gains `Cookie2`, so both are stripped on a cross-site redirect. [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
+* **Breaking:** Headers set through `Mechanize#request_headers=` now obey the same redirect rules as per-request headers, instead of being re-applied unconditionally to every request. [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
 
 
 ## 2.14.0 / 2025-01-05

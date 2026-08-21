@@ -242,7 +242,7 @@ class Mechanize::HTTP::Agent
   # page.  If it is over the redirection_limit an error will be raised.
 
   def fetch uri, method = :get, headers = {}, params = [],
-            referer = current_page, redirects = 0
+            referer = current_page, redirects = 0, redirect_across = nil
 
     referer_uri = referer ? referer.uri : nil
     uri         = resolve uri, referer
@@ -258,7 +258,7 @@ class Mechanize::HTTP::Agent
     request_host             request, uri
     request_referer          request, uri, referer_uri
     request_user_agent       request
-    request_add_headers      request, headers
+    request_add_headers      request, headers, redirect_across
     pre_connect              request
 
     # Consult robots.txt
@@ -585,8 +585,9 @@ class Mechanize::HTTP::Agent
     end
   end
 
-  def request_add_headers request, headers = {}
+  def request_add_headers request, headers = {}, redirect_across = nil
     @request_headers.each do |k,v|
+      next if drop_after_redirect? k, redirect_across
       request[k] = v
     end
 
@@ -600,6 +601,26 @@ class Mechanize::HTTP::Agent
         request[field] = value
       end
     end
+  end
+
+  # Should the header named +name+ be withheld from a request issued after a
+  # redirect that crossed the boundary +redirect_across+?  See
+  # #response_redirect for the boundaries.
+  def drop_after_redirect? name, redirect_across
+    case redirect_across
+    when nil
+      false
+    when :port
+      # https://datatracker.ietf.org/doc/html/rfc6265#section-8.5
+      # cookies are OK to be shared across ports on the same host
+      match_header? name, CREDENTIAL_HEADERS
+    when :site
+      match_header? name, CREDENTIAL_HEADERS + COOKIE_HEADERS
+    end
+  end
+
+  def match_header? name, candidates
+    candidates.any? { |candidate| name.to_s.casecmp?(candidate) }
   end
 
   def request_auth request, uri
@@ -1065,18 +1086,17 @@ class Mechanize::HTTP::Agent
       headers.delete_if { |h| h.casecmp?(key) }
     end
 
-    # Make sure we clear credential headers if being redirected to another site
-    if new_uri.host == page.uri.host
-      if new_uri.port != page.uri.port
-        # https://datatracker.ietf.org/doc/html/rfc6265#section-8.5
-        # cookies are OK to be shared across ports on the same host
-        CREDENTIAL_HEADERS.each { |ch| headers.delete_if { |h| h.casecmp?(ch) } }
+    # Which boundary, if any, did this redirect cross?  Sensitive headers must
+    # not follow it across.
+    redirect_across =
+      if new_uri.host != page.uri.host then :site
+      elsif new_uri.port != page.uri.port then :port
       end
-    else
-      (COOKIE_HEADERS + CREDENTIAL_HEADERS).each { |ch| headers.delete_if { |h| h.casecmp?(ch) } }
-    end
 
-    fetch new_uri, redirect_method, headers, [], referer, redirects + 1
+    headers.delete_if { |h, _| drop_after_redirect? h, redirect_across }
+
+    fetch new_uri, redirect_method, headers, [], referer, redirects + 1,
+          redirect_across
   end
 
   # :section: Robots

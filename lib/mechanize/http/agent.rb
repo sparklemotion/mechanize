@@ -242,7 +242,7 @@ class Mechanize::HTTP::Agent
   # page.  If it is over the redirection_limit an error will be raised.
 
   def fetch uri, method = :get, headers = {}, params = [],
-            referer = current_page, redirects = 0, redirect_across = nil
+            referer = current_page, redirects = 0, crossed_origin = false
 
     referer_uri = referer ? referer.uri : nil
     uri         = resolve uri, referer
@@ -258,7 +258,7 @@ class Mechanize::HTTP::Agent
     request_host             request, uri
     request_referer          request, uri, referer_uri
     request_user_agent       request
-    request_add_headers      request, headers, redirect_across
+    request_add_headers      request, headers, crossed_origin
     pre_connect              request
 
     # Consult robots.txt
@@ -585,9 +585,9 @@ class Mechanize::HTTP::Agent
     end
   end
 
-  def request_add_headers request, headers = {}, redirect_across = nil
+  def request_add_headers request, headers = {}, crossed_origin = false
     @request_headers.each do |k,v|
-      next if drop_after_redirect? k, redirect_across
+      next if drop_after_redirect? k, crossed_origin
       request[k] = v
     end
 
@@ -603,20 +603,18 @@ class Mechanize::HTTP::Agent
     end
   end
 
+  # Does moving from +from_uri+ to +to_uri+ cross an origin?  An origin is the
+  # scheme, host and port together; see RFC 6454.
+  def crosses_origin? from_uri, to_uri
+    to_uri.scheme != from_uri.scheme ||
+      to_uri.host != from_uri.host ||
+      to_uri.port != from_uri.port
+  end
+
   # Should the header named +name+ be withheld from a request issued after a
-  # redirect that crossed the boundary +redirect_across+?  See
-  # #response_redirect for the boundaries.
-  def drop_after_redirect? name, redirect_across
-    case redirect_across
-    when nil
-      false
-    when :port
-      # https://datatracker.ietf.org/doc/html/rfc6265#section-8.5
-      # cookies are OK to be shared across ports on the same host
-      match_header? name, CREDENTIAL_HEADERS
-    when :site
-      match_header? name, CREDENTIAL_HEADERS + COOKIE_HEADERS
-    end
+  # redirect that crossed an origin?
+  def drop_after_redirect? name, crossed_origin
+    crossed_origin && match_header?(name, CREDENTIAL_HEADERS + COOKIE_HEADERS)
   end
 
   def match_header? name, candidates
@@ -1086,17 +1084,13 @@ class Mechanize::HTTP::Agent
       headers.delete_if { |h| h.casecmp?(key) }
     end
 
-    # Which boundary, if any, did this redirect cross?  Sensitive headers must
-    # not follow it across.
-    redirect_across =
-      if new_uri.host != page.uri.host then :site
-      elsif new_uri.port != page.uri.port then :port
-      end
+    # Sensitive headers must not follow a redirect across an origin.
+    crossed_origin = crosses_origin? page.uri, new_uri
 
-    headers.delete_if { |h, _| drop_after_redirect? h, redirect_across }
+    headers.delete_if { |h, _| drop_after_redirect? h, crossed_origin }
 
     fetch new_uri, redirect_method, headers, [], referer, redirects + 1,
-          redirect_across
+          crossed_origin
   end
 
   # :section: Robots

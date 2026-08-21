@@ -4,8 +4,9 @@
 
 ### Security
 
-* `CREDENTIAL_HEADERS` gains `Proxy-Authorization` and `COOKIE_HEADERS` gains `Cookie2`, so both are stripped on a cross-site redirect. [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
-* **Breaking:** Headers set through `Mechanize#request_headers=` now obey the same redirect rules as per-request headers, instead of being re-applied unconditionally to every request. [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
+* `CREDENTIAL_HEADERS` gains `Proxy-Authorization` and `COOKIE_HEADERS` gains `Cookie2`, so both are stripped on a cross-origin redirect. [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
+* **Breaking:** Headers set through `Mechanize#request_headers=` now obey the same cross-origin redirect rules as per-request headers, instead of being re-applied unconditionally to every request. [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
+* **Breaking:** A redirect crosses an origin when the scheme, the host or the port changes, per [RFC 6454](https://datatracker.ietf.org/doc/html/rfc6454). Previously only a host change discarded cookies, and an `https:` to `http:` redirect to the same host carried credentials in cleartext. This matches curl, which withholds both after [CVE-2022-27776](https://curl.se/docs/CVE-2022-27776.html). [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
 
 
 ## 2.14.0 / 2025-01-05

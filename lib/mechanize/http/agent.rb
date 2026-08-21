@@ -981,7 +981,8 @@ class Mechanize::HTTP::Agent
     sleep delay
     @history.push(page, page.uri)
     fetch new_url, :get, {}, [],
-          Mechanize::Page.new, redirects + 1
+          Mechanize::Page.new, redirects + 1,
+          crosses_origin?(uri, new_url)
   end
 
   def response_log response

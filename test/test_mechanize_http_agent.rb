@@ -1300,6 +1300,42 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal uri, page.uri
   end
 
+  def test_response_follow_meta_refresh_to_cross_origin_drops_agent_request_headers
+    uri = URI.parse 'http://example/'
+
+    body = <<-BODY
+<title></title>
+<meta http-equiv="refresh" content="0;url=http://trap/http_headers">
+    BODY
+
+    page = Mechanize::Page.new(uri, nil, body, 200, @mech)
+
+    @agent.follow_meta_refresh = true
+    @agent.request_headers = { 'Authorization' => 'Bearer tokensecret' }
+
+    page = @agent.response_follow_meta_refresh @res, uri, page, 0
+
+    refute_match("authorization|Bearer tokensecret", page.body)
+  end
+
+  def test_response_follow_meta_refresh_to_same_origin_keeps_agent_request_headers
+    uri = URI.parse 'http://example/'
+
+    body = <<-BODY
+<title></title>
+<meta http-equiv="refresh" content="0;url=http://example/http_headers">
+    BODY
+
+    page = Mechanize::Page.new(uri, nil, body, 200, @mech)
+
+    @agent.follow_meta_refresh = true
+    @agent.request_headers = { 'Authorization' => 'Bearer tokensecret' }
+
+    page = @agent.response_follow_meta_refresh @res, uri, page, 0
+
+    assert_match("authorization|Bearer tokensecret", page.body)
+  end
+
   def test_response_follow_meta_refresh_limit
     uri = URI.parse 'http://example/#id+1'
 

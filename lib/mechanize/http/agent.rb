@@ -9,8 +9,8 @@ require 'webrobots'
 
 class Mechanize::HTTP::Agent
 
-  CREDENTIAL_HEADERS = ['Authorization']
-  COOKIE_HEADERS = ['Cookie']
+  CREDENTIAL_HEADERS = ['Authorization', 'Proxy-Authorization']
+  COOKIE_HEADERS = ['Cookie', 'Cookie2']
   POST_HEADERS = ['Content-Length', 'Content-MD5', 'Content-Type']
 
   # :section: Headers

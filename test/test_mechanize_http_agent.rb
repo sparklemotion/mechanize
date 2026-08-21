@@ -1669,6 +1669,42 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     refute_match("cookie|name=value", page.body)
   end
 
+  def test_response_redirect_to_cross_site_strips_all_credential_headers
+    @agent.redirect_ok = true
+
+    headers = {
+      'Range' => 'bytes=0-9999',
+      'Proxy-Authorization' => 'Basic proxysecret',
+      'Cookie2' => 'version=1',
+    }
+
+    page = html_page ''
+    page = @agent.response_redirect({ 'Location' => 'http://trap/http_headers' }, :get,
+                                    page, 0, headers)
+
+    refute_includes(headers.keys, "Proxy-Authorization")
+    refute_includes(headers.keys, "Cookie2")
+
+    refute_match("proxy-authorization|Basic proxysecret", page.body)
+    refute_match("cookie2|version=1", page.body)
+  end
+
+  def test_response_redirect_to_same_site_keeps_all_credential_headers
+    @agent.redirect_ok = true
+
+    headers = {
+      'Proxy-Authorization' => 'Basic proxysecret',
+      'Cookie2' => 'version=1',
+    }
+
+    page = html_page ''
+    page = @agent.response_redirect({ 'Location' => '/http_headers' }, :get,
+                                    page, 0, headers)
+
+    assert_match("proxy-authorization|Basic proxysecret", page.body)
+    assert_match("cookie2|version=1", page.body)
+  end
+
   def test_response_redirect_to_same_site_with_credential
     @agent.redirect_ok = true
 

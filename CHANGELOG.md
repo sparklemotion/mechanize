@@ -1,5 +1,12 @@
 # Mechanize CHANGELOG
 
+## 2.15.0 / unreleased
+
+### Security
+
+* `CREDENTIAL_HEADERS` gains `Proxy-Authorization` and `COOKIE_HEADERS` gains `Cookie2`, so both are stripped on a cross-site redirect. [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
+
+
 ## 2.14.0 / 2025-01-05
 
 * `Mechanize` exposes a `write_timeout` attribute, which is set on the connection if it's supported (e.g., `Net::HTTP::Persistent.write_timeout`). (#586) @maurycy

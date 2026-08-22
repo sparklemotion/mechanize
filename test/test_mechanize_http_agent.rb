@@ -464,12 +464,50 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal @headers, @req.to_hash.keys.sort
   end
 
-  def test_request_add_headers_request_headers
+  def test_fetch_accepts_symbol_names_in_request_headers
+    @agent.request_headers = { Authorization: 'Bearer tokensecret' }
+
+    page = @agent.fetch 'http://example/http_headers'
+
+    assert_match 'authorization|Bearer tokensecret', page.body
+  end
+
+  def test_fetch_lets_a_request_header_override_any_spelling_of_an_agent_header
+    @agent.request_headers = { 'Authorization' => 'agent-one', 'authorization' => 'agent-two' }
+
+    page = @agent.fetch 'http://example/http_headers', :get,
+                        { 'Authorization' => 'per-request' }
+
+    assert_match 'authorization|per-request', page.body
+  end
+
+  def test_meta_refresh_drops_entity_headers
+    @agent.follow_meta_refresh = true
+
+    uri = URI 'http://example/session'
+    response = Net::HTTPOK.new '1.1', '200', 'OK'
+    response['Refresh'] = '0;url=/http_headers'
+    page = Mechanize::Page.new uri, response, '', 200, @mech
+
+    @agent.response_follow_meta_refresh(response, uri, page, 0,
+                                        { 'Content-Length' => '7',
+                                          'Content-Type' => 'text/plain',
+                                          'Content-MD5' => 'deadbeef' })
+
+    request = requests.last
+
+    assert_equal 'GET', request.method
+    assert_nil request['Content-Length']
+    assert_nil request['Content-Type']
+    assert_nil request['Content-MD5']
+  end
+
+  def test_fetch_applies_request_headers
     @agent.request_headers['X-Foo'] = 'bar'
 
-    @agent.request_add_headers @req
+    page = @agent.fetch 'http://example/http_headers'
 
-    assert_equal @headers + %w[x-foo], @req.to_hash.keys.sort
+    assert_match 'x-foo|bar', page.body
   end
 
   def test_request_add_headers_symbol
@@ -1300,6 +1338,33 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal uri, page.uri
   end
 
+  def test_response_follow_meta_refresh_to_cross_origin_drops_agent_request_headers
+    uri = URI.parse 'http://example/'
+
+    body = <<-BODY
+<title></title>
+<meta http-equiv="refresh" content="0;url=http://trap/http_headers">
+    BODY
+
+    page = Mechanize::Page.new(uri, nil, body, 200, @mech)
+
+    @agent.follow_meta_refresh = true
+    @agent.request_headers = { 'Authorization' => 'Bearer tokensecret' }
+
+    page = @agent.response_follow_meta_refresh @res, uri, page, 0
+
+    refute_match("authorization|Bearer tokensecret", page.body)
+  end
+
+  def test_meta_refresh_to_same_origin_keeps_agent_request_headers
+    @agent.follow_meta_refresh = true
+    @agent.request_headers = { 'Authorization' => 'Bearer tokensecret' }
+
+    page = @agent.fetch 'http://example/http_refresh?refresh_url=/http_headers'
+
+    assert_match("authorization|Bearer tokensecret", page.body)
+  end
+
   def test_response_follow_meta_refresh_limit
     uri = URI.parse 'http://example/#id+1'
 
@@ -1669,6 +1734,171 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     refute_match("cookie|name=value", page.body)
   end
 
+  def test_response_redirect_to_cross_site_strips_all_credential_headers
+    @agent.redirect_ok = true
+
+    headers = {
+      'Range' => 'bytes=0-9999',
+      'Proxy-Authorization' => 'Basic proxysecret',
+      'Cookie2' => 'version=1',
+    }
+
+    page = html_page ''
+    page = @agent.response_redirect({ 'Location' => 'http://trap/http_headers' }, :get,
+                                    page, 0, headers)
+
+    refute_includes(headers.keys, "Proxy-Authorization")
+    refute_includes(headers.keys, "Cookie2")
+
+    refute_match("proxy-authorization|Basic proxysecret", page.body)
+    refute_match("cookie2|version=1", page.body)
+  end
+
+  def test_response_redirect_to_same_site_keeps_all_credential_headers
+    @agent.redirect_ok = true
+
+    headers = {
+      'Proxy-Authorization' => 'Basic proxysecret',
+      'Cookie2' => 'version=1',
+    }
+
+    page = html_page ''
+    page = @agent.response_redirect({ 'Location' => '/http_headers' }, :get,
+                                    page, 0, headers)
+
+    assert_match("proxy-authorization|Basic proxysecret", page.body)
+    assert_match("cookie2|version=1", page.body)
+  end
+
+  def test_response_redirect_to_cross_site_drops_agent_request_headers
+    @agent.redirect_ok = true
+    @agent.request_headers = { 'Authorization' => 'Bearer tokensecret', 'Cookie' => 'name=value' }
+
+    page = html_page ''
+    page = @agent.response_redirect({ 'Location' => 'http://trap/http_headers' }, :get,
+                                    page, 0, {})
+
+    refute_match("authorization|Bearer tokensecret", page.body)
+    refute_match("cookie|name=value", page.body)
+  end
+
+  def test_redirect_to_cross_site_keeps_insensitive_agent_request_headers
+    @agent.redirect_ok = true
+    @agent.request_headers = { 'Authorization' => 'Bearer tokensecret', 'X-Api-Key' => 'apikey' }
+
+    page = @agent.fetch 'http://example/redirect', :get,
+                        { 'X-Location' => 'http://trap/http_headers' }
+
+    refute_match("authorization|Bearer tokensecret", page.body)
+    assert_match("x-api-key|apikey", page.body)
+  end
+
+  def test_redirect_to_same_site_keeps_agent_request_headers
+    @agent.redirect_ok = true
+    @agent.request_headers = { 'Authorization' => 'Bearer tokensecret' }
+
+    page = @agent.fetch 'http://example/redirect', :get, { 'X-Location' => '/http_headers' }
+
+    assert_match("authorization|Bearer tokensecret", page.body)
+  end
+
+  def test_response_redirect_to_downgraded_scheme_strips_credential
+    @agent.redirect_ok = true
+
+    headers = { 'AUTHORIZATION' => 'Basic xxx', 'cookie' => 'name=value' }
+
+    page = page 'https://example:8443/', 'text/html'
+    page = @agent.response_redirect({ 'Location' => 'http://example:8443/http_headers' }, :get,
+                                    page, 0, headers)
+
+    refute_includes(headers.keys, "AUTHORIZATION")
+    refute_includes(headers.keys, "cookie")
+
+    refute_match("authorization|Basic xxx", page.body)
+    refute_match("cookie|name=value", page.body)
+  end
+
+  def test_response_redirect_to_downgraded_scheme_drops_agent_request_headers
+    @agent.redirect_ok = true
+    @agent.request_headers = { 'Authorization' => 'Bearer tokensecret' }
+
+    page = page 'https://example:8443/', 'text/html'
+    page = @agent.response_redirect({ 'Location' => 'http://example:8443/http_headers' }, :get,
+                                    page, 0, {})
+
+    refute_match("authorization|Bearer tokensecret", page.body)
+  end
+
+  def test_response_redirect_to_different_port_strips_cookie
+    @agent.redirect_ok = true
+
+    headers = { 'cookie' => 'name=value' }
+
+    page = html_page ''
+    page = @agent.response_redirect({ 'Location' => 'http://example:81/http_headers' }, :get,
+                                    page, 0, headers)
+
+    refute_match("cookie|name=value", page.body)
+  end
+
+  # Every request the agent made to a host other than the one the credential
+  # was set for.
+  def foreign_requests
+    requests.reject { |request| request['host'] == 'example' }
+  end
+
+  def test_second_redirect_hop_on_a_foreign_origin_does_not_restore_credentials
+    @agent.redirect_ok = true
+    @agent.redirection_limit = 2
+    @agent.request_headers = { 'Authorization' => 'Bearer tokensecret' }
+
+    assert_raises Mechanize::RedirectLimitReachedError do
+      @agent.fetch 'http://example/redirect', :get,
+                   { 'X-Location' => 'http://trap/redirect' }
+    end
+
+    assert_operator foreign_requests.length, :>, 1
+    assert_empty foreign_requests.select { |r| r['Authorization'] }
+  end
+
+  def test_authentication_retry_on_a_foreign_origin_does_not_restore_credentials
+    @agent.redirect_ok = true
+    @agent.request_headers = { 'Authorization' => 'Bearer tokensecret' }
+    @agent.add_auth URI('http://trap/'), 'user', 'pass'
+
+    begin
+      @agent.fetch 'http://example/redirect', :get,
+                   { 'X-Location' => 'http://trap/basic_auth' }
+    rescue Mechanize::UnauthorizedError
+      # a leaked bearer token overwrites the Basic credential and the retry fails
+    end
+
+    assert_operator foreign_requests.length, :>, 1
+    assert_empty foreign_requests.select { |r| r['Authorization'] == 'Bearer tokensecret' }
+  end
+
+  def test_meta_refresh_to_a_second_foreign_origin_does_not_restore_credentials
+    @agent.redirect_ok = true
+    @agent.follow_meta_refresh = true
+    @agent.request_headers = { 'Authorization' => 'Bearer tokensecret' }
+
+    @agent.fetch 'http://example/redirect', :get,
+                 { 'X-Location' => 'http://trap/http_refresh?refresh_url=/http_headers' }
+
+    assert_nil requests.find { |r| r.path == '/http_headers' }['Authorization']
+  end
+
+  def test_robots_lookup_on_a_foreign_origin_does_not_send_credentials
+    @agent.redirect_ok = true
+    @agent.robots = true
+    @agent.request_headers = { 'Authorization' => 'Bearer tokensecret' }
+
+    @agent.fetch 'http://example/redirect', :get,
+                 { 'X-Location' => 'http://trap/http_headers' }
+
+    assert_nil requests.find { |r| r.path == '/robots.txt' }['Authorization']
+  end
+
   def test_response_redirect_to_same_site_with_credential
     @agent.redirect_ok = true
 
@@ -1704,11 +1934,11 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
                                     page, 0, headers)
 
     refute_includes(headers.keys, "AUTHORIZATION")
-    assert_includes(headers.keys, "cookie")
+    refute_includes(headers.keys, "cookie")
 
     assert_match("range|bytes=0-9999", page.body)
     refute_match("authorization|Basic xxx", page.body)
-    assert_match("cookie|name=value", page.body)
+    refute_match("cookie|name=value", page.body)
   end
 
   def test_response_redirect_not_ok

@@ -9,9 +9,13 @@ require 'webrobots'
 
 class Mechanize::HTTP::Agent
 
-  CREDENTIAL_HEADERS = ['Authorization']
-  COOKIE_HEADERS = ['Cookie']
+  CREDENTIAL_HEADERS = ['Authorization', 'Proxy-Authorization']
+  COOKIE_HEADERS = ['Cookie', 'Cookie2']
   POST_HEADERS = ['Content-Length', 'Content-MD5', 'Content-Type']
+
+  # Symbols accepted as header names in the per-request headers hash, and the
+  # header each one names.
+  SYMBOL_HEADERS = { :etag => 'ETag', :if_modified_since => 'If-Modified-Since' }.freeze
 
   # :section: Headers
 
@@ -21,7 +25,9 @@ class Mechanize::HTTP::Agent
   # Is gzip compression of requests enabled?
   attr_accessor :gzip_enabled
 
-  # A hash of request headers to be used for every request
+  # A hash of request headers to be used for every request.  Headers named in
+  # CREDENTIAL_HEADERS or COOKIE_HEADERS are withheld from a request that
+  # follows a redirect across an origin; see #crosses_origin?.
   attr_accessor :request_headers
 
   # The User-Agent header to send
@@ -240,9 +246,20 @@ class Mechanize::HTTP::Agent
   #
   # +redirects+ tracks the number of redirects experienced when retrieving the
   # page.  If it is over the redirection_limit an error will be raised.
+  #
+  # +apply_request_headers+ merges #request_headers into +headers+.  It is true
+  # for a request the caller initiated and false for one continuing an
+  # operation already under way, such as following a redirect, where +headers+
+  # already carries the merged set minus anything withheld along the way.
 
   def fetch uri, method = :get, headers = {}, params = [],
-            referer = current_page, redirects = 0
+            referer = current_page, redirects = 0, apply_request_headers = true
+
+    # Fold the agent defaults into the caller's headers once, at the start of
+    # the operation, so that from here on a single hash carries every header
+    # and #response_redirect can drop a credential from it for good.  Requests
+    # continuing an operation pass false and supply the hash they were given.
+    headers = merge_request_headers headers if apply_request_headers
 
     referer_uri = referer ? referer.uri : nil
     uri         = resolve uri, referer
@@ -313,7 +330,7 @@ class Mechanize::HTTP::Agent
 
     response_cookies response, uri, page
 
-    meta = response_follow_meta_refresh response, uri, page, redirects
+    meta = response_follow_meta_refresh response, uri, page, redirects, headers
     return meta if meta
 
     if robots && page.is_a?(Mechanize::Page)
@@ -585,21 +602,56 @@ class Mechanize::HTTP::Agent
     end
   end
 
-  def request_add_headers request, headers = {}
-    @request_headers.each do |k,v|
-      request[k] = v
-    end
+  # The agent defaults, with +headers+ applied on top.  A header in +headers+
+  # replaces an agent default naming the same header, whatever the spelling,
+  # because header names are case-insensitive and the agent's keys may be
+  # symbols.
+  def merge_request_headers headers
+    merged = {}
+
+    @request_headers.each { |field, value| merged[field.to_s] = value }
 
     headers.each do |field, value|
-      case field
-      when :etag              then request["ETag"] = value
-      when :if_modified_since then request["If-Modified-Since"] = value
-      when Symbol then
-        raise ArgumentError, "unknown header symbol #{field}"
+      name = canonical_header_name field
+      merged.delete_if { |existing, _| canonical_header_name(existing) == name }
+      merged[field] = value
+    end
+
+    merged
+  end
+
+  def canonical_header_name field
+    (SYMBOL_HEADERS[field] || field).to_s.downcase
+  end
+
+  def request_add_headers request, headers = {}
+    headers.each do |field, value|
+      if Symbol === field then
+        name = SYMBOL_HEADERS[field] or
+          raise ArgumentError, "unknown header symbol #{field}"
+        request[name] = value
       else
         request[field] = value
       end
     end
+  end
+
+  # Does moving from +from_uri+ to +to_uri+ cross an origin?  An origin is the
+  # scheme, host and port together; see RFC 6454.
+  def crosses_origin? from_uri, to_uri
+    to_uri.scheme != from_uri.scheme ||
+      to_uri.host != from_uri.host ||
+      to_uri.port != from_uri.port
+  end
+
+  # Should the header named +name+ be withheld from a request issued after a
+  # redirect that crossed an origin?
+  def drop_after_redirect? name, crossed_origin
+    crossed_origin && match_header?(name, CREDENTIAL_HEADERS + COOKIE_HEADERS)
+  end
+
+  def match_header? name, candidates
+    candidates.any? { |candidate| name.to_s.casecmp?(candidate) }
   end
 
   def request_auth request, uri
@@ -874,7 +926,7 @@ class Mechanize::HTTP::Agent
       raise Mechanize::UnauthorizedError.new(page, challenges, message)
     end
 
-    fetch uri, request.method.downcase.to_sym, headers, params, referer
+    fetch uri, request.method.downcase.to_sym, headers, params, referer, 0, false
   end
 
   def response_content_encoding response, body_io
@@ -951,7 +1003,7 @@ class Mechanize::HTTP::Agent
     end
   end
 
-  def response_follow_meta_refresh response, uri, page, redirects
+  def response_follow_meta_refresh response, uri, page, redirects, headers = {}
     delay, new_url = get_meta_refresh(response, uri, page)
     return nil unless delay
     new_url = new_url ? secure_resolve!(new_url, page) : uri
@@ -961,8 +1013,16 @@ class Mechanize::HTTP::Agent
 
     sleep delay
     @history.push(page, page.uri)
-    fetch new_url, :get, {}, [],
-          Mechanize::Page.new, redirects + 1
+
+    headers = headers.dup
+
+    # The refresh is fetched with GET, so the original request's entity headers
+    # must not describe it.
+    POST_HEADERS.each { |key| headers.delete_if { |h, _| h.to_s.casecmp?(key) } }
+    headers.delete_if { |h, _| drop_after_redirect? h, crosses_origin?(uri, new_url) }
+
+    fetch new_url, :get, headers, [],
+          Mechanize::Page.new, redirects + 1, false
   end
 
   def response_log response
@@ -1065,18 +1125,12 @@ class Mechanize::HTTP::Agent
       headers.delete_if { |h| h.casecmp?(key) }
     end
 
-    # Make sure we clear credential headers if being redirected to another site
-    if new_uri.host == page.uri.host
-      if new_uri.port != page.uri.port
-        # https://datatracker.ietf.org/doc/html/rfc6265#section-8.5
-        # cookies are OK to be shared across ports on the same host
-        CREDENTIAL_HEADERS.each { |ch| headers.delete_if { |h| h.casecmp?(ch) } }
-      end
-    else
-      (COOKIE_HEADERS + CREDENTIAL_HEADERS).each { |ch| headers.delete_if { |h| h.casecmp?(ch) } }
-    end
+    # Sensitive headers must not follow a redirect across an origin.
+    crossed_origin = crosses_origin? page.uri, new_uri
 
-    fetch new_uri, redirect_method, headers, [], referer, redirects + 1
+    headers.delete_if { |h, _| drop_after_redirect? h, crossed_origin }
+
+    fetch new_uri, redirect_method, headers, [], referer, redirects + 1, false
   end
 
   # :section: Robots
@@ -1087,7 +1141,7 @@ class Mechanize::HTTP::Agent
     robots_mutex.synchronize do
       Thread.current[RobotsKey] = true
       begin
-        fetch(uri).body
+        fetch(uri, :get, {}, [], current_page, 0, false).body
       rescue Mechanize::ResponseCodeError => e
         case e.response_code
         when /\A4\d\d\z/

@@ -4,10 +4,10 @@
 
 ### Security
 
-* `CREDENTIAL_HEADERS` gains `Proxy-Authorization` and `COOKIE_HEADERS` gains `Cookie2`, so both are stripped on a cross-origin redirect. [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
-* **Breaking:** Headers set through `Mechanize#request_headers=` now obey the same cross-origin redirect rules as per-request headers, instead of being re-applied unconditionally to every request. [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
-* **Breaking:** A redirect crosses an origin when the scheme, the host or the port changes, per [RFC 6454](https://datatracker.ietf.org/doc/html/rfc6454). Previously only a host change discarded cookies, and an `https:` to `http:` redirect to the same host carried credentials in cleartext. This matches curl, which withholds both after [CVE-2022-27776](https://curl.se/docs/CVE-2022-27776.html). [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
-* **Breaking:** A `meta` refresh that points at another origin now discards sensitive request headers, the same as an HTTP redirect. Previously headers set through `Mechanize#request_headers=` followed it unconditionally. [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
+* Strip both `Proxy-Authorization` and `Cookie2` headers on a cross-origin redirect. [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
+* Headers set through `Mechanize#request_headers=` now obey the same cross-origin redirect rules as per-request headers, instead of being re-applied unconditionally to every request. [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
+* A redirect is now considered cross-origin when the scheme, the host or the port changes, per [RFC 6454](https://datatracker.ietf.org/doc/html/rfc6454). Previously only a host change discarded cookies, and an `https:` to `http:` redirect to the same host carried credentials in cleartext. This behavior now matches curl's, which withholds both after [CVE-2022-27776](https://curl.se/docs/CVE-2022-27776.html). [GHSA-5jgv-wc2m-xv99](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-5jgv-wc2m-xv99)
+* A `meta` refresh that points cross-origin now discards sensitive request headers, the same as an HTTP redirect. Previously headers set through `Mechanize#request_headers=` followed it unconditionally. [GHSA-c6rp-p8xm-4q9f](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-c6rp-p8xm-4q9f)
 
 
 ## 2.14.0 / 2025-01-05

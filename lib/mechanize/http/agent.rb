@@ -13,6 +13,10 @@ class Mechanize::HTTP::Agent
   COOKIE_HEADERS = ['Cookie', 'Cookie2']
   POST_HEADERS = ['Content-Length', 'Content-MD5', 'Content-Type']
 
+  # Symbols accepted as header names in the per-request headers hash, and the
+  # header each one names.
+  SYMBOL_HEADERS = { :etag => 'ETag', :if_modified_since => 'If-Modified-Since' }.freeze
+
   # :section: Headers
 
   # Disables If-Modified-Since conditional requests (enabled by default)
@@ -255,7 +259,7 @@ class Mechanize::HTTP::Agent
     # the operation, so that from here on a single hash carries every header
     # and #response_redirect can drop a credential from it for good.  Requests
     # continuing an operation pass false and supply the hash they were given.
-    headers = @request_headers.merge headers if apply_request_headers
+    headers = merge_request_headers headers if apply_request_headers
 
     referer_uri = referer ? referer.uri : nil
     uri         = resolve uri, referer
@@ -598,13 +602,34 @@ class Mechanize::HTTP::Agent
     end
   end
 
+  # The agent defaults, with +headers+ applied on top.  A header in +headers+
+  # replaces an agent default naming the same header, whatever the spelling,
+  # because header names are case-insensitive and the agent's keys may be
+  # symbols.
+  def merge_request_headers headers
+    merged = {}
+
+    @request_headers.each { |field, value| merged[field.to_s] = value }
+
+    headers.each do |field, value|
+      name = canonical_header_name field
+      merged.delete_if { |existing, _| canonical_header_name(existing) == name }
+      merged[field] = value
+    end
+
+    merged
+  end
+
+  def canonical_header_name field
+    (SYMBOL_HEADERS[field] || field).to_s.downcase
+  end
+
   def request_add_headers request, headers = {}
     headers.each do |field, value|
-      case field
-      when :etag              then request["ETag"] = value
-      when :if_modified_since then request["If-Modified-Since"] = value
-      when Symbol then
-        raise ArgumentError, "unknown header symbol #{field}"
+      if Symbol === field then
+        name = SYMBOL_HEADERS[field] or
+          raise ArgumentError, "unknown header symbol #{field}"
+        request[name] = value
       else
         request[field] = value
       end
@@ -990,6 +1015,10 @@ class Mechanize::HTTP::Agent
     @history.push(page, page.uri)
 
     headers = headers.dup
+
+    # The refresh is fetched with GET, so the original request's entity headers
+    # must not describe it.
+    POST_HEADERS.each { |key| headers.delete_if { |h, _| h.to_s.casecmp?(key) } }
     headers.delete_if { |h, _| drop_after_redirect? h, crosses_origin?(uri, new_url) }
 
     fetch new_url, :get, headers, [],

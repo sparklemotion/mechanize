@@ -1015,8 +1015,12 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
   #
   # Headers named in Mechanize::HTTP::Agent::CREDENTIAL_HEADERS or
   # COOKIE_HEADERS are withheld from a request that follows a redirect to
-  # another origin, where an origin is the scheme, host and port together.
-  # A meta refresh to another origin is treated the same way.
+  # another origin, where an origin is the scheme, host and port together, and
+  # stay withheld for the rest of that operation.  A meta refresh to another
+  # origin is treated the same way.
+  #
+  # The robots.txt lookup carries none of these headers, on any origin.  It is
+  # a request mechanize makes on its own behalf.
 
   def request_headers
     @agent.request_headers

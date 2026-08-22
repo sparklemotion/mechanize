@@ -464,6 +464,44 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
     assert_equal @headers, @req.to_hash.keys.sort
   end
 
+  def test_fetch_accepts_symbol_names_in_request_headers
+    @agent.request_headers = { Authorization: 'Bearer tokensecret' }
+
+    page = @agent.fetch 'http://example/http_headers'
+
+    assert_match 'authorization|Bearer tokensecret', page.body
+  end
+
+  def test_fetch_lets_a_request_header_override_any_spelling_of_an_agent_header
+    @agent.request_headers = { 'Authorization' => 'agent-one', 'authorization' => 'agent-two' }
+
+    page = @agent.fetch 'http://example/http_headers', :get,
+                        { 'Authorization' => 'per-request' }
+
+    assert_match 'authorization|per-request', page.body
+  end
+
+  def test_meta_refresh_drops_entity_headers
+    @agent.follow_meta_refresh = true
+
+    uri = URI 'http://example/session'
+    response = Net::HTTPOK.new '1.1', '200', 'OK'
+    response['Refresh'] = '0;url=/http_headers'
+    page = Mechanize::Page.new uri, response, '', 200, @mech
+
+    @agent.response_follow_meta_refresh(response, uri, page, 0,
+                                        { 'Content-Length' => '7',
+                                          'Content-Type' => 'text/plain',
+                                          'Content-MD5' => 'deadbeef' })
+
+    request = requests.last
+
+    assert_equal 'GET', request.method
+    assert_nil request['Content-Length']
+    assert_nil request['Content-Type']
+    assert_nil request['Content-MD5']
+  end
+
   def test_fetch_applies_request_headers
     @agent.request_headers['X-Foo'] = 'bar'
 

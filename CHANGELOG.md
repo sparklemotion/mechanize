@@ -1,6 +1,6 @@
 # Mechanize CHANGELOG
 
-## 2.15.0 / unreleased
+## 2.14.1 / unreleased
 
 ### Security
 

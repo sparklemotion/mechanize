@@ -21,7 +21,9 @@ class Mechanize::HTTP::Agent
   # Is gzip compression of requests enabled?
   attr_accessor :gzip_enabled
 
-  # A hash of request headers to be used for every request
+  # A hash of request headers to be used for every request.  Headers named in
+  # CREDENTIAL_HEADERS or COOKIE_HEADERS are withheld from a request that
+  # follows a redirect across an origin; see #crosses_origin?.
   attr_accessor :request_headers
 
   # The User-Agent header to send

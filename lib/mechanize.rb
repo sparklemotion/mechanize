@@ -1011,7 +1011,12 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
   end
 
   ##
-  # A hash of custom request headers that will be sent on every request
+  # A hash of custom request headers that will be sent on every request.
+  #
+  # Headers named in Mechanize::HTTP::Agent::CREDENTIAL_HEADERS or
+  # COOKIE_HEADERS are withheld from a request that follows a redirect to
+  # another origin, where an origin is the scheme, host and port together.
+  # A meta refresh to another origin is treated the same way.
 
   def request_headers
     @agent.request_headers
@@ -1019,7 +1024,8 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
 
   ##
   # Replaces the custom request headers that will be sent on every request
-  # with +request_headers+
+  # with +request_headers+.  See #request_headers for the credentials
+  # withheld after a redirect to another origin.
 
   def request_headers= request_headers
     @agent.request_headers = request_headers

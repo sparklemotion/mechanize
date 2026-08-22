@@ -8,6 +8,8 @@
 * Headers set through `Mechanize#request_headers=` now obey the same cross-origin redirect rules as per-request headers, instead of being re-applied unconditionally to every request. [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
 * A redirect is now considered cross-origin when the scheme, the host or the port changes, per [RFC 6454](https://datatracker.ietf.org/doc/html/rfc6454). Previously only a host change discarded cookies, and an `https:` to `http:` redirect to the same host carried credentials in cleartext. This behavior now matches curl's, which withholds both after [CVE-2022-27776](https://curl.se/docs/CVE-2022-27776.html). [GHSA-5jgv-wc2m-xv99](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-5jgv-wc2m-xv99)
 * A `meta` refresh that points cross-origin now discards sensitive request headers, the same as an HTTP redirect. Previously headers set through `Mechanize#request_headers=` followed it unconditionally. [GHSA-c6rp-p8xm-4q9f](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-c6rp-p8xm-4q9f)
+* A credential withheld from a cross-origin redirect stays withheld for the rest of the operation. Previously the origin check was recomputed against the previous hop, so a second redirect, an authentication retry, or a second `meta` refresh on the foreign origin re-sent it, and the `robots.txt` lookup never applied the check at all. [GHSA-2mwr-xjcg-37j7](https://github.com/sparklemotion/mechanize/security/advisories/GHSA-2mwr-xjcg-37j7)
+* `robots.txt` is fetched without any caller-supplied request headers.
 
 
 ## 2.14.0 / 2025-01-05

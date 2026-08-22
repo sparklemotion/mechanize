@@ -242,9 +242,20 @@ class Mechanize::HTTP::Agent
   #
   # +redirects+ tracks the number of redirects experienced when retrieving the
   # page.  If it is over the redirection_limit an error will be raised.
+  #
+  # +apply_request_headers+ merges #request_headers into +headers+.  It is true
+  # for a request the caller initiated and false for one continuing an
+  # operation already under way, such as following a redirect, where +headers+
+  # already carries the merged set minus anything withheld along the way.
 
   def fetch uri, method = :get, headers = {}, params = [],
-            referer = current_page, redirects = 0, crossed_origin = false
+            referer = current_page, redirects = 0, apply_request_headers = true
+
+    # Fold the agent defaults into the caller's headers once, at the start of
+    # the operation, so that from here on a single hash carries every header
+    # and #response_redirect can drop a credential from it for good.  Requests
+    # continuing an operation pass false and supply the hash they were given.
+    headers = @request_headers.merge headers if apply_request_headers
 
     referer_uri = referer ? referer.uri : nil
     uri         = resolve uri, referer
@@ -260,7 +271,7 @@ class Mechanize::HTTP::Agent
     request_host             request, uri
     request_referer          request, uri, referer_uri
     request_user_agent       request
-    request_add_headers      request, headers, crossed_origin
+    request_add_headers      request, headers
     pre_connect              request
 
     # Consult robots.txt
@@ -315,7 +326,7 @@ class Mechanize::HTTP::Agent
 
     response_cookies response, uri, page
 
-    meta = response_follow_meta_refresh response, uri, page, redirects
+    meta = response_follow_meta_refresh response, uri, page, redirects, headers
     return meta if meta
 
     if robots && page.is_a?(Mechanize::Page)
@@ -587,12 +598,7 @@ class Mechanize::HTTP::Agent
     end
   end
 
-  def request_add_headers request, headers = {}, crossed_origin = false
-    @request_headers.each do |k,v|
-      next if drop_after_redirect? k, crossed_origin
-      request[k] = v
-    end
-
+  def request_add_headers request, headers = {}
     headers.each do |field, value|
       case field
       when :etag              then request["ETag"] = value
@@ -895,7 +901,7 @@ class Mechanize::HTTP::Agent
       raise Mechanize::UnauthorizedError.new(page, challenges, message)
     end
 
-    fetch uri, request.method.downcase.to_sym, headers, params, referer
+    fetch uri, request.method.downcase.to_sym, headers, params, referer, 0, false
   end
 
   def response_content_encoding response, body_io
@@ -972,7 +978,7 @@ class Mechanize::HTTP::Agent
     end
   end
 
-  def response_follow_meta_refresh response, uri, page, redirects
+  def response_follow_meta_refresh response, uri, page, redirects, headers = {}
     delay, new_url = get_meta_refresh(response, uri, page)
     return nil unless delay
     new_url = new_url ? secure_resolve!(new_url, page) : uri
@@ -982,9 +988,12 @@ class Mechanize::HTTP::Agent
 
     sleep delay
     @history.push(page, page.uri)
-    fetch new_url, :get, {}, [],
-          Mechanize::Page.new, redirects + 1,
-          crosses_origin?(uri, new_url)
+
+    headers = headers.dup
+    headers.delete_if { |h, _| drop_after_redirect? h, crosses_origin?(uri, new_url) }
+
+    fetch new_url, :get, headers, [],
+          Mechanize::Page.new, redirects + 1, false
   end
 
   def response_log response
@@ -1092,8 +1101,7 @@ class Mechanize::HTTP::Agent
 
     headers.delete_if { |h, _| drop_after_redirect? h, crossed_origin }
 
-    fetch new_uri, redirect_method, headers, [], referer, redirects + 1,
-          crossed_origin
+    fetch new_uri, redirect_method, headers, [], referer, redirects + 1, false
   end
 
   # :section: Robots
@@ -1104,7 +1112,7 @@ class Mechanize::HTTP::Agent
     robots_mutex.synchronize do
       Thread.current[RobotsKey] = true
       begin
-        fetch(uri).body
+        fetch(uri, :get, {}, [], current_page, 0, false).body
       rescue Mechanize::ResponseCodeError => e
         case e.response_code
         when /\A4\d\d\z/

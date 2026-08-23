@@ -31,7 +31,7 @@ end
 desc "Run tests"
 Rake::TestTask.new { |t|
   t.test_files = Dir['test/**/test*.rb']
-  t.verbose = true
+  # t.verbose = true
 }
 
 task publish_docs: %w[rdoc] do

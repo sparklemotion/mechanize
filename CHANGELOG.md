@@ -1,6 +1,6 @@
 # Mechanize CHANGELOG
 
-## 2.14.1 / unreleased
+## 2.14.1 / 2026-08-22
 
 ### Security
 

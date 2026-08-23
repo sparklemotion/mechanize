@@ -1,5 +1,9 @@
 # Mechanize CHANGELOG
 
+
+## next (unreleased)
+* Reduce gem size by excluding test files
+
 ## 2.14.1 / 2026-08-22
 
 ### Security
@@ -13,7 +17,6 @@
 
 * A `meta` refresh now carries the original request's headers, minus any credential withheld for crossing an origin and minus the entity headers of the original request. Previously it carried only the headers set through `Mechanize#request_headers=`.
 * `robots.txt` is fetched without any caller-supplied request headers, on any origin. Previously it received the headers set through `Mechanize#request_headers=`. It is a request mechanize makes on its own behalf.
-
 
 ## 2.14.0 / 2025-01-05
 

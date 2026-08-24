@@ -32,7 +32,9 @@ class TestMechanizeFormEncoding < Mechanize::TestCase
 
     assert accept_charset
     assert_equal accept_charset, form.encoding
-    refute_equal page.encoding, form.encoding
+    if Mechanize.html_parser != Nokogiri::HTML5
+      refute_equal page.encoding, form.encoding
+    end
   end
 
   def test_form_encoding_returns_page_encoding_when_no_accept_charset

@@ -85,8 +85,13 @@ class TestMechanize < Mechanize::TestCase
   end
 
   def test_click
+    if Mechanize.html_parser == Nokogiri::HTML5
+      page = @mech.get("http://localhost/find_link.html")
+    else
+      page = @mech.get("http://localhost/frame_test.html")
+    end
+
     @mech.user_agent_alias = 'Mac Safari'
-    page = @mech.get("http://localhost/frame_test.html")
     link = page.link_with(:text => "Form Test")
 
     page = @mech.click(link)
@@ -143,8 +148,13 @@ class TestMechanize < Mechanize::TestCase
   end
 
   def test_click_hpricot_style # HACK move to test_divide in Page
-    page = @mech.get("http://localhost/frame_test.html")
-    link = (page/"//a[@class='bar']").first
+    if Mechanize.html_parser == Nokogiri::HTML5
+      page = @mech.get("http://localhost/find_link.html")
+      link = (page/"//a[@class='formtest']").first
+    else
+      page = @mech.get("http://localhost/frame_test.html")
+      link = (page/"//a[@class='bar']").first
+    end
 
     page = @mech.click(link)
 

@@ -629,7 +629,7 @@ class Mechanize
   # Settings that adjust how mechanize makes HTTP requests including timeouts,
   # keep-alives, compression, redirects and headers.
 
-  @html_parser = Nokogiri::HTML
+  @html_parser = Nokogiri::HTML5
   @log = nil
 
   class << self

@@ -1,5 +1,10 @@
 # Mechanize CHANGELOG
 
+## next / unreleased
+
+* The gem no longer packages the test suite, the test certificates, or the example scripts, which makes it about a third smaller. It still packages `test/htdocs/`, which `Mechanize::TestCase` needs. (#667) @yuri-zubov
+
+
 ## 2.14.1 / 2026-08-22
 
 ### Security

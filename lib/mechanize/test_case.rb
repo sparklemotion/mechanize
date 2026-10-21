@@ -262,15 +262,8 @@ class Net::HTTP # :nodoc:
     response['Content-Type'] ||= 'text/html'
     response['Content-Length'] = res['Content-Length'] || res.body.length.to_s
 
-    io = StringIO.new(res.body)
-    response.instance_variable_set :@socket, io
-    def io.read clen, dest = nil, _ = nil
-      if dest then
-        dest << super(clen)
-      else
-        super clen
-      end
-    end
+    socket = Net::BufferedIO.new(StringIO.new(res.body))
+    response.instance_variable_set :@socket, socket
 
     body_exist = req.response_body_permitted? &&
       response_klass.body_permitted?

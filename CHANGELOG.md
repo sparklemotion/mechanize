@@ -1,7 +1,9 @@
 # Mechanize CHANGELOG
 
-## next (unreleased)
-* Reduce gem size by excluding test files
+## next / unreleased
+
+* The gem no longer packages the test suite, the test certificates, or the example scripts, which makes it about a third smaller. It still packages `test/htdocs/`, which `Mechanize::TestCase` needs. (#667) @yuri-zubov
+
 
 ## 2.14.1 / 2026-08-22
 
@@ -1150,3 +1152,4 @@ Mechanize is now under the MIT license
 * Added a response code exception
 * Thanks to Brian Ellin (brianellin@gmail.com) for:
   Added support for CA files, and support for 301 response codes
+

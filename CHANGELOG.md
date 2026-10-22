@@ -3,6 +3,7 @@
 ## next / unreleased
 
 * The gem no longer packages the test suite, the test certificates, or the example scripts, which makes it about a third smaller. It still packages `test/htdocs/`, which `Mechanize::TestCase` needs. (#667) @yuri-zubov
+* `Mechanize::TestCase` fake responses work with `net-http` 0.10.0 and later, which reads response lines with `Net::BufferedIO#readuntil`. Previously a chunked response body raised `NoMethodError`. The fake socket is now a `Net::BufferedIO`, like a real one, so `read_body` yields fragments of at most 16 KiB, and a body shorter than its `Content-Length` raises `EOFError` when `ignore_eof` is false.
 
 
 ## 2.14.1 / 2026-08-22

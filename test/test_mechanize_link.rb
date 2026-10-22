@@ -23,7 +23,12 @@ class TestMechanizeLink < Mechanize::TestCase
   end
 
   def test_click
-    page = @mech.get("http://localhost/frame_test.html")
+    if Mechanize.html_parser == Nokogiri::HTML5
+      page = @mech.get("http://localhost/find_link.html")
+    else
+      page = @mech.get("http://localhost/frame_test.html")
+    end
+
     link = page.link_with(:text => "Form Test")
 
     assert_equal('Form Test', link.text)
@@ -33,7 +38,12 @@ class TestMechanizeLink < Mechanize::TestCase
   end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse body of NOFRAMES
 
   def test_click_bang
-    page = @mech.get("http://localhost/frame_test.html")
+    if Mechanize.html_parser == Nokogiri::HTML5
+      page = @mech.get("http://localhost/find_link.html")
+    else
+      page = @mech.get("http://localhost/frame_test.html")
+    end
+
     link = page.link_with!(:text => "Form Test")
 
     assert_equal('Form Test', link.text)
@@ -161,10 +171,16 @@ class TestMechanizeLink < Mechanize::TestCase
   end
 
   def test_resolving_full_uri
-    page = @mech.get("http://localhost/frame_test.html")
-    link = page.link_with(:text => "Form Test")
+    if Mechanize.html_parser == Nokogiri::HTML5
+      page = @mech.get("http://localhost/find_link.html")
+      link = page.link_with(:text => "Form Test")
+      assert_equal "form_test.html", link.uri.to_s
+    else
+      page = @mech.get("http://localhost/frame_test.html")
+      link = page.link_with(:text => "Form Test")
+      assert_equal "/form_test.html", link.uri.to_s
+    end
 
-    assert_equal "/form_test.html", link.uri.to_s
     assert_equal "http://localhost/form_test.html", link.resolved_uri.to_s
   end unless RUBY_ENGINE == 'jruby'  # NekoHTML does not parse body of NOFRAMES
 end

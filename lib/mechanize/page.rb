@@ -119,7 +119,12 @@ class Mechanize::Page < Mechanize::File
       @parser = mech.html_parser.parse html_body, url, @mech.default_encoding
     else
       @encodings.reverse_each do |encoding|
-        @parser = mech.html_parser.parse html_body, url, encoding
+        begin
+          @parser = mech.html_parser.parse html_body, url, encoding
+        rescue Encoding::UndefinedConversionError, ArgumentError
+          # HTML5 parser may raise these if encoding is invalid or conversion fails
+          next
+        end
 
         break unless encoding_error? @parser
       end

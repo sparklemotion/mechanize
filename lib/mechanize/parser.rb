@@ -108,10 +108,10 @@ module Mechanize::Parser
     handled = false
 
     if @uri then
-      uri = @uri
-      uri += 'index.html' if uri.path.end_with? '/'
+      uri_path = remove_dot_segments @uri.path
+      uri_path += 'index.html' if uri_path.end_with? '/'
 
-      path     = uri.path.split(/\//)
+      path     = uri_path.split(/\//)
       filename = path.pop || 'index.html'
     else
       path     = []
@@ -161,6 +161,36 @@ module Mechanize::Parser
     } if response
 
     @response
+  end
+
+  ##
+  # Resolves "." and ".." segments in the absolute +path+ as RFC 3986 section
+  # 5.2.4 does, without reparsing it as a URI.
+
+  def remove_dot_segments path
+    segments = path.split '/', -1
+
+    resolved = segments.each_with_object [] do |segment, result|
+      case segment
+      when '.'  then next
+      when '..' then result.pop unless result == ['']
+      else           result << segment
+      end
+    end
+
+    resolved << '' if ['.', '..'].include? segments.last
+    resolved.join '/'
+  end
+
+  ##
+  # Raises Mechanize::Error unless +path+ is inside +directory+.
+
+  def ensure_within directory, path
+    directory = File.join File.expand_path(directory), ''
+
+    return if File.expand_path(path).start_with? directory
+
+    raise Mechanize::Error, "refusing to save #{path} outside #{directory}"
   end
 
   ##

@@ -25,6 +25,7 @@ class Mechanize::FileSaver < Mechanize::Download
 
     super
 
+    ensure_within Dir.pwd, @uri.host
     ensure_within @uri.host, @filename
     save @filename
   end

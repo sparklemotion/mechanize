@@ -69,6 +69,20 @@ class TestMechanizeFileSaver < Mechanize::TestCase
     end
   end
 
+  def test_initialize_dot_host
+    in_tmpdir do
+      FileUtils.mkdir 'cwd'
+
+      Dir.chdir 'cwd' do
+        assert_raises Mechanize::Error do
+          Mechanize::FileSaver.new URI('http://../outside.html'), nil, @io, 200
+        end
+      end
+
+      assert_empty saved_files_outside('cwd')
+    end
+  end
+
   def saved_files_outside directory
     Dir.glob('**/*').select { |path| File.file? path }.reject { |path| path.start_with? "#{directory}/" }
   end

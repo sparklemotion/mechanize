@@ -1,6 +1,6 @@
 # Mechanize CHANGELOG
 
-## next / unreleased
+## 2.14.2 / 2026-10-26
 
 ### Security
 
@@ -1159,4 +1159,3 @@ Mechanize is now under the MIT license
 * Added a response code exception
 * Thanks to Brian Ellin (brianellin@gmail.com) for:
   Added support for CA files, and support for 301 response codes
-

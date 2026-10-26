@@ -64,8 +64,9 @@ class Mechanize::DirectorySaver < Mechanize::Download
 
     super
 
-    @filename = CGI.unescape(@filename) if self.class.decode_filename?
+    @filename = CGI.unescape(@filename).tr('/\\', '_') if self.class.decode_filename?
     path = File.join directory, @filename
+    ensure_within directory, path
 
     if self.class.overwrite?
       save! path

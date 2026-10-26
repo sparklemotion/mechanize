@@ -46,6 +46,43 @@ class TestMechanizeDirectorySaver < Mechanize::TestCase
     end
   end
 
+  def test_with_decode_filename_encoded_dot_segments_in_content_disposition
+    in_tmpdir do
+      saver = Mechanize::DirectorySaver.save_to 'dir', :decode_filename => true
+      response = {
+        'content-disposition' => 'attachment; filename="..%2Foutside.html"'
+      }
+
+      saver.new @uri, response, @io, 200
+
+      assert_empty saved_files_outside('dir')
+      assert File.exist? 'dir/.._outside.html'
+    end
+  end
+
+  def test_with_decode_filename_encoded_dot_segments_in_uri
+    in_tmpdir do
+      saver = Mechanize::DirectorySaver.save_to 'dir', :decode_filename => true
+      uri = URI 'http://example/..%2Foutside.html'
+
+      saver.new uri, nil, @io, 200
+
+      assert_empty saved_files_outside('dir')
+      assert File.exist? 'dir/.._outside.html'
+    end
+  end
+
+  def test_with_decode_filename_encoded_parent_directory
+    in_tmpdir do
+      saver = Mechanize::DirectorySaver.save_to 'dir', :decode_filename => true, :overwrite => true
+      response = { 'content-disposition' => 'attachment; filename="%2E%2E"' }
+
+      assert_raises Mechanize::Error do
+        saver.new @uri, response, @io, 200
+      end
+    end
+  end
+
   def test_initialize_no_save_dir
     in_tmpdir do
       e = assert_raises Mechanize::Error do
@@ -56,5 +93,8 @@ class TestMechanizeDirectorySaver < Mechanize::TestCase
     end
   end
 
-end
+  def saved_files_outside directory
+    Dir.glob('**/*').select { |path| File.file? path }.reject { |path| path.start_with? "#{directory}/" }
+  end
 
+end

@@ -240,6 +240,28 @@ class TestMechanizeParser < Mechanize::TestCase
     assert_equal 'example/foo.jpg', @parser.extract_filename(true)
   end
 
+  def test_extract_filename_uri_full_path_dot_segments
+    @parser.response = {}
+    @parser.uri = URI 'http://example/a/../../b/./foo.jpg'
+
+    assert_equal 'example/b/foo.jpg', @parser.extract_filename(true)
+
+    @parser.uri = URI 'http://example/a/b/..'
+
+    assert_equal 'example/a/index.html', @parser.extract_filename(true)
+  end
+
+  def test_extract_filename_uri_leading_double_slash
+    @parser.response = {}
+    @parser.uri = URI 'http://example//foo/bar.txt'
+
+    assert_equal 'example/foo/bar.txt', @parser.extract_filename(true)
+
+    @parser.uri = URI 'http://example//foo?x'
+
+    assert_equal 'foo.html_x', @parser.extract_filename
+  end
+
   def test_extract_filename_uri_query
     @parser.response = {}
     @parser.uri = URI 'http://example/?id=5'

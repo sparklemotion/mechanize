@@ -98,7 +98,11 @@ class TestMechanizePageLink < Mechanize::TestCase
   def test_encoding
     page = util_page WINDOWS_1255.dup
 
-    assert_equal 'windows-1255', page.encoding
+    if Mechanize.html_parser == Nokogiri::HTML5
+      assert_equal 'UTF-8', page.encoding
+    else
+      assert_equal 'windows-1255', page.encoding
+    end
   end
 
   def test_encoding_charset_after_title
@@ -106,7 +110,11 @@ class TestMechanizePageLink < Mechanize::TestCase
 
     assert_equal false, page.encoding_error?
 
-    assert_equal 'Shift_JIS', page.encoding
+    if Mechanize.html_parser == Nokogiri::HTML5
+      assert_equal 'UTF-8', page.encoding
+    else
+      assert_equal 'Shift_JIS', page.encoding
+    end
   end
 
   def test_encoding_charset_after_title_bad
@@ -129,7 +137,11 @@ class TestMechanizePageLink < Mechanize::TestCase
 
     assert_equal false, page.encoding_error?
 
-    assert_equal 'SHIFT_JIS', page.encoding
+    if Mechanize.html_parser == Nokogiri::HTML5
+      assert_equal 'UTF-8', page.encoding
+    else
+      assert_equal 'SHIFT_JIS', page.encoding
+    end
   end
 
   def test_encoding_charset_bad
@@ -218,8 +230,13 @@ class TestMechanizePageLink < Mechanize::TestCase
     page.encoding = 'ISO-8859-2'
 
     assert_equal false, page.encoding_error?
-    assert_equal 'ISO-8859-2', page.encoding
-    assert_equal 'ISO-8859-2', page.parser.encoding
+    if Mechanize.html_parser == Nokogiri::HTML5
+      assert_equal 'UTF-8', page.encoding
+      assert_equal 'UTF-8', page.parser.encoding
+    else
+      assert_equal 'ISO-8859-2', page.encoding
+      assert_equal 'ISO-8859-2', page.parser.encoding
+    end
   end
 
   def test_encoding_equals_after_parser
@@ -228,7 +245,11 @@ class TestMechanizePageLink < Mechanize::TestCase
     page.parser
 
     # autodetection sets encoding to windows-1255
-    assert_equal 'windows-1255', page.encoding
+    if Mechanize.html_parser == Nokogiri::HTML5
+      assert_equal 'UTF-8', page.encoding
+    else
+      assert_equal 'windows-1255', page.encoding
+    end
     # believe in yourself, not machine
     assert_equal false, page.encoding_error?
 
@@ -236,8 +257,13 @@ class TestMechanizePageLink < Mechanize::TestCase
     page.encoding = 'ISO-8859-2'
 
     assert_equal false, page.encoding_error?
-    assert_equal 'ISO-8859-2', page.encoding
-    assert_equal 'ISO-8859-2', page.parser.encoding
+    if Mechanize.html_parser == Nokogiri::HTML5
+      assert_equal 'UTF-8', page.encoding
+      assert_equal 'UTF-8', page.parser.encoding
+    else
+      assert_equal 'ISO-8859-2', page.encoding
+      assert_equal 'ISO-8859-2', page.parser.encoding
+    end
   end
 
   def test_frames_with
@@ -349,8 +375,13 @@ class TestMechanizePageLink < Mechanize::TestCase
   def test_page_decoded_with_charset
     page = util_page @body, 'content-type' => 'text/html; charset=EUC-JP'
 
-    assert_equal 'EUC-JP', page.encoding
-    assert_equal 'EUC-JP', page.parser.encoding
+    if Mechanize.html_parser == Nokogiri::HTML5
+      assert_equal 'UTF-8', page.encoding
+      assert_equal 'UTF-8', page.parser.encoding
+    else
+      assert_equal 'EUC-JP', page.encoding
+      assert_equal 'EUC-JP', page.parser.encoding
+    end
   end
 
   def test_form

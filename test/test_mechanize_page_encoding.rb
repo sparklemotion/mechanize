@@ -166,11 +166,19 @@ class TestMechanizePageEncoding < Mechanize::TestCase
     @mech.force_default_encoding = true
     page = util_page
 
-    assert_equal 'Windows-1252', page.encoding
+    if Mechanize.html_parser == Nokogiri::HTML5
+      assert_equal 'UTF-8', page.encoding
+    else
+      assert_equal 'Windows-1252', page.encoding
+    end
 
     page.encoding = 'ISO-8859-2'
 
-    assert_equal 'ISO-8859-2', page.encoding
+    if Mechanize.html_parser == Nokogiri::HTML5
+      assert_equal 'UTF-8', page.encoding
+    else
+      assert_equal 'ISO-8859-2', page.encoding
+    end
   end
 
   def test_parser_encoding_when_searching_elements

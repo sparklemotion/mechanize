@@ -1,12 +1,16 @@
 require 'mechanize'
-require 'ostruct'
 
 # LatestUAFetcher fetches latest user agents from `WhatIsMyBrowser.com`.
 # It can use to update `Mechanize::AGENT_ALIASES`.
 class LatestUAFetcher
   attr_reader :user_agents
 
-  USER_AGENT_TYPES = OpenStruct.new(
+  USER_AGENT_TYPES = Struct.new(
+    :linux_firefox, :mac_firefox, :mac_safari,
+    :windows_chrome, :windows_edge, :windows_firefox,
+    :android, :iphone, :ipad,
+    keyword_init: true,
+  ).new(
     linux_firefox: "Linux Firefox",
     mac_firefox: "Mac Firefox",
     mac_safari: "Mac Safari",

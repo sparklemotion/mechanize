@@ -1,5 +1,10 @@
 # Mechanize CHANGELOG
 
+## next / unreleased
+
+* Updated User-Agent strings to represent modern browser versions. (#679) @takatea
+
+
 ## 2.14.2 / 2026-10-26
 
 ### Security

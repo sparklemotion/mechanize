@@ -22,6 +22,12 @@ task('ssl_cert') do |p|
   sh "rm server.key.org"
 end
 
+desc "Update the browser User-Agent strings in Mechanize::AGENT_ALIASES"
+task :update_user_agents do
+  require_relative "scripts/user_agent_aliases"
+  UserAgentAliases.update
+end
+
 RDoc::Task.new do |rdoc|
   rdoc.main = "README.md"
   rdoc.rdoc_dir = 'doc'
